@@ -26,7 +26,8 @@ class Oneoff < ActiveRecord::Base
         ]
       }
     )
-    self.task_arn = resp.tasks[0].task_arn
+    @task = resp.tasks[0]
+    self.task_arn = @task.task_arn
   end
 
   def run!
@@ -34,7 +35,24 @@ class Oneoff < ActiveRecord::Base
     save!
   end
 
+  def status
+    task.try(:containers).try(:[], 0).try(:last_status)
+  end
+
+  def exit_code
+    task.try(:containers).try(:[], 0).try(:exit_code)
+  end
+
   private
+
+  def task
+    return @task if @task.present?
+    resp = ecs.describe_tasks(
+      cluster: heritage.district.name,
+      tasks: [task_arn]
+    )
+    @task = resp.tasks[0]
+  end
 
   def task_family
     "#{heritage.name}-oneoff"

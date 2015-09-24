@@ -25,14 +25,6 @@ class HeritagesController < ApplicationController
     render status: 204, nothing: true
   end
 
-  def run_task
-    command = params.require(:command)
-    oneoff = @heritage.oneoffs.create(command: command)
-    oneoff.run!
-
-    render json: @heritage
-  end
-
   def set_env_vars
     env_vars = params[:env_vars]
     env_vars.each do |k, v|
