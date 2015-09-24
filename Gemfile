@@ -1,0 +1,32 @@
+source 'https://rubygems.org'
+
+gem 'rails', '4.2.4'
+gem 'pg'
+
+gem 'aws-sdk'
+
+# Use ActiveModel has_secure_password
+gem 'bcrypt', '~> 3.1.7'
+
+gem 'puma'
+gem 'active_model_serializers', "0.10.0.rc2"
+gem 'memoist'
+
+group :development, :test do
+  gem 'pry-rails'
+  gem 'pry-byebug'
+end
+
+group :development do
+  gem 'web-console', '~> 2.0'
+
+  # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
+  gem 'spring'
+  gem 'spring-commands-rspec'
+
+end
+
+group :test do
+  gem 'rspec-rails'
+  gem 'rspec-its'
+end
