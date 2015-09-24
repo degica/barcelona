@@ -1,8 +1,11 @@
 class Oneoff < ActiveRecord::Base
   belongs_to :heritage
   validates :heritage, presence: true
+  validates :command, presence: true
 
-  attr_accessor :command, :env_vars
+  attr_accessor :env_vars
+
+  serialize :command
 
   after_initialize do |oneoff|
     oneoff.env_vars ||= []

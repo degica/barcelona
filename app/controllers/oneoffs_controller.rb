@@ -7,7 +7,7 @@ class OneoffsController < ApplicationController
   end
 
   def create
-    @oneoff = @heritage.oneoffs.create(create_params)
+    @oneoff = @heritage.oneoffs.create!(create_params)
     @oneoff.run!
     render json: @oneoff
   end
