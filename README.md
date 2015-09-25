@@ -74,7 +74,6 @@ Barcelona provides a Restful API
 
 ## TODO
 
-- Auth
 - Logentries integration
 - scheduled tasks(cron integration)
 - interactive command execution
