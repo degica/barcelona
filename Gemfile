@@ -6,7 +6,7 @@ gem 'pg'
 gem 'aws-sdk'
 
 gem 'puma'
-gem 'active_model_serializers', "0.10.0.rc2"
+gem 'active_model_serializers', "0.10.0.rc3"
 gem 'memoist'
 
 group :development, :test do
