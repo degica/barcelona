@@ -5,9 +5,6 @@ gem 'pg'
 
 gem 'aws-sdk'
 
-# Use ActiveModel has_secure_password
-gem 'bcrypt', '~> 3.1.7'
-
 gem 'puma'
 gem 'active_model_serializers', "0.10.0.rc2"
 gem 'memoist'
