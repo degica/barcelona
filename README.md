@@ -55,6 +55,15 @@ Additionally, We also may want another heritage `komoju-core-front` which runs n
 
 ## Usage
 
+### Authentication
+
+Currently only users in `developers` team of `degica` organinzation can login.
+
+1. [Create Github access token](https://github.com/settings/tokens) with permission `read:org`
+2. login by `curl -XPOST -H "X-GitHub-Token: [your GitHub access token]" http://localhost:3000/login`
+  - the response includes barcelona access token: `{"login":"k2nr","token":"24106f22c0b6c0e0a032cb001229c2e9d8009cd7"}`
+3. You can call Barcelona API with the token: `curl -H "X-Barcelona-Token: 24106f22c0b6c0e0a032cb001229c2e9d8009cd7" http://localhost:3000/districts`
+
 ### API
 
 Barcelona provides a Restful API
