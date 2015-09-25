@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150924085338) do
+ActiveRecord::Schema.define(version: 20150925074004) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -32,7 +32,7 @@ ActiveRecord::Schema.define(version: 20150924085338) do
   create_table "env_vars", force: :cascade do |t|
     t.integer "heritage_id"
     t.string  "key"
-    t.string  "value"
+    t.text    "encrypted_value"
   end
 
   add_index "env_vars", ["heritage_id", "key"], name: "index_env_vars_on_heritage_id_and_key", unique: true, using: :btree
