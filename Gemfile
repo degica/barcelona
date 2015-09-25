@@ -8,6 +8,8 @@ gem 'aws-sdk'
 gem 'puma'
 gem 'active_model_serializers', "0.10.0.rc3"
 gem 'memoist'
+gem 'gibberish'
+gem 'octokit'
 
 group :development, :test do
   gem 'pry-rails'

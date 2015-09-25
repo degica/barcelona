@@ -8,4 +8,6 @@ Rails.application.routes.draw do
       resources :oneoffs, only: [:show, :create]
     end
   end
+
+  post "/login", to: "users#login"
 end
