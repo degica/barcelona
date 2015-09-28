@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150925074004) do
+ActiveRecord::Schema.define(version: 20150927012824) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -27,6 +27,7 @@ ActiveRecord::Schema.define(version: 20150925074004) do
     t.string   "docker_registry_url"
     t.datetime "created_at",                 null: false
     t.datetime "updated_at",                 null: false
+    t.string   "private_hosted_zone_id"
   end
 
   create_table "env_vars", force: :cascade do |t|

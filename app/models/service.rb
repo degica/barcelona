@@ -91,7 +91,7 @@ class Service < ActiveRecord::Base
   def create_load_balancer
     subnets = district.subnets(public? ? 'Public' : 'Private')
     security_group = public? ? district.public_elb_security_group : district.private_elb_security_group
-    elb.create_load_balancer(
+    load_balancer = elb.create_load_balancer(
       load_balancer_name: service_name,
       subnets: subnets.map(&:subnet_id),
       scheme: public? ? 'internet-facing' : 'internal',
@@ -124,6 +124,7 @@ class Service < ActiveRecord::Base
         }
       }
     )
+    change_elb_record_set("CREATE", load_balancer.dns_name)
   end
 
   def container_definition(image_path)
@@ -147,12 +148,37 @@ class Service < ActiveRecord::Base
   def delete_service
     return unless applied?
     scale(0)
+    dns_name = fetch_load_balancer.dns_name
     lb_names = fetch_me.load_balancers.map(&:load_balancer_name)
 
     ecs.delete_service(cluster: district.name, service: service_name)
     lb_names.each do |name|
       elb.delete_load_balancer(load_balancer_name: name)
     end
+    change_elb_record_set("DELETE", dns_name)
+  end
+
+  def change_elb_record_set(action, elb_dns_name)
+    route53.change_resource_record_sets(
+      hosted_zone_id: district.private_hosted_zone_id,
+      change_batch: {
+        changes: [
+          {
+            action: action,
+            resource_record_set: {
+              name: [name, heritage.name, "barcelona.local."].join("."),
+              type: "CNAME",
+              ttl: 300,
+              resource_records: [
+                {
+                  value: elb_dns_name
+                }
+              ]
+            }
+          }
+        ]
+      }
+    )
   end
 
   def fetch_me
@@ -182,5 +208,9 @@ class Service < ActiveRecord::Base
     Aws::ElasticLoadBalancing::Client.new
   end
 
-  memoize :ecs, :elb, :load_balancers, :fetch_me
+  def route53
+    Aws::Route53::Client.new
+  end
+
+  memoize :ecs, :elb, :route53, :load_balancers, :fetch_me
 end

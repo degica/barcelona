@@ -5,7 +5,10 @@ class District < ActiveRecord::Base
   after_destroy :delete_ecs_cluster
 
   has_many :heritages, dependent: :destroy
+
   validates :name, presence: true
+  validates :vpc_id, presence: true
+  validates :private_hosted_zone_id, presence: true
 
   def to_param
     name
@@ -23,7 +26,7 @@ class District < ActiveRecord::Base
   private
 
   def create_ecs_cluster
-#    ecs.create_cluster(cluster_name: name)
+    ecs.create_cluster(cluster_name: name)
   end
 
   def delete_ecs_cluster
