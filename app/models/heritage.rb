@@ -1,7 +1,7 @@
 class Heritage < ActiveRecord::Base
   has_many :services, dependent: :destroy
   has_many :env_vars, dependent: :destroy
-  has_many :oneoffs
+  has_many :oneoffs, dependent: :destroy
   belongs_to :district
 
   validates :name, presence: true, uniqueness: true
