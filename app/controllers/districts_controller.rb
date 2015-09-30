@@ -17,11 +17,13 @@ class DistrictsController < ApplicationController
 
   def update
     @district.update!(update_params)
+    render json: @district
   end
 
   def launch_instances
     count = params.require(:count)
     @district.launch_instances(count: count)
+    render status: 204, nothing: true
   end
 
   def destroy
