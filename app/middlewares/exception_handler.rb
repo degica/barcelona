@@ -69,7 +69,11 @@ class ExceptionHandler
       raise InternalServerError
     end
   rescue ExceptionHandler::Exception => e
-    debug = Rails.env.development?
+    debug = Rails.env.development? || query_parameters(env)["debug"] == "true"
     e.to_rack_response(debug)
+  end
+
+  def query_parameters(env)
+    Hash[env["QUERY_STRING"].split('&').map{ |s| s.split("=") }]
   end
 end
