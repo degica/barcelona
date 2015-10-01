@@ -8,16 +8,17 @@ class OneoffsController < ApplicationController
 
   def create
     @oneoff = @heritage.oneoffs.create!(create_params)
-    @oneoff.run!
+    sync = params[:sync] || false
+    @oneoff.run!(sync: sync)
     render json: @oneoff
   end
 
   private
 
   def create_params
-    params.permit [
+    params.permit(
       command: []
-    ].tap do |whitelisted|
+    ).tap do |whitelisted|
       whitelisted[:env_vars] = params[:env_vars]
     end
   end

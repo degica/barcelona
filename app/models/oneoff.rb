@@ -11,7 +11,7 @@ class Oneoff < ActiveRecord::Base
     oneoff.env_vars ||= []
   end
 
-  def run
+  def run(sync: false)
     ecs.register_task_definition(
       family: task_family,
       container_definitions: [task_definition]
@@ -31,10 +31,21 @@ class Oneoff < ActiveRecord::Base
     )
     @task = resp.tasks[0]
     self.task_arn = @task.task_arn
+    if sync
+      100.times do
+        break unless running?
+        sleep 3
+      end
+    end
   end
 
-  def run!
-    run
+  def running?
+    fetch_task
+    !(["STOPPED", "MISSING"].include?(status))
+  end
+
+  def run!(sync: false)
+    run(sync: sync)
     save!
   end
 
@@ -50,11 +61,14 @@ class Oneoff < ActiveRecord::Base
 
   def task
     return @task if @task.present?
-    resp = ecs.describe_tasks(
+    fetch_task
+  end
+
+  def fetch_task
+    @task = ecs.describe_tasks(
       cluster: heritage.district.name,
       tasks: [task_arn]
-    )
-    @task = resp.tasks[0]
+    ).tasks[0]
   end
 
   def task_family
