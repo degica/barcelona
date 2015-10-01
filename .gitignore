@@ -10,3 +10,4 @@ vendor/bundle
 .DS_Store
 .idea
 .secret
+.env

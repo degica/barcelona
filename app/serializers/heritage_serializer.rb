@@ -1,5 +1,5 @@
 class HeritageSerializer < ActiveModel::Serializer
-  attributes :name, :container_name, :container_tag, :env_vars
+  attributes :name, :container_name, :container_tag, :env_vars, :before_deploy
 
   has_many :services
   belongs_to :district

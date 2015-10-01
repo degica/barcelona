@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151001060655) do
+ActiveRecord::Schema.define(version: 20151001075024) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -40,7 +40,6 @@ ActiveRecord::Schema.define(version: 20151001060655) do
     t.string   "instance_security_group"
     t.string   "ecs_service_role"
     t.string   "ecs_instance_role"
-    t.string   "docker_registry_url"
     t.datetime "created_at",                 null: false
     t.datetime "updated_at",                 null: false
     t.string   "private_hosted_zone_id"
@@ -63,6 +62,7 @@ ActiveRecord::Schema.define(version: 20151001060655) do
     t.integer  "district_id"
     t.datetime "created_at",     null: false
     t.datetime "updated_at",     null: false
+    t.text     "before_deploy"
   end
 
   add_index "heritages", ["district_id"], name: "index_heritages_on_district_id", using: :btree
