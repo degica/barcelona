@@ -22,18 +22,16 @@ class Heritage < ActiveRecord::Base
     ).services
   end
 
-  def container_image_path
+  def image_path
     return nil if container_name.blank?
-    path = "#{container_name}:#{container_tag}"
-    url = district.docker_registry_url
-    url.present? ? "#{url}/#{path}" : path
+    "#{container_name}:#{container_tag}"
   end
 
   def update_services
-    return if container_image_path.nil?
+    return if image_path.nil?
     services.each do |service|
       Rails.logger.info "Updating service #{service.name} ..."
-      service.apply_to_ecs(container_image_path)
+      service.apply_to_ecs(image_path)
     end
   end
 

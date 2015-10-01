@@ -81,7 +81,7 @@ class Oneoff < ActiveRecord::Base
       cpu: 128,
       memory: 128,
       essential: true,
-      image: heritage.container_image_path,
+      image: heritage.image_path,
       environment: heritage.env_vars.map { |e| {name: e.key, value: e.value} }
     }.compact
   end
