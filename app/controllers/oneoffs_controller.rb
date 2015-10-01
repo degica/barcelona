@@ -16,9 +16,10 @@ class OneoffsController < ApplicationController
 
   def create_params
     params.permit [
-      :env_vars,
       command: []
-    ]
+    ].tap do |whitelisted|
+      whitelisted[:env_vars] = params[:env_vars]
+    end
   end
 
   def load_heritage
