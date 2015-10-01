@@ -12,6 +12,7 @@ gem 'active_model_serializers', "0.10.0.rc3"
 gem 'memoist'
 gem 'gibberish'
 gem 'octokit'
+gem 'delayed_job_active_record'
 
 group :development, :test do
   gem 'pry-rails'
