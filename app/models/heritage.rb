@@ -29,10 +29,7 @@ class Heritage < ActiveRecord::Base
 
   def update_services
     return if image_path.nil?
-    services.each do |service|
-      Rails.logger.info "Updating service #{service.name} ..."
-      service.apply_to_ecs(image_path)
-    end
+    DeployRunnerJob.perform_later self
   end
 
   private
