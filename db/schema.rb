@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151001075024) do
+ActiveRecord::Schema.define(version: 20151002043100) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -55,6 +55,18 @@ ActiveRecord::Schema.define(version: 20151001075024) do
   add_index "env_vars", ["heritage_id", "key"], name: "index_env_vars_on_heritage_id_and_key", unique: true, using: :btree
   add_index "env_vars", ["heritage_id"], name: "index_env_vars_on_heritage_id", using: :btree
 
+  create_table "events", force: :cascade do |t|
+    t.string   "uuid"
+    t.integer  "heritage_id"
+    t.text     "message"
+    t.string   "level"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+  end
+
+  add_index "events", ["heritage_id"], name: "index_events_on_heritage_id", using: :btree
+  add_index "events", ["uuid"], name: "index_events_on_uuid", unique: true, using: :btree
+
   create_table "heritages", force: :cascade do |t|
     t.string   "name",           null: false
     t.string   "container_name"
@@ -63,6 +75,7 @@ ActiveRecord::Schema.define(version: 20151001075024) do
     t.datetime "created_at",     null: false
     t.datetime "updated_at",     null: false
     t.text     "before_deploy"
+    t.text     "slack_url"
   end
 
   add_index "heritages", ["district_id"], name: "index_heritages_on_district_id", using: :btree
@@ -114,6 +127,7 @@ ActiveRecord::Schema.define(version: 20151001075024) do
   add_index "users", ["token_hash"], name: "index_users_on_token_hash", unique: true, using: :btree
 
   add_foreign_key "env_vars", "heritages"
+  add_foreign_key "events", "heritages"
   add_foreign_key "heritages", "districts"
   add_foreign_key "oneoffs", "heritages"
   add_foreign_key "port_mappings", "services"
