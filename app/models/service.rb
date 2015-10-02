@@ -61,8 +61,7 @@ class Service < ActiveRecord::Base
   end
 
   def applied?
-    me = fetch_me
-    !(me.nil? || me.status != "ACTIVE")
+    !(ecs_service.nil? || ecs_service.status != "ACTIVE")
   end
 
   def load_balancers
@@ -149,7 +148,7 @@ class Service < ActiveRecord::Base
     return unless applied?
     scale(0)
     dns_name = fetch_load_balancer.dns_name
-    lb_names = fetch_me.load_balancers.map(&:load_balancer_name)
+    lb_names = ecs_service.load_balancers.map(&:load_balancer_name)
 
     ecs.delete_service(cluster: district.name, service: service_name)
     lb_names.each do |name|
@@ -181,15 +180,18 @@ class Service < ActiveRecord::Base
     )
   end
 
-  def fetch_me
-    ecs.describe_services(cluster: district.name, services: [service_name]).services.first
+  def ecs_service
+    @ecs_service ||= fetch_ecs_service
+  end
+
+  def fetch_ecs_service
+    @ecs_service = ecs.describe_services(cluster: district.name, services: [service_name]).services.first
   end
 
   def status
-    me = fetch_me
-    return :not_created if me.nil?
-    deployment_statuses = me.deployments.map(&:status)
-    if me.status != "ACTIVE"
+    return :not_created if ecs_service.nil?
+    deployment_statuses = ecs_service.deployments.map(&:status)
+    if ecs_service.status != "ACTIVE"
       :inactive
     elsif deployment_statuses.include? "ACTIVE"
       :deploying
@@ -212,5 +214,5 @@ class Service < ActiveRecord::Base
     Aws::Route53::Client.new
   end
 
-  memoize :ecs, :elb, :route53, :load_balancers, :fetch_me
+  memoize :ecs, :elb, :route53, :load_balancers
 end
