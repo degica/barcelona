@@ -74,6 +74,7 @@ class HeritagesController < ApplicationController
         :name,
         :cpu,
         :memory,
+        :command,
         :public,
         {
           port_mappings: [:lb_port, :container_port]
