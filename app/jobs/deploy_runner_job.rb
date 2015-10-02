@@ -18,6 +18,7 @@ class DeployRunnerJob < ActiveJob::Base
     heritage.services.each do |service|
       Rails.logger.info "Updating service #{service.service_name} ..."
       service.apply_to_ecs(heritage.image_path)
+      MonitorDeploymentJob.perform_later(service)
     end
   end
 end
