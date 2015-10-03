@@ -49,14 +49,15 @@ class Service < ActiveRecord::Base
         task_definition: service_name
       )
     else
-      ecs.create_service(
+      params = {
         cluster: district.name,
         service_name: service_name,
         task_definition: service_name,
-        load_balancers: load_balancers,
-        role: "ecsServiceRole",
+        load_balancers: load_balancers.presence,
+        role: district.ecs_service_role,
         desired_count: 1
-      )
+      }.compact
+      ecs.create_service(params)
     end
   end
 
