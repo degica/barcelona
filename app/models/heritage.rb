@@ -11,6 +11,7 @@ class Heritage < ActiveRecord::Base
   validates :district, presence: true
 
   accepts_nested_attributes_for :services
+  accepts_nested_attributes_for :env_vars
 
   after_save :update_services
 
