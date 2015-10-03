@@ -57,6 +57,10 @@ class Oneoff < ActiveRecord::Base
     task.try(:containers).try(:[], 0).try(:exit_code)
   end
 
+  def reason
+    task.try(:containers).try(:[], 0).try(:reason)
+  end
+
   private
 
   def task
