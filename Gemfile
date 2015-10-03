@@ -13,7 +13,7 @@ gem 'memoist'
 gem 'gibberish'
 gem 'octokit'
 gem 'delayed_job_active_record'
-gem 'rails_12factor'
+gem 'rails_12factor', group: :production
 gem 'slack-notifier'
 
 group :development, :test do
