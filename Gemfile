@@ -20,6 +20,7 @@ group :development, :test do
   gem 'pry-rails'
   gem 'pry-byebug'
   gem 'dotenv-rails'
+  gem 'sqlite3'
 end
 
 group :development do
