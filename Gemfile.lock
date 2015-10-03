@@ -158,6 +158,7 @@ GEM
     sawyer (0.6.0)
       addressable (~> 2.3.5)
       faraday (~> 0.8, < 0.10)
+    slack-notifier (1.3.1)
     slop (3.6.0)
     spring (1.3.6)
     spring-commands-rspec (1.0.4)
@@ -197,6 +198,7 @@ DEPENDENCIES
   rails_12factor
   rspec-its
   rspec-rails
+  slack-notifier
   spring
   spring-commands-rspec
   web-console (~> 2.0)

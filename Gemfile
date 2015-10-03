@@ -14,6 +14,7 @@ gem 'gibberish'
 gem 'octokit'
 gem 'delayed_job_active_record'
 gem 'rails_12factor'
+gem 'slack-notifier'
 
 group :development, :test do
   gem 'pry-rails'

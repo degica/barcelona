@@ -2,6 +2,7 @@ class Heritage < ActiveRecord::Base
   has_many :services, dependent: :destroy
   has_many :env_vars, dependent: :destroy
   has_many :oneoffs, dependent: :destroy
+  has_many :events, dependent: :destroy
   belongs_to :district
 
   serialize :before_deploy

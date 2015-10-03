@@ -68,6 +68,7 @@ class HeritagesController < ApplicationController
       :name,
       :container_name,
       :container_tag,
+      :slack_url,
       before_deploy: [],
       services: [
         :name,
