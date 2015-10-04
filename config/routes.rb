@@ -4,7 +4,7 @@ Rails.application.routes.draw do
       post :launch_instances
     end
 
-    resources :heritages, except: [:new, :edit] do
+    resources :heritages, shallow: true, except: [:new, :edit] do
       post   :env_vars, on: :member, to: "heritages#set_env_vars"
       delete :env_vars, on: :member, to: "heritages#delete_env_vars"
 
