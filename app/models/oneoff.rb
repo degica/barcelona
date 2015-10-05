@@ -32,7 +32,7 @@ class Oneoff < ActiveRecord::Base
     @task = resp.tasks[0]
     self.task_arn = @task.task_arn
     if sync
-      100.times do
+      300.times do
         break unless running?
         sleep 3
       end
@@ -55,6 +55,10 @@ class Oneoff < ActiveRecord::Base
 
   def exit_code
     task.try(:containers).try(:[], 0).try(:exit_code)
+  end
+
+  def reason
+    task.try(:containers).try(:[], 0).try(:reason)
   end
 
   private

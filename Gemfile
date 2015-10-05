@@ -13,13 +13,14 @@ gem 'memoist'
 gem 'gibberish'
 gem 'octokit'
 gem 'delayed_job_active_record'
-gem 'rails_12factor'
+gem 'rails_12factor', group: :production
 gem 'slack-notifier'
 
 group :development, :test do
   gem 'pry-rails'
   gem 'pry-byebug'
   gem 'dotenv-rails'
+  gem 'sqlite3'
 end
 
 group :development do

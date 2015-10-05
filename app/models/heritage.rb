@@ -5,12 +5,15 @@ class Heritage < ActiveRecord::Base
   has_many :events, dependent: :destroy
   belongs_to :district
 
+  attr_accessor :sync
+
   serialize :before_deploy
 
   validates :name, presence: true, uniqueness: true
   validates :district, presence: true
 
   accepts_nested_attributes_for :services
+  accepts_nested_attributes_for :env_vars
 
   after_save :update_services
 
@@ -32,7 +35,11 @@ class Heritage < ActiveRecord::Base
 
   def update_services
     return if image_path.nil?
-    DeployRunnerJob.perform_later self
+    if sync
+      DeployRunnerJob.perform_now self, sync: true
+    else
+      DeployRunnerJob.perform_later self
+    end
   end
 
   private

@@ -4,6 +4,8 @@ class Service < ActiveRecord::Base
   belongs_to :heritage
   has_many :port_mappings, dependent: :destroy
 
+  serialize :command
+
   validates :name, presence: true
   validates :cpu, numericality: {greater_than: 0}
   validates :memory, numericality: {greater_than: 0}
@@ -49,14 +51,17 @@ class Service < ActiveRecord::Base
         task_definition: service_name
       )
     else
-      ecs.create_service(
+      params = {
         cluster: district.name,
         service_name: service_name,
         task_definition: service_name,
-        load_balancers: load_balancers,
-        role: "ecsServiceRole",
         desired_count: 1
-      )
+      }
+      if (lbs = load_balancers).present?
+        params[:load_balancers] = lbs
+        params[:role] = district.ecs_service_role
+      end
+      ecs.create_service(params)
     end
   end
 
@@ -133,7 +138,7 @@ class Service < ActiveRecord::Base
       memory: memory,
       essential: true,
       image: image_path,
-      command: command.present? ? [command] : nil,
+      command: command,
       port_mappings: port_mappings.map{ |m|
         {
           container_port: m.container_port,
