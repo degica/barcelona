@@ -66,8 +66,8 @@ class HeritagesController < ApplicationController
   def create_params
     permitted = params.permit [
       :name,
-      :container_name,
-      :container_tag,
+      :image_name,
+      :image_tag,
       :slack_url,
       before_deploy: [],
       services: [

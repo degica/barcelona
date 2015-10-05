@@ -58,8 +58,8 @@ namespace :bcn do
 
     heritage = district.heritages.create!(
       name: "barcelona",
-      container_name: docker_image_name,
-      container_tag: "self-hosting"
+      image_name: docker_image_name,
+      image_tag: "self-hosting"
     )
 
     oneoff = heritage.oneoffs.create(
