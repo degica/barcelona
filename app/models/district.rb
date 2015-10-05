@@ -42,6 +42,37 @@ class District < ActiveRecord::Base
     )
   end
 
+  def container_instances
+    arns = ecs.list_container_instances(cluster: name).container_instance_arns
+    container_instances = ecs.describe_container_instances(cluster: name,
+                                                           container_instances: arns)
+                          .container_instances
+    instances = {}
+    container_instances.each do |ci|
+      instance = {
+        status: ci.status,
+        container_instance_arn: ci.container_instance_arn,
+        remaining_resources: ci.remaining_resources,
+        registered_resources: ci.registered_resources,
+        running_tasks_count: ci.running_tasks_count,
+        pending_tasks_count: ci.pending_tasks_count
+      }
+      instances[ci.ec2_instance_id] = instance
+    end
+
+    ec2_instances = ec2.describe_instances(
+      instance_ids: container_instances.map(&:ec2_instance_id)
+    ).reservations.map(&:instances).flatten
+
+    ec2_instances.each do |ins|
+      instances[ins.instance_id].merge!(
+        private_ip_address: ins.private_ip_address
+      )
+    end
+
+    instances.map { |ec2_id, ins| ins.merge(ec2_instance_id: ec2_id) }
+  end
+
   private
 
   def update_ecs_config
