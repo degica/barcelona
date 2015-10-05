@@ -1,5 +1,3 @@
-require 'dotenv'
-
 namespace :bcn do
   def user_input(desc, default_value: nil)
     default_desc = default_value.nil? ? "" : "[#{default_value}]"
@@ -9,6 +7,8 @@ namespace :bcn do
   end
 
   task :prepare_self_deploy do
+    require 'dotenv'
+
     ENV["RAILS_ENV"] = 'self_hosting'
     Dotenv.load('.env.self_hosting')
     Rake::Task["db:setup"].invoke
