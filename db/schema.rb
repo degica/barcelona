@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151003060822) do
+ActiveRecord::Schema.define(version: 20151005033551) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -68,12 +68,12 @@ ActiveRecord::Schema.define(version: 20151003060822) do
   add_index "events", ["uuid"], name: "index_events_on_uuid", unique: true, using: :btree
 
   create_table "heritages", force: :cascade do |t|
-    t.string   "name",           null: false
-    t.string   "container_name"
-    t.string   "container_tag"
+    t.string   "name",          null: false
+    t.string   "image_name"
+    t.string   "image_tag"
     t.integer  "district_id"
-    t.datetime "created_at",     null: false
-    t.datetime "updated_at",     null: false
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
     t.text     "before_deploy"
     t.text     "slack_url"
   end

@@ -29,8 +29,8 @@ class Heritage < ActiveRecord::Base
   end
 
   def image_path
-    return nil if container_name.blank?
-    "#{container_name}:#{container_tag}"
+    return nil if image_name.blank?
+    "#{image_name}:#{image_tag}"
   end
 
   def update_services
