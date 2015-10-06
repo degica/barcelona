@@ -4,5 +4,10 @@ cache:
   - bundler
 rvm:
   - 2.2.3
+addons:
+  postgresql: "9.4"
+before_script:
+  - psql -c 'create database travis_ci_test;' -U postgres
+  - cp config/database.travis.yml config/database.yml
 script:
   - bundle exec rake spec
