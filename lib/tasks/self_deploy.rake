@@ -59,7 +59,7 @@ namespace :bcn do
     heritage = district.heritages.create!(
       name: "barcelona",
       image_name: docker_image_name,
-      image_tag: "self-hosting"
+      image_tag: "latest"
     )
 
     oneoff = heritage.oneoffs.create(
@@ -105,8 +105,8 @@ namespace :bcn do
     district.heritages.create!(
       sync: true,
       name: "barcelona",
-      container_name: ENV["DOCKER_IMAGE_NAME"],
-      container_tag: "self-hosting",
+      image_name: ENV["DOCKER_IMAGE_NAME"],
+      image_tag: "latest",
       before_deploy: ["rake", "db:migrate"],
       env_vars_attributes: [
         {key: "AWS_REGION", value: ENV["AWS_REGION"]},
