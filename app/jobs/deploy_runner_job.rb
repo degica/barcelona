@@ -1,7 +1,7 @@
 class DeployRunnerJob < ActiveJob::Base
   queue_as :default
 
-  def perform(heritage, sync: false)
+  def perform(heritage)
     heritage.events.create(level: :good, message: "Deploying...")
     before_deploy = heritage.before_deploy
     if before_deploy.present?
@@ -21,11 +21,7 @@ class DeployRunnerJob < ActiveJob::Base
     end
 
     heritage.services.each do |service|
-      if sync
-        MonitorDeploymentJob.perform_now(service)
-      else
-        MonitorDeploymentJob.perform_later(service)
-      end
+      MonitorDeploymentJob.perform_later(service)
     end
   end
 end

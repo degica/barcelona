@@ -88,6 +88,7 @@ namespace :bcn do
   desc "Deploy Barcelona to the specified ECS cluster(remote)"
   task :self_deploy_remote => :environment do
     Rake::Task["db:setup"].invoke
+    Delayed::Worker.delay_jobs = false
     district = District.create!(
       name:   ENV["DISTRICT_NAME"],
       vpc_id: ENV["VPC_ID"],
@@ -103,7 +104,6 @@ namespace :bcn do
     ENV["ENCRYPTION_KEY"] = SecureRandom.hex(64)
 
     district.heritages.create!(
-      sync: true,
       name: "barcelona",
       image_name: ENV["DOCKER_IMAGE_NAME"],
       image_tag: "latest",
