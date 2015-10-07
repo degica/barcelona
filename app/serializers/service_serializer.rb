@@ -1,5 +1,5 @@
 class ServiceSerializer < ActiveModel::Serializer
-  attributes :name, :command, :cpu, :memory, :load_balancer, :status, :slack_url
+  attributes :name, :command, :cpu, :memory, :load_balancer, :status
 
   belongs_to :heritage
 
