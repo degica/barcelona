@@ -9,7 +9,7 @@ class MonitorDeploymentJob < ActiveJob::Base
       # deploys not finished after 1000 seconds are marked as timeout
       service.heritage.events.create!(level: :error, message: "Deploying #{service.service_name} timed out")
     else
-      MonitorDeploymentJob.set(wait: 5.seconds).perform_later(service, count + 1)
+      MonitorDeploymentJob.set(wait: 5.seconds).perform_later(service, count: count + 1)
     end
   end
 end
