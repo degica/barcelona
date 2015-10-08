@@ -47,7 +47,8 @@ class DistrictsController < ApplicationController
       :ecs_service_role,
       :ecs_instance_role,
       :private_hosted_zone_id,
-      :s3_bucket_name
+      :s3_bucket_name,
+      :logentries_token
     ).tap do |whitelisted|
       whitelisted[:dockercfg] = params[:dockercfg] if params[:dockercfg].present?
     end

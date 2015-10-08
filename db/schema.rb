@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151005033551) do
+ActiveRecord::Schema.define(version: 20151008084738) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -44,6 +44,7 @@ ActiveRecord::Schema.define(version: 20151005033551) do
     t.datetime "updated_at",                 null: false
     t.string   "private_hosted_zone_id"
     t.string   "s3_bucket_name"
+    t.string   "logentries_token"
   end
 
   create_table "env_vars", force: :cascade do |t|
