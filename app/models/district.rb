@@ -88,11 +88,20 @@ class District < ActiveRecord::Base
   end
 
   def instance_user_data
-    user_data = [
-      "#!/bin/bash",
-      "yum install -y aws-cli",
-      "aws s3 cp s3://#{s3_bucket_name}/#{name}/ecs.config /etc/ecs/ecs.config"
-    ].join("\n")
+    user_data = <<EOS
+#!/bin/bash
+yum install -y aws-cli
+aws s3 cp s3://#{s3_bucket_name}/#{name}/ecs.config /etc/ecs/ecs.config
+
+cat <<EOF > /etc/sysconfig/docker
+OPTIONS="--log-driver=syslog --log-opt syslog-address=tcp://127.0.0.1:514"
+EOF
+service docker restart
+
+PRIVATE_IP=`curl http://169.254.169.254/latest/meta-data/local-ipv4`
+docker run -d --name="logger" -p 514:514 -v /var/log:/var/log -e "LE_TOKEN=#{logentries_token}" -e "SYSLOG_HOSTNAME=$PRIVATE_IP" k2nr/rsyslog-logentries
+start ecs
+EOS
     Base64.encode64(user_data)
   end
 
@@ -100,7 +109,8 @@ class District < ActiveRecord::Base
     {
       "ECS_CLUSTER" => name,
       "ECS_ENGINE_AUTH_TYPE" => "dockercfg",
-      "ECS_ENGINE_AUTH_DATA" => dockercfg.to_json
+      "ECS_ENGINE_AUTH_DATA" => dockercfg.to_json,
+      "ECS_AVAILABLE_LOGGING_DRIVERS" => '["json-file", "syslog", "fluentd"]'
     }.map {|k, v| "#{k}=#{v}"}.join("\n")
   end
 
