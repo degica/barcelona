@@ -28,7 +28,7 @@ class District < ActiveRecord::Base
 
   def launch_instances(count: 1)
     ec2.run_instances(
-      image_id: 'ami-ce2ba4ce', # amzn-ami-2015.03.g-amazon-ecs-optimized
+      image_id: 'ami-6e920b6e', # amzn-ami-2015.09.a-amazon-ecs-optimized
       min_count: count,
       max_count: count,
       key_name: 'kkajihiro',
