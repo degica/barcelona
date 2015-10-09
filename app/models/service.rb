@@ -145,7 +145,14 @@ class Service < ActiveRecord::Base
           host_port: m.host_port
         }
       },
-      environment: heritage.env_vars.map { |e| {name: e.key, value: e.value} }
+      environment: heritage.env_vars.map { |e| {name: e.key, value: e.value} },
+      log_configuration: {
+        log_driver: "syslog",
+        options: {
+          "syslog-address" => "tcp://127.0.0.1:514",
+          "syslog-tag" => name
+        }
+      }
     }.compact
   end
 
