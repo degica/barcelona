@@ -99,7 +99,7 @@ EOF
 service docker restart
 
 PRIVATE_IP=`curl http://169.254.169.254/latest/meta-data/local-ipv4`
-docker run -d --name="logger" -p 514:514 -v /var/log:/var/log -e "LE_TOKEN=#{logentries_token}" -e "SYSLOG_HOSTNAME=$PRIVATE_IP" k2nr/rsyslog-logentries
+docker run -d --restart=always --name="logger" -p 514:514 -v /var/log:/var/log -e "LE_TOKEN=#{logentries_token}" -e "SYSLOG_HOSTNAME=$PRIVATE_IP" k2nr/rsyslog-logentries
 start ecs
 EOS
     Base64.encode64(user_data)
