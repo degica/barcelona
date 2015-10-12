@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151008084738) do
+ActiveRecord::Schema.define(version: 20151012052928) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -127,10 +127,22 @@ ActiveRecord::Schema.define(version: 20151008084738) do
   add_index "users", ["name"], name: "index_users_on_name", unique: true, using: :btree
   add_index "users", ["token_hash"], name: "index_users_on_token_hash", unique: true, using: :btree
 
+  create_table "users_districts", force: :cascade do |t|
+    t.integer  "user_id"
+    t.integer  "district_id"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+  end
+
+  add_index "users_districts", ["district_id"], name: "index_users_districts_on_district_id", using: :btree
+  add_index "users_districts", ["user_id"], name: "index_users_districts_on_user_id", using: :btree
+
   add_foreign_key "env_vars", "heritages"
   add_foreign_key "events", "heritages"
   add_foreign_key "heritages", "districts"
   add_foreign_key "oneoffs", "heritages"
   add_foreign_key "port_mappings", "services"
   add_foreign_key "services", "heritages"
+  add_foreign_key "users_districts", "districts"
+  add_foreign_key "users_districts", "users"
 end

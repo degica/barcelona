@@ -8,6 +8,8 @@ class District < ActiveRecord::Base
   after_destroy :delete_ecs_cluster
 
   has_many :heritages, dependent: :destroy
+  has_many :users_districts
+  has_many :users, through: :users_districts
 
   validates :name, presence: true
   validates :vpc_id, presence: true

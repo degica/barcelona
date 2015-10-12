@@ -1,7 +1,11 @@
 class User < ActiveRecord::Base
   ALLOWED_TEAM = {org: 'degica', team: 'developers'}
+  has_many :users_districts
+  has_many :districts, through: :users_districts
 
   attr_accessor :token
+
+  before_validation :assign_all_districts
 
   def self.login!(github_token)
     client = Octokit::Client.new(access_token: github_token)
@@ -25,5 +29,11 @@ class User < ActiveRecord::Base
     self.token = SecureRandom.hex(20)
     self.token_hash = Gibberish::SHA256(self.token)
     save!
+  end
+
+  private
+
+  def assign_all_districts
+    self.districts << District.all
   end
 end
