@@ -9,4 +9,17 @@ class UsersController < ApplicationController
       format.json { render json: {"login" => user.name, "token" => user.token}}
     end
   end
+
+  def update
+    current_user.update(update_params)
+    render json: current_user
+  end
+
+  private
+
+  def update_params
+    params.permit [
+      :public_key
+    ]
+  end
 end

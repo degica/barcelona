@@ -14,4 +14,5 @@ Rails.application.routes.draw do
   end
 
   post "/login", to: "users#login"
+  patch "/user", to: "users#update"
 end
