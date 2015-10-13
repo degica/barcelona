@@ -5,6 +5,8 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :null_session
   before_action :authenticate
 
+  attr_accessor :current_user
+
   def authenticate
     @current_user = User.find_by_token(request.headers['HTTP_X_BARCELONA_TOKEN'])
     raise "user not found" if @current_user.blank?
