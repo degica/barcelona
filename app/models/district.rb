@@ -8,6 +8,8 @@ class District < ActiveRecord::Base
   after_destroy :delete_ecs_cluster
 
   has_many :heritages, dependent: :destroy
+  has_many :users_districts
+  has_many :users, through: :users_districts
 
   validates :name, presence: true
   validates :vpc_id, presence: true
@@ -73,6 +75,14 @@ class District < ActiveRecord::Base
     instances.map { |ec2_id, ins| ins.merge(ec2_instance_id: ec2_id) }
   end
 
+  def update_instance_user_account(user)
+    s3.put_object(bucket: s3_bucket_name,
+                  key: "#{name}/users",
+                  body: users_body,
+                  server_side_encryption: "AES256")
+    UpdateUserTask.new(self, user).run
+  end
+
   private
 
   def update_ecs_config
@@ -100,6 +110,14 @@ service docker restart
 
 PRIVATE_IP=`curl http://169.254.169.254/latest/meta-data/local-ipv4`
 docker run -d --restart=always --name="logger" -p 514:514 -v /var/log:/var/log -e "LE_TOKEN=#{logentries_token}" -e "SYSLOG_HOSTNAME=$PRIVATE_IP" k2nr/rsyslog-logentries
+
+aws s3 cp s3://#{s3_bucket_name}/#{name}/users ./users
+echo >> ./users
+while IFS=, read name pub
+do
+  docker run --rm -v /etc:/etc -v /home:/home -e "USER_NAME=$name" -e "USER_PUBLIC_KEY=$pub" k2nr/docker-user-manager
+done < ./users
+rm ./users
 start ecs
 EOS
     Base64.encode64(user_data)
@@ -112,6 +130,10 @@ EOS
       "ECS_ENGINE_AUTH_DATA" => dockercfg.to_json,
       "ECS_AVAILABLE_LOGGING_DRIVERS" => '["json-file", "syslog", "fluentd"]'
     }.map {|k, v| "#{k}=#{v}"}.join("\n")
+  end
+
+  def users_body
+    users.map{|u| "#{u.name},#{u.public_key}"}.join("\n")
   end
 
   def delete_ecs_cluster
