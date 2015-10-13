@@ -15,4 +15,5 @@ Rails.application.routes.draw do
 
   post "/login", to: "users#login"
   patch "/user", to: "users#update"
+  get "/user", to: "users#show"
 end
