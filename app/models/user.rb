@@ -42,8 +42,10 @@ class User < ActiveRecord::Base
   end
 
   def update_instance_user_account
-    districts.each do |district|
-      district.update_instance_user_account(self)
+    if public_key.present? && public_key_changed?
+      districts.each do |district|
+        district.update_instance_user_account(self)
+      end
     end
   end
 end
