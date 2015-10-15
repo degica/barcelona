@@ -159,14 +159,15 @@ class Service < ActiveRecord::Base
   def delete_service
     return unless applied?
     scale(0)
-    dns_name = fetch_load_balancer.dns_name
     lb_names = ecs_service.load_balancers.map(&:load_balancer_name)
 
     ecs.delete_service(cluster: district.name, service: service_name)
     lb_names.each do |name|
       elb.delete_load_balancer(load_balancer_name: name)
     end
-    change_elb_record_set("DELETE", dns_name)
+
+    dns_name = fetch_load_balancer.try(:dns_name)
+    change_elb_record_set("DELETE", dns_name) if dns_name.present?
   end
 
   def change_elb_record_set(action, elb_dns_name)
