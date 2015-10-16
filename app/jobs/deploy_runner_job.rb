@@ -8,10 +8,10 @@ class DeployRunnerJob < ActiveJob::Base
       oneoff = heritage.oneoffs.create!(command: before_deploy)
       oneoff.run!(sync: true)
       if oneoff.exit_code != 0
-        heritage.events.create(level: :error, message: "The command `#{before_deploy.join(" ")}` failed. Stopped deploying.")
+        heritage.events.create(level: :error, message: "The command `#{before_deploy}` failed. Stopped deploying.")
         return
       else
-        heritage.events.create(level: :good, message:  "`#{before_deploy.join(" ")}` successfuly finished")
+        heritage.events.create(level: :good, message:  "`#{before_deploy}` successfuly finished")
       end
     end
 

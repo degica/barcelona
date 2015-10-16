@@ -5,8 +5,6 @@ class Oneoff < ActiveRecord::Base
 
   attr_accessor :env_vars
 
-  serialize :command
-
   after_initialize do |oneoff|
     oneoff.env_vars ||= []
   end
@@ -23,7 +21,7 @@ class Oneoff < ActiveRecord::Base
         container_overrides: [
           {
             name: heritage.name,
-            command: command,
+            command: command.try(:split, " "),
             environment: env_vars
           }
         ]

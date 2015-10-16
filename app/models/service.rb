@@ -4,8 +4,6 @@ class Service < ActiveRecord::Base
   belongs_to :heritage
   has_many :port_mappings, dependent: :destroy
 
-  serialize :command
-
   validates :name, presence: true
   validates :cpu, numericality: {greater_than: 0}
   validates :memory, numericality: {greater_than: 0}
@@ -138,7 +136,7 @@ class Service < ActiveRecord::Base
       memory: memory,
       essential: true,
       image: image_path,
-      command: command,
+      command: command.try(:split, " "),
       port_mappings: port_mappings.map{ |m|
         {
           container_port: m.container_port,

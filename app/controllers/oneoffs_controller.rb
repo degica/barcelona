@@ -17,7 +17,7 @@ class OneoffsController < ApplicationController
 
   def create_params
     params.permit(
-      command: []
+      :command
     ).tap do |whitelisted|
       whitelisted[:env_vars] = params[:env_vars]
     end
