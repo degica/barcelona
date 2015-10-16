@@ -1,5 +1,5 @@
 class ServiceSerializer < ActiveModel::Serializer
-  attributes :name, :command, :cpu, :memory, :load_balancer, :status
+  attributes :name, :public, :command, :cpu, :memory, :load_balancer, :status, :port_mappings
 
   belongs_to :heritage
 
