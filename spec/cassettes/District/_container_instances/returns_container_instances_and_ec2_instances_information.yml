@@ -1,0 +1,307 @@
+---
+http_interactions:
+- request:
+    method: post
+    uri: https://ecs.ap-northeast-1.amazonaws.com/
+    body:
+      encoding: UTF-8
+      string: '{"clusterName":"dev"}'
+    headers:
+      Content-Type:
+      - application/x-amz-json-1.1
+      Accept-Encoding:
+      - ''
+      User-Agent:
+      - aws-sdk-ruby2/2.1.19 ruby/2.2.3 x86_64-darwin14
+      X-Amz-Target:
+      - AmazonEC2ContainerServiceV20141113.CreateCluster
+      X-Amz-Date:
+      - 20151005T084111Z
+      Host:
+      - ecs.ap-northeast-1.amazonaws.com
+      X-Amz-Content-Sha256:
+      - 28c0169e70de534010437ded364724323d42d4fbc628144c97eb1366c97d7526
+      Authorization:
+      - AWS4-HMAC-SHA256 Credential=AWS_ACCESS_KEY_ID/20151005/ap-northeast-1/ecs/aws4_request,
+        SignedHeaders=content-type;host;user-agent;x-amz-content-sha256;x-amz-date;x-amz-target,
+        Signature=53b0dfc22ac054bb0492379851121db0ca7df680a41c3184a33accc69924da5d
+      Content-Length:
+      - '21'
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - Server
+      Date:
+      - Mon, 05 Oct 2015 08:41:11 GMT
+      Content-Type:
+      - application/x-amz-json-1.1
+      Content-Length:
+      - '224'
+      Connection:
+      - keep-alive
+      X-Amzn-Requestid:
+      - d4e86df6-6b3c-11e5-b85c-bb126543f103
+    body:
+      encoding: UTF-8
+      string: '{"cluster":{"activeServicesCount":1,"clusterArn":"arn:aws:ecs:ap-northeast-1:822761295011:cluster/dev","clusterName":"dev","pendingTasksCount":0,"registeredContainerInstancesCount":1,"runningTasksCount":1,"status":"ACTIVE"}}'
+    http_version: 
+  recorded_at: Mon, 05 Oct 2015 08:41:11 GMT
+- request:
+    method: post
+    uri: https://ecs.ap-northeast-1.amazonaws.com/
+    body:
+      encoding: UTF-8
+      string: '{"cluster":"dev"}'
+    headers:
+      Content-Type:
+      - application/x-amz-json-1.1
+      Accept-Encoding:
+      - ''
+      User-Agent:
+      - aws-sdk-ruby2/2.1.19 ruby/2.2.3 x86_64-darwin14
+      X-Amz-Target:
+      - AmazonEC2ContainerServiceV20141113.ListContainerInstances
+      X-Amz-Date:
+      - 20151005T084111Z
+      Host:
+      - ecs.ap-northeast-1.amazonaws.com
+      X-Amz-Content-Sha256:
+      - 3413cf3974597d3f567a13185874be81f84f254603bad32a1a93a39e3bf161a6
+      Authorization:
+      - AWS4-HMAC-SHA256 Credential=AWS_ACCESS_KEY_ID/20151005/ap-northeast-1/ecs/aws4_request,
+        SignedHeaders=content-type;host;user-agent;x-amz-content-sha256;x-amz-date;x-amz-target,
+        Signature=bba7cc56b4d57c3352e2bedbfc5af80a8a4f8c698405d6b7a4fd579cabcb4e9d
+      Content-Length:
+      - '17'
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - Server
+      Date:
+      - Mon, 05 Oct 2015 08:41:12 GMT
+      Content-Type:
+      - application/x-amz-json-1.1
+      Content-Length:
+      - '125'
+      Connection:
+      - keep-alive
+      X-Amzn-Requestid:
+      - d4f9d2f6-6b3c-11e5-82d2-afcc9e1e395f
+    body:
+      encoding: UTF-8
+      string: '{"containerInstanceArns":["arn:aws:ecs:ap-northeast-1:822761295011:container-instance/8ba4968b-0aea-46be-aaa1-d751712258cb"]}'
+    http_version: 
+  recorded_at: Mon, 05 Oct 2015 08:41:12 GMT
+- request:
+    method: post
+    uri: https://ecs.ap-northeast-1.amazonaws.com/
+    body:
+      encoding: UTF-8
+      string: '{"cluster":"dev","containerInstances":["arn:aws:ecs:ap-northeast-1:822761295011:container-instance/8ba4968b-0aea-46be-aaa1-d751712258cb"]}'
+    headers:
+      Content-Type:
+      - application/x-amz-json-1.1
+      Accept-Encoding:
+      - ''
+      User-Agent:
+      - aws-sdk-ruby2/2.1.19 ruby/2.2.3 x86_64-darwin14
+      X-Amz-Target:
+      - AmazonEC2ContainerServiceV20141113.DescribeContainerInstances
+      X-Amz-Date:
+      - 20151005T084112Z
+      Host:
+      - ecs.ap-northeast-1.amazonaws.com
+      X-Amz-Content-Sha256:
+      - eb9ad5c8a9f79c7bb27fb2d8e95850b376110bbf4c6577c002341caf0ddf5983
+      Authorization:
+      - AWS4-HMAC-SHA256 Credential=AWS_ACCESS_KEY_ID/20151005/ap-northeast-1/ecs/aws4_request,
+        SignedHeaders=content-type;host;user-agent;x-amz-content-sha256;x-amz-date;x-amz-target,
+        Signature=fbdf8fdb647677f6d82a18feab120c58a051395ad721f552e02bab0e0229c4be
+      Content-Length:
+      - '138'
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Server:
+      - Server
+      Date:
+      - Mon, 05 Oct 2015 08:41:12 GMT
+      Content-Type:
+      - application/x-amz-json-1.1
+      Content-Length:
+      - '1248'
+      Connection:
+      - keep-alive
+      X-Amzn-Requestid:
+      - d5087834-6b3c-11e5-81a7-1bab7c04301e
+    body:
+      encoding: UTF-8
+      string: '{"containerInstances":[{"agentConnected":true,"containerInstanceArn":"arn:aws:ecs:ap-northeast-1:822761295011:container-instance/8ba4968b-0aea-46be-aaa1-d751712258cb","ec2InstanceId":"i-bc75b819","pendingTasksCount":0,"registeredResources":[{"doubleValue":0.0,"integerValue":1024,"longValue":0,"name":"CPU","type":"INTEGER"},{"doubleValue":0.0,"integerValue":996,"longValue":0,"name":"MEMORY","type":"INTEGER"},{"doubleValue":0.0,"integerValue":0,"longValue":0,"name":"PORTS","stringSetValue":["22","2376","2375","51678"],"type":"STRINGSET"},{"doubleValue":0.0,"integerValue":0,"longValue":0,"name":"PORTS_UDP","stringSetValue":[],"type":"STRINGSET"}],"remainingResources":[{"doubleValue":0.0,"integerValue":896,"longValue":0,"name":"CPU","type":"INTEGER"},{"doubleValue":0.0,"integerValue":740,"longValue":0,"name":"MEMORY","type":"INTEGER"},{"doubleValue":0.0,"integerValue":0,"longValue":0,"name":"PORTS","stringSetValue":["22","2376","2375","51678","23511"],"type":"STRINGSET"},{"doubleValue":0.0,"integerValue":0,"longValue":0,"name":"PORTS_UDP","stringSetValue":[],"type":"STRINGSET"}],"runningTasksCount":1,"status":"ACTIVE","versionInfo":{"agentHash":"4ab1051","agentVersion":"1.4.0","dockerVersion":"DockerVersion:
+        1.7.1"}}],"failures":[]}'
+    http_version: 
+  recorded_at: Mon, 05 Oct 2015 08:41:12 GMT
+- request:
+    method: post
+    uri: https://ec2.ap-northeast-1.amazonaws.com/
+    body:
+      encoding: UTF-8
+      string: Action=DescribeInstances&InstanceId.1=i-bc75b819&Version=2015-04-15
+    headers:
+      Content-Type:
+      - application/x-www-form-urlencoded; charset=utf-8
+      Accept-Encoding:
+      - ''
+      User-Agent:
+      - aws-sdk-ruby2/2.1.19 ruby/2.2.3 x86_64-darwin14
+      X-Amz-Date:
+      - 20151005T084112Z
+      Host:
+      - ec2.ap-northeast-1.amazonaws.com
+      X-Amz-Content-Sha256:
+      - 5bb0297f9211c84e075eb9bfca3109aaa1ea6d8e133ae72bca4fa806995b55ff
+      Authorization:
+      - AWS4-HMAC-SHA256 Credential=AWS_ACCESS_KEY_ID/20151005/ap-northeast-1/ec2/aws4_request,
+        SignedHeaders=content-type;host;user-agent;x-amz-content-sha256;x-amz-date,
+        Signature=21044043a284681603326aca6b914b06f0e2f22c8582863db608c849582df5a5
+      Content-Length:
+      - '67'
+      Accept:
+      - "*/*"
+  response:
+    status:
+      code: 200
+      message: OK
+    headers:
+      Content-Type:
+      - text/xml;charset=UTF-8
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      Date:
+      - Mon, 05 Oct 2015 08:41:13 GMT
+      Server:
+      - AmazonEC2
+    body:
+      encoding: UTF-8
+      string: |-
+        <?xml version="1.0" encoding="UTF-8"?>
+        <DescribeInstancesResponse xmlns="http://ec2.amazonaws.com/doc/2015-04-15/">
+            <requestId>52b60bc2-70df-4e1a-a3f9-d33e724370c3</requestId>
+            <reservationSet>
+                <item>
+                    <reservationId>r-00b574f2</reservationId>
+                    <ownerId>822761295011</ownerId>
+                    <groupSet/>
+                    <instancesSet>
+                        <item>
+                            <instanceId>i-bc75b819</instanceId>
+                            <imageId>ami-ce2ba4ce</imageId>
+                            <instanceState>
+                                <code>16</code>
+                                <name>running</name>
+                            </instanceState>
+                            <privateDnsName>ip-10-0-1-53.ap-northeast-1.compute.internal</privateDnsName>
+                            <dnsName/>
+                            <reason/>
+                            <keyName>k2nr</keyName>
+                            <amiLaunchIndex>0</amiLaunchIndex>
+                            <productCodes/>
+                            <instanceType>t2.micro</instanceType>
+                            <launchTime>2015-10-04T04:20:19.000Z</launchTime>
+                            <placement>
+                                <availabilityZone>ap-northeast-1a</availabilityZone>
+                                <groupName/>
+                                <tenancy>default</tenancy>
+                            </placement>
+                            <monitoring>
+                                <state>disabled</state>
+                            </monitoring>
+                            <subnetId>subnet-7802890f</subnetId>
+                            <vpcId>vpc-46f84523</vpcId>
+                            <privateIpAddress>10.0.1.53</privateIpAddress>
+                            <sourceDestCheck>true</sourceDestCheck>
+                            <groupSet>
+                                <item>
+                                    <groupId>sg-3b327b5e</groupId>
+                                    <groupName>barcelona-InstanceSecurityGroup-F1B56AYLWN5S</groupName>
+                                </item>
+                            </groupSet>
+                            <architecture>x86_64</architecture>
+                            <rootDeviceType>ebs</rootDeviceType>
+                            <rootDeviceName>/dev/xvda</rootDeviceName>
+                            <blockDeviceMapping>
+                                <item>
+                                    <deviceName>/dev/xvda</deviceName>
+                                    <ebs>
+                                        <volumeId>vol-69aa4696</volumeId>
+                                        <status>attached</status>
+                                        <attachTime>2015-10-04T04:20:23.000Z</attachTime>
+                                        <deleteOnTermination>true</deleteOnTermination>
+                                    </ebs>
+                                </item>
+                            </blockDeviceMapping>
+                            <virtualizationType>hvm</virtualizationType>
+                            <clientToken/>
+                            <hypervisor>xen</hypervisor>
+                            <networkInterfaceSet>
+                                <item>
+                                    <networkInterfaceId>eni-f93ac3b0</networkInterfaceId>
+                                    <subnetId>subnet-7802890f</subnetId>
+                                    <vpcId>vpc-46f84523</vpcId>
+                                    <description/>
+                                    <ownerId>822761295011</ownerId>
+                                    <status>in-use</status>
+                                    <macAddress>06:70:c5:c4:28:b3</macAddress>
+                                    <privateIpAddress>10.0.1.53</privateIpAddress>
+                                    <privateDnsName>ip-10-0-1-53.ap-northeast-1.compute.internal</privateDnsName>
+                                    <sourceDestCheck>true</sourceDestCheck>
+                                    <groupSet>
+                                        <item>
+                                            <groupId>sg-3b327b5e</groupId>
+                                            <groupName>barcelona-InstanceSecurityGroup-F1B56AYLWN5S</groupName>
+                                        </item>
+                                    </groupSet>
+                                    <attachment>
+                                        <attachmentId>eni-attach-697cbd72</attachmentId>
+                                        <deviceIndex>0</deviceIndex>
+                                        <status>attached</status>
+                                        <attachTime>2015-10-04T04:20:19.000Z</attachTime>
+                                        <deleteOnTermination>true</deleteOnTermination>
+                                    </attachment>
+                                    <privateIpAddressesSet>
+                                        <item>
+                                            <privateIpAddress>10.0.1.53</privateIpAddress>
+                                            <privateDnsName>ip-10-0-1-53.ap-northeast-1.compute.internal</privateDnsName>
+                                            <primary>true</primary>
+                                        </item>
+                                    </privateIpAddressesSet>
+                                </item>
+                            </networkInterfaceSet>
+                            <iamInstanceProfile>
+                                <arn>arn:aws:iam::822761295011:instance-profile/ecsInstanceRole</arn>
+                                <id>AIPAILJRRVUXRYRLBPBMW</id>
+                            </iamInstanceProfile>
+                            <ebsOptimized>false</ebsOptimized>
+                        </item>
+                    </instancesSet>
+                </item>
+            </reservationSet>
+        </DescribeInstancesResponse>
+    http_version: 
+  recorded_at: Mon, 05 Oct 2015 08:41:13 GMT
+recorded_with: VCR 2.9.3

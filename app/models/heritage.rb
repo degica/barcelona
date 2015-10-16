@@ -5,8 +5,6 @@ class Heritage < ActiveRecord::Base
   has_many :events, dependent: :destroy
   belongs_to :district
 
-  serialize :before_deploy
-
   validates :name, presence: true, uniqueness: true
   validates :district, presence: true
 

@@ -15,6 +15,8 @@ require "sprockets/railtie"
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
+require_relative "../app/middlewares/exception_handler"
+
 module Bcn
   class Application < Rails::Application
     # Settings in config/environments/* take precedence over those specified here.
@@ -32,7 +34,7 @@ module Bcn
     # Do not swallow errors in after_commit/after_rollback callbacks.
     config.active_record.raise_in_transactional_callbacks = true
 
-    config.middleware.insert_after ActionDispatch::DebugExceptions, "ExceptionHandler"
+    config.middleware.insert_after ActionDispatch::DebugExceptions, ExceptionHandler
 
     config.active_job.queue_adapter = :delayed_job
   end

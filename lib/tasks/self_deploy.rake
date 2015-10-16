@@ -80,7 +80,7 @@ namespace :bcn do
         {name: "S3_BUCKET_NAME",             value: s3_bucket_name},
         {name: "DOCKER_IMAGE_NAME",          value: docker_image_name},
       ],
-      command: ["rake", "bcn:self_deploy_remote"]
+      command: "rake bcn:self_deploy_remote"
     )
     oneoff.run!(sync: true)
   end
@@ -123,7 +123,7 @@ namespace :bcn do
           cpu: 128,
           memory: 128,
           public: true,
-          command: ["rails", "s", "-p", "3000", "-b", "0.0.0.0"],
+          command: "rails s -p 3000 -b 0.0.0.0",
           port_mappings_attributes: [
             {lb_port: 80, container_port: 3000}
           ]
@@ -132,7 +132,7 @@ namespace :bcn do
           name: "worker",
           cpu: 128,
           memory: 128,
-          command: ["rake", "jobs:work"]
+          command: "rake jobs:work"
         }
       ]
     )
