@@ -34,3 +34,4 @@ end
 
 puts "Triggered deployment for #{ENV["TRAVIS_COMMIT"]}"
 system "bcn deploy -e staging --tag master"
+exit $?
