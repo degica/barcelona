@@ -7,31 +7,53 @@ if ENV["TRAVIS_BRANCH"] != "master" || ENV["TRAVIS_PULL_REQUEST"] != "false"
   exit
 end
 
-puts ENV["TRAVIS_COMMIT"]
+def fetch_quay_builds
+    response = `curl -H "Authorization: Bearer #{ENV['QUAY_TOKEN']}" https://quay.io/api/v1/repository/degica/barcelona/build/ 2>/dev/null`
+    JSON.load(response)["builds"]
+end
 
-while true
-  response = `curl -H "Authorization: Bearer #{ENV['QUAY_TOKEN']}" https://quay.io/api/v1/repository/degica/barcelona/build/ 2>/dev/null`
+def wait_build
+  while true
+    builds = fetch_quay_builds
+    target_build_phases = builds.select do |b|
+      b["trigger_metadata"]["commit"] == ENV["TRAVIS_COMMIT"]
+    end.map do |b|
+      b["phase"]
+    end
 
-  builds = JSON.load(response)["builds"]
-  target_build_phases = builds.select do |b|
-    b["trigger_metadata"]["commit"] == ENV["TRAVIS_COMMIT"]
-  end.map do |b|
-    b["phase"]
-  end
-  if !target_build_phases.include?("complete") && target_build_phases.include?("error")
-    puts "The docker build failed"
-    exit 1
-  end
+    if !target_build_phases.include?("complete") && target_build_phases.include?("error")
+      raise "The docker build failed"
+    end
 
-  if target_build_phases.include?("complete")
-    puts ""
-    break
-  else
-    print '.'
-    sleep 5
+    if target_build_phases.include?("complete")
+      puts ""
+      return
+    else
+      print '.'
+      sleep 5
+    end
   end
 end
 
+def get_image_id_for_tag(tag)
+    response = `curl -H "Authorization: Bearer #{ENV['QUAY_TOKEN']}" https://quay.io/api/v1/repository/degica/barcelona/tag/?specificTag=master 2>/dev/null`
+    tags = JSON.load(response)["tags"]
+    tags.select do |tag|
+      tag["end_ts"].nil?
+    end.first["docker_image_id"]
+end
+
+def put_tag(image_id, tag)
+  response = `curl -XPUT -H "Content-Type: application/json" -H "Authorization: Bearer #{ENV['QUAY_TOKEN']}" https://quay.io/api/v1/repository/degica/barcelona/tag/#{tag} -d '{"image": "#{image_id}"}' 2> /dev/null`
+  p response
+end
+
+puts "Waiting for quay.io build to be finished"
+wait_build
+
+puts "Putting version tag to the latest master image"
+put_tag(get_image_id_for_tag("master"), "v#{ENV["TRAVIS_BUILD_NUMBER"]}")
+
 puts "Triggered deployment for #{ENV["TRAVIS_COMMIT"]}"
-system "bcn deploy -e staging --tag master 1> /dev/null"
-exit $?
+system "bcn deploy -e staging --tag v#{ENV["TRAVIS_BUILD_NUMBER"]} 1> /dev/null"
+exit($?.exitstatus)
