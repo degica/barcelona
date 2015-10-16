@@ -7,7 +7,10 @@ rvm:
 addons:
   postgresql: "9.4"
 before_script:
+  - npm install -g barcelona
   - psql -c 'create database travis_ci_test;' -U postgres
   - cp config/database.travis.yml config/database.yml
 script:
   - bundle exec rake spec
+after_success:
+  - bin/deploy_barcelona

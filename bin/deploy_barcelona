@@ -1,0 +1,36 @@
+#!/usr/bin/env ruby
+
+require 'json'
+
+if ENV["TRAVIS_BRANCH"] != "master" || ENV["TRAVIS_PULL_REQUEST"] != "false"
+  puts "The current branch is not master"
+  exit
+end
+
+puts ENV["TRAVIS_COMMIT"]
+
+while true
+  response = `curl -H "Authorization: Bearer #{ENV['QUAY_TOKEN']}" https://quay.io/api/v1/repository/degica/barcelona/build/ 2>/dev/null`
+
+  builds = JSON.load(response)["builds"]
+  target_build_phases = builds.select do |b|
+    b["trigger_metadata"]["commit"] == ENV["TRAVIS_COMMIT"]
+  end.map do |b|
+    b["phase"]
+  end
+  if !target_build_phases.include?("complete") && target_build_phases.include?("error")
+    puts "The docker build failed"
+    exit 1
+  end
+
+  if target_build_phases.include?("complete")
+    puts ""
+    break
+  else
+    print '.'
+    sleep 5
+  end
+end
+
+puts "Triggered deployment for #{ENV["TRAVIS_COMMIT"]}"
+system "bcn deploy -e staging --tag master"
