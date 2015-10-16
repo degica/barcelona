@@ -12,7 +12,9 @@ class User < ActiveRecord::Base
 
   def self.login!(github_token)
     client = Octokit::Client.new(access_token: github_token)
-    raise unless allowed_user?(client.user_teams)
+    unless allowed_user?(client.user_teams)
+      raise ExceptionHandler::Unauthorized.new("You are not allowed to login")
+    end
     user = User.find_or_create_by!(name: client.user.login)
     user.new_token!
     user

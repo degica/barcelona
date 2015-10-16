@@ -9,6 +9,6 @@ class ApplicationController < ActionController::Base
 
   def authenticate
     @current_user = User.find_by_token(request.headers['HTTP_X_BARCELONA_TOKEN'])
-    raise "user not found" if @current_user.blank?
+    raise ExceptionHandler::Unauthorized.new("User not found") if @current_user.blank?
   end
 end

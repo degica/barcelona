@@ -50,6 +50,18 @@ class ExceptionHandler
   class InternalServerError < Exception
   end
 
+  class Unauthorized < Exception
+    def status_code
+      401
+    end
+  end
+
+  class UnprocessableEntity < Exception
+    def status_code
+      422
+    end
+  end
+
   class NotFound < Exception
     def status_code
       404
@@ -63,8 +75,12 @@ class ExceptionHandler
   def call(env)
     begin
       @app.call(env)
+    rescue ExceptionHandler::Exception => e
+      raise e
     rescue ActiveRecord::RecordNotFound
       raise NotFound
+    rescue ActiveRecord::RecordInvalid => e
+      raise UnprocessableEntity.new(e.message)
     rescue
       raise InternalServerError
     end
