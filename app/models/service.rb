@@ -148,7 +148,7 @@ class Service < ActiveRecord::Base
         log_driver: "syslog",
         options: {
           "syslog-address" => "tcp://127.0.0.1:514",
-          "syslog-tag" => name
+          "syslog-tag" => service_name
         }
       }
     }.compact
