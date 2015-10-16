@@ -11,12 +11,14 @@ class HeritagesController < ApplicationController
   end
 
   def create
-    @heritage = @district.heritages.create!(create_params)
+    @heritage = BuildHeritage.new(permitted_params, district: @district).execute
+    @heritage.save!
     render json: @heritage
   end
 
   def update
-    @heritage.update!(update_params)
+    @heritage = BuildHeritage.new(permitted_params).execute
+    @heritage.save!
     render json: @heritage
   end
 
@@ -38,8 +40,8 @@ class HeritagesController < ApplicationController
   end
 
   def delete_env_vars
-    env_vars = params[:env_keys]
-    env_vars.each do |k|
+    env_keys = params[:env_keys]
+    env_keys.each do |k|
       @heritage.env_vars.find_by(key: k).destroy!
     end
     @heritage.save!
@@ -47,29 +49,14 @@ class HeritagesController < ApplicationController
     render json: @heritage
   end
 
-  def update_params
-    permitted = create_params
-    permitted.delete :district_name
-    permitted.delete :name
-
-    map = Hash[@heritage.services.pluck(:name, :id)]
-    if permitted[:services].present?
-      permitted[:services_attributes].each do |service|
-        service.delete :port_mappings_attributes # Currently updating port mapping is not supported
-        name = service.delete :name
-        service[:id] = map[name]
-      end
-    end
-    permitted
-  end
-
-  def create_params
-    permitted = params.permit [
+  def permitted_params
+    params.permit([
+      :id,
       :name,
       :image_name,
       :image_tag,
       :slack_url,
-      before_deploy: [],
+      :before_deploy,
       services: [
         :name,
         :cpu,
@@ -80,14 +67,9 @@ class HeritagesController < ApplicationController
           port_mappings: [:lb_port, :container_port]
         }
       ]
-    ]
-    if permitted[:services].present?
-      permitted[:services_attributes] = permitted.delete(:services)
-      permitted[:services_attributes].each do |service|
-        service[:port_mappings_attributes] = service.delete(:port_mappings) if service[:port_mappings].present?
-      end
+    ]).tap do |whitelisted|
+      whitelisted[:env_vars] = params[:env_vars] if params[:env_vars].present?
     end
-    permitted
   end
 
   def load_heritage
