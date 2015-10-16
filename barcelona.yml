@@ -8,8 +8,8 @@ environments:
     services:
       - name: web
         public: true
-        cpu: 128
-        memory: 128
+        cpu: 256
+        memory: 256
         command: rails s -p 3000 -b 0.0.0.0
         port_mappings:
           - lb_port: 80
