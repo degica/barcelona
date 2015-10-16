@@ -33,5 +33,5 @@ while true
 end
 
 puts "Triggered deployment for #{ENV["TRAVIS_COMMIT"]}"
-system "bcn deploy -e staging --tag master"
+system "bcn deploy -e staging --tag master 1> /dev/null"
 exit $?
