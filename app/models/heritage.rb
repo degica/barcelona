@@ -11,6 +11,10 @@ class Heritage < ActiveRecord::Base
   accepts_nested_attributes_for :services
   accepts_nested_attributes_for :env_vars
 
+  after_initialize do |heritage|
+    heritage.image_tag ||= "latest"
+  end
+
   after_save :update_services
 
   def to_param
