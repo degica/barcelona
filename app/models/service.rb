@@ -22,8 +22,8 @@ class Service < ActiveRecord::Base
     heritage.district
   end
 
-  def apply_to_ecs(image_path)
-    register_task(image_path)
+  def apply_to_ecs
+    register_task
     apply_service
   end
 
@@ -37,9 +37,9 @@ class Service < ActiveRecord::Base
     "#{heritage.name}-#{name}"
   end
 
-  def register_task(image_path)
+  def register_task
     ecs.register_task_definition(family: service_name,
-                                 container_definitions: [container_definition(image_path)])
+                                 container_definitions: [container_definition])
   end
 
   def apply_service
@@ -130,13 +130,13 @@ class Service < ActiveRecord::Base
     change_elb_record_set("CREATE", load_balancer.dns_name)
   end
 
-  def container_definition(image_path)
+  def container_definition
     {
       name: service_name,
       cpu: cpu,
       memory: memory,
       essential: true,
-      image: image_path,
+      image: heritage.image_path,
       command: command.try(:split, " "),
       port_mappings: port_mappings.map{ |m|
         {
