@@ -1,4 +1,5 @@
 class District < ActiveRecord::Base
+  include AwsAccessible
   extend Memoist
 
   attr_accessor :dockercfg
@@ -140,17 +141,5 @@ EOS
     ecs.delete_cluster(cluster: name)
   end
 
-  def ecs
-    Aws::ECS::Client.new
-  end
-
-  def s3
-    Aws::S3::Client.new
-  end
-
-  def ec2
-    Aws::EC2::Client.new
-  end
-
-  memoize :subnets, :ecs
+  memoize :subnets
 end

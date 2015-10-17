@@ -1,4 +1,5 @@
 class Heritage < ActiveRecord::Base
+  include AwsAccessible
   has_many :services, dependent: :destroy
   has_many :env_vars, dependent: :destroy
   has_many :oneoffs, dependent: :destroy
@@ -36,11 +37,5 @@ class Heritage < ActiveRecord::Base
   def update_services
     return if image_path.nil?
     DeployRunnerJob.perform_later self
-  end
-
-  private
-
-  def ecs
-    @ecs ||= Aws::ECS::Client.new
   end
 end

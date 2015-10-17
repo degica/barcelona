@@ -1,4 +1,5 @@
 class UpdateUserTask
+  include AwsAccessible
   attr_accessor :district, :user
 
   def initialize(district, user)
@@ -67,11 +68,5 @@ class UpdateUserTask
       },
       container_instances: district.container_instances.map{ |c| c[:container_instance_arn] }
     )
-  end
-
-  private
-
-  def ecs
-    @ecs ||= Aws::ECS::Client.new
   end
 end

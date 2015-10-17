@@ -30,7 +30,6 @@ group :development do
   gem 'spring'
   gem 'spring-commands-rspec'
   gem 'guard-rspec'
-
 end
 
 group :test do

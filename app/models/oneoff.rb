@@ -1,4 +1,5 @@
 class Oneoff < ActiveRecord::Base
+  include AwsAccessible
   belongs_to :heritage
   validates :heritage, presence: true
   validates :command, presence: true
@@ -86,9 +87,5 @@ class Oneoff < ActiveRecord::Base
       image: heritage.image_path,
       environment: heritage.env_vars.map { |e| {name: e.key, value: e.value} }
     }.compact
-  end
-
-  def ecs
-    @ecs ||= Aws::ECS::Client.new
   end
 end

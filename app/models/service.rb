@@ -1,4 +1,5 @@
 class Service < ActiveRecord::Base
+  include AwsAccessible
   extend Memoist
 
   belongs_to :heritage
@@ -213,17 +214,5 @@ class Service < ActiveRecord::Base
     end
   end
 
-  def ecs
-    Aws::ECS::Client.new
-  end
-
-  def elb
-    Aws::ElasticLoadBalancing::Client.new
-  end
-
-  def route53
-    Aws::Route53::Client.new
-  end
-
-  memoize :ecs, :elb, :route53, :load_balancers
+  memoize :load_balancers
 end
