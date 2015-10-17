@@ -1,6 +1,5 @@
 class District < ActiveRecord::Base
   include AwsAccessible
-  extend Memoist
 
   attr_accessor :dockercfg
 
@@ -21,7 +20,7 @@ class District < ActiveRecord::Base
   end
 
   def subnets(network)
-    Aws::EC2::Client.new.describe_subnets(
+    @subnets ||= Aws::EC2::Client.new.describe_subnets(
       filters: [
         {name: "vpc-id", values: [vpc_id]},
         {name: 'tag:Network', values: [network]}
@@ -140,6 +139,4 @@ EOS
   def delete_ecs_cluster
     ecs.delete_cluster(cluster: name)
   end
-
-  memoize :subnets
 end

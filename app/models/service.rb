@@ -1,6 +1,5 @@
 class Service < ActiveRecord::Base
   include AwsAccessible
-  extend Memoist
 
   belongs_to :heritage
   has_many :port_mappings, dependent: :destroy
@@ -211,6 +210,4 @@ class Service < ActiveRecord::Base
       :unknown
     end
   end
-
-  memoize :load_balancers
 end

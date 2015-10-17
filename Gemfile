@@ -4,12 +4,9 @@ ruby "2.2.3"
 
 gem 'rails', '4.2.4'
 gem 'pg'
-
 gem 'aws-sdk'
-
 gem 'puma'
 gem 'active_model_serializers', "0.10.0.rc3"
-gem 'memoist'
 gem 'gibberish'
 gem 'octokit'
 gem 'delayed_job_active_record'
