@@ -1,4 +1,5 @@
 class Heritage < ActiveRecord::Base
+  include AwsAccessible
   has_many :services, dependent: :destroy
   has_many :env_vars, dependent: :destroy
   has_many :oneoffs, dependent: :destroy
@@ -10,10 +11,6 @@ class Heritage < ActiveRecord::Base
 
   accepts_nested_attributes_for :services
   accepts_nested_attributes_for :env_vars
-
-  after_initialize do |heritage|
-    heritage.image_tag ||= "latest"
-  end
 
   after_save :update_services
 
@@ -30,17 +27,12 @@ class Heritage < ActiveRecord::Base
 
   def image_path
     return nil if image_name.blank?
-    "#{image_name}:#{image_tag}"
+    tag = "latest" if image_tag.blank?
+    "#{image_name}:#{tag}"
   end
 
   def update_services
     return if image_path.nil?
     DeployRunnerJob.perform_later self
-  end
-
-  private
-
-  def ecs
-    @ecs ||= Aws::ECS::Client.new
   end
 end

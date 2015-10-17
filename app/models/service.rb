@@ -1,5 +1,5 @@
 class Service < ActiveRecord::Base
-  extend Memoist
+  include AwsAccessible
 
   belongs_to :heritage
   has_many :port_mappings, dependent: :destroy
@@ -21,8 +21,8 @@ class Service < ActiveRecord::Base
     heritage.district
   end
 
-  def apply_to_ecs(image_path)
-    register_task(image_path)
+  def apply_to_ecs
+    register_task
     apply_service
   end
 
@@ -36,9 +36,9 @@ class Service < ActiveRecord::Base
     "#{heritage.name}-#{name}"
   end
 
-  def register_task(image_path)
+  def register_task
     ecs.register_task_definition(family: service_name,
-                                 container_definitions: [container_definition(image_path)])
+                                 container_definitions: [container_definition])
   end
 
   def apply_service
@@ -129,13 +129,13 @@ class Service < ActiveRecord::Base
     change_elb_record_set("CREATE", load_balancer.dns_name)
   end
 
-  def container_definition(image_path)
+  def container_definition
     {
       name: service_name,
       cpu: cpu,
       memory: memory,
       essential: true,
-      image: image_path,
+      image: heritage.image_path,
       command: command.try(:split, " "),
       port_mappings: port_mappings.map{ |m|
         {
@@ -157,15 +157,13 @@ class Service < ActiveRecord::Base
   def delete_service
     return unless applied?
     scale(0)
-    lb_names = ecs_service.load_balancers.map(&:load_balancer_name)
-
+    lb = fetch_load_balancer
     ecs.delete_service(cluster: district.name, service: service_name)
-    lb_names.each do |name|
-      elb.delete_load_balancer(load_balancer_name: name)
-    end
 
-    dns_name = fetch_load_balancer.try(:dns_name)
-    change_elb_record_set("DELETE", dns_name) if dns_name.present?
+    if lb.present?
+      elb.delete_load_balancer(load_balancer_name: lb.load_balancer_name)
+      change_elb_record_set("DELETE", lb.dns_name)
+    end
   end
 
   def change_elb_record_set(action, elb_dns_name)
@@ -212,18 +210,4 @@ class Service < ActiveRecord::Base
       :unknown
     end
   end
-
-  def ecs
-    Aws::ECS::Client.new
-  end
-
-  def elb
-    Aws::ElasticLoadBalancing::Client.new
-  end
-
-  def route53
-    Aws::Route53::Client.new
-  end
-
-  memoize :ecs, :elb, :route53, :load_balancers
 end

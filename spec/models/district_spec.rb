@@ -2,6 +2,11 @@ require 'rails_helper'
 
 describe District, :vcr do
   let(:district) { create(:district) }
+
+  before do
+    Aws.config[:stub_responses] = false
+  end
+
   describe "#subnets" do
     it "returns private subnets" do
       expect(district.subnets("Private").count).to eq 2
