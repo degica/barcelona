@@ -2,7 +2,6 @@ class MonitorDeploymentJob < ActiveJob::Base
   queue_as :default
 
   def perform(service, count: 0)
-    service.fetch_ecs_service
     if service.status == :active
       service.heritage.events.create!(level: :good, message: "#{service.service_name} deployed")
     elsif count > 200

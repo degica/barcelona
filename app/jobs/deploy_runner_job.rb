@@ -17,7 +17,7 @@ class DeployRunnerJob < ActiveJob::Base
 
     heritage.services.each do |service|
       Rails.logger.info "Updating service #{service.service_name} ..."
-      service.apply_to_ecs
+      service.apply
     end
 
     heritage.services.each do |service|
