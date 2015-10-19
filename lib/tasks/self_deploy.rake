@@ -63,23 +63,23 @@ namespace :bcn do
     )
 
     oneoff = heritage.oneoffs.create(
-      env_vars: [
-        {name: "AWS_REGION",                 value: ENV["AWS_REGION"]},
-        {name: "AWS_ACCESS_KEY_ID",          value: ENV["AWS_ACCESS_KEY_ID"]},
-        {name: "AWS_SECRET_ACCESS_KEY",      value: ENV["AWS_SECRET_ACCESS_KEY"]},
-        {name: "RAILS_ENV",                  value: "production"},
-        {name: "DATABASE_URL",               value: database_url},
-        {name: "DISTRICT_NAME",              value: district_name},
-        {name: "VPC_ID",                     value: vpc_id},
-        {name: "PUBLIC_ELB_SECURITY_GROUP",  value: public_elb_sg},
-        {name: "PRIVATE_ELB_SECURITY_GROUP", value: private_elb_sg},
-        {name: "INSTANCE_SECURITY_GROUP",    value: instance_sg},
-        {name: "ECS_SERVICE_ROLE",           value: ecs_service_role},
-        {name: "ECS_INSTANCE_ROLE",          value: ecs_instance_role},
-        {name: "PRIVATE_HOSTED_ZONE_ID",     value: private_hosted_zone_id},
-        {name: "S3_BUCKET_NAME",             value: s3_bucket_name},
-        {name: "DOCKER_IMAGE_NAME",          value: docker_image_name},
-      ],
+      env_vars: {
+        "AWS_REGION"                 => ENV["AWS_REGION"],
+        "AWS_ACCESS_KEY_ID"          => ENV["AWS_ACCESS_KEY_ID"],
+        "AWS_SECRET_ACCESS_KEY"      => ENV["AWS_SECRET_ACCESS_KEY"],
+        "RAILS_ENV"                  => "production",
+        "DATABASE_URL"               => database_url,
+        "DISTRICT_NAME"              => district_name,
+        "VPC_ID"                     => vpc_id,
+        "PUBLIC_ELB_SECURITY_GROUP"  => public_elb_sg,
+        "PRIVATE_ELB_SECURITY_GROUP" => private_elb_sg,
+        "INSTANCE_SECURITY_GROUP"    => instance_sg,
+        "ECS_SERVICE_ROLE"           => ecs_service_role,
+        "ECS_INSTANCE_ROLE"          => ecs_instance_role,
+        "PRIVATE_HOSTED_ZONE_ID"     => private_hosted_zone_id,
+        "S3_BUCKET_NAME"             => s3_bucket_name,
+        "DOCKER_IMAGE_NAME"          => docker_image_name,
+      },
       command: "rake bcn:self_deploy_remote"
     )
     oneoff.run!(sync: true)

@@ -23,7 +23,7 @@ class Oneoff < ActiveRecord::Base
           {
             name: heritage.name,
             command: command.try(:split, " "),
-            environment: env_vars
+            environment: env_vars.map { |k, v| {name: k, value: v} }
           }
         ]
       }
