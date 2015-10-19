@@ -112,7 +112,7 @@ aws s3 cp s3://#{s3_bucket_name}/#{name}/users ./users
 echo >> ./users
 while IFS=, read name pub
 do
-  docker run --rm -v /etc:/etc -v /home:/home -e "USER_NAME=$name" -e "USER_PUBLIC_KEY=$pub" k2nr/docker-user-manager
+  docker run --rm -v /etc:/etc -v /home:/home -e "USER_NAME=$name" -e "USER_PUBLIC_KEY=$pub" -e "USER_DOCKERCFG=#{dockercfg.to_json}" k2nr/docker-user-manager
 done < ./users
 rm ./users
 start ecs
