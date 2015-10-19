@@ -27,7 +27,7 @@ class Heritage < ActiveRecord::Base
 
   def image_path
     return nil if image_name.blank?
-    tag = "latest" if image_tag.blank?
+    tag = image_tag || 'latest'
     "#{image_name}:#{tag}"
   end
 

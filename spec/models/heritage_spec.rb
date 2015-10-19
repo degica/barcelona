@@ -24,5 +24,10 @@ describe Heritage do
       let(:heritage) { build :heritage, image_name: 'nginx', image_tag: nil }
       it { expect(heritage.image_path).to eq "nginx:latest" }
     end
+
+    context "when image_tag is present" do
+      let(:heritage) { build :heritage, image_name: 'nginx', image_tag: "master" }
+      it { expect(heritage.image_path).to eq "nginx:master" }
+    end
   end
 end
