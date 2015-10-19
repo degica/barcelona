@@ -21,7 +21,14 @@ describe Oneoff do
                                  memory: 256,
                                  essential: true,
                                  image: "#{heritage.image_path}",
-                                 environment: []
+                                 environment: [],
+                                 log_configuration: {
+                                   log_driver: "syslog",
+                                   options: {
+                                     "syslog-address" => "tcp://127.0.0.1:514",
+                                     "syslog-tag" => "#{heritage.name}-oneoff"
+                                   }
+                                 }
                                }
                              ]
                            )
@@ -59,7 +66,14 @@ describe Oneoff do
                                    memory: 256,
                                    essential: true,
                                    image: "#{heritage.image_name}:v100",
-                                   environment: []
+                                   environment: [],
+                                   log_configuration: {
+                                     log_driver: "syslog",
+                                     options: {
+                                       "syslog-address" => "tcp://127.0.0.1:514",
+                                       "syslog-tag" => "#{heritage.name}-oneoff"
+                                     }
+                                   }
                                  }
                                ]
                              )
