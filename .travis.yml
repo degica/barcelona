@@ -14,3 +14,5 @@ script:
   - bundle exec rake spec
 after_success:
   - bin/deploy_barcelona
+notifications:
+  slack: degica:5qSWYJuIKSySc5KqlxwIoNRd

@@ -1,8 +1,6 @@
 class District < ActiveRecord::Base
   include AwsAccessible
 
-  attr_accessor :dockercfg
-
   before_save :update_ecs_config
   before_create :create_ecs_cluster
   after_destroy :delete_ecs_cluster
@@ -14,6 +12,8 @@ class District < ActiveRecord::Base
   validates :name, presence: true
   validates :vpc_id, presence: true
   validates :private_hosted_zone_id, presence: true
+
+  serialize :dockercfg, JSON
 
   def to_param
     name
