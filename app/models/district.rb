@@ -103,10 +103,7 @@ class District < ActiveRecord::Base
 yum install -y aws-cli
 aws s3 cp s3://#{s3_bucket_name}/#{name}/ecs.config /etc/ecs/ecs.config
 
-cat <<EOF > /etc/sysconfig/docker
-OPTIONS="--log-driver=syslog --log-opt syslog-address=tcp://127.0.0.1:514"
-EOF
-service docker restart
+service docker start
 
 PRIVATE_IP=`curl http://169.254.169.254/latest/meta-data/local-ipv4`
 docker run -d --restart=always --name="logger" -p 514:514 -v /var/log:/var/log -e "LE_TOKEN=#{logentries_token}" -e "SYSLOG_HOSTNAME=$PRIVATE_IP" k2nr/rsyslog-logentries
