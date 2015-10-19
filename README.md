@@ -11,19 +11,6 @@ Prior to alpha status.
 Barcelona tries to be tied with AWS managed services(ECS, ELB, VPC) so that we have less amount of ops tasks.
 Barcelona will not offer new concpets. It's a simple wrapper service on top of AWS EC2 Container Service(ECS). All data or configurations in Barcelona are directly linked to AWS resource.
 
-## Architecture
-
-Barcelona consists of
-
-- Front Restful API which eventually make requests to AWS API
-- AWS resources as a backend
-  - ECS(AWS container service) for docker container management
-  - ELB + Route53 for service discovery and load balancing
-
-All of your applications will run on ECS container instances and registered to an ELB dedicated for an application. The ELB endpoint URL is resolved by Route53 CNAME record(for private services) or A ALIAS record(for public-facing services)
-
-Barcelona has 2 important resources: `District` and `Heritage`
-
 ### District
 
 `District` is basically same as AWS ECS's cluster. It also has several associations to provide proper AWS configuration:
