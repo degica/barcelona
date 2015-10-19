@@ -4,7 +4,7 @@ class Oneoff < ActiveRecord::Base
   validates :heritage, presence: true
   validates :command, presence: true
 
-  attr_accessor :env_vars
+  attr_accessor :env_vars, :image_tag
 
   after_initialize do |oneoff|
     oneoff.env_vars ||= []
@@ -78,13 +78,21 @@ class Oneoff < ActiveRecord::Base
     "#{heritage.name}-oneoff"
   end
 
+  def image_path
+    if image_tag.present?
+      "#{heritage.image_name}:#{image_tag}"
+    else
+      heritage.image_path
+    end
+  end
+
   def task_definition
     {
       name: heritage.name,
-      cpu: 128,
-      memory: 128,
+      cpu: 256,
+      memory: 256,
       essential: true,
-      image: heritage.image_path,
+      image: image_path,
       environment: heritage.env_vars.map { |e| {name: e.key, value: e.value} }
     }.compact
   end
