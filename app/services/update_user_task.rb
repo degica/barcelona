@@ -46,6 +46,10 @@ class UpdateUserTask
       ]
     )
 
+    env = {"USER_NAME" => user.name,}
+    env["USER_PUBLIC_KEY"] = user.public_key if user.public_key.present?
+    env["USER_DOCKERCFG"] = district.dockercfg.to_json if district.dockercfg.present?
+
     resp = ecs.start_task(
       cluster: district.name,
       task_definition: "update_user",
@@ -53,16 +57,7 @@ class UpdateUserTask
         container_overrides: [
           {
             name: "update_user",
-            environment: [
-              {
-                name: "USER_NAME",
-                value: user.name
-              },
-              {
-                name: "USER_PUBLIC_KEY",
-                value: user.public_key
-              }
-            ]
+            environment: env.map { |k, v| {name: k, value: v} }
           }
         ]
       },
