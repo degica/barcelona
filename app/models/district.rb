@@ -28,7 +28,7 @@ class District < ActiveRecord::Base
     ).subnets
   end
 
-  def launch_instances(count: 1)
+  def launch_instances(count: 1, instance_type:)
     ec2.run_instances(
       image_id: 'ami-6e920b6e', # amzn-ami-2015.09.a-amazon-ecs-optimized
       min_count: count,
@@ -36,7 +36,7 @@ class District < ActiveRecord::Base
       key_name: 'kkajihiro',
       security_group_ids: [instance_security_group].compact,
       user_data: instance_user_data,
-      instance_type: 't2.micro',
+      instance_type: instance_type,
       subnet_id: subnets("Private").sample.subnet_id,
       iam_instance_profile: {
         name: ecs_instance_role
