@@ -112,7 +112,10 @@ chmod 755 /usr/bin/docker
 service docker restart
 
 PRIVATE_IP=`curl http://169.254.169.254/latest/meta-data/local-ipv4`
-docker run -d --restart=always --name="logger" -p 514:514 -v /var/log:/var/log -e "LE_TOKEN=#{logentries_token}" -e "SYSLOG_HOSTNAME=$PRIVATE_IP" k2nr/rsyslog-logentries
+
+service rsyslog stop
+rm -rf /dev/log
+docker run -d --restart=always --name="logger" -p 514:514 -v /dev:/dev -e "LE_TOKEN=#{logentries_token}" -e "SYSLOG_HOSTNAME=$PRIVATE_IP" k2nr/rsyslog-logentries
 
 aws s3 cp s3://#{s3_bucket_name}/#{name}/users ./users
 echo >> ./users
