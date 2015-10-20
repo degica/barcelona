@@ -2,7 +2,7 @@ class DeployRunnerJob < ActiveJob::Base
   queue_as :default
 
   def perform(heritage)
-    heritage.events.create(level: :good, message: "Deploying...")
+    heritage.events.create(level: :good, message: "Deploying #{heritage.name}(#{heritage.image_path}) to #{heritage.district.name} district...")
     before_deploy = heritage.before_deploy
     if before_deploy.present?
       oneoff = heritage.oneoffs.create!(command: before_deploy)
@@ -11,7 +11,7 @@ class DeployRunnerJob < ActiveJob::Base
         heritage.events.create(level: :error, message: "The command `#{before_deploy}` failed. Stopped deploying.")
         return
       else
-        heritage.events.create(level: :good, message:  "`#{before_deploy}` successfuly finished")
+        heritage.events.create(level: :good, message:  "before_deploy script `#{before_deploy}` successfully finished")
       end
     end
 
