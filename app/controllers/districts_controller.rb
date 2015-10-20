@@ -22,7 +22,8 @@ class DistrictsController < ApplicationController
 
   def launch_instances
     count = params.require(:count)
-    @district.launch_instances(count: count)
+    instance_type = params[:instance_type] || 't2.micro'
+    @district.launch_instances(count: count, instance_type: instance_type)
     render status: 204, nothing: true
   end
 

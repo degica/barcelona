@@ -28,7 +28,7 @@ describe District, :vcr do
   end
 
   describe "#launch_instances" do
-    subject { district.launch_instances(count: 1) }
+    subject { district.launch_instances(count: 1, instance_type: 't2.micro') }
 
     it "launches EC2 instance" do
       is_expected.to_not be_nil
