@@ -46,7 +46,10 @@ class UpdateUserTask
       ]
     )
 
-    env = {"USER_NAME" => user.name,}
+    env = {
+      "USER_NAME" => user.name,
+      "USER_GROUPS" => ["docker", "wheel"].join(",")
+    }
     env["USER_PUBLIC_KEY"] = user.public_key if user.public_key.present?
     env["USER_DOCKERCFG"] = district.dockercfg.to_json if district.dockercfg.present?
 
