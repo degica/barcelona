@@ -103,7 +103,7 @@ class District < ActiveRecord::Base
 yum install -y aws-cli
 aws s3 cp s3://#{s3_bucket_name}/#{name}/ecs.config /etc/ecs/ecs.config
 
-sed -i 's/^#\s%wheel\s*ALL=(ALL)\s*NOPASSWD:\sALL$/%wheel\tALL=(ALL)\tNOPASSWD:\tALL/g' /etc/sudoers
+sed -i 's/^#\\s%wheel\\s*ALL=(ALL)\\s*NOPASSWD:\\sALL$/%wheel\\tALL=(ALL)\\tNOPASSWD:\\tALL/g' /etc/sudoers
 
 curl -o ./docker https://get.docker.com/builds/Linux/x86_64/docker-1.8.3
 mv ./docker /usr/bin/docker
