@@ -1,0 +1,16 @@
+environments:
+  staging:
+    name: barcelona-nginx
+    image_name: quay.io/degica/barcelona-nginx
+    env_vars:
+      UPSTREAM_URL: web.barcelona.barcelona.local
+      RESOLVER_IP: 10.0.0.2
+      SERVER_NAME: barcelona.yourdomain.com
+    services:
+      - name: web
+        public: true
+        cpu: 256
+        memory: 256
+        port_mappings:
+          - lb_port: 80
+            container_port: 80
