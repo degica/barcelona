@@ -122,6 +122,9 @@ describe Backend::Ecs::Adapter do
                                    }
                                  }
                                )
+          expect(route53_mock).to receive(:get_hosted_zone) do
+            double(hosted_zone: double(name: 'bcn.'))
+          end
           expect(route53_mock).to receive(:change_resource_record_sets)
                                    .with(
                                      hosted_zone_id: service.district.private_hosted_zone_id,
@@ -130,7 +133,7 @@ describe Backend::Ecs::Adapter do
                                          {
                                            action: "CREATE",
                                            resource_record_set: {
-                                             name: "web.awesome-app.barcelona.local.",
+                                             name: "web.awesome-app.bcn.",
                                              type: "CNAME",
                                              ttl: 300,
                                              resource_records: [
@@ -175,6 +178,10 @@ describe Backend::Ecs::Adapter do
                              cluster: service.district.name,
                              service: service.service_name
                            )
+
+      expect(route53_mock).to receive(:get_hosted_zone) do
+        double(hosted_zone: double(name: 'bcn.'))
+      end
       expect(route53_mock).to receive(:change_resource_record_sets)
                                .with(
                                  hosted_zone_id: service.district.private_hosted_zone_id,
@@ -183,7 +190,7 @@ describe Backend::Ecs::Adapter do
                                      {
                                        action: "DELETE",
                                        resource_record_set: {
-                                         name: "web.awesome-app.barcelona.local.",
+                                         name: "web.awesome-app.bcn.",
                                          type: "CNAME",
                                          ttl: 300,
                                          resource_records: [

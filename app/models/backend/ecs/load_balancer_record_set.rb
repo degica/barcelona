@@ -27,7 +27,7 @@ module Backend::Ecs
             {
               action: action,
               resource_record_set: {
-                name: [name, heritage.name, "barcelona.local."].join("."),
+                name: [name, heritage.name, hosted_zone.name].join("."),
                 type: "CNAME",
                 ttl: 300,
                 resource_records: [
@@ -40,6 +40,10 @@ module Backend::Ecs
           ]
         }
       )
+    end
+
+    def hosted_zone
+      @hosted_zone ||= route53.get_hosted_zone(id: district.private_hosted_zone_id).hosted_zone
     end
   end
 end

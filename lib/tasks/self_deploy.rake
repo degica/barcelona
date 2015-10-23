@@ -49,12 +49,14 @@ namespace :bcn do
       dockercfg: dockercfg
     )
 
-#    district.launch_instances(count: 1)
+    if user_input("Do you want to launch a new container instance? [y/N]") =~ /^[Yy]?$/
+      district.launch_instances(count: 1, instance_type: "t2.micro")
 
-    puts ""
-    puts "Created new ECS cluster with 1 container instance."
-    puts "Press enter when you confirm the container instance is running and registered to the cluster."
-    STDIN.gets
+      puts ""
+      puts "Created new ECS cluster with 1 container instance."
+      puts "Press enter when you confirm the container instance is running and registered to the cluster."
+      STDIN.gets
+    end
 
     heritage = district.heritages.create!(
       name: "barcelona",
@@ -82,6 +84,8 @@ namespace :bcn do
       },
       command: "rake bcn:self_deploy_remote"
     )
+
+    puts "Provisioning barcelona service. This may take several minutes."
     oneoff.run!(sync: true)
   end
 
@@ -107,7 +111,7 @@ namespace :bcn do
       name: "barcelona",
       image_name: ENV["DOCKER_IMAGE_NAME"],
       image_tag: "latest",
-      before_deploy: ["rake", "db:migrate"],
+      before_deploy: "rake db:migrate",
       env_vars_attributes: [
         {key: "AWS_REGION", value: ENV["AWS_REGION"]},
         {key: "AWS_ACCESS_KEY_ID",     value: ENV["AWS_ACCESS_KEY_ID"]},
@@ -120,8 +124,8 @@ namespace :bcn do
       services_attributes: [
         {
           name: "web",
-          cpu: 128,
-          memory: 128,
+          cpu: 256,
+          memory: 256,
           public: true,
           command: "rails s -p 3000 -b 0.0.0.0",
           port_mappings_attributes: [
@@ -131,7 +135,7 @@ namespace :bcn do
         {
           name: "worker",
           cpu: 128,
-          memory: 128,
+          memory: 256,
           command: "rake jobs:work"
         }
       ]
