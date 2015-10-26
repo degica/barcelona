@@ -48,7 +48,7 @@ class UpdateUserTask
 
     env = {
       "USER_NAME" => user.name,
-      "USER_GROUPS" => ["docker", "wheel"].join(",")
+      "USER_GROUPS" => user_groups.join(",")
     }
     env["USER_PUBLIC_KEY"] = user.public_key if user.public_key.present?
     env["USER_DOCKERCFG"] = district.dockercfg.to_json if district.dockercfg.present?
@@ -66,5 +66,14 @@ class UpdateUserTask
       },
       container_instances: district.container_instances.map{ |c| c[:container_instance_arn] }
     )
+  end
+
+  private
+
+  def user_groups
+    groups = []
+    groups << "docker" if user.developer?
+    groups << "wheel" if user.admin?
+    groups
   end
 end
