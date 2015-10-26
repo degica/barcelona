@@ -81,6 +81,7 @@ namespace :bcn do
         "PRIVATE_HOSTED_ZONE_ID"     => private_hosted_zone_id,
         "S3_BUCKET_NAME"             => s3_bucket_name,
         "DOCKER_IMAGE_NAME"          => docker_image_name,
+        "DOCKERCFG"                  => district.dockercfg.to_json
       },
       command: "rake bcn:self_deploy_remote"
     )
@@ -102,7 +103,8 @@ namespace :bcn do
       ecs_service_role: ENV["ECS_SERVICE_ROLE"],
       ecs_instance_role: ENV["ECS_INSTANCE_ROLE"],
       private_hosted_zone_id: ENV["PRIVATE_HOSTED_ZONE_ID"],
-      s3_bucket_name: ENV["S3_BUCKET_NAME"]
+      s3_bucket_name: ENV["S3_BUCKET_NAME"],
+      dockercfg: JSON.load(ENV["DOCKERCFG"])
     )
 
     ENV["ENCRYPTION_KEY"] = SecureRandom.hex(64)
