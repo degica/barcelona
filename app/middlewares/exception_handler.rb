@@ -81,6 +81,8 @@ class ExceptionHandler
       raise NotFound
     rescue ActiveRecord::RecordInvalid => e
       raise UnprocessableEntity.new(e.message)
+    rescue Pundit::Error => e
+      raise Unauthorized.new(e.message)
     rescue
       raise InternalServerError
     end

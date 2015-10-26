@@ -12,6 +12,7 @@ gem 'octokit'
 gem 'delayed_job_active_record'
 gem 'rails_12factor', group: :production
 gem 'slack-notifier'
+gem 'pundit'
 
 group :development, :test do
   gem 'pry-rails'
