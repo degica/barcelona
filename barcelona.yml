@@ -1,6 +1,5 @@
 environments:
   production:
-  staging:
     name: barcelona
     image_name: quay.io/degica/barcelona
     before_deploy: rake db:migrate
