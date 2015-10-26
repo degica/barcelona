@@ -1,21 +1,28 @@
 class User < ActiveRecord::Base
-  ALLOWED_TEAM = {org: 'degica', team: 'developers'}
+  ALLOWED_TEAMS = [
+    {org: 'degica', team: 'developers', role: "developer"},
+    {org: 'degica', team: 'Admin developers', role: "admin"},
+  ]
+
   has_many :users_districts
   has_many :districts, through: :users_districts
 
   attr_accessor :token
 
+  serialize :roles
+
   validates :name, presence: true, uniqueness: true
 
-  before_validation :assign_all_districts
+  before_validation :assign_districts
   after_save :update_instance_user_account
 
   def self.login!(github_token)
     client = Octokit::Client.new(access_token: github_token)
-    unless allowed_user?(client.user_teams)
-      raise ExceptionHandler::Unauthorized.new("You are not allowed to login")
-    end
+    roles = user_roles(client.user_teams)
+    raise ExceptionHandler::Unauthorized.new("You are not allowed to login") if roles.blank?
+
     user = User.find_or_create_by!(name: client.user.login)
+    user.roles = roles
     user.new_token!
     user
   end
@@ -24,10 +31,14 @@ class User < ActiveRecord::Base
     User.find_by(token_hash: Gibberish::SHA256(token))
   end
 
-  def self.allowed_user?(user_teams)
-    user_teams.any? { |t|
-      t.name == ALLOWED_TEAM[:team] && t.organization.login == ALLOWED_TEAM[:org]
-    }
+  def self.user_roles(user_teams)
+    user_teams.map{ |t| role_for(team: t.name, org: t.organization.login) }.compact
+  end
+
+  def self.role_for(team:, org:)
+    ALLOWED_TEAMS.select do |t|
+      t[:team] == team && t[:org] == org
+    end.first.try(:[], :role)
   end
 
   def new_token!
@@ -36,9 +47,17 @@ class User < ActiveRecord::Base
     save!
   end
 
+  def admin?
+    roles.include? "admin"
+  end
+
+  def developer?
+    roles.include?("developer") || roles.include?("admin")
+  end
+
   private
 
-  def assign_all_districts
+  def assign_districts
     # Currently all users belong to all districts
     self.districts = District.all
   end
