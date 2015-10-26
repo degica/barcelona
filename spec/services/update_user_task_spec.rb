@@ -58,7 +58,7 @@ describe UpdateUserTask do
                                  name: "update_user",
                                  environment: [
                                    {name: "USER_NAME", value: user.name},
-                                   {name: "USER_GROUPS", value: "docker,wheel"},
+                                   {name: "USER_GROUPS", value: "docker"},
                                    {name: "USER_PUBLIC_KEY", value: user.public_key},
                                    {name: "USER_DOCKERCFG", value: district.dockercfg.to_json}
                                  ]
