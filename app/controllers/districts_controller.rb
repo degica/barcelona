@@ -1,5 +1,6 @@
 class DistrictsController < ApplicationController
   before_action :load_district, except: [:index, :create]
+  before_action :authorize_district
 
   def index
     @districts = District.all
@@ -11,7 +12,7 @@ class DistrictsController < ApplicationController
   end
 
   def create
-    @district = District.create(create_params)
+    @district = District.create!(create_params)
     render json: @district
   end
 
@@ -57,5 +58,13 @@ class DistrictsController < ApplicationController
 
   def load_district
     @district = District.find_by!(name: params[:id])
+  end
+
+  def authorize_district
+    if @district.present?
+      authorize @district
+    else
+      authorize District
+    end
   end
 end
