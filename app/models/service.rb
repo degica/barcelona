@@ -1,6 +1,4 @@
 class Service < ActiveRecord::Base
-  include AwsAccessible
-
   belongs_to :heritage
   has_many :port_mappings, dependent: :destroy
 

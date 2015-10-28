@@ -7,7 +7,7 @@ describe UpdateUserTask do
   let(:ecs_mock) { double }
 
   before do
-    allow(task).to receive(:ecs) { ecs_mock }
+    allow(task).to receive_message_chain(:aws, :ecs) { ecs_mock }
   end
   it "updates users on every container instance" do
     expect(ecs_mock).to receive(:register_task_definition)

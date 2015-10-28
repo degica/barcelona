@@ -1,5 +1,4 @@
 class Heritage < ActiveRecord::Base
-  include AwsAccessible
   has_many :services, dependent: :destroy
   has_many :env_vars, dependent: :destroy
   has_many :oneoffs, dependent: :destroy
@@ -19,7 +18,7 @@ class Heritage < ActiveRecord::Base
   end
 
   def describe_services
-    ecs.describe_services(
+    district.aws.ecs.describe_services(
       cluster: district.name,
       services: services.map(&:service_name)
     ).services

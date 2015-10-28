@@ -46,7 +46,9 @@ namespace :bcn do
       ecs_instance_role:       ecs_instance_role,
       private_hosted_zone_id:  private_hosted_zone_id,
       s3_bucket_name:          s3_bucket_name,
-      dockercfg: dockercfg
+      dockercfg: dockercfg,
+      aws_access_key_id: access_key_id,
+      aws_secret_access_key: secret_access_key
     )
 
     if user_input("Do you want to launch a new container instance? [y/N]") =~ /^[Yy]?$/
@@ -104,7 +106,9 @@ namespace :bcn do
       ecs_instance_role: ENV["ECS_INSTANCE_ROLE"],
       private_hosted_zone_id: ENV["PRIVATE_HOSTED_ZONE_ID"],
       s3_bucket_name: ENV["S3_BUCKET_NAME"],
-      dockercfg: JSON.load(ENV["DOCKERCFG"])
+      dockercfg: JSON.load(ENV["DOCKERCFG"]),
+      aws_access_key_id: ENV["AWS_ACCESS_KEY_ID"],
+      aws_secret_access_key: ENV["AWS_SECRET_ACCESS_KEY"]
     )
 
     ENV["ENCRYPTION_KEY"] = SecureRandom.hex(64)

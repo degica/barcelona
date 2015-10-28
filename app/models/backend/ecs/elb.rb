@@ -1,10 +1,9 @@
 module Backend::Ecs
   class Elb
-    include AwsAccessible
-
     attr_accessor :service
 
     delegate :port_mappings, :service_name, :district, :public?, to: :service
+    delegate :aws, to: :district
 
     def initialize(service)
       @service = service
@@ -12,7 +11,7 @@ module Backend::Ecs
 
     def fetch_load_balancer
       begin
-        return @fetched_load_balancer ||= elb.describe_load_balancers(
+        return @fetched_load_balancer ||= aws.elb.describe_load_balancers(
           load_balancer_names: [service_name],
         ).load_balancer_descriptions.first
       rescue Aws::ElasticLoadBalancing::Errors::LoadBalancerNotFound
@@ -27,7 +26,7 @@ module Backend::Ecs
 
       subnets = district.subnets(public? ? 'Public' : 'Private')
       security_group = public? ? district.public_elb_security_group : district.private_elb_security_group
-      load_balancer = elb.create_load_balancer(
+      load_balancer = aws.elb.create_load_balancer(
         load_balancer_name: service_name,
         subnets: subnets.map(&:subnet_id),
         scheme: public? ? 'internet-facing' : 'internal',
@@ -41,7 +40,7 @@ module Backend::Ecs
           }
         }
       )
-      elb.configure_health_check(
+      aws.elb.configure_health_check(
         load_balancer_name: service_name,
         health_check: {
           target: "TCP:#{port_mappings.first.host_port}",
@@ -51,7 +50,7 @@ module Backend::Ecs
           healthy_threshold: 2
         }
       )
-      elb.modify_load_balancer_attributes(
+      aws.elb.modify_load_balancer_attributes(
         load_balancer_name: service_name,
         load_balancer_attributes: {
           connection_draining: {
@@ -65,7 +64,7 @@ module Backend::Ecs
 
     def delete
       lb = fetch_load_balancer
-      elb.delete_load_balancer(load_balancer_name: lb.load_balancer_name) if lb.present?
+      aws.elb.delete_load_balancer(load_balancer_name: lb.load_balancer_name) if lb.present?
       lb
     end
   end
