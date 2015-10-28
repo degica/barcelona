@@ -1,5 +1,6 @@
 class District < ActiveRecord::Base
   include AwsAccessible
+  include EncryptAttribute
 
   before_save :update_ecs_config
   before_create :create_ecs_cluster
@@ -12,9 +13,13 @@ class District < ActiveRecord::Base
   validates :name, presence: true
   validates :vpc_id, presence: true
   validates :private_hosted_zone_id, presence: true
+  validates :aws_access_key_id, presence: true
+  validates :aws_secret_access_key, presence: true
 
   serialize :dockercfg, JSON
 
+  encrypted_attribute :aws_access_key_id, secret_key: ENV['ENCRYPTION_KEY']
+  encrypted_attribute :aws_secret_access_key, secret_key: ENV['ENCRYPTION_KEY']
   def to_param
     name
   end
