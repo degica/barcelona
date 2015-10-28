@@ -68,6 +68,91 @@ Barcelona provides a Restful API
   - Scale out/in
     - POST /heritages/:heritage_name/services/:service_name/scale
 
+## IAM users and roles
+
+### IAM user for Barcelona API
+
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "Stmt1445588337000",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:RunInstances",
+                "ec2:StopInstances",
+                "ec2:StartInstances",
+                "ec2:DescribeInstances",
+                "ec2:DescribeSubnets",
+                "ecs:*",
+                "elasticloadbalancing:ConfigureHealthCheck",
+                "elasticloadbalancing:CreateLoadBalancer",
+                "elasticloadbalancing:CreateLoadBalancerListeners",
+                "elasticloadbalancing:DeleteLoadBalancer",
+                "elasticloadbalancing:DescribeLoadBalancers",
+                "elasticloadbalancing:ModifyLoadBalancerAttributes",
+                "route53:ChangeResourceRecordSets",
+                "route53:GetHostedZone",
+                "s3:PutObject",
+                "iam:PassRole"
+            ],
+            "Resource": [
+                "*"
+            ]
+        }
+    ]
+}
+```
+
+### ECS instance role
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ecs:CreateCluster",
+        "ecs:DeregisterContainerInstance",
+        "ecs:DiscoverPollEndpoint",
+        "ecs:Poll",
+        "ecs:RegisterContainerInstance",
+        "ecs:StartTelemetrySession",
+        "ecs:Submit*",
+        "s3:Get*",
+        "s3:List*"
+      ],
+      "Resource": [
+        "*"
+      ]
+    }
+  ]
+}
+```
+
+### ECS service role
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "ec2:AuthorizeSecurityGroupIngress",
+        "ec2:Describe*",
+        "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
+        "elasticloadbalancing:Describe*",
+        "elasticloadbalancing:RegisterInstancesWithLoadBalancer"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
+
 ## TODO
 
 - Logentries integration
