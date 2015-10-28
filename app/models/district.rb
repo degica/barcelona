@@ -9,7 +9,7 @@ class District < ActiveRecord::Base
   has_many :users_districts, dependent: :destroy
   has_many :users, through: :users_districts
 
-  validates :name, presence: true
+  validates :name, presence: true, uniqueness: true
   validates :vpc_id, presence: true
   validates :private_hosted_zone_id, presence: true
   validates :aws_access_key_id, presence: true
