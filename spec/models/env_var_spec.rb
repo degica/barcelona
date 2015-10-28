@@ -10,5 +10,6 @@ describe EnvVar do
   it "decrypts encrypted value" do
     expect(EnvVar.find(env_var.id).key).to eq "KEY"
     expect(EnvVar.find(env_var.id).value).to eq "VALUE"
+    expect(EnvVar.find(env_var.id).value).to be_a String
   end
 end
