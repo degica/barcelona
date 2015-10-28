@@ -5,6 +5,22 @@ describe Oneoff do
   let(:heritage) { create :heritage }
   let(:oneoff) { create :oneoff, heritage: heritage, command: "rake db:migrate" }
 
+  describe "#running?" do
+    before do
+      allow(oneoff).to receive_message_chain(:aws, :ecs, :describe_tasks) {
+        double(
+          tasks: [
+            double(
+              containers: [
+                double(last_status: "STOPPED")
+              ])
+          ])
+      }
+    end
+
+    it { expect(oneoff.running?).to eq false }
+  end
+
   describe "#run" do
     before do
       allow(oneoff).to receive_message_chain(:aws, :ecs) { ecs_mock }

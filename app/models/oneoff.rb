@@ -70,7 +70,7 @@ class Oneoff < ActiveRecord::Base
   end
 
   def fetch_task
-    @task = ecs.describe_tasks(
+    @task = aws.ecs.describe_tasks(
       cluster: heritage.district.name,
       tasks: [task_arn]
     ).tasks[0]
