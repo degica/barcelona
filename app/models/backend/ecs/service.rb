@@ -1,24 +1,23 @@
 module Backend::Ecs
   class Service
-    include AwsAccessible
-
     attr_accessor :service
-    delegate :service_name, :cpu, :memory, :command, :port_mappings, to: :service
+    delegate :service_name, :cpu, :memory, :command, :port_mappings, :district, to: :service
+    delegate :aws, to: :district
 
     def initialize(service)
       @service = service
     end
 
     def scale(desired_count)
-      ecs.update_service(cluster: service.district.name,
-                         service: service.service_name,
+      aws.ecs.update_service(cluster: district.name,
+                         service: service_name,
                          desired_count: desired_count)
     end
 
     def delete
       return unless applied?
       scale(0)
-      ecs.delete_service(cluster: service.district.name, service: service.service_name)
+      aws.ecs.delete_service(cluster: district.name, service: service.service_name)
     end
 
     def status
@@ -65,13 +64,13 @@ module Backend::Ecs
     end
 
     def register_task
-      ecs.register_task_definition(family: service.service_name,
+      aws.ecs.register_task_definition(family: service.service_name,
                                    container_definitions: [container_definition])
     end
 
     def update
-      ecs.update_service(
-        cluster: service.district.name,
+      aws.ecs.update_service(
+        cluster: district.name,
         service: service.service_name,
         task_definition: service.service_name
       )
@@ -79,7 +78,7 @@ module Backend::Ecs
 
     def create(load_balancer)
       params = {
-        cluster: service.district.name,
+        cluster: district.name,
         service_name: service.service_name,
         task_definition: service.service_name,
         desired_count: 1
@@ -92,9 +91,9 @@ module Backend::Ecs
             container_port: port_mapping.container_port
           }
         end
-        params[:role] = service.district.ecs_service_role
+        params[:role] = district.ecs_service_role
       end
-      ecs.create_service(params)
+      aws.ecs.create_service(params)
     end
 
     def ecs_service
@@ -102,8 +101,8 @@ module Backend::Ecs
     end
 
     def fetch_ecs_service
-      @ecs_service = ecs.describe_services(
-        cluster: service.district.name,
+      @ecs_service = aws.ecs.describe_services(
+        cluster: district.name,
         services: [service.service_name]
       ).services.first
     end

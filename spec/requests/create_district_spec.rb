@@ -12,7 +12,9 @@ describe "POST /districts", :vcr, type: :request do
     {
       name: "district",
       vpc_id: "vpcid",
-      private_hosted_zone_id: "hosted_zone"
+      private_hosted_zone_id: "hosted_zone",
+      aws_access_key_id: "awsaccessskeyid",
+      aws_secret_access_key: "secret key"
     }
   end
 

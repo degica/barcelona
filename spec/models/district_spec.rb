@@ -3,11 +3,11 @@ require 'rails_helper'
 describe District, :vcr do
   let(:district) { create(:district) }
 
-  before do
-    Aws.config[:stub_responses] = false
-  end
-
   describe "#subnets" do
+    before do
+      Aws.config[:stub_responses] = false
+    end
+
     it "returns private subnets" do
       expect(district.subnets("Private").count).to eq 2
     end
@@ -17,6 +17,10 @@ describe District, :vcr do
   end
 
   describe "#container_instances" do
+    before do
+      Aws.config[:stub_responses] = false
+    end
+
     it "returns container instances and ec2 instances information" do
       result = district.container_instances
       expect(result).to be_a Array
@@ -28,6 +32,10 @@ describe District, :vcr do
   end
 
   describe "#launch_instances" do
+    before do
+      Aws.config[:stub_responses] = false
+    end
+
     subject { district.launch_instances(count: 1, instance_type: 't2.micro') }
 
     it "launches EC2 instance" do

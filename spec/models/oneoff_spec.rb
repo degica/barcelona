@@ -7,7 +7,7 @@ describe Oneoff do
 
   describe "#run" do
     before do
-      allow(oneoff).to receive(:ecs) { ecs_mock }
+      allow(oneoff).to receive_message_chain(:aws, :ecs) { ecs_mock }
     end
 
     it "creates ECS task" do

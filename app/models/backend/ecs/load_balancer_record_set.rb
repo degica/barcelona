@@ -1,9 +1,8 @@
 module Backend::Ecs
   class LoadBalancerRecordSet
-    include AwsAccessible
-
     attr_accessor :service
     delegate :name, :heritage, :service_name, :district, to: :service
+    delegate :aws, to: :district
 
     def initialize(service)
       @service = service
@@ -20,7 +19,7 @@ module Backend::Ecs
     private
 
     def change_record_set(action, elb_dns_name)
-      route53.change_resource_record_sets(
+      aws.route53.change_resource_record_sets(
         hosted_zone_id: district.private_hosted_zone_id,
         change_batch: {
           changes: [
@@ -43,7 +42,7 @@ module Backend::Ecs
     end
 
     def hosted_zone
-      @hosted_zone ||= route53.get_hosted_zone(id: district.private_hosted_zone_id).hosted_zone
+      @hosted_zone ||= aws.route53.get_hosted_zone(id: district.private_hosted_zone_id).hosted_zone
     end
   end
 end

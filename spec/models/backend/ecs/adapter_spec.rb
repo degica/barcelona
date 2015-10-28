@@ -10,7 +10,7 @@ describe Backend::Ecs::Adapter do
     context "when updating service" do
       before do
         allow(adapter.ecs_service).to receive(:applied?) { true }
-        allow(adapter.ecs_service).to receive(:ecs) { ecs_mock }
+        allow(adapter.ecs_service).to receive_message_chain(:aws, :ecs) { ecs_mock }
       end
 
       context "when port_mappings is blank" do
@@ -34,7 +34,7 @@ describe Backend::Ecs::Adapter do
     context "when creating service" do
       before do
         allow(adapter.ecs_service).to receive(:applied?) { false }
-        allow(adapter.ecs_service).to receive(:ecs) { ecs_mock }
+        allow(adapter.ecs_service).to receive_message_chain(:aws, :ecs) { ecs_mock }
       end
 
       context "when port_mappings is blank" do
@@ -60,8 +60,8 @@ describe Backend::Ecs::Adapter do
         let(:route53_mock) { double }
 
         before do
-          allow(adapter.elb).to receive(:elb) { elb_mock }
-          allow(adapter.record_set).to receive(:route53) { route53_mock }
+          allow(adapter.elb).to receive_message_chain(:aws, :elb) { elb_mock }
+          allow(adapter.record_set).to receive_message_chain(:aws, :route53) { route53_mock }
           allow(adapter.elb).to receive(:fetch_load_balancer) { nil }
           service.port_mappings.create(lb_port: 80, container_port: 3000)
         end
@@ -158,8 +158,8 @@ describe Backend::Ecs::Adapter do
 
     before do
       allow(adapter.ecs_service).to receive(:applied?) { true }
-      allow(adapter.ecs_service).to receive(:ecs) { ecs_mock }
-      allow(adapter.record_set).to receive(:route53) { route53_mock }
+      allow(adapter.ecs_service).to receive_message_chain(:aws, :ecs) { ecs_mock }
+      allow(adapter.record_set).to receive_message_chain(:aws, :route53) { route53_mock }
     end
 
     it "deletes ECS resources" do

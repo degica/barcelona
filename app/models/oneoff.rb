@@ -1,21 +1,23 @@
 class Oneoff < ActiveRecord::Base
-  include AwsAccessible
   belongs_to :heritage
   validates :heritage, presence: true
   validates :command, presence: true
 
   attr_accessor :env_vars, :image_tag
 
+  delegate :district, to: :heritage
+  delegate :aws, to: :district
+
   after_initialize do |oneoff|
     oneoff.env_vars ||= []
   end
 
   def run(sync: false)
-    ecs.register_task_definition(
+    aws.ecs.register_task_definition(
       family: task_family,
       container_definitions: [task_definition]
     )
-    resp = ecs.run_task(
+    resp = aws.ecs.run_task(
       cluster: heritage.district.name,
       task_definition: task_family,
       overrides: {

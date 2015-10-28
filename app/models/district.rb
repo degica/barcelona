@@ -1,5 +1,4 @@
 class District < ActiveRecord::Base
-  include AwsAccessible
   include EncryptAttribute
 
   before_save :update_ecs_config
@@ -20,12 +19,17 @@ class District < ActiveRecord::Base
 
   encrypted_attribute :aws_access_key_id, secret_key: ENV['ENCRYPTION_KEY']
   encrypted_attribute :aws_secret_access_key, secret_key: ENV['ENCRYPTION_KEY']
+
+  def aws
+    @aws ||= AwsAccessor.new(aws_access_key_id, aws_secret_access_key)
+  end
+
   def to_param
     name
   end
 
   def subnets(network)
-    @subnets ||= Aws::EC2::Client.new.describe_subnets(
+    @subnets ||= aws.ec2.describe_subnets(
       filters: [
         {name: "vpc-id", values: [vpc_id]},
         {name: 'tag:Network', values: [network]}
@@ -34,7 +38,7 @@ class District < ActiveRecord::Base
   end
 
   def launch_instances(count: 1, instance_type:)
-    ec2.run_instances(
+    aws.ec2.run_instances(
       image_id: 'ami-6e920b6e', # amzn-ami-2015.09.a-amazon-ecs-optimized
       min_count: count,
       max_count: count,
@@ -50,8 +54,8 @@ class District < ActiveRecord::Base
   end
 
   def container_instances
-    arns = ecs.list_container_instances(cluster: name).container_instance_arns
-    container_instances = ecs.describe_container_instances(cluster: name,
+    arns = aws.ecs.list_container_instances(cluster: name).container_instance_arns
+    container_instances = aws.ecs.describe_container_instances(cluster: name,
                                                            container_instances: arns)
                           .container_instances
     instances = {}
@@ -67,7 +71,7 @@ class District < ActiveRecord::Base
       instances[ci.ec2_instance_id] = instance
     end
 
-    ec2_instances = ec2.describe_instances(
+    ec2_instances = aws.ec2.describe_instances(
       instance_ids: container_instances.map(&:ec2_instance_id)
     ).reservations.map(&:instances).flatten
 
@@ -81,7 +85,7 @@ class District < ActiveRecord::Base
   end
 
   def update_instance_user_account(user)
-    s3.put_object(bucket: s3_bucket_name,
+    aws.s3.put_object(bucket: s3_bucket_name,
                   key: "#{name}/users",
                   body: users_body,
                   server_side_encryption: "AES256")
@@ -92,14 +96,14 @@ class District < ActiveRecord::Base
 
   def update_ecs_config
     return if dockercfg.blank?
-    s3.put_object(bucket: s3_bucket_name,
+    aws.s3.put_object(bucket: s3_bucket_name,
                   key: "#{name}/ecs.config",
                   body: ecs_config,
                   server_side_encryption: "AES256")
   end
 
   def create_ecs_cluster
-    ecs.create_cluster(cluster_name: name)
+    aws.ecs.create_cluster(cluster_name: name)
   end
 
   def instance_user_data
@@ -148,6 +152,6 @@ EOS
   end
 
   def delete_ecs_cluster
-    ecs.delete_cluster(cluster: name)
+    aws.ecs.delete_cluster(cluster: name)
   end
 end

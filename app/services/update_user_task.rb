@@ -1,6 +1,6 @@
 class UpdateUserTask
-  include AwsAccessible
   attr_accessor :district, :user
+  delegate :aws, to: :district
 
   def initialize(district, user)
     @district = district
@@ -9,7 +9,7 @@ class UpdateUserTask
 
   def run
     Rails.logger.info "Updating user #{user.name} for district #{district.name}"
-    ecs.register_task_definition(
+    aws.ecs.register_task_definition(
       family: "update_user",
       container_definitions: [
         {
@@ -53,7 +53,7 @@ class UpdateUserTask
     env["USER_PUBLIC_KEY"] = user.public_key if user.public_key.present?
     env["USER_DOCKERCFG"] = district.dockercfg.to_json if district.dockercfg.present?
 
-    resp = ecs.start_task(
+    resp = aws.ecs.start_task(
       cluster: district.name,
       task_definition: "update_user",
       overrides: {
