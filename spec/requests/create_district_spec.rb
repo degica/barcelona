@@ -14,7 +14,8 @@ describe "POST /districts", :vcr, type: :request do
       vpc_id: "vpcid",
       private_hosted_zone_id: "hosted_zone",
       aws_access_key_id: "awsaccessskeyid",
-      aws_secret_access_key: "secret key"
+      aws_secret_access_key: "secret key",
+      s3_bucket_name: "degica-barcelona"
     }
   end
 
