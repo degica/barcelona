@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "DELETE /heritages/:heritage", :vcr, type: :request do
+describe "DELETE /heritages/:heritage", type: :request do
   let(:user) { create :user }
   let(:auth) { {"X-Barcelona-Token" => user.token} }
   let(:district) { create :district }

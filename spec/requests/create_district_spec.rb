@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "POST /districts", :vcr, type: :request do
+describe "POST /districts", type: :request do
   let(:auth) { {"X-Barcelona-Token" => user.token} }
 
   before do
@@ -14,7 +14,8 @@ describe "POST /districts", :vcr, type: :request do
       vpc_id: "vpcid",
       private_hosted_zone_id: "hosted_zone",
       aws_access_key_id: "awsaccessskeyid",
-      aws_secret_access_key: "secret key"
+      aws_secret_access_key: "secret key",
+      s3_bucket_name: "degica-barcelona"
     }
   end
 

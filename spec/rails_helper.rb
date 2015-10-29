@@ -6,7 +6,6 @@ abort("The Rails environment is running in production mode!") if Rails.env.produ
 require 'spec_helper'
 require 'rspec/rails'
 # Add additional requires below this line. Rails is not loaded until this point!
-require 'vcr'
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
@@ -51,14 +50,5 @@ RSpec.configure do |config|
 
   config.before :each do |example|
     Aws.config[:stub_responses] = true
-  end
-end
-
-VCR.configure do |c|
-  c.cassette_library_dir = 'spec/cassettes'
-  c.hook_into :webmock
-  c.configure_rspec_metadata!
-  c.filter_sensitive_data("AWS_ACCESS_KEY_ID") do |http|
-    ENV["AWS_ACCESS_KEY_ID"]
   end
 end

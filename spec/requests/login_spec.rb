@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "POST /login", :vcr, type: :request do
+describe "POST /login", type: :request do
   let(:user) { create :user }
   let(:gh_auth) { {"X-GitHub-Token" => "abcdef", "Accept" => "application/json"} }
   let(:district) { create :district }

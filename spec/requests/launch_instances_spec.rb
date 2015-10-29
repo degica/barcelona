@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "POST /districts/:district/launch_instances", :vcr, type: :request do
+describe "POST /districts/:district/launch_instances", type: :request do
   let(:user) { create :user }
   let(:auth) { {"X-Barcelona-Token" => user.token} }
   let(:district) { create :district }
