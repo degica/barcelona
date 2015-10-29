@@ -42,7 +42,6 @@ class District < ActiveRecord::Base
       image_id: 'ami-6e920b6e', # amzn-ami-2015.09.a-amazon-ecs-optimized
       min_count: count,
       max_count: count,
-      key_name: 'kkajihiro',
       security_group_ids: [instance_security_group].compact,
       user_data: instance_user_data,
       instance_type: instance_type,
