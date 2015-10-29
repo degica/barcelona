@@ -57,8 +57,8 @@ class District < ActiveRecord::Base
   def container_instances
     arns = aws.ecs.list_container_instances(cluster: name).container_instance_arns
     return [] if arns.blank?
-    container_instances = aws.ecs.describe_container_instances(cluster: name,
-                                                           container_instances: arns)
+    container_instances = aws.ecs
+                          .describe_container_instances(cluster: name, container_instances: arns)
                           .container_instances
     instances = {}
     container_instances.each do |ci|
