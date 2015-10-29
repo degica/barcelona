@@ -11,8 +11,13 @@ class UsersController < ApplicationController
     end
   end
 
+  def index
+    users = User.all
+    render json: users
+  end
+
   def show
-    render json: current_user
+    render json: @user
   end
 
   def update
