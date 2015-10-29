@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "PATCH /districts/:district", :vcr, type: :request do
+describe "PATCH /districts/:district", type: :request do
   let(:auth) { {"X-Barcelona-Token" => user.token} }
   let(:district) { create :district }
 

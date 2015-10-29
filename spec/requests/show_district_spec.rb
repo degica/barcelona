@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "GET /districts/:district", :vcr, type: :request do
+describe "GET /districts/:district", type: :request do
   let(:user) { create :user }
   let(:auth) { {"X-Barcelona-Token" => user.token} }
   let(:district) { create :district }

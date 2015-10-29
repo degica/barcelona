@@ -34,6 +34,4 @@ group :test do
   gem 'rspec-rails'
   gem 'rspec-its'
   gem 'factory_girl_rails'
-  gem 'vcr'
-  gem 'webmock', require: false
 end

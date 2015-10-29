@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "POST /heritages/:heritage/oneoffs", :vcr, type: :request do
+describe "POST /heritages/:heritage/oneoffs", type: :request do
   let(:user) { create :user }
   let(:auth) { {"X-Barcelona-Token" => user.token} }
   let(:heritage) { create :heritage }

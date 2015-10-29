@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe District, :vcr do
+describe District do
   let(:district) { create(:district) }
   let(:ec2_mock) { double }
   let(:ecs_mock) { double }

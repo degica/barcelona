@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "POST /districts/:district/heritages", :vcr, type: :request do
+describe "POST /districts/:district/heritages", type: :request do
   let(:user) { create :user }
   let(:auth) { {"X-Barcelona-Token" => user.token} }
   let(:district) { create :district }

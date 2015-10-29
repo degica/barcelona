@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "PATCH /heritages/:heritage", :vcr, type: :request do
+describe "PATCH /heritages/:heritage", type: :request do
   let(:user) { create :user }
   let(:auth) { {"X-Barcelona-Token" => user.token} }
   let(:district) { create :district }

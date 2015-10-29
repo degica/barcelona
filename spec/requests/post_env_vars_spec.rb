@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "POST /heritages/:heritage/env_vars", :vcr, type: :request do
+describe "POST /heritages/:heritage/env_vars", type: :request do
   let(:user) { create :user }
   let(:auth) { {"X-Barcelona-Token" => user.token} }
   let(:district) { create :district }

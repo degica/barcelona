@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "POST /districts", :vcr, type: :request do
+describe "POST /districts", type: :request do
   let(:auth) { {"X-Barcelona-Token" => user.token} }
 
   before do
