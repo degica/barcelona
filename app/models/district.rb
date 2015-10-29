@@ -3,6 +3,7 @@ class District < ActiveRecord::Base
 
   before_save :update_ecs_config
   before_create :create_ecs_cluster
+  after_create :put_users_file
   after_destroy :delete_ecs_cluster
 
   has_many :heritages, dependent: :destroy
@@ -10,6 +11,7 @@ class District < ActiveRecord::Base
   has_many :users, through: :users_districts
 
   validates :name, presence: true, uniqueness: true
+  validates :s3_bucket_name, presence: true
   validates :vpc_id, presence: true
   validates :private_hosted_zone_id, presence: true
   validates :aws_access_key_id, presence: true
@@ -85,11 +87,15 @@ class District < ActiveRecord::Base
   end
 
   def update_instance_user_account(user)
+    put_users_file
+    UpdateUserTask.new(self, user).run
+  end
+
+  def put_users_file
     aws.s3.put_object(bucket: s3_bucket_name,
                   key: "#{name}/users",
                   body: users_body,
                   server_side_encryption: "AES256")
-    UpdateUserTask.new(self, user).run
   end
 
   private
