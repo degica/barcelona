@@ -56,6 +56,12 @@ class ExceptionHandler
     end
   end
 
+  class Forbidden < Exception
+    def status_code
+      403
+    end
+  end
+
   class UnprocessableEntity < Exception
     def status_code
       422
@@ -82,7 +88,7 @@ class ExceptionHandler
     rescue ActiveRecord::RecordInvalid => e
       raise UnprocessableEntity.new(e.message)
     rescue Pundit::Error => e
-      raise Unauthorized.new(e.message)
+      raise Forbidden.new(e.message)
     rescue
       raise InternalServerError
     end

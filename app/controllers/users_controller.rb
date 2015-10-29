@@ -1,5 +1,6 @@
 class UsersController < ApplicationController
   skip_before_action :authenticate, only: [:login]
+  before_action :load_user, except: [:index, :login]
 
   def login
     github_token = request.headers['HTTP_X_GITHUB_TOKEN']
@@ -10,8 +11,13 @@ class UsersController < ApplicationController
     end
   end
 
+  def index
+    users = User.all
+    render json: users
+  end
+
   def show
-    render json: current_user
+    render json: @user
   end
 
   def update
@@ -20,6 +26,15 @@ class UsersController < ApplicationController
   end
 
   private
+
+  def load_user
+    @user = if params[:id].present?
+              User.find_by!(name: params[:id])
+            else
+              current_user
+            end
+    authorize @user
+  end
 
   def update_params
     params.permit [
