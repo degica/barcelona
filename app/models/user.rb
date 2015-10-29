@@ -14,6 +14,7 @@ class User < ActiveRecord::Base
   validates :name, presence: true, uniqueness: true
 
   before_validation :assign_districts
+  before_save :hash_token
   after_save :update_instance_user_account
 
   def self.login!(github_token)
@@ -43,7 +44,6 @@ class User < ActiveRecord::Base
 
   def new_token!
     self.token = SecureRandom.hex(20)
-    self.token_hash = Gibberish::SHA256(self.token)
     save!
   end
 
@@ -55,7 +55,15 @@ class User < ActiveRecord::Base
     roles.include?("developer") || roles.include?("admin")
   end
 
+  def to_param
+    name
+  end
+
   private
+
+  def hash_token
+    self.token_hash = Gibberish::SHA256(self.token) if token.present?
+  end
 
   def assign_districts
     # Currently all users belong to all districts
