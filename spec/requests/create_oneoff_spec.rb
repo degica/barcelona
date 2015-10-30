@@ -16,7 +16,6 @@ describe "POST /heritages/:heritage/oneoffs", type: :request do
       command: "rake db:migrate",
       image_tag: "v100"
     }
-    expect(DeployRunnerJob).to receive(:perform_later)
     post "/heritages/#{heritage.name}/oneoffs", params, auth
     expect(response).to be_success
     oneoff = JSON.load(response.body)["oneoff"]

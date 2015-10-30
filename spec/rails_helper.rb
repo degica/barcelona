@@ -48,7 +48,7 @@ RSpec.configure do |config|
   # https://relishapp.com/rspec/rspec-rails/docs
   config.infer_spec_type_from_file_location!
 
-  config.before :each do |example|
+  config.before :all do |example|
     Aws.config[:stub_responses] = true
   end
 end

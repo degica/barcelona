@@ -1,10 +1,10 @@
 class DeployRunnerJob < ActiveJob::Base
   queue_as :default
 
-  def perform(heritage)
+  def perform(heritage, without_before_deploy:)
     heritage.events.create(level: :good, message: "Deploying #{heritage.name}(#{heritage.image_path}) to #{heritage.district.name} district...")
     before_deploy = heritage.before_deploy
-    if before_deploy.present?
+    if before_deploy.present? && !without_before_deploy
       oneoff = heritage.oneoffs.create!(command: before_deploy)
       oneoff.run!(sync: true)
       if oneoff.exit_code != 0
