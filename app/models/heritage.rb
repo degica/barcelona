@@ -11,8 +11,6 @@ class Heritage < ActiveRecord::Base
   accepts_nested_attributes_for :services
   accepts_nested_attributes_for :env_vars
 
-  after_save :update_services
-
   def to_param
     name
   end
@@ -30,8 +28,15 @@ class Heritage < ActiveRecord::Base
     "#{image_name}:#{tag}"
   end
 
-  def update_services
+  def save_and_deploy!(without_before_deploy: false)
+    save!
+    update_services(without_before_deploy)
+  end
+
+  private
+
+  def update_services(without_before_deploy)
     return if image_path.nil?
-    DeployRunnerJob.perform_later self
+    DeployRunnerJob.perform_later self, without_before_deploy: without_before_deploy
   end
 end

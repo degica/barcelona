@@ -3,10 +3,10 @@ require 'rails_helper'
 describe Heritage do
   let(:heritage) { build :heritage }
 
-  describe "create" do
+  describe "#save_and_deploy!" do
     it "enqueues deploy job" do
-      expect(DeployRunnerJob).to receive(:perform_later).with(heritage)
-      heritage.save!
+      expect(DeployRunnerJob).to receive(:perform_later).with(heritage, without_before_deploy: false)
+      heritage.save_and_deploy!
     end
   end
 
