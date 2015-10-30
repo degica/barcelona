@@ -45,7 +45,8 @@ module Backend::Ecs
         port_mappings: port_mappings.map{ |m|
           {
             container_port: m.container_port,
-            host_port: m.host_port
+            host_port: m.host_port,
+            protocol: m.protocol
           }
         },
         environment: service.heritage.env_vars.map { |e| {name: e.key, value: e.value} },

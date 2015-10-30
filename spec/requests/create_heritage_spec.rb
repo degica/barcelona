@@ -23,6 +23,11 @@ describe "POST /districts/:district/heritages", type: :request do
             {
               lb_port: 80,
               container_port: 80
+            },
+            {
+              lb_port: 3333,
+              container_port: 3333,
+              protocol: "udp"
             }
           ]
         }
@@ -42,5 +47,9 @@ describe "POST /districts/:district/heritages", type: :request do
     expect(heritage["services"][0]["memory"]).to eq 256
     expect(heritage["services"][0]["port_mappings"][0]["lb_port"]).to eq 80
     expect(heritage["services"][0]["port_mappings"][0]["container_port"]).to eq 80
+    expect(heritage["services"][0]["port_mappings"][0]["protocol"]).to eq "tcp"
+    expect(heritage["services"][0]["port_mappings"][1]["lb_port"]).to eq 3333
+    expect(heritage["services"][0]["port_mappings"][1]["container_port"]).to eq 3333
+    expect(heritage["services"][0]["port_mappings"][1]["protocol"]).to eq "udp"
   end
 end

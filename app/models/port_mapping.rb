@@ -4,6 +4,11 @@ class PortMapping < ActiveRecord::Base
 
   validates :host_port, uniqueness: true
   validates :host_port, :lb_port, :container_port, presence: true
+  validates :protocol, inclusion: { in: %w(tcp udp) }
+
+  after_initialize do |mapping|
+    mapping.protocol ||= "tcp"
+  end
 
   before_validation :assign_host_port
 
