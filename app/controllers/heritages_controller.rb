@@ -64,7 +64,7 @@ class HeritagesController < ApplicationController
         :command,
         :public,
         {
-          port_mappings: [:lb_port, :container_port]
+          port_mappings: [:lb_port, :container_port, :protocol]
         }
       ]
     ]).tap do |whitelisted|
