@@ -10,8 +10,8 @@ module Backend::Ecs
 
     def scale(desired_count)
       aws.ecs.update_service(cluster: district.name,
-                         service: service_name,
-                         desired_count: desired_count)
+                             service: service_name,
+                             desired_count: desired_count)
     end
 
     def delete
