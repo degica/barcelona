@@ -2,6 +2,7 @@ module Backend::Ecs
   class Service
     attr_accessor :service
     delegate :service_name, :cpu, :memory, :command, :port_mappings, :district, to: :service
+    delegate :desired_count, :running_count, :pending_count, to: :ecs_service
     delegate :aws, to: :district
 
     def initialize(service)
@@ -32,6 +33,18 @@ module Backend::Ecs
       else
         :unknown
       end
+    end
+
+    def desired_count
+      ecs_service.try(:desired_count)
+    end
+
+    def running_count
+      ecs_service.try(:running_count)
+    end
+
+    def pending_count
+      ecs_service.try(:pending_count)
     end
 
     def container_definition

@@ -2,6 +2,8 @@ module Backend::Ecs
   class Adapter
     attr_accessor :service
 
+    delegate :scale, :status, :desired_count, :running_count, :pending_count, to: :ecs_service
+
     def initialize(service)
       @service = service
     end
@@ -21,14 +23,6 @@ module Backend::Ecs
       ecs_service.delete
       load_balancer = elb.delete
       record_set.delete(load_balancer) if load_balancer.present?
-    end
-
-    def status
-      ecs_service.status
-    end
-
-    def scale(count)
-      ecs_service.scale(count)
     end
 
     def endpoint
