@@ -34,6 +34,10 @@ class Service < ActiveRecord::Base
     backend.endpoint
   end
 
+  def scale(count)
+    backend.scale(count)
+  end
+
   private
 
   def backend

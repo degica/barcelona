@@ -27,6 +27,10 @@ module Backend::Ecs
       ecs_service.status
     end
 
+    def scale(count)
+      ecs_service.scale(count)
+    end
+
     def endpoint
       lb = elb.fetch_load_balancer
       if lb.nil?
