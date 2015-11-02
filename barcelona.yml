@@ -15,5 +15,5 @@ environments:
             container_port: 3000
       - name: worker
         command: rake jobs:work
-        cpu: 128
-        memory: 128
+        cpu: 256
+        memory: 256
