@@ -53,6 +53,9 @@ module Backend::Ecs
       aws.elb.modify_load_balancer_attributes(
         load_balancer_name: service_name,
         load_balancer_attributes: {
+          cross_zone_load_balancing: {
+            enabled: true
+          },
           connection_draining: {
             enabled: true,
             timeout: 300

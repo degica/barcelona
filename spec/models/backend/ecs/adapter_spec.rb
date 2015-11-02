@@ -116,6 +116,9 @@ describe Backend::Ecs::Adapter do
                                .with(
                                  load_balancer_name: 'awesome-app-web',
                                  load_balancer_attributes: {
+                                   cross_zone_load_balancing: {
+                                     enabled: true
+                                   },
                                    connection_draining: {
                                      enabled: true,
                                      timeout: 300
