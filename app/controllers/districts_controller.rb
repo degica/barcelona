@@ -25,8 +25,17 @@ class DistrictsController < ApplicationController
     count = params.require(:count)
     instance_type = params[:instance_type] || 't2.micro'
     section = params[:section] || :private
-    @district.launch_instances(count: count, instance_type: instance_type, section: section)
+    associate_eip = params[:associate_eip] == "true"
+    @district.launch_instances(count: count.to_i,
+                               instance_type: instance_type,
+                               section: section,
+                               associate_eip: associate_eip)
     render status: 204, nothing: true
+  end
+
+  def allocate_elastic_ip
+    eip = @district.elastic_ips.create!(allocation_id: params[:allocation_id])
+    render json: eip
   end
 
   def destroy

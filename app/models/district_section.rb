@@ -26,8 +26,13 @@ class DistrictSection
     ).subnets
   end
 
-  def launch_instances(count: 1, instance_type:)
-    aws.ec2.run_instances(
+  def launch_instances(count: 1, instance_type:, associate_eip: false)
+    if associate_eip
+      available_eips = district.elastic_ips.available(district).to_a
+      raise "Elastic IP not available" if available_eips.count < count
+    end
+
+    resp = aws.ec2.run_instances(
       image_id: 'ami-6e920b6e', # amzn-ami-2015.09.a-amazon-ecs-optimized
       min_count: count,
       max_count: count,
@@ -39,6 +44,12 @@ class DistrictSection
         name: ecs_instance_role
       }
     )
+    if associate_eip
+      instance_ids = resp.instances.map(&:instance_id)
+      instance_ids.each_with_index do |instance_id, index|
+        available_eips[index].associate(instance_id)
+      end
+    end
   end
 
   def container_instances

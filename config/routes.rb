@@ -2,6 +2,7 @@ Rails.application.routes.draw do
   resources :districts, except: [:new, :edit] do
     member do
       post :launch_instances
+      post :allocate_elastic_ip
     end
 
     resources :heritages, shallow: true, except: [:new, :edit] do
