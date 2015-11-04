@@ -101,10 +101,16 @@ describe District do
                             image_id: instance_of(String),
                             min_count: 1,
                             max_count: 1,
-                            security_group_ids: [district.instance_security_group],
                             user_data: instance_of(String),
                             instance_type: "t2.micro",
-                            subnet_id: "subnet_id",
+                            network_interfaces: [
+                              {
+                                groups: [district.instance_security_group],
+                                subnet_id: "subnet_id",
+                                device_index: 0,
+                                associate_public_ip_address: false
+                              }
+                            ],
                             iam_instance_profile: {
                               name: district.ecs_instance_role
                             }

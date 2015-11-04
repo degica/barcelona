@@ -34,7 +34,7 @@ describe "POST /districts/:district/launch_instances", type: :request do
       section: "public",
       associate_eip: true
     }
-    post "/districts/#{district.name}/launch_instances?debug=true", params, auth
+    post "/districts/#{district.name}/launch_instances", params, auth
     expect(response.status).to eq 204
   end
 end
