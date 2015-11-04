@@ -13,7 +13,7 @@ class DistrictSection
            to: :district
 
   def initialize(name, district)
-    @name = name
+    @name = name.to_s
     @district = district
   end
 
@@ -21,7 +21,7 @@ class DistrictSection
     @subnets ||= aws.ec2.describe_subnets(
       filters: [
         {name: "vpc-id", values: [vpc_id]},
-        {name: 'tag:Network', values: [name.to_s.camelize]}
+        {name: 'tag:Network', values: [name.camelize]}
       ]
     ).subnets
   end
@@ -32,23 +32,12 @@ class DistrictSection
       raise "Elastic IP not available" if available_eips.count < count
     end
 
-    resp = aws.ec2.run_instances(
-      image_id: 'ami-6e920b6e', # amzn-ami-2015.09.a-amazon-ecs-optimized
-      min_count: count,
-      max_count: count,
-      security_group_ids: [instance_security_group].compact,
-      user_data: instance_user_data,
-      instance_type: instance_type,
-      subnet_id: subnets.sample.subnet_id,
-      iam_instance_profile: {
-        name: ecs_instance_role
-      }
-    )
-    if associate_eip
-      instance_ids = resp.instances.map(&:instance_id)
-      instance_ids.each_with_index do |instance_id, index|
-        available_eips[index].associate(instance_id)
-      end
+    count.times do |i|
+      allocation_id = available_eips[i].allocation_id if associate_eip
+      instance = ContainerInstance.new(self,
+                                       instance_type: instance_type,
+                                       eip_allocation_id: allocation_id)
+      instance.launch
     end
   end
 
@@ -91,9 +80,9 @@ class DistrictSection
 
   def cluster_name
     case name
-    when :private
+    when "private"
       district.name
-    when :public
+    when "public"
       "#{district.name}-public"
     end
   end
@@ -114,43 +103,15 @@ class DistrictSection
     aws.ecs.delete_cluster(cluster: cluster_name)
   end
 
-  private
-
-  def instance_user_data
-    user_data = <<EOS
-#!/bin/bash
-yum install -y aws-cli
-aws s3 cp s3://#{s3_bucket_name}/#{cluster_name}/ecs.config /etc/ecs/ecs.config
-
-sed -i 's/^#\\s%wheel\\s*ALL=(ALL)\\s*NOPASSWD:\\sALL$/%wheel\\tALL=(ALL)\\tNOPASSWD:\\tALL/g' /etc/sudoers
-
-curl -o ./docker https://get.docker.com/builds/Linux/x86_64/docker-1.8.3
-mv ./docker /usr/bin/docker
-chmod 755 /usr/bin/docker
-
-service docker restart
-
-PRIVATE_IP=`curl http://169.254.169.254/latest/meta-data/local-ipv4`
-
-service rsyslog stop
-rm -rf /dev/log
-docker run -d --restart=always --name="logger" -p 514:514 -v /dev:/dev -e "LE_TOKEN=#{logentries_token}" -e "SYSLOG_HOSTNAME=$PRIVATE_IP" k2nr/rsyslog-logentries
-
-aws s3 cp s3://#{s3_bucket_name}/#{district.name}/users ./users
-echo >> ./users
-while IFS=, read name pub
-do
-  docker run --rm -v /etc:/etc -v /home:/home -e "USER_NAME=$name" -e "USER_PUBLIC_KEY=$pub" -e 'USER_DOCKERCFG=#{dockercfg.to_json}' -e USER_GROUPS="docker,wheel" k2nr/docker-user-manager
-done < ./users
-rm ./users
-start ecs
-EOS
-    Base64.encode64(user_data)
+  def public?
+    name == "public"
   end
+
+  private
 
   def ecs_config
     {
-      "ECS_CLUSTER" => name,
+      "ECS_CLUSTER" => cluster_name,
       "ECS_ENGINE_AUTH_TYPE" => "dockercfg",
       "ECS_ENGINE_AUTH_DATA" => dockercfg.to_json,
       "ECS_AVAILABLE_LOGGING_DRIVERS" => '["json-file", "syslog", "fluentd"]'
