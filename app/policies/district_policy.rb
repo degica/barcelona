@@ -18,4 +18,8 @@ class DistrictPolicy < ApplicationPolicy
   def launch_instances?
     user.developer?
   end
+
+  def allocate_elastic_ip?
+    user.developer?
+  end
 end

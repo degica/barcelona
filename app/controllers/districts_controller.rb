@@ -33,6 +33,11 @@ class DistrictsController < ApplicationController
     render status: 204, nothing: true
   end
 
+  def allocate_elastic_ip
+    eip = @district.elastic_ips.create!(allocation_id: params[:allocation_id])
+    render json: eip
+  end
+
   def destroy
     @district.destroy!
     render status: 204, nothing: true
