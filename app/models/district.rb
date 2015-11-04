@@ -44,7 +44,7 @@ class District < ActiveRecord::Base
   end
 
   def launch_instances(count: 1, instance_type:, section: :private)
-    sections[section].launch_instances(count: count, instance_type: instance_type)
+    sections[section.to_sym].launch_instances(count: count, instance_type: instance_type)
   end
 
   def container_instances(section: :private)
