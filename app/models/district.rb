@@ -44,8 +44,10 @@ class District < ActiveRecord::Base
     sections[section.downcase.to_sym].subnets
   end
 
-  def launch_instances(count: 1, instance_type:, section: :private)
-    sections[section.to_sym].launch_instances(count: count, instance_type: instance_type)
+  def launch_instances(count: 1, instance_type:, associate_eip: false, section: :private)
+    sections[section.to_sym].launch_instances(count: count,
+                                              instance_type: instance_type,
+                                              associate_eip: associate_eip)
   end
 
   def container_instances(section: :private)
