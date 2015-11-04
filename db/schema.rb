@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151104043618) do
+ActiveRecord::Schema.define(version: 20151104062154) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -49,6 +49,15 @@ ActiveRecord::Schema.define(version: 20151104043618) do
     t.text     "encrypted_aws_access_key_id"
     t.text     "encrypted_aws_secret_access_key"
   end
+
+  create_table "elastic_ips", force: :cascade do |t|
+    t.string   "allocation_id"
+    t.integer  "district_id"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+  end
+
+  add_index "elastic_ips", ["district_id"], name: "index_elastic_ips_on_district_id", using: :btree
 
   create_table "env_vars", force: :cascade do |t|
     t.integer "heritage_id"
@@ -144,6 +153,7 @@ ActiveRecord::Schema.define(version: 20151104043618) do
   add_index "users_districts", ["district_id"], name: "index_users_districts_on_district_id", using: :btree
   add_index "users_districts", ["user_id"], name: "index_users_districts_on_user_id", using: :btree
 
+  add_foreign_key "elastic_ips", "districts"
   add_foreign_key "env_vars", "heritages"
   add_foreign_key "events", "heritages"
   add_foreign_key "heritages", "districts"

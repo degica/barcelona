@@ -9,6 +9,7 @@ class District < ActiveRecord::Base
   has_many :heritages, dependent: :destroy
   has_many :users_districts, dependent: :destroy
   has_many :users, through: :users_districts
+  has_many :elastic_ips, dependent: :destroy
 
   attr_accessor :sections
 
