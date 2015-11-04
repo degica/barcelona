@@ -5,12 +5,6 @@ describe "GET /user", type: :request do
   let(:district) { create :district }
   let(:user) { create :user, roles: ["developer"], districts: [district] }
 
-  before do
-    allow_any_instance_of(District).to receive(:subnets) {
-      [double(subnet_id: 'subnet_id')]
-    }
-  end
-
   it "shows user information" do
     get "/user", nil, auth
     expect(response.status).to eq 200
@@ -26,12 +20,6 @@ describe "GET /users/:id", type: :request do
   let(:district) { create :district }
   let(:user) { create :user, roles: ["developer"], districts: [district] }
   let(:user2) { create :user, name: 'user2', roles: ["developer"], districts: [district] }
-
-  before do
-    allow_any_instance_of(District).to receive(:subnets) {
-      [double(subnet_id: 'subnet_id')]
-    }
-  end
 
   it "shows user information" do
     get "/users/#{user2.name}", nil, auth

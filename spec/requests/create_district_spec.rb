@@ -3,11 +3,6 @@ require 'rails_helper'
 describe "POST /districts", type: :request do
   let(:auth) { {"X-Barcelona-Token" => user.token} }
 
-  before do
-    allow_any_instance_of(District).to receive(:subnets) {
-      [double(subnet_id: 'subnet_id')]
-    }
-  end
   let(:params) do
     {
       name: "district",

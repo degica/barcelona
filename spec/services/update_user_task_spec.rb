@@ -3,7 +3,8 @@ require 'rails_helper'
 describe UpdateUserTask do
   let(:user) { create :user, public_key: 'ssh-rsa aaaabbbb' }
   let(:district) { create :district, dockercfg: {"quay.io" => {"auth" => "abcdef"}} }
-  let(:task) { described_class.new(district, user) }
+  let(:section) { district.sections[:private] }
+  let(:task) { described_class.new(section, user) }
   let(:ecs_mock) { double }
 
   before do
@@ -50,7 +51,7 @@ describe UpdateUserTask do
 
     expect(ecs_mock).to receive(:start_task)
                          .with(
-                           cluster: district.name,
+                           cluster: section.cluster_name,
                            task_definition: "update_user",
                            overrides: {
                              container_overrides: [
@@ -60,12 +61,12 @@ describe UpdateUserTask do
                                    {name: "USER_NAME", value: user.name},
                                    {name: "USER_GROUPS", value: "docker"},
                                    {name: "USER_PUBLIC_KEY", value: user.public_key},
-                                   {name: "USER_DOCKERCFG", value: district.dockercfg.to_json}
+                                   {name: "USER_DOCKERCFG", value: section.dockercfg.to_json}
                                  ]
                                }
                              ]
                            },
-                           container_instances: district.container_instances.map{ |c| c[:container_instance_arn] }
+                           container_instances: section.container_instances.map{ |c| c[:container_instance_arn] }
                          )
     task.run
   end
