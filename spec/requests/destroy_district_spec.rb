@@ -4,12 +4,6 @@ describe "DELETE /districts/:district", type: :request do
   let(:auth) { {"X-Barcelona-Token" => user.token} }
   let(:district) { create :district }
 
-  before do
-    allow_any_instance_of(District).to receive(:subnets) {
-      [double(subnet_id: 'subnet_id')]
-    }
-  end
-
   context "when a user is a developer" do
     let(:user) { create :user, roles: ["developer"] }
     it "returns 403" do

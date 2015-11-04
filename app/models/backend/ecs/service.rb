@@ -10,7 +10,7 @@ module Backend::Ecs
     end
 
     def scale(desired_count)
-      aws.ecs.update_service(cluster: district.name,
+      aws.ecs.update_service(cluster: section.cluster_name,
                              service: service_name,
                              desired_count: desired_count)
     end
@@ -18,7 +18,7 @@ module Backend::Ecs
     def delete
       return unless applied?
       scale(0)
-      aws.ecs.delete_service(cluster: district.name, service: service.service_name)
+      aws.ecs.delete_service(cluster: section.cluster_name, service: service.service_name)
     end
 
     def status
@@ -67,6 +67,9 @@ module Backend::Ecs
           log_driver: "syslog",
           options: {
             "syslog-address" => "tcp://127.0.0.1:514",
+            # TODO: Since docker 1.9.0 `syslog-tag` has been marked as deprecated and
+            # the option name changed to `tag`
+            # `syslog-tag` option will be removed at docker 1.11.0
             "syslog-tag" => service_name
           }
         }
@@ -84,7 +87,7 @@ module Backend::Ecs
 
     def update
       aws.ecs.update_service(
-        cluster: district.name,
+        cluster: section.cluster_name,
         service: service.service_name,
         task_definition: service.service_name
       )
@@ -92,7 +95,7 @@ module Backend::Ecs
 
     def create(load_balancer)
       params = {
-        cluster: district.name,
+        cluster: section.cluster_name,
         service_name: service.service_name,
         task_definition: service.service_name,
         desired_count: 1
@@ -116,9 +119,15 @@ module Backend::Ecs
 
     def fetch_ecs_service
       @ecs_service = aws.ecs.describe_services(
-        cluster: district.name,
+        cluster: section.cluster_name,
         services: [service.service_name]
       ).services.first
+    end
+
+    private
+
+    def section
+      service.heritage.section
     end
   end
 end

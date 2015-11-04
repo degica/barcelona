@@ -6,7 +6,7 @@ describe "POST /districts/:district/launch_instances", type: :request do
   let(:district) { create :district }
 
   before do
-    allow_any_instance_of(District).to receive(:subnets) {
+    allow_any_instance_of(DistrictSection).to receive(:subnets) {
       [double(subnet_id: 'subnet_id')]
     }
   end

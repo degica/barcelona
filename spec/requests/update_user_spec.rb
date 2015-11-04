@@ -6,12 +6,6 @@ describe "PATCH /users/:id", type: :request do
   let(:user) { create :user, roles: [role], districts: [district] }
   let(:user2) { create :user, name: 'user2', roles: ["developer"], districts: [district] }
 
-  before do
-    allow_any_instance_of(District).to receive(:subnets) {
-      [double(subnet_id: 'subnet_id')]
-    }
-  end
-
   context "when a user is admin" do
     let(:role) { "admin" }
     it "updates user information" do
@@ -43,12 +37,6 @@ describe "PATCH /user", type: :request do
   let(:auth) { {"X-Barcelona-Token" => user.token} }
   let(:district) { create :district }
   let(:user) { create :user, roles: ["developer"], districts: [district] }
-
-  before do
-    allow_any_instance_of(District).to receive(:subnets) {
-      [double(subnet_id: 'subnet_id')]
-    }
-  end
 
   it "updates user information" do
     params = {
