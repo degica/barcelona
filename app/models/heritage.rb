@@ -7,7 +7,7 @@ class Heritage < ActiveRecord::Base
 
   validates :name, presence: true, uniqueness: true
   validates :district, presence: true
-  validates :section_name, presence: true
+  validates :section_name, presence: true, inclusion: { in: %w[public private] }
 
   before_validation do |heritage|
     heritage.section_name ||= 'private'
