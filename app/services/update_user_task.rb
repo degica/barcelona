@@ -1,14 +1,14 @@
 class UpdateUserTask
-  attr_accessor :district, :user
-  delegate :aws, to: :district
+  attr_accessor :section, :user
+  delegate :aws, to: :section
 
-  def initialize(district, user)
-    @district = district
+  def initialize(section, user)
+    @section = section
     @user = user
   end
 
   def run
-    Rails.logger.info "Updating user #{user.name} for district #{district.name}"
+    Rails.logger.info "Updating user #{user.name} for #{section.cluster_name}"
     aws.ecs.register_task_definition(
       family: "update_user",
       container_definitions: [
@@ -51,10 +51,10 @@ class UpdateUserTask
       "USER_GROUPS" => user_groups.join(",")
     }
     env["USER_PUBLIC_KEY"] = user.public_key if user.public_key.present?
-    env["USER_DOCKERCFG"] = district.dockercfg.to_json if district.dockercfg.present?
+    env["USER_DOCKERCFG"] = section.dockercfg.to_json if section.dockercfg.present?
 
     resp = aws.ecs.start_task(
-      cluster: district.name,
+      cluster: section.cluster_name,
       task_definition: "update_user",
       overrides: {
         container_overrides: [
@@ -64,7 +64,7 @@ class UpdateUserTask
           }
         ]
       },
-      container_instances: district.container_instances.map{ |c| c[:container_instance_arn] }
+      container_instances: section.container_instances.map{ |c| c[:container_instance_arn] }
     )
   end
 
