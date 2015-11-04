@@ -28,7 +28,7 @@ class DistrictSection
 
   def launch_instances(count: 1, instance_type:, associate_eip: false)
     if associate_eip
-      available_eips = district.elastic_ips.available.to_a
+      available_eips = district.elastic_ips.available(district).to_a
       raise "Elastic IP not available" if available_eips.count < count
     end
 

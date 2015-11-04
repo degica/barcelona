@@ -6,8 +6,8 @@ class ElasticIp < ActiveRecord::Base
   validates :district, presence: true
   validates :allocation_id, presence: true
 
-  def self.available
-    allocation_ids = ec2
+  def self.available(district)
+    allocation_ids = district.aws.ec2
                      .describe_addresses(allocation_ids: self.pluck(:allocation_id))
                      .addresses
                      .select { |a| a.association_id.nil? }
