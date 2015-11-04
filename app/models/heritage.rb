@@ -7,6 +7,11 @@ class Heritage < ActiveRecord::Base
 
   validates :name, presence: true, uniqueness: true
   validates :district, presence: true
+  validates :section_name, presence: true
+
+  before_validation do |heritage|
+    heritage.section_name ||= 'private'
+  end
 
   accepts_nested_attributes_for :services
   accepts_nested_attributes_for :env_vars
@@ -31,6 +36,10 @@ class Heritage < ActiveRecord::Base
   def save_and_deploy!(without_before_deploy: false)
     save!
     update_services(without_before_deploy)
+  end
+
+  def section
+    district.sections[section_name.to_sym]
   end
 
   private
