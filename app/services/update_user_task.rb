@@ -48,7 +48,7 @@ class UpdateUserTask
 
     env = {
       "USER_NAME" => user.name,
-      "USER_GROUPS" => user_groups.join(",")
+      "USER_GROUPS" => user.instance_groups.join(",")
     }
     env["USER_PUBLIC_KEY"] = user.public_key if user.public_key.present?
     env["USER_DOCKERCFG"] = section.dockercfg.to_json if section.dockercfg.present?
@@ -66,14 +66,5 @@ class UpdateUserTask
       },
       container_instances: section.container_instances.map{ |c| c[:container_instance_arn] }
     )
-  end
-
-  private
-
-  def user_groups
-    groups = []
-    groups << "docker" if user.developer?
-    groups << "wheel" if user.admin?
-    groups
   end
 end
