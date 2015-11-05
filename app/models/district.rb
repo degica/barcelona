@@ -70,6 +70,12 @@ class District < ActiveRecord::Base
                   server_side_encryption: "AES256")
   end
 
+  def hook_plugins(trigger, origin, arg=nil)
+    plugins.reverse.reduce(arg) do |a, plugin|
+      plugin.hook(trigger, origin, a)
+    end
+  end
+
   private
 
   def update_ecs_config
