@@ -55,7 +55,7 @@ describe Oneoff do
                              overrides: {
                                container_overrides: [
                                  {
-                                   name: heritage.name,
+                                   name: heritage.name + "-oneoff",
                                    command: ["rake", "db:migrate"],
                                    environment: []
                                  }
@@ -100,7 +100,7 @@ describe Oneoff do
                                overrides: {
                                  container_overrides: [
                                    {
-                                     name: heritage.name,
+                                     name: heritage.name + "-oneoff",
                                      command: ["rake", "db:migrate"],
                                      environment: [
                                        {name: "OVERRITE_ENV", value: "VALUE"}
