@@ -23,7 +23,7 @@ class Oneoff < ActiveRecord::Base
       overrides: {
         container_overrides: [
           {
-            name: heritage.name,
+            name: container_name,
             command: command.try(:split, " "),
             environment: env_vars.map { |k, v| {name: k, value: v} }
           }
@@ -80,6 +80,10 @@ class Oneoff < ActiveRecord::Base
     "#{heritage.name}-oneoff"
   end
 
+  def container_name
+    "#{heritage.name}-oneoff"
+  end
+
   def image_path
     if image_tag.present?
       "#{heritage.image_name}:#{image_tag}"
@@ -89,7 +93,7 @@ class Oneoff < ActiveRecord::Base
   end
 
   def task_definition
-    heritage.base_task_definition("#{heritage.name}-oneoff").merge(
+    heritage.base_task_definition(container_name).merge(
       cpu: 256,
       memory: 256,
       image: image_path
