@@ -32,7 +32,7 @@ describe Oneoff do
                              family: "#{heritage.name}-oneoff",
                              container_definitions: [
                                {
-                                 name: heritage.name,
+                                 name: heritage.name + "-oneoff",
                                  cpu: 256,
                                  memory: 256,
                                  essential: true,
@@ -77,7 +77,7 @@ describe Oneoff do
                                family: "#{heritage.name}-oneoff",
                                container_definitions: [
                                  {
-                                   name: heritage.name,
+                                   name: heritage.name + "-oneoff",
                                    cpu: 256,
                                    memory: 256,
                                    essential: true,
