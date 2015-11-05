@@ -1,4 +1,47 @@
 class ContainerInstance
+  class UserData
+    attr_accessor :files, :boot_commands, :run_commands, :packages, :users
+
+    def initialize
+      @files = []
+      @boot_commands = []
+      @run_commands = []
+      @users = []
+      @packages = ["aws-cli"]
+    end
+
+    def build
+      user_data = {
+        "repo_update" => true,
+        "repo_upgrade" => "all",
+        "packages" => packages,
+        "write_files" => files,
+        "bootcmd" => boot_commands,
+        "runcmd" => run_commands,
+        "users" => users
+      }.reject{ |k, v| v.blank? }
+      raw_user_data = "#cloud-config\n" << YAML.dump(user_data)
+      Base64.encode64(raw_user_data)
+    end
+
+    def add_file(path, owner, permissions, content)
+      @files << {
+        "path" => path,
+        "owner" => owner,
+        "permissions" => permissions,
+        "content" => content
+      }
+    end
+
+    def add_user(name, authorized_keys: [], groups: [])
+      @users << {
+        "name" => name,
+        "ssh-authorized-keys" => authorized_keys,
+        "groups" => groups.join(',')
+      }
+    end
+  end
+
   attr_accessor :section, :options
 
   def aws
@@ -36,48 +79,31 @@ class ContainerInstance
   end
 
   def instance_user_data
-    user_data = <<EOS
-#!/bin/bash
-yum install -y aws-cli
-
-#{associate_address_user_data}
-
-aws s3 cp s3://#{section.s3_bucket_name}/#{section.cluster_name}/ecs.config /etc/ecs/ecs.config
-
-sed -i 's/^#\\s%wheel\\s*ALL=(ALL)\\s*NOPASSWD:\\sALL$/%wheel\\tALL=(ALL)\\tNOPASSWD:\\tALL/g' /etc/sudoers
-
-curl -o ./docker https://get.docker.com/builds/Linux/x86_64/docker-1.8.3
-mv ./docker /usr/bin/docker
-chmod 755 /usr/bin/docker
-
-service docker restart
-
-PRIVATE_IP=`curl http://169.254.169.254/latest/meta-data/local-ipv4`
-
-service rsyslog stop
-rm -rf /dev/log
-docker run -d --restart=always --name="logger" -p 514:514 -v /dev:/dev -e "LE_TOKEN=#{section.logentries_token}" -e "SYSLOG_HOSTNAME=$PRIVATE_IP" k2nr/rsyslog-logentries
-
-aws s3 cp s3://#{section.s3_bucket_name}/#{district.name}/users ./users
-echo >> ./users
-while IFS=, read name pub
-do
-  docker run --rm -v /etc:/etc -v /home:/home -e "USER_NAME=$name" -e "USER_PUBLIC_KEY=$pub" -e 'USER_DOCKERCFG=#{section.dockercfg.to_json}' -e USER_GROUPS="docker,wheel" k2nr/docker-user-manager
-done < ./users
-rm ./users
-start ecs
-EOS
-    Base64.encode64(user_data)
-  end
-
-  def associate_address_user_data
+    user_data = UserData.new
     if options[:eip_allocation_id]
-    <<EOS
-INSTANCE_ID=`curl http://169.254.169.254/latest/meta-data/instance-id`
-aws ec2 associate-address --region ap-northeast-1 --instance-id $INSTANCE_ID --allocation-id #{options[:eip_allocation_id]}
-EOS
-    else
-      ""
+      user_data.run_commands += [
+        "INSTANCE_ID=`curl http://169.254.169.254/latest/meta-data/instance-id`",
+        "aws ec2 associate-address --region ap-northeast-1 --instance-id $INSTANCE_ID --allocation-id #{options[:eip_allocation_id]}"
+      ]
     end
+    user_data.run_commands += [
+      "aws s3 cp s3://#{section.s3_bucket_name}/#{section.cluster_name}/ecs.config /etc/ecs/ecs.config",
+      "sed -i 's/^#\\s%wheel\\s*ALL=(ALL)\\s*NOPASSWD:\\sALL$/%wheel\\tALL=(ALL)\\tNOPASSWD:\\tALL/g' /etc/sudoers",
+      "curl -o ./docker https://get.docker.com/builds/Linux/x86_64/docker-1.8.3",
+      "mv ./docker /usr/bin/docker",
+      "chmod 755 /usr/bin/docker",
+      "service docker restart",
+      "PRIVATE_IP=`curl http://169.254.169.254/latest/meta-data/local-ipv4`",
+      "service rsyslog stop",
+      "rm -rf /dev/log",
+      "docker run -d --restart=always --name=\"logger\" -p 514:514 -v /dev:/dev -e \"LE_TOKEN=#{section.logentries_token}\" -e \"SYSLOG_HOSTNAME=$PRIVATE_IP\" k2nr/rsyslog-logentries",
+      "start ecs"
+    ]
+
+    district.users.each do |user|
+      user_data.add_user(user.name, authorized_keys: [user.public_key], groups: user.instance_groups)
+    end
+
+    user_data.build
   end
 end
