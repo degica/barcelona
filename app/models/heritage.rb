@@ -42,6 +42,27 @@ class Heritage < ActiveRecord::Base
     district.sections[section_name.to_sym]
   end
 
+  def base_task_definition(task_name)
+    {
+      name: task_name,
+      cpu: 256,
+      memory: 256,
+      essential: true,
+      image: image_path,
+      environment: env_vars.map { |e| {name: e.key, value: e.value} },
+      log_configuration: {
+        log_driver: "syslog",
+        options: {
+          "syslog-address" => "tcp://127.0.0.1:514",
+          # TODO: Since docker 1.9.0 `syslog-tag` has been marked as deprecated and
+          # the option name changed to `tag`
+          # `syslog-tag` option will be removed at docker 1.11.0
+          "syslog-tag" => task_name
+        }
+      }
+    }
+  end
+
   private
 
   def update_services(without_before_deploy)

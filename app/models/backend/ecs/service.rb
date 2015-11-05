@@ -48,12 +48,9 @@ module Backend::Ecs
     end
 
     def container_definition
-      {
-        name: service_name,
+      service.heritage.base_task_definition(service_name).merge(
         cpu: cpu,
         memory: memory,
-        essential: true,
-        image: service.heritage.image_path,
         command: command.try(:split, " "),
         port_mappings: port_mappings.map{ |m|
           {
@@ -61,19 +58,8 @@ module Backend::Ecs
             host_port: m.host_port,
             protocol: m.protocol
           }
-        },
-        environment: service.heritage.env_vars.map { |e| {name: e.key, value: e.value} },
-        log_configuration: {
-          log_driver: "syslog",
-          options: {
-            "syslog-address" => "tcp://127.0.0.1:514",
-            # TODO: Since docker 1.9.0 `syslog-tag` has been marked as deprecated and
-            # the option name changed to `tag`
-            # `syslog-tag` option will be removed at docker 1.11.0
-            "syslog-tag" => service_name
-          }
         }
-      }.compact
+      ).compact
     end
 
     def applied?
