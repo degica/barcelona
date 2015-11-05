@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151104062154) do
+ActiveRecord::Schema.define(version: 20151105081240) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -105,6 +105,16 @@ ActiveRecord::Schema.define(version: 20151104062154) do
 
   add_index "oneoffs", ["heritage_id"], name: "index_oneoffs_on_heritage_id", using: :btree
 
+  create_table "plugins", force: :cascade do |t|
+    t.text     "plugin_attributes"
+    t.integer  "district_id"
+    t.string   "name"
+    t.datetime "created_at",        null: false
+    t.datetime "updated_at",        null: false
+  end
+
+  add_index "plugins", ["district_id"], name: "index_plugins_on_district_id", using: :btree
+
   create_table "port_mappings", force: :cascade do |t|
     t.integer  "host_port"
     t.integer  "lb_port"
@@ -158,6 +168,7 @@ ActiveRecord::Schema.define(version: 20151104062154) do
   add_foreign_key "events", "heritages"
   add_foreign_key "heritages", "districts"
   add_foreign_key "oneoffs", "heritages"
+  add_foreign_key "plugins", "districts"
   add_foreign_key "port_mappings", "services"
   add_foreign_key "services", "heritages"
   add_foreign_key "users_districts", "districts"
