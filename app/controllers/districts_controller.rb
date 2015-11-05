@@ -25,7 +25,7 @@ class DistrictsController < ApplicationController
     count = params.require(:count)
     instance_type = params[:instance_type] || 't2.micro'
     section = params[:section] || :private
-    associate_eip = params[:associate_eip] == "true"
+    associate_eip = params[:associate_eip].to_s == "true"
     @district.launch_instances(count: count.to_i,
                                instance_type: instance_type,
                                section: section,
