@@ -59,6 +59,13 @@ class User < ActiveRecord::Base
     name
   end
 
+  def instance_groups
+    groups = []
+    groups << "docker" if developer?
+    groups << "wheel"  if admin?
+    groups
+  end
+
   private
 
   def hash_token
