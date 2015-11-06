@@ -1,11 +1,10 @@
 module Barcelona
   module Plugins
     class Base
-      attr_accessor :district, :attributes
+      attr_accessor :model
 
-      def initialize(district, attributes)
-        @district = district
-        @attributes = attributes
+      def initialize(model)
+        @model = model
       end
 
       def hook(trigger, origin, arg)

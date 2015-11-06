@@ -18,6 +18,11 @@ module Barcelona
         expect(port_mapping.container_port).to eq 3128
       end
 
+      it "gets hooked with destroyed trigger" do
+        district.plugins.first.destroy!
+        expect(Heritage.count).to be_zero
+      end
+
       it "gets hooked with heritage_task_definition trigger" do
         heritage = district.heritages.create(name: 'heritage',
                                              image_name: "docker_image",
