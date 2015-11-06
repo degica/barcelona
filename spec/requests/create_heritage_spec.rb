@@ -5,8 +5,6 @@ describe "POST /districts/:district/heritages", type: :request do
   let(:auth) { {"X-Barcelona-Token" => user.token} }
   let(:district) { create :district }
 
-  before {Aws.config[:stub_responses] = true}
-
   it "creates a heritage" do
     params = {
       name: "nginx",
