@@ -17,7 +17,7 @@ Bundler.require(*Rails.groups)
 
 require_relative "../app/middlewares/exception_handler"
 
-module Bcn
+module Barcelona
   class Application < Rails::Application
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
@@ -37,5 +37,8 @@ module Bcn
     config.middleware.insert_after ActionDispatch::DebugExceptions, ExceptionHandler
 
     config.active_job.queue_adapter = :delayed_job
+    config.eager_load_paths += [
+      "#{Rails.root}/lib"
+    ]
   end
 end

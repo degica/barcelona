@@ -104,6 +104,8 @@ class ContainerInstance
       user_data.add_user(user.name, authorized_keys: [user.public_key], groups: user.instance_groups)
     end
 
+    user_data = district.hook_plugins(:container_instance_user_data, self, user_data)
+
     user_data.build
   end
 end

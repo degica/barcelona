@@ -10,6 +10,7 @@ class District < ActiveRecord::Base
   has_many :users_districts, dependent: :destroy
   has_many :users, through: :users_districts
   has_many :elastic_ips, dependent: :destroy
+  has_many :plugins, dependent: :destroy
 
   attr_accessor :sections
 
@@ -24,6 +25,8 @@ class District < ActiveRecord::Base
 
   encrypted_attribute :aws_access_key_id, secret_key: ENV['ENCRYPTION_KEY']
   encrypted_attribute :aws_secret_access_key, secret_key: ENV['ENCRYPTION_KEY']
+
+  accepts_nested_attributes_for :plugins
 
   after_initialize do |district|
     district.sections = {
@@ -65,6 +68,12 @@ class District < ActiveRecord::Base
                   key: "#{name}/users",
                   body: users_body,
                   server_side_encryption: "AES256")
+  end
+
+  def hook_plugins(trigger, origin, arg=nil)
+    plugins.reverse.reduce(arg) do |a, plugin|
+      plugin.hook(trigger, origin, a)
+    end
   end
 
   private

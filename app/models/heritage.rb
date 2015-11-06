@@ -43,7 +43,7 @@ class Heritage < ActiveRecord::Base
   end
 
   def base_task_definition(task_name)
-    {
+    base = {
       name: task_name,
       cpu: 256,
       memory: 256,
@@ -61,6 +61,7 @@ class Heritage < ActiveRecord::Base
         }
       }
     }
+    district.hook_plugins(:heritage_task_definition, self, base)
   end
 
   private
