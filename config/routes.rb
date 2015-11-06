@@ -5,6 +5,8 @@ Rails.application.routes.draw do
       post :allocate_elastic_ip
     end
 
+    resources :plugins, except: [:new, :edit]
+
     resources :heritages, shallow: true, except: [:new, :edit] do
       post   :env_vars, on: :member, to: "heritages#set_env_vars"
       delete :env_vars, on: :member, to: "heritages#delete_env_vars"
