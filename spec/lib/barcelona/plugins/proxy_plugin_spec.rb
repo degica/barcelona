@@ -9,7 +9,7 @@ module Barcelona
         heritage = Heritage.last
         expect(heritage).to be_present
         expect(heritage.name).to eq "#{district.name}-proxy"
-        expect(heritage.image_name).to eq "degica/squid"
+        expect(heritage.image_name).to eq "k2nr/squid"
 
         service = heritage.services.first
         expect(service.name).to eq "main"

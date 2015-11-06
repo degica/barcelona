@@ -24,7 +24,7 @@ EOS
       def on_created(_, _)
         district.heritages.create(
           name: proxy_heritage_name,
-          image_name: "degica/squid",
+          image_name: "k2nr/squid",
           section_name: "public",
           services_attributes: [
             {
