@@ -21,6 +21,13 @@ EOS
         task_definition
       end
 
+      def on_ecs_config(_, config)
+        config.merge(
+          "HTTP_PROXY" => PROXY_URL,
+          "HTTPS_PROXY" => PROXY_URL
+        )
+      end
+
       def on_created(_, _)
         district.heritages.create(
           name: proxy_heritage_name,
