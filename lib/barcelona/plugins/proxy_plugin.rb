@@ -29,21 +29,23 @@ EOS
       end
 
       def on_created(_, _)
-        district.heritages.create(
+        params = {
           name: proxy_heritage_name,
           image_name: "k2nr/squid",
           section_name: "public",
-          services_attributes: [
+          services: [
             {
               name: "main",
               cpu: 256,
               memory: 256,
-              port_mappings_attributes: [
+              port_mappings: [
                 {lb_port: 3128, container_port: 3128}
               ]
             }
           ]
-        )
+        }
+        proxy_heritage = BuildHeritage.new(params, district: district).execute
+        proxy_heritage.save_and_deploy!
       end
 
       def on_destroyed(_, _)
