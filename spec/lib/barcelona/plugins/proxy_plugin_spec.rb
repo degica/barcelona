@@ -40,8 +40,8 @@ module Barcelona
         expect(definition[:name]).to eq "heritage"
         expect(definition[:environment]).to eq [
                                               {name: "ENVIRONMENT", value: "VALUE"},
-                                              {name: "http_proxy", value: "http://main.proxy.bcn:3128"},
-                                              {name: "https_proxy", value: "http://main.proxy.bcn:3128"},
+                                              {name: "http_proxy", value: "http://main.#{district.name}-proxy.bcn:3128"},
+                                              {name: "https_proxy", value: "http://main.#{district.name}-proxy.bcn:3128"},
                                               {name: "no_proxy", value: "10.0.0.1,localhost,127.0.0.1,169.254.169.254,.bcn"},
                                             ]
       end

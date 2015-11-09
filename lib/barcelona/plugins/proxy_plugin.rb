@@ -1,7 +1,6 @@
 module Barcelona
   module Plugins
     class ProxyPlugin < Base
-      PROXY_URL = "http://main.proxy.bcn:3128"
       DEFAULT_NO_PROXY = [
         "localhost",
         "127.0.0.1",
@@ -14,8 +13,8 @@ module Barcelona
 
         user_data.add_file("/etc/profile.d/http_proxy.sh", "root:root", "755", <<EOS)
 #!/bin/bash
-export http_proxy=#{PROXY_URL}
-export https_proxy=#{PROXY_URL}
+export http_proxy=#{proxy_url}
+export https_proxy=#{proxy_url}
 export no_proxy=#{no_proxy.join(',')}
 EOS
         user_data
@@ -24,8 +23,8 @@ EOS
       def on_heritage_task_definition(heritage, task_definition)
         return task_definition if heritage.name == proxy_heritage_name
         task_definition[:environment] += [
-          {name: "http_proxy", value: PROXY_URL},
-          {name: "https_proxy", value: PROXY_URL},
+          {name: "http_proxy", value: proxy_url},
+          {name: "https_proxy", value: proxy_url},
           {name: "no_proxy", value: no_proxy.join(',')}
         ]
         task_definition
@@ -35,8 +34,8 @@ EOS
         return config if section.public?
 
         config.merge(
-          "HTTP_PROXY" => PROXY_URL,
-          "HTTPS_PROXY" => PROXY_URL,
+          "HTTP_PROXY" => proxy_url,
+          "HTTPS_PROXY" => proxy_url,
           # Directly connect to metadata service and docker socket
           "NO_PROXY" => "169.254.169.254,/var/run/docker.sock"
         )
@@ -71,6 +70,10 @@ EOS
 
       def district
         model.district
+      end
+
+      def proxy_url
+        "http://main.#{proxy_heritage_name}.bcn:3128"
       end
 
       def proxy_heritage_name
