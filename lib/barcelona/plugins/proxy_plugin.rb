@@ -11,6 +11,11 @@ module Barcelona
       def on_container_instance_user_data(instance, user_data)
         return config if instance.section.public?
 
+        user_data.boot_commands += [
+          "echo export http_proxy=#{proxy_url} >> /etc/sysconfig/docker",
+          "echo export https_proxy=#{proxy_url} >> /etc/sysconfig/docker"
+        ]
+
         user_data.add_file("/etc/profile.d/http_proxy.sh", "root:root", "755", <<EOS)
 #!/bin/bash
 export http_proxy=#{proxy_url}
