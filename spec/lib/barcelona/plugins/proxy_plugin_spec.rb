@@ -55,6 +55,14 @@ module Barcelona
         expect(user_data["write_files"][0]["permissions"]).to eq "755"
         expect(user_data["write_files"][0]["content"]).to be_a String
       end
+
+      it "gets hooked with ecs_config trigger" do
+        section = district.sections[:private]
+        config = section.send(:ecs_config)
+        expect(config).to include "HTTP_PROXY"
+        expect(config).to include "HTTPS_PROXY"
+        expect(config).to include "NO_PROXY"
+      end
     end
   end
 end
