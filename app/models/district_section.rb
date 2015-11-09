@@ -110,12 +110,14 @@ class DistrictSection
   private
 
   def ecs_config
-    {
+    config = {
       "ECS_CLUSTER" => cluster_name,
       "ECS_ENGINE_AUTH_TYPE" => "dockercfg",
       "ECS_ENGINE_AUTH_DATA" => dockercfg.to_json,
       "ECS_AVAILABLE_LOGGING_DRIVERS" => '["json-file", "syslog", "fluentd"]'
-    }.map {|k, v| "#{k}=#{v}"}.join("\n")
+    }
+    config = district.hook_plugins(:ecs_config, self, config)
+    config.map {|k, v| "#{k}=#{v}"}.join("\n")
   end
 
   def users_body
