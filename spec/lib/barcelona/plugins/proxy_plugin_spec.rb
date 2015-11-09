@@ -3,7 +3,14 @@ require 'rails_helper'
 module Barcelona
   module Plugins
     describe ProxyPlugin do
-      let!(:district) { create :district, plugins_attributes: [{name: 'proxy'}] }
+      let!(:district) { create :district,
+                               plugins_attributes: [
+                                 {
+                                   name: 'proxy',
+                                   plugin_attributes: {no_proxy: ["10.0.0.1"]}
+                                 }
+                               ]
+      }
 
       it "gets hooked with created trigger" do
         heritage = Heritage.last
@@ -35,17 +42,18 @@ module Barcelona
                                               {name: "ENVIRONMENT", value: "VALUE"},
                                               {name: "http_proxy", value: "http://main.proxy.bcn:3128"},
                                               {name: "https_proxy", value: "http://main.proxy.bcn:3128"},
+                                              {name: "no_proxy", value: "10.0.0.1,localhost,127.0.0.1,169.254.169.254,.bcn"},
                                             ]
       end
 
       it "gets hooked with container_instance_user_data trigger" do
-        section = district.sections[:public]
+        section = district.sections[:private]
         ci = ContainerInstance.new(section, instance_type: 't2.micro')
         user_data = YAML.load(Base64.decode64(ci.instance_user_data))
         expect(user_data["write_files"][0]["path"]).to eq "/etc/profile.d/http_proxy.sh"
         expect(user_data["write_files"][0]["owner"]).to eq "root:root"
         expect(user_data["write_files"][0]["permissions"]).to eq "755"
-        expect(user_data["write_files"][0]["content"]).to be_a String
+        expect(p user_data["write_files"][0]["content"]).to be_a String
       end
     end
   end
