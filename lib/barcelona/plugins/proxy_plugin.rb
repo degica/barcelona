@@ -2,8 +2,9 @@ module Barcelona
   module Plugins
     class ProxyPlugin < Base
       PROXY_URL = "http://main.proxy.bcn:3128"
+      def on_container_instance_user_data(instance, user_data)
+        return config if instance.section.public?
 
-      def on_container_instance_user_data(_, user_data)
         user_data.add_file("/etc/profile.d/http_proxy.sh", "root:root", "755", <<EOS)
 #!/bin/bash
 export http_proxy=#{PROXY_URL}
@@ -21,7 +22,9 @@ EOS
         task_definition
       end
 
-      def on_ecs_config(_, config)
+      def on_ecs_config(instance, config)
+        return config if instance.section.public?
+
         config.merge(
           "HTTP_PROXY" => PROXY_URL,
           "HTTPS_PROXY" => PROXY_URL
