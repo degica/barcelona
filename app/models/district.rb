@@ -3,7 +3,6 @@ class District < ActiveRecord::Base
 
   before_save :update_ecs_config
   before_create :create_ecs_cluster
-  after_create :put_users_file
   after_destroy :delete_ecs_cluster
 
   has_many :heritages, dependent: :destroy
@@ -61,13 +60,6 @@ class District < ActiveRecord::Base
     sections.each do |_, section|
       section.update_instance_user_account(user)
     end
-  end
-
-  def put_users_file
-    aws.s3.put_object(bucket: s3_bucket_name,
-                  key: "#{name}/users",
-                  body: users_body,
-                  server_side_encryption: "AES256")
   end
 
   def hook_plugins(trigger, origin, arg=nil)
