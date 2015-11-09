@@ -74,7 +74,6 @@ class DistrictSection
   end
 
   def update_instance_user_account(user)
-    district.put_users_file
     UpdateUserTask.new(self, user).run
   end
 
