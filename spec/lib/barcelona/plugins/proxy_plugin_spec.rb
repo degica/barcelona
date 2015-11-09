@@ -53,7 +53,7 @@ module Barcelona
         expect(user_data["write_files"][0]["path"]).to eq "/etc/profile.d/http_proxy.sh"
         expect(user_data["write_files"][0]["owner"]).to eq "root:root"
         expect(user_data["write_files"][0]["permissions"]).to eq "755"
-        expect(p user_data["write_files"][0]["content"]).to be_a String
+        expect(user_data["write_files"][0]["content"]).to be_a String
       end
     end
   end
