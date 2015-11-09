@@ -31,8 +31,8 @@ EOS
         task_definition
       end
 
-      def on_ecs_config(instance, config)
-        return config if instance.section.public?
+      def on_ecs_config(section, config)
+        return config if section.public?
 
         config.merge(
           "HTTP_PROXY" => PROXY_URL,
