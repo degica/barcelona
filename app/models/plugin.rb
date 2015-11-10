@@ -10,11 +10,13 @@ class Plugin < ActiveRecord::Base
   after_destroy :hook_destroyed
 
   def hook(trigger, origin, arg=nil)
-    klass = ("Barcelona::Plugins::" + "#{name}_plugin".classify).constantize
+    begin
+      klass = ("Barcelona::Plugins::" + "#{name}_plugin".classify).constantize
+    rescue NameError => e
+      Rails.logger.error e
+      return arg
+    end
     klass.new(self).hook(trigger, origin, arg)
-  rescue NameError => e
-    Rails.logger.error e
-    return arg
   end
 
   def to_param

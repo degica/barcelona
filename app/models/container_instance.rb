@@ -93,10 +93,6 @@ class ContainerInstance
       "mv ./docker /usr/bin/docker",
       "chmod 755 /usr/bin/docker",
       "service docker restart",
-      "PRIVATE_IP=`curl http://169.254.169.254/latest/meta-data/local-ipv4`",
-      "service rsyslog stop",
-      "rm -rf /dev/log",
-      "docker run -d --restart=always --name=\"logger\" -p 514:514 -v /dev:/dev -e \"LE_TOKEN=#{section.logentries_token}\" -e \"SYSLOG_HOSTNAME=$PRIVATE_IP\" k2nr/rsyslog-logentries",
       "start ecs"
     ]
 

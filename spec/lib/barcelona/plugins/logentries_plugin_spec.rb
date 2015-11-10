@@ -2,12 +2,14 @@ require 'rails_helper'
 
 module Barcelona
   module Plugins
-    describe ProxyPlugin do
+    describe LogentriesPlugin do
       let!(:district) do
         create :district, plugins_attributes: [
                  {
-                   name: 'proxy',
-                   plugin_attributes: {no_proxy: ["10.0.0.1"]}
+                   name: 'logentries',
+                   plugin_attributes: {
+                     token: "logentries_token"
+                   }
                  }
                ]
       end
@@ -15,14 +17,14 @@ module Barcelona
       it "gets hooked with created trigger" do
         heritage = Heritage.last
         expect(heritage).to be_present
-        expect(heritage.name).to eq "#{district.name}-proxy"
-        expect(heritage.image_name).to eq "k2nr/squid"
+        expect(heritage.name).to eq "#{district.name}-logger"
+        expect(heritage.image_name).to eq "k2nr/rsyslog-logentries"
 
         service = heritage.services.first
         expect(service.name).to eq "main"
         port_mapping = service.port_mappings.first
-        expect(port_mapping.lb_port).to eq 3128
-        expect(port_mapping.container_port).to eq 3128
+        expect(port_mapping.lb_port).to eq 514
+        expect(port_mapping.container_port).to eq 514
       end
 
       it "gets hooked with destroyed trigger" do
@@ -38,30 +40,21 @@ module Barcelona
                                              ])
         definition = heritage.base_task_definition("heritage")
         expect(definition[:name]).to eq "heritage"
-        expect(definition[:environment]).to eq [
-                                              {name: "ENVIRONMENT", value: "VALUE"},
-                                              {name: "http_proxy", value: "http://main.#{district.name}-proxy.bcn:3128"},
-                                              {name: "https_proxy", value: "http://main.#{district.name}-proxy.bcn:3128"},
-                                              {name: "no_proxy", value: "10.0.0.1,localhost,127.0.0.1,169.254.169.254,.bcn"},
-                                            ]
+        expect(definition[:log_configuration]).to eq(log_driver: "syslog",
+                                                     options: {
+                                                       "syslog-address" => "tcp://127.0.0.1:514",
+                                                       "syslog-tag" => "heritage"
+                                                     })
       end
 
       it "gets hooked with container_instance_user_data trigger" do
         section = district.sections[:private]
         ci = ContainerInstance.new(section, instance_type: 't2.micro')
         user_data = YAML.load(Base64.decode64(ci.instance_user_data))
-        expect(user_data["write_files"][0]["path"]).to eq "/etc/profile.d/http_proxy.sh"
+        expect(user_data["write_files"][0]["path"]).to eq "/etc/rsyslog.d/barcelona-logger.conf"
         expect(user_data["write_files"][0]["owner"]).to eq "root:root"
-        expect(user_data["write_files"][0]["permissions"]).to eq "755"
+        expect(user_data["write_files"][0]["permissions"]).to eq "644"
         expect(user_data["write_files"][0]["content"]).to be_a String
-      end
-
-      it "gets hooked with ecs_config trigger" do
-        section = district.sections[:private]
-        config = section.send(:ecs_config)
-        expect(config).to include "HTTP_PROXY"
-        expect(config).to include "HTTPS_PROXY"
-        expect(config).to include "NO_PROXY"
       end
     end
   end
