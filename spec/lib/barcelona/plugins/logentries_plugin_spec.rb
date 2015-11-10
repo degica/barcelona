@@ -19,6 +19,8 @@ module Barcelona
         expect(heritage).to be_present
         expect(heritage.name).to eq "#{district.name}-logger"
         expect(heritage.image_name).to eq "k2nr/rsyslog-logentries"
+        expect(heritage.env_vars[0].key).to eq "LE_TOKEN"
+        expect(heritage.env_vars[0].value).to eq "logentries_token"
 
         service = heritage.services.first
         expect(service.name).to eq "main"

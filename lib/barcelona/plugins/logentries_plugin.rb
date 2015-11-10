@@ -39,7 +39,7 @@ EOS
           image_name: "k2nr/rsyslog-logentries",
           section_name: "public",
           env_vars: {
-            "LE_TOKEN" => district.logentries_token
+            "LE_TOKEN" => model.plugin_attributes[:token]
           },
           services: [
             {
