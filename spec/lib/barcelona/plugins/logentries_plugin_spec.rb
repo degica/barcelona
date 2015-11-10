@@ -25,7 +25,7 @@ module Barcelona
         service = heritage.services.first
         expect(service.name).to eq "main"
         port_mapping = service.port_mappings.first
-        expect(port_mapping.lb_port).to eq 514
+        expect(port_mapping.lb_port).to eq described_class::LOGGER_PORT
         expect(port_mapping.container_port).to eq 514
       end
 
