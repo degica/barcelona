@@ -49,17 +49,7 @@ class Heritage < ActiveRecord::Base
       memory: 256,
       essential: true,
       image: image_path,
-      environment: env_vars.map { |e| {name: e.key, value: e.value} },
-      log_configuration: {
-        log_driver: "syslog",
-        options: {
-          "syslog-address" => "tcp://127.0.0.1:514",
-          # TODO: Since docker 1.9.0 `syslog-tag` has been marked as deprecated and
-          # the option name changed to `tag`
-          # `syslog-tag` option will be removed at docker 1.11.0
-          "syslog-tag" => task_name
-        }
-      }
+      environment: env_vars.map { |e| {name: e.key, value: e.value} }
     }
     district.hook_plugins(:heritage_task_definition, self, base)
   end
