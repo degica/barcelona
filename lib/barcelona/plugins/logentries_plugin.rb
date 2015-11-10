@@ -1,13 +1,14 @@
 module Barcelona
   module Plugins
     class LogentriesPlugin < Base
+      LOGGER_PORT = 20514 # TCP port for logger service ELB
+      LOCAL_LOGGER_PORT = 514 # TCP port for local rsyslog
+      CONTAINER_PORT = 514 # TCP container port for a logger container
+
       def on_container_instance_user_data(instance, user_data)
         user_data.add_file("/etc/rsyslog.d/barcelona-logger.conf", "root:root", "644", <<EOS)
-$ModLoad imudp
-$UDPServerRun 514
-
 $ModLoad imtcp
-$InputTCPServerRun 514
+$InputTCPServerRun #{LOCAL_LOGGER_PORT}
 $template LineTemplate,"%syslogtag% hostname=%hostname% %msg:1:1024%\\n"
 *.* @@#{logger_url};LineTemplate
 EOS
@@ -23,7 +24,7 @@ EOS
           log_configuration: {
             log_driver: "syslog",
             options: {
-              "syslog-address" => "tcp://127.0.0.1:514",
+              "syslog-address" => "tcp://127.0.0.1:#{LOCAL_LOGGER_PORT}",
               # TODO: Since docker 1.9.0 `syslog-tag` has been marked as deprecated and
               # the option name changed to `tag`
               # `syslog-tag` option will be removed at docker 1.11.0
@@ -47,7 +48,7 @@ EOS
               cpu: 256,
               memory: 256,
               port_mappings: [
-                {lb_port: 514, container_port: 514}
+                {lb_port: LOGGER_PORT, container_port: CONTAINER_PORT}
               ]
             }
           ]
@@ -72,7 +73,7 @@ EOS
       end
 
       def logger_url
-        "main.#{logger_heritage_name}.bcn:514"
+        "main.#{logger_heritage_name}.bcn:#{LOGGER_PORT}"
       end
     end
   end
