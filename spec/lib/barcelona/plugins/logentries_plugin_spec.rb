@@ -3,16 +3,16 @@ require 'rails_helper'
 module Barcelona
   module Plugins
     describe LogentriesPlugin do
-      let!(:district) { create :district,
-                               plugins_attributes: [
-                                 {
-                                   name: 'logentries',
-                                   plugin_attributes: {
-                                     token: "logentries_token"
-                                   }
-                                 }
-                               ]
-      }
+      let!(:district) do
+        create :district, plugins_attributes: [
+                 {
+                   name: 'logentries',
+                   plugin_attributes: {
+                     token: "logentries_token"
+                   }
+                 }
+               ]
+      end
 
       it "gets hooked with created trigger" do
         heritage = Heritage.last

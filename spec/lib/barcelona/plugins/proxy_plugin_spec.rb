@@ -3,14 +3,14 @@ require 'rails_helper'
 module Barcelona
   module Plugins
     describe ProxyPlugin do
-      let!(:district) { create :district,
-                               plugins_attributes: [
-                                 {
-                                   name: 'proxy',
-                                   plugin_attributes: {no_proxy: ["10.0.0.1"]}
-                                 }
-                               ]
-      }
+      let!(:district) do
+        create :district, plugins_attributes: [
+                 {
+                   name: 'proxy',
+                   plugin_attributes: {no_proxy: ["10.0.0.1"]}
+                 }
+               ]
+      end
 
       it "gets hooked with created trigger" do
         heritage = Heritage.last
