@@ -9,7 +9,7 @@ module Barcelona
       ]
 
       def on_container_instance_user_data(instance, user_data)
-        return config if instance.section.public?
+        return user_data if instance.section.public?
 
         user_data.boot_commands += [
           "echo export http_proxy=#{proxy_url} >> /etc/sysconfig/docker",
