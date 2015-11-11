@@ -6,7 +6,7 @@ class Plugin < ActiveRecord::Base
   before_validation :default_attributes
   before_validation :name, uniqueness: {scope: :district_id}
   after_create :hook_created
-  after_create :hook_updated
+  after_update :hook_updated
   after_destroy :hook_destroyed
 
   def hook(trigger, origin, arg=nil)
