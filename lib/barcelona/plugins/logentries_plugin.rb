@@ -40,7 +40,7 @@ EOS
           image_name: "k2nr/rsyslog-logentries",
           section_name: "public",
           env_vars: {
-            "LE_TOKEN" => model.plugin_attributes[:token]
+            "LE_TOKEN" => token
           },
           services: [
             {
@@ -70,6 +70,10 @@ EOS
 
       def logger_heritage_name
         "#{district.name}-logger"
+      end
+
+      def token
+        model.plugin_attributes[:token]
       end
 
       def logger_url
