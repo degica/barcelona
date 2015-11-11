@@ -57,6 +57,13 @@ EOS
         logger_heritage.save_and_deploy!
       end
 
+      def on_updated(_, _)
+        heritage = Heritage.find_by!(name: logger_heritage_name)
+        env_var = heritage.env_vars.find_by(key: "LE_TOKEN")
+        env_var.update!(value: token)
+        heritage.save_and_deploy!(without_before_deploy: true)
+      end
+
       def on_destroyed(_, _)
         heritage = district.heritages.find_by(name: logger_heritage_name)
         heritage.destroy!
