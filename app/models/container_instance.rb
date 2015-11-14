@@ -14,7 +14,7 @@ class ContainerInstance
       user_data = {
         "repo_update" => true,
         "repo_upgrade" => "all",
-        "packages" => packages,
+        "packages" => packages.uniq,
         "write_files" => files,
         "bootcmd" => boot_commands,
         "runcmd" => run_commands,
