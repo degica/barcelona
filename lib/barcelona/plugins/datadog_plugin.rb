@@ -21,7 +21,7 @@ module Barcelona
          "-e", "API_KEY=#{api_key}",
          proxy_env,
          tags,
-         "datadog/docer-dd-agent:latest"
+         "datadog/docker-dd-agent:latest"
         ].flatten.compact.join(" ")
       end
 
@@ -35,7 +35,7 @@ module Barcelona
       end
 
       def tags
-        "TAGS=\"barcelona,district:#{district.name}\""
+        "-e TAGS=\"barcelona,district:#{district.name}\""
       end
 
       def proxy_plugin
