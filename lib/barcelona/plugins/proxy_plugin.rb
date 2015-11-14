@@ -71,14 +71,16 @@ EOS
         heritage.destroy!
       end
 
-      private
-
-      def district
-        model.district
+      def proxy_url
+        "http://#{proxy_host}:#{proxy_port}"
       end
 
-      def proxy_url
-        "http://main.#{proxy_heritage_name}.bcn:3128"
+      def proxy_host
+        "main.#{proxy_heritage_name}.bcn"
+      end
+
+      def proxy_port
+        3128
       end
 
       def proxy_heritage_name
@@ -87,6 +89,12 @@ EOS
 
       def no_proxy
         @no_proxy ||= (model.plugin_attributes["no_proxy"] || []).concat(DEFAULT_NO_PROXY)
+      end
+
+      private
+
+      def district
+        model.district
       end
     end
   end
