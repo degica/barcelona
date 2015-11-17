@@ -42,7 +42,17 @@ describe Backend::Ecs::Adapter do
           expect(ecs_mock).to receive(:register_task_definition)
                                .with(
                                  family: service.service_name,
-                                 container_definitions: [adapter.ecs_service.container_definition]
+                                 container_definitions: [
+                                   {
+                                     name: "awesome-app-web",
+                                     cpu: 128,
+                                     memory: 128,
+                                     essential: true,
+                                     image: 'nginx:1.9.5',
+                                     environment: [],
+                                     port_mappings: []
+                                   }
+                                 ]
                                )
           expect(ecs_mock).to receive(:create_service)
                                .with(
@@ -70,7 +80,21 @@ describe Backend::Ecs::Adapter do
           expect(ecs_mock).to receive(:register_task_definition)
                                .with(
                                  family: service.service_name,
-                                 container_definitions: [adapter.ecs_service.container_definition]
+                                 container_definitions: [
+                                   {
+                                     name: "awesome-app-web",
+                                     cpu: 128,
+                                     memory: 128,
+                                     essential: true,
+                                     image: 'nginx:1.9.5',
+                                     environment: [
+                                       {name: "HOST_PORT_TCP_3000", value: Integer},
+                                     ],
+                                     port_mappings: [
+                                       {container_port: 3000, protocol: "tcp", host_port: Integer}
+                                     ]
+                                   }
+                                 ]
                                )
           expect(ecs_mock).to receive(:create_service)
                                .with(
