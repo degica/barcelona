@@ -48,7 +48,15 @@ module Backend::Ecs
     end
 
     def container_definition
-      service.heritage.base_task_definition(service_name).merge(
+      base = service.heritage.base_task_definition(service_name)
+      base[:environment] += service.port_mappings.map do |pm|
+        {
+          name: "HOST_PORT_#{pm.protocol.upcase}_#{pm.container_port}",
+          value: pm.host_port
+        }
+      end
+
+      base.merge(
         cpu: cpu,
         memory: memory,
         command: command.try(:split, " "),

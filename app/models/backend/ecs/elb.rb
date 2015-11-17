@@ -31,12 +31,12 @@ module Backend::Ecs
         subnets: subnets.map(&:subnet_id),
         scheme: public? ? 'internet-facing' : 'internal',
         security_groups: [security_group],
-        listeners: port_mappings.map { |port_mapping|
+        listeners: port_mappings.tcp.map { |pm|
           {
             protocol: "TCP",
-            load_balancer_port: port_mapping.lb_port,
+            load_balancer_port: pm.lb_port,
             instance_protocol: "TCP",
-            instance_port: port_mapping.host_port
+            instance_port: pm.host_port
           }
         }
       )
