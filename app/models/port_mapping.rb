@@ -10,7 +10,7 @@ class PortMapping < ActiveRecord::Base
     mapping.protocol ||= "tcp"
   end
 
-  before_validation :assign_host_port
+  before_validation :assign_host_port, on: :create
 
   scope :tcp, -> { where(protocol: "tcp") }
   scope :udp, -> { where(protocol: "udp") }
