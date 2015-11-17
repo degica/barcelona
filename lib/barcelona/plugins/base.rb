@@ -10,7 +10,11 @@ module Barcelona
 
       def hook(trigger, origin, arg)
         method_name = "on_#{trigger}"
-        send(method_name, origin, arg) if respond_to? method_name
+        if respond_to? method_name
+          send(method_name, origin, arg)
+        else
+          arg
+        end
       end
 
       def attributes
