@@ -3,6 +3,7 @@ class PortMapping < ActiveRecord::Base
   belongs_to :service
 
   validates :host_port, :lb_port, :container_port, presence: true
+  validates :host_port, numericality: {greater_than: 1023, less_than: 20000}
   validates :protocol, inclusion: { in: %w(tcp udp) }
   validate :validate_host_port_uniqueness_on_district
 
