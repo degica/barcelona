@@ -1,10 +1,10 @@
 class PortMapping < ActiveRecord::Base
-  HOST_PORT_RANGE = (10000..19999)
+  RANDOM_HOST_PORT_RANGE = (10000..19999)
   belongs_to :service
 
-  validates :host_port, uniqueness: true
   validates :host_port, :lb_port, :container_port, presence: true
   validates :protocol, inclusion: { in: %w(tcp udp) }
+  validate :validate_host_port_uniqueness_on_district
 
   after_initialize do |mapping|
     mapping.protocol ||= "tcp"
@@ -18,7 +18,20 @@ class PortMapping < ActiveRecord::Base
   private
 
   def assign_host_port
-    available_ports = HOST_PORT_RANGE.to_a - self.class.pluck(:host_port)
+    available_ports = RANDOM_HOST_PORT_RANGE.to_a - used_host_ports
     self.host_port = available_ports.sample
+  end
+
+  def validate_host_port_uniqueness_on_district
+    if used_host_ports.include? host_port
+      errors.add(:host_port, "must be unique in a district")
+    end
+  end
+
+  def used_host_ports
+    @used_host_ports = PortMapping
+                       .joins(service: { heritage: :district })
+                       .where("heritages.district_id" => service.heritage.district.id)
+                       .pluck(:host_port)
   end
 end
