@@ -5,7 +5,7 @@ module Barcelona
         return user_data if instance.section.public?
 
         user_data.boot_commands += [
-          "sed '/^server /s/^/#/' /etc/ntp.conf",
+          "sed -i '/^server /s/^/#/' /etc/ntp.conf",
           hosts.map { |h| "echo server #{h} iburst >> /etc/ntp.conf" },
           "service ntpd restart"
         ].flatten
