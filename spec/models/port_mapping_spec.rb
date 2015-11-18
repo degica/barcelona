@@ -35,5 +35,13 @@ describe PortMapping do
       port_mapping2 = service.port_mappings.create(container_port: 3000, lb_port: 80, host_port: 10000)
       expect(port_mapping2).to_not be_valid
     end
+
+    it "can be same host port if mappings belong to different distrects" do
+      another_service = create :web_service
+      port_mapping1 = service.port_mappings.create(container_port: 3000, lb_port: 80, host_port: 10000)
+      expect(port_mapping1).to be_valid
+      port_mapping2 = another_service.port_mappings.create(container_port: 3000, lb_port: 80, host_port: 10000)
+      expect(port_mapping2).to be_valid
+    end
   end
 end

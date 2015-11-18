@@ -1,6 +1,8 @@
 FactoryGirl.define do
   factory :web_service, class: 'Service' do
-    name "web"
+    sequence :name do |n|
+      "service#{n}"
+    end
     cpu 128
     memory 128
     public true

@@ -44,7 +44,7 @@ describe Backend::Ecs::Adapter do
                                  family: service.service_name,
                                  container_definitions: [
                                    {
-                                     name: "awesome-app-web",
+                                     name: service.service_name,
                                      cpu: 128,
                                      memory: 128,
                                      essential: true,
@@ -82,7 +82,7 @@ describe Backend::Ecs::Adapter do
                                  family: service.service_name,
                                  container_definitions: [
                                    {
-                                     name: "awesome-app-web",
+                                     name: service.service_name,
                                      cpu: 128,
                                      memory: 128,
                                      essential: true,
@@ -103,8 +103,8 @@ describe Backend::Ecs::Adapter do
                                  task_definition: service.service_name,
                                  load_balancers: [
                                    {
-                                     load_balancer_name: "awesome-app-web",
-                                     container_name: 'awesome-app-web',
+                                     load_balancer_name: service.service_name,
+                                     container_name: service.service_name,
                                      container_port: 3000
                                    }
                                  ],
@@ -113,7 +113,7 @@ describe Backend::Ecs::Adapter do
                                )
           expect(elb_mock).to receive(:create_load_balancer)
                                .with(
-                                 load_balancer_name: 'awesome-app-web',
+                                 load_balancer_name: service.service_name,
                                  subnets: [],
                                  scheme: 'internet-facing',
                                  security_groups: [service.district.public_elb_security_group],
@@ -127,7 +127,7 @@ describe Backend::Ecs::Adapter do
                                .and_return(OpenStruct.new(dns_name: 'dns.internal'))
           expect(elb_mock).to receive(:configure_health_check)
                                .with(
-                                 load_balancer_name: 'awesome-app-web',
+                                 load_balancer_name: service.service_name,
                                  health_check: {
                                    target: "TCP:#{service.port_mappings.first.host_port}",
                                    interval: 5,
@@ -138,7 +138,7 @@ describe Backend::Ecs::Adapter do
                                )
           expect(elb_mock).to receive(:modify_load_balancer_attributes)
                                .with(
-                                 load_balancer_name: 'awesome-app-web',
+                                 load_balancer_name: service.service_name,
                                  load_balancer_attributes: {
                                    cross_zone_load_balancing: {
                                      enabled: true
@@ -160,7 +160,7 @@ describe Backend::Ecs::Adapter do
                                          {
                                            action: "CREATE",
                                            resource_record_set: {
-                                             name: "web.awesome-app.bcn.",
+                                             name: "#{service.name}.#{service.heritage.name}.bcn.",
                                              type: "CNAME",
                                              ttl: 300,
                                              resource_records: [
@@ -197,7 +197,7 @@ describe Backend::Ecs::Adapter do
                              desired_count: 0
                            )
       expect(adapter.elb).to receive(:fetch_load_balancer) do
-        OpenStruct.new(load_balancer_name: 'awesome-app-web', dns_name: 'dns.elb')
+        OpenStruct.new(load_balancer_name: service.service_name, dns_name: 'dns.elb')
       end
 
       expect(ecs_mock).to receive(:delete_service)
@@ -217,7 +217,7 @@ describe Backend::Ecs::Adapter do
                                      {
                                        action: "DELETE",
                                        resource_record_set: {
-                                         name: "web.awesome-app.bcn.",
+                                         name: "#{service.name}.#{service.heritage.name}.bcn.",
                                          type: "CNAME",
                                          ttl: 300,
                                          resource_records: [
