@@ -4,5 +4,6 @@ FactoryGirl.define do
     cpu 128
     memory 128
     public true
+    association :heritage, factory: :heritage
   end
 end
