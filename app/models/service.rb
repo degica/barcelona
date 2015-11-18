@@ -1,6 +1,6 @@
 class Service < ActiveRecord::Base
-  belongs_to :heritage
-  has_many :port_mappings, dependent: :destroy
+  belongs_to :heritage, inverse_of: :services
+  has_many :port_mappings, inverse_of: :service, dependent: :destroy
 
   validates :name, presence: true
   validates :cpu, numericality: {greater_than: 0}

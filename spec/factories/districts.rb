@@ -1,6 +1,8 @@
 FactoryGirl.define do
   factory :district do
-    name "dev"
+    sequence :name do |n|
+      "district#{n}"
+    end
     vpc_id "vpc-46f84523"
     public_elb_security_group 'sg-71307914'
     private_elb_security_group 'sg-71307914'

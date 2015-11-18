@@ -1,9 +1,9 @@
 class Heritage < ActiveRecord::Base
-  has_many :services, dependent: :destroy
+  has_many :services, inverse_of: :heritage, dependent: :destroy
   has_many :env_vars, dependent: :destroy
   has_many :oneoffs, dependent: :destroy
   has_many :events, dependent: :destroy
-  belongs_to :district
+  belongs_to :district, inverse_of: :heritages
 
   validates :name, presence: true, uniqueness: true
   validates :district, presence: true

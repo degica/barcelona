@@ -5,7 +5,7 @@ class District < ActiveRecord::Base
   before_create :create_ecs_cluster
   after_destroy :delete_ecs_cluster
 
-  has_many :heritages, dependent: :destroy
+  has_many :heritages, inverse_of: :district, dependent: :destroy
   has_many :users_districts, dependent: :destroy
   has_many :users, through: :users_districts
   has_many :elastic_ips, dependent: :destroy
