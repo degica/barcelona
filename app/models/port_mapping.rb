@@ -2,7 +2,7 @@ class PortMapping < ActiveRecord::Base
   RANDOM_HOST_PORT_RANGE = (10000..19999)
   belongs_to :service, inverse_of: :port_mappings
 
-  validates :host_port, :lb_port, :container_port, presence: true
+  validates :service, :lb_port, :container_port, presence: true
   validates :host_port, numericality: {greater_than: 1023, less_than: 20000}
   validates :protocol, inclusion: { in: %w(tcp udp) }
   validate :validate_host_port_uniqueness_on_district
