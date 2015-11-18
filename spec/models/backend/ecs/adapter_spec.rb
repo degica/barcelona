@@ -88,7 +88,7 @@ describe Backend::Ecs::Adapter do
                                      essential: true,
                                      image: 'nginx:1.9.5',
                                      environment: [
-                                       {name: "HOST_PORT_TCP_3000", value: Integer},
+                                       {name: "HOST_PORT_TCP_3000", value: String},
                                      ],
                                      port_mappings: [
                                        {container_port: 3000, protocol: "tcp", host_port: Integer}

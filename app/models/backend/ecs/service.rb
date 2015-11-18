@@ -52,7 +52,7 @@ module Backend::Ecs
       base[:environment] += service.port_mappings.map do |pm|
         {
           name: "HOST_PORT_#{pm.protocol.upcase}_#{pm.container_port}",
-          value: pm.host_port
+          value: pm.host_port.to_s
         }
       end
 
