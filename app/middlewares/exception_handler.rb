@@ -1,10 +1,10 @@
 class ExceptionHandler
   class Exception < StandardError
-    attr_accessor :errors
+    attr_accessor :error
 
-    def initialize(errors = [])
+    def initialize(error = [])
       super
-      @errors = errors
+      @error = error
     end
 
     def to_rack_response(debug=false)
@@ -20,11 +20,11 @@ class ExceptionHandler
     end
 
     def body(debug)
-      data = { errors: errors.presence || [default_error] }
+      data = { error: error.presence || [default_error] }
       if debug
         data.merge!(
           backtrace: original.backtrace,
-          debug_message: original.message
+          debug_message: "#{original.class.to_s}: #{original.message}"
         )
       end
       data.to_json
@@ -86,7 +86,7 @@ class ExceptionHandler
     rescue ActiveRecord::RecordNotFound
       raise NotFound
     rescue ActiveRecord::RecordInvalid => e
-      raise UnprocessableEntity.new(e.message)
+      raise UnprocessableEntity.new(e.record.errors)
     rescue Pundit::Error => e
       raise Forbidden.new(e.message)
     rescue
