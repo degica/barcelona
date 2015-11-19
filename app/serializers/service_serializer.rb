@@ -8,6 +8,7 @@ class ServiceSerializer < ActiveModel::Serializer
       {
         container_port: pm.container_port,
         lb_port: pm.lb_port,
+        host_port: pm.host_port,
         protocol: pm.protocol
       }
     end
