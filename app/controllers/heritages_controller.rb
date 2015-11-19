@@ -73,7 +73,7 @@ class HeritagesController < ApplicationController
   end
 
   def load_heritage
-    @heritage = Heritage.find_by(name: params[:id])
+    @heritage = Heritage.find_by!(name: params[:id])
   end
 
   def load_district
