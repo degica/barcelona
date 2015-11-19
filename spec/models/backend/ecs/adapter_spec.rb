@@ -145,7 +145,7 @@ describe Backend::Ecs::Adapter do
                                    },
                                    connection_draining: {
                                      enabled: true,
-                                     timeout: 300
+                                     timeout: 60
                                    }
                                  }
                                )

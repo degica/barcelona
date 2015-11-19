@@ -58,7 +58,7 @@ module Backend::Ecs
           },
           connection_draining: {
             enabled: true,
-            timeout: 300
+            timeout: 60
           }
         }
       )
