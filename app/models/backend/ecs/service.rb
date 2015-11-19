@@ -95,13 +95,25 @@ module Backend::Ecs
         desired_count: 1
       }
       if load_balancer.present?
-        params[:load_balancers] = port_mappings.map do |port_mapping|
+        # Currently ECS doesn't support assigning multi ELB to a particular ECS service
+        # so only the first port mapping is set to ECS service
+        # If the service has multiple port mappings it just works because both the ELB and
+        # ECS task definition has multiple port settings
+
+#        params[:load_balancers] = port_mappings.tcp.map do |port_mapping|
+#          {
+#            load_balancer_name: load_balancer.load_balancer_name,
+#            container_name: service_name,
+#            container_port: port_mapping.container_port
+#          }
+#        end
+        params[:load_balancers] = [
           {
             load_balancer_name: load_balancer.load_balancer_name,
             container_name: service_name,
-            container_port: port_mapping.container_port
+            container_port: port_mappings.tcp.first.container_port
           }
-        end
+        ]
         params[:role] = district.ecs_service_role
       end
       aws.ecs.create_service(params)
