@@ -1,4 +1,16 @@
 class User < ActiveRecord::Base
+  if Rails.env.development?
+    class Fake
+      def admin?
+        true
+      end
+
+      def developer?
+        true
+      end
+    end
+  end
+
   ALLOWED_TEAMS = [
     {org: 'degica', team: 'developers', role: "developer"},
     {org: 'degica', team: 'Admin developers', role: "admin"},
