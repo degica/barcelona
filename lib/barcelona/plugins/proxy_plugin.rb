@@ -13,7 +13,8 @@ module Barcelona
 
         user_data.boot_commands += [
           "echo export http_proxy=#{proxy_url} >> /etc/sysconfig/docker",
-          "echo export https_proxy=#{proxy_url} >> /etc/sysconfig/docker"
+          "echo export https_proxy=#{proxy_url} >> /etc/sysconfig/docker",
+          "echo proxy=#{proxy_url} >> /etc/yum.conf"
         ]
 
         user_data.add_file("/etc/profile.d/http_proxy.sh", "root:root", "755", <<EOS)
@@ -22,6 +23,11 @@ export http_proxy=#{proxy_url}
 export https_proxy=#{proxy_url}
 export no_proxy=#{no_proxy.join(',')}
 EOS
+
+        user_data.run_commands = [
+          "export http_proxy=#{proxy_url}",
+          "export https_proxy=#{proxy_url}"
+        ] + user_data.run_commands
         user_data
       end
 

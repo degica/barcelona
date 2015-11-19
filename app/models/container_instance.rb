@@ -59,7 +59,7 @@ class ContainerInstance
 
   def launch
     resp = aws.ec2.run_instances(
-      image_id: 'ami-6e920b6e', # amzn-ami-2015.09.a-amazon-ecs-optimized
+      image_id: 'ami-3077525e', # amzn-ami-2015.09.b-amazon-ecs-optimized
       min_count: 1,
       max_count: 1,
       user_data: instance_user_data,
@@ -80,6 +80,9 @@ class ContainerInstance
 
   def instance_user_data
     user_data = UserData.new
+    user_data.boot_commands += [
+      "echo exclude=ecs-init docker >> /etc/yum.conf"
+    ]
     if options[:eip_allocation_id]
       user_data.run_commands += [
         "INSTANCE_ID=`curl http://169.254.169.254/latest/meta-data/instance-id`",
