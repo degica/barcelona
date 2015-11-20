@@ -9,6 +9,9 @@ describe "POST /districts/:district/launch_instances", type: :request do
     allow_any_instance_of(DistrictSection).to receive(:subnets) {
       [double(subnet_id: 'subnet_id')]
     }
+    allow_any_instance_of(Aws::EC2::Client).to receive(:run_instances) {
+      double(instances: [double(instance_id: 'instance_id')])
+    }
   end
 
   it "launches a instance" do

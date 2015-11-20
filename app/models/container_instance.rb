@@ -76,6 +76,15 @@ class ContainerInstance
         name: section.ecs_instance_role
       }
     )
+    instance_id = resp.instances[0].instance_id
+    aws.ec2.create_tags(
+      resources: [instance_id],
+      tags: [
+        {key: "Name", value: "barcelona-container-instance"},
+        {key: "District", value: section.district.name},
+        {key: "Section", value: section.name},
+      ]
+    )
   end
 
   def instance_user_data
