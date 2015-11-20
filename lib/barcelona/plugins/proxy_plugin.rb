@@ -22,6 +22,9 @@ module Barcelona
 export http_proxy=#{proxy_url}
 export https_proxy=#{proxy_url}
 export no_proxy=#{no_proxy.join(',')}
+export HTTP_PROXY=#{proxy_url}
+export HTTPS_PROXY=#{proxy_url}
+export NO_PROXY=#{no_proxy.join(',')}
 EOS
 
         user_data.run_commands = [
@@ -36,7 +39,10 @@ EOS
         task_definition[:environment] += [
           {name: "http_proxy", value: proxy_url},
           {name: "https_proxy", value: proxy_url},
-          {name: "no_proxy", value: no_proxy.join(',')}
+          {name: "no_proxy", value: no_proxy.join(',')},
+          {name: "HTTP_PROXY", value: proxy_url},
+          {name: "HTTPS_PROXY", value: proxy_url},
+          {name: "NO_PROXY", value: no_proxy.join(',')}
         ]
         task_definition
       end
