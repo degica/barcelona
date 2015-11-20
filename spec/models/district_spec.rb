@@ -114,7 +114,10 @@ describe District do
                             iam_instance_profile: {
                               name: district.ecs_instance_role
                             }
-                          )
+                          ) do
+        double(instances: [double(instance_id: 'instance_id')])
+      end
+      expect(ec2_mock).to receive(:create_tags)
       subject
     end
   end
