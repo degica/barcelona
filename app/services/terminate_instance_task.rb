@@ -3,7 +3,7 @@ class TerminateInstanceTask < SystemTask
     env = {
       "STOP_TIMEOUT" => 120,
       "AWS_REGION" => "ap-northeast-1"
-    }
+    }.merge(env)
     super(arns, env)
   end
 
