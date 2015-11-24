@@ -18,7 +18,7 @@ class SystemTask
         container_overrides: [
           {
             name: task_family,
-            environment: env.map { |k, v| {name: k, value: v} }
+            environment: env.map { |k, v| {name: k, value: v.to_s} }
           }
         ]
       },
