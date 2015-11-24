@@ -68,6 +68,12 @@ class District < ActiveRecord::Base
     end
   end
 
+  def base_task_definition
+    base = {
+      environment: []
+    }
+    hook_plugins(:district_task_definition, self, base)
+  end
   private
 
   def update_ecs_config
