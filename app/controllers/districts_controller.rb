@@ -33,6 +33,13 @@ class DistrictsController < ApplicationController
     render status: 204, nothing: true
   end
 
+  def terminate_instance
+    section = params[:section] || :private
+    arn = params[:container_instance_arn]
+    @district.terminate_instance(container_instance_arn: arn, section: section)
+    render status: 204, nothing: true
+  end
+
   def allocate_elastic_ip
     eip = @district.elastic_ips.create!(allocation_id: params[:allocation_id])
     render json: eip
