@@ -1,10 +1,9 @@
 class SystemTask
-  attr_accessor :section, :user
+  attr_accessor :section
   delegate :aws, :district, to: :section
 
-  def initialize(section, user)
+  def initialize(section)
     @section = section
-    @user = user
   end
 
   def run(container_instance_arns, env = {})

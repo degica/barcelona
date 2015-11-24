@@ -1,4 +1,11 @@
 class UpdateUserTask < SystemTask
+  attr_accessor :user
+
+  def initialize(section, user)
+    super(section)
+    @user = user
+  end
+
   def run
     Rails.logger.info "Updating user #{user.name} for #{section.cluster_name}"
     env = {
