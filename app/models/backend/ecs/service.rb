@@ -76,7 +76,7 @@ module Backend::Ecs
 
     def register_task
       aws.ecs.register_task_definition(family: service.service_name,
-                                   container_definitions: [container_definition])
+                                       container_definitions: [container_definition])
     end
 
     def update

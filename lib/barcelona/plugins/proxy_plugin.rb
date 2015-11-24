@@ -34,7 +34,7 @@ EOS
         user_data
       end
 
-      def on_heritage_task_definition(heritage, task_definition)
+      def on_district_task_definition(heritage, task_definition)
         return task_definition if heritage.name == proxy_heritage_name
         task_definition[:environment] += [
           {name: "http_proxy", value: proxy_url},

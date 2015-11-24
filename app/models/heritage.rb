@@ -43,14 +43,15 @@ class Heritage < ActiveRecord::Base
   end
 
   def base_task_definition(task_name)
-    base = {
+    base = district.base_task_definition.merge(
       name: task_name,
       cpu: 256,
       memory: 256,
       essential: true,
-      image: image_path,
-      environment: env_vars.map { |e| {name: e.key, value: e.value} }
-    }
+      image: image_path
+    )
+    base[:environment] += env_vars.map { |e| {name: e.key, value: e.value} }
+
     district.hook_plugins(:heritage_task_definition, self, base)
   end
 

@@ -30,7 +30,8 @@ describe UpdateUserTask do
                                    source_volume: "home",
                                    container_path: "/home"
                                  }
-                               ]
+                               ],
+                               environment: []
                              }
                            ],
                            volumes: [

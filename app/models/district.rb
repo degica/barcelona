@@ -52,6 +52,10 @@ class District < ActiveRecord::Base
                                               associate_eip: associate_eip)
   end
 
+  def terminate_instance(section: :private, container_instance_arn: nil)
+    sections[section.to_sym].terminate_instance(container_instance_arn: container_instance_arn)
+  end
+
   def container_instances(section: :private)
     sections[section].container_instances
   end
@@ -68,6 +72,12 @@ class District < ActiveRecord::Base
     end
   end
 
+  def base_task_definition
+    base = {
+      environment: []
+    }
+    hook_plugins(:district_task_definition, self, base)
+  end
   private
 
   def update_ecs_config
