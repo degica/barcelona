@@ -96,4 +96,24 @@ describe "updating a heritage" do
       expect(heritage["services"][0]["port_mappings"][0]["container_port"]).to eq 80
     end
   end
+
+  describe "with wrong heritage token", type: :request do
+    let(:district) { create :district }
+
+    it "returns 404" do
+      params = {
+        image_tag: "v3",
+        before_deploy: nil,
+        services: [
+          {
+            name: "web",
+            command: "true"
+          }
+        ]
+      }
+
+      post "/heritages/nginx/trigger/wrong-token", params
+      expect(response.status).to eq 404
+    end
+  end
 end
