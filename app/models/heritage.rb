@@ -11,6 +11,7 @@ class Heritage < ActiveRecord::Base
 
   before_validation do |heritage|
     heritage.section_name ||= 'private'
+    heritage.regenerate_token if heritage.token.blank?
   end
 
   accepts_nested_attributes_for :services
@@ -40,6 +41,10 @@ class Heritage < ActiveRecord::Base
 
   def section
     district.sections[section_name.to_sym]
+  end
+
+  def regenerate_token
+    self.token = SecureRandom.uuid
   end
 
   def base_task_definition(task_name)
