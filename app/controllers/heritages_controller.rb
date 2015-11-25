@@ -1,6 +1,7 @@
 class HeritagesController < ApplicationController
   before_action :load_district,  only:   [:index, :create]
-  before_action :load_heritage, except: [:index, :create]
+  before_action :load_heritage, except: [:index, :create, :trigger]
+  skip_before_action :authenticate, only: [:trigger]
 
   def index
     render json: @district.heritages
@@ -25,6 +26,16 @@ class HeritagesController < ApplicationController
   def destroy
     @heritage.destroy!
     render status: 204, nothing: true
+  end
+
+  def trigger
+    @heritage = Heritage.find_by!(name: params[:heritage_id])
+    params[:id] = params.delete :heritage_id
+    if Rack::Utils.secure_compare(params[:token], @heritage.token)
+      update
+    else
+      raise ExceptionHandler::NotFound
+    end
   end
 
   def set_env_vars

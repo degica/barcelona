@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151118040937) do
+ActiveRecord::Schema.define(version: 20151125090157) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -90,6 +90,7 @@ ActiveRecord::Schema.define(version: 20151118040937) do
     t.text     "before_deploy"
     t.text     "slack_url"
     t.string   "section_name"
+    t.string   "token"
   end
 
   add_index "heritages", ["district_id"], name: "index_heritages_on_district_id", using: :btree
