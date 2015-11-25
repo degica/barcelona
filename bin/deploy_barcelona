@@ -55,5 +55,5 @@ puts "Putting version tag to the latest master image"
 put_tag(get_image_id_for_tag("master"), "master.#{ENV["TRAVIS_BUILD_NUMBER"]}")
 
 puts "Triggered deployment for #{ENV["TRAVIS_COMMIT"]}"
-system "bcn deploy -e production --tag master.#{ENV["TRAVIS_BUILD_NUMBER"]} 1> /dev/null"
+system "bcn deploy -e production --tag master.#{ENV["TRAVIS_BUILD_NUMBER"]} --heritage-token #{ENV["HERITAGE_TOKEN"]} 1> /dev/null"
 exit($?.exitstatus)
