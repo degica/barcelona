@@ -4,10 +4,10 @@ Rails.application.routes.draw do
       member do
         post :launch_instances
         post :terminate_instance
-        post :allocate_elastic_ip
       end
 
       resources :plugins, except: [:new, :edit]
+      resources :elastic_ips, only: [:index, :create]
 
       resources :heritages, shallow: true, except: [:new, :edit] do
         post   :env_vars, on: :member, to: "heritages#set_env_vars"
