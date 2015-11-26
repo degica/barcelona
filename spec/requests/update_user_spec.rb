@@ -12,7 +12,7 @@ describe "PATCH /users/:id", type: :request do
       params = {
         "public_key" => "ssh-rsa aaaaaaaa"
       }
-      patch "/users/#{user2.name}", params, auth
+      patch "/v1/users/#{user2.name}", params, auth
       expect(response.status).to eq 200
       body = JSON.load(response.body)["user"]
       expect(body["name"]).to eq user.name
@@ -27,7 +27,7 @@ describe "PATCH /users/:id", type: :request do
       params = {
         "public_key" => "ssh-rsa aaaaaaaa"
       }
-      patch "/users/#{user2.name}", params, auth
+      patch "/v1/users/#{user2.name}", params, auth
       expect(response.status).to eq 403
     end
   end
@@ -42,7 +42,7 @@ describe "PATCH /user", type: :request do
     params = {
       "public_key" => "ssh-rsa aaaaaaaa"
     }
-    patch "/user", params, auth
+    patch "/v1/user", params, auth
     expect(response.status).to eq 200
     body = JSON.load(response.body)["user"]
     expect(body["name"]).to eq user.name

@@ -7,7 +7,7 @@ describe "GET /districts/:district", type: :request do
   let!(:plugin) { create :plugin, district: district }
 
   it "shows a district" do
-    get "/districts/#{district.name}", nil, auth
+    get "/v1/districts/#{district.name}", nil, auth
     expect(response.status).to eq 200
     district = JSON.load(response.body)["district"]
     expect(district["plugins"]).to eq([{"name" => plugin.name, "plugin_attributes" => {}}])

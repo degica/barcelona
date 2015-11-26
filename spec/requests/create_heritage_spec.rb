@@ -33,7 +33,7 @@ describe "POST /districts/:district/heritages", type: :request do
       ]
     }
     expect(DeployRunnerJob).to receive(:perform_later)
-    post "/districts/#{district.name}/heritages", params, auth
+    post "/v1/districts/#{district.name}/heritages", params, auth
     expect(response.status).to eq 200
     heritage = JSON.load(response.body)["heritage"]
     expect(heritage["name"]).to eq "nginx"

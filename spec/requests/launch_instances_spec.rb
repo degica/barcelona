@@ -19,7 +19,7 @@ describe "POST /districts/:district/launch_instances", type: :request do
       count: 1,
       instance_type: 't2.micro'
     }
-    post "/districts/#{district.name}/launch_instances", params, auth
+    post "/v1/districts/#{district.name}/launch_instances", params, auth
     expect(response.status).to eq 204
   end
 
@@ -37,7 +37,7 @@ describe "POST /districts/:district/launch_instances", type: :request do
       section: "public",
       associate_eip: true
     }
-    post "/districts/#{district.name}/launch_instances", params, auth
+    post "/v1/districts/#{district.name}/launch_instances", params, auth
     expect(response.status).to eq 204
   end
 end

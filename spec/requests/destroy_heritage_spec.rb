@@ -28,10 +28,10 @@ describe "DELETE /heritages/:heritage", type: :request do
         }
       ]
     }
-    post "/districts/#{district.name}/heritages", params, auth
+    post "/v1/districts/#{district.name}/heritages", params, auth
     expect(response).to be_success
 
-    delete "/heritages/nginx", nil, auth
+    delete "/v1/heritages/nginx", nil, auth
     expect(response.status).to eq 204
   end
 end

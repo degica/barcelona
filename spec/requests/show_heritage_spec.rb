@@ -28,10 +28,10 @@ describe "GET /heritages/:heritage", type: :request do
         }
       ]
     }
-    post "/districts/#{district.name}/heritages", params, auth
+    post "/v1/districts/#{district.name}/heritages", params, auth
     expect(response).to be_success
 
-    get "/heritages/nginx", nil, auth
+    get "/v1/heritages/nginx", nil, auth
     expect(response).to be_success
 
     heritage = JSON.load(response.body)["heritage"]

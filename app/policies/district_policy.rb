@@ -22,8 +22,4 @@ class DistrictPolicy < ApplicationPolicy
   def terminate_instance?
     user.developer?
   end
-
-  def allocate_elastic_ip?
-    user.developer?
-  end
 end

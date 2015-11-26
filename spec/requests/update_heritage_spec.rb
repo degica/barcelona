@@ -26,7 +26,7 @@ describe "updating a heritage" do
         }
       ]
     }
-    post "/districts/#{district.name}/heritages", params, auth
+    post "/v1/districts/#{district.name}/heritages", params, auth
   end
 
   describe "PATCH /heritages/:heritage", type: :request do
@@ -43,7 +43,7 @@ describe "updating a heritage" do
       }
 
       expect(DeployRunnerJob).to receive(:perform_later)
-      patch "/heritages/nginx", params, auth
+      patch "/v1/heritages/nginx", params, auth
       expect(response).to be_success
 
       heritage = JSON.load(response.body)["heritage"]
@@ -79,7 +79,7 @@ describe "updating a heritage" do
       token = JSON.load(response.body)["heritage"]["token"]
 
       expect(DeployRunnerJob).to receive(:perform_later)
-      post "/heritages/nginx/trigger/#{token}", params
+      post "/v1/heritages/nginx/trigger/#{token}", params
       expect(response).to be_success
       heritage = JSON.load(response.body)["heritage"]
 
@@ -112,7 +112,7 @@ describe "updating a heritage" do
         ]
       }
 
-      post "/heritages/nginx/trigger/wrong-token", params
+      post "/v1/heritages/nginx/trigger/wrong-token", params
       expect(response.status).to eq 404
     end
   end
