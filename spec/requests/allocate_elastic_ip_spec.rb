@@ -7,7 +7,7 @@ describe "GET /districts/:district", type: :request do
 
   it "allocates elastic IP" do
     params = {}
-    post "/districts/#{district.name}/allocate_elastic_ip", params, auth
+    post "/v1/districts/#{district.name}/allocate_elastic_ip", params, auth
     expect(response.status).to eq 200
     body = JSON.load(response.body)["elastic_ip"]
     expect(body["allocation_id"]).to be_present
@@ -17,7 +17,7 @@ describe "GET /districts/:district", type: :request do
     params = {
       allocation_id: 'allocation_id'
     }
-    post "/districts/#{district.name}/allocate_elastic_ip", params, auth
+    post "/v1/districts/#{district.name}/allocate_elastic_ip", params, auth
     expect(response.status).to eq 200
     body = JSON.load(response.body)["elastic_ip"]
     expect(body["allocation_id"]).to eq "allocation_id"

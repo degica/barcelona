@@ -16,7 +16,7 @@ describe "POST /heritages/:heritage/oneoffs", type: :request do
       command: "rake db:migrate",
       image_tag: "v100"
     }
-    post "/heritages/#{heritage.name}/oneoffs", params, auth
+    post "/v1/heritages/#{heritage.name}/oneoffs", params, auth
     expect(response).to be_success
     oneoff = JSON.load(response.body)["oneoff"]
     expect(oneoff["task_arn"]).to eq "arn"

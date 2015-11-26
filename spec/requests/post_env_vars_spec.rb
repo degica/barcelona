@@ -27,7 +27,7 @@ describe "POST /heritages/:heritage/env_vars", type: :request do
         }
       ]
     }
-    post "/districts/#{district.name}/heritages", params, auth
+    post "/v1/districts/#{district.name}/heritages", params, auth
   end
 
   it "updates heritage's environment variables" do
@@ -39,7 +39,7 @@ describe "POST /heritages/:heritage/env_vars", type: :request do
     }
 
     expect(DeployRunnerJob).to receive(:perform_later)
-    post "/heritages/nginx/env_vars", params, auth
+    post "/v1/heritages/nginx/env_vars", params, auth
     expect(response).to be_success
 
     heritage = JSON.load(response.body)["heritage"]

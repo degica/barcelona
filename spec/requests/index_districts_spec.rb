@@ -6,7 +6,7 @@ describe "GET /districts", type: :request do
   let(:district) { create :district }
 
   it "lists districts" do
-    get "/districts/#{district.name}", nil, auth
+    get "/v1/districts/#{district.name}", nil, auth
     expect(response.status).to eq 200
   end
 end

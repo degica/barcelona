@@ -12,7 +12,7 @@ describe "POST /districts/:district/terminate_instance", type: :request do
     params = {
       container_instance_arn: 'container-instance-arn'
     }
-    post "/districts/#{district.name}/terminate_instance", params, auth
+    post "/v1/districts/#{district.name}/terminate_instance", params, auth
     expect(response.status).to eq 204
   end
 end

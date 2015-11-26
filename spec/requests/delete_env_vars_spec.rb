@@ -30,7 +30,7 @@ describe "DELETE /heritages/:heritage/env_vars", type: :request do
         }
       ]
     }
-    post "/districts/#{district.name}/heritages", params, auth
+    post "/v1/districts/#{district.name}/heritages", params, auth
     expect(response).to be_success
   end
 
@@ -40,7 +40,7 @@ describe "DELETE /heritages/:heritage/env_vars", type: :request do
     }
 
     expect(DeployRunnerJob).to receive(:perform_later)
-    delete "/heritages/nginx/env_vars", params, auth
+    delete "/v1/heritages/nginx/env_vars", params, auth
     expect(response).to be_success
 
     heritage = JSON.load(response.body)["heritage"]

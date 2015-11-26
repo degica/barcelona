@@ -9,7 +9,7 @@ describe "POST /districts/:district/plugins", type: :request do
     params = {
       name: "proxy"
     }
-    post "/districts/#{district.name}/plugins", params, auth
+    post "/v1/districts/#{district.name}/plugins", params, auth
     expect(response.status).to eq 200
     plugin = JSON.load(response.body)["plugin"]
     expect(plugin["name"]).to eq "proxy"
