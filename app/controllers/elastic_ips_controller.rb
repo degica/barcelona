@@ -2,8 +2,8 @@ class ElasticIpsController < ApplicationController
   before_action :load_district
 
   def index
-    @districts = District.all
-    render json: @districts
+    eips = @district.elastic_ips
+    render json: eips
   end
 
   def create
