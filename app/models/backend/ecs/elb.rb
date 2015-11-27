@@ -31,7 +31,7 @@ module Backend::Ecs
         subnets: subnets.map(&:subnet_id),
         scheme: public? ? 'internet-facing' : 'internal',
         security_groups: [security_group],
-        listeners: port_mappings.tcp.map { |pm|
+        listeners: port_mappings.lb_registerable.map { |pm|
           {
             protocol: "TCP",
             load_balancer_port: pm.lb_port,
