@@ -18,18 +18,28 @@ class PortMapping < ActiveRecord::Base
 
   before_validation :assign_host_port
   before_validation :assign_lb_port
+  after_create :create_https, if: :http?
 
   scope :lb_registerable, -> { where.not(protocol: "udp") }
   scope :tcp, -> { where(protocol: "tcp") }
   scope :udp, -> { where(protocol: "udp") }
-  scope :http, -> { where(protocol: "http") }
 
-  def to_task_definition
-    {
-      container_port: container_port,
-      host_port: (http? || https?) ? nil : host_port,
-      protocol: host_protocol
-    }.compact
+  def self.to_task_definition
+    self.all.map do |pm|
+      {
+        container_port: pm.container_port,
+        host_port: pm.special_protocol? ? nil : pm.host_port,
+        protocol: pm.host_protocol
+      }.compact
+    end.uniq { |pm| pm[:container_port] }
+  end
+
+  def self.http
+    find_by(protocol: 'http')
+  end
+
+  def self.https
+    find_by(protocol: 'https')
   end
 
   def http?
@@ -44,11 +54,11 @@ class PortMapping < ActiveRecord::Base
     !["tcp", "udp"].include?(protocol)
   end
 
-  private
-
   def host_protocol
     (http? || https?) ? "tcp" : protocol
   end
+
+  private
 
   def assign_host_port
     return if host_port.present?
@@ -72,6 +82,13 @@ class PortMapping < ActiveRecord::Base
     if (http? && lb_port != 80) || (https? && lb_port != 443)
       errors.add(:lb_port, "cannot be changed for http/https protocol")
     end
+  end
+
+  def create_https
+    service.port_mappings.create!(
+      container_port: container_port,
+      protocol: 'https'
+    )
   end
 
   def used_host_ports

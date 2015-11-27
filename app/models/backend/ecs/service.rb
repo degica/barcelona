@@ -60,12 +60,13 @@ module Backend::Ecs
         cpu: cpu,
         memory: memory,
         command: command.try(:split, " "),
-        port_mappings: port_mappings.map(&:to_task_definition)
+        port_mappings: port_mappings.to_task_definition
       ).compact
     end
 
     def reverse_proxy_definition
-      http_port_mapping = service.port_mappings.http.first
+      http = service.port_mappings.http
+      https = service.port_mappings.https
       {
         name: "#{service.service_name}-revpro",
         cpu: 128,
@@ -75,12 +76,17 @@ module Backend::Ecs
         links: ["#{service.service_name}:backend"],
         environment: [
           {name: "UPSTREAM_NAME", value: "backend"},
-          {name: "UPSTREAM_PORT", value: http_port_mapping.container_port.to_s}
+          {name: "UPSTREAM_PORT", value: http.container_port.to_s}
         ],
         port_mappings: [
           {
             container_port: 80,
-            host_port: http_port_mapping.host_port,
+            host_port: http.host_port,
+            protocol: "tcp"
+          },
+          {
+            container_port: 443,
+            host_port: https.host_port,
             protocol: "tcp"
           }
         ]

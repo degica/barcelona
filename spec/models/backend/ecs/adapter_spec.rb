@@ -91,6 +91,7 @@ describe Backend::Ecs::Adapter do
                                      environment: [
                                        {name: "HOST_PORT_TCP_1111", value: @port_tcp.host_port.to_s},
                                        {name: "HOST_PORT_HTTP_3000", value: @port_http.host_port.to_s},
+                                       {name: "HOST_PORT_HTTPS_3000", value: String},
                                      ],
                                      port_mappings: [
                                        {container_port: 1111, protocol: "tcp", host_port: @port_tcp.host_port},
@@ -112,6 +113,11 @@ describe Backend::Ecs::Adapter do
                                        {
                                          container_port: 80,
                                          host_port: @port_http.host_port,
+                                         protocol: "tcp"
+                                       },
+                                       {
+                                         container_port: 443,
+                                         host_port: Integer,
                                          protocol: "tcp"
                                        }
                                      ]
@@ -151,6 +157,12 @@ describe Backend::Ecs::Adapter do
                                      load_balancer_port: 80,
                                      instance_protocol: 'TCP',
                                      instance_port: @port_http.host_port
+                                   },
+                                   {
+                                     protocol: 'TCP',
+                                     load_balancer_port: 443,
+                                     instance_protocol: 'TCP',
+                                     instance_port: Integer
                                    }
                                  ]
                                )
