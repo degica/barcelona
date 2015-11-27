@@ -4,6 +4,10 @@ class PortMapping < ActiveRecord::Base
 
   validates :service, :lb_port, :container_port, presence: true
   validates :host_port, numericality: {greater_than: 1023, less_than: 20000}
+  validates :protocol,
+            uniqueness: {scope: :service_id, message: "special protocol must be unique per service"},
+            if: :special_protocol?
+
   validates :protocol, inclusion: { in: %w(tcp udp http https) }
   validate :validate_host_port_uniqueness_on_district, on: :create
   validate :validate_lb_port_and_protocol
@@ -34,6 +38,10 @@ class PortMapping < ActiveRecord::Base
 
   def https?
     protocol == 'https'
+  end
+
+  def special_protocol?
+    !["tcp", "udp"].include?(protocol)
   end
 
   private
