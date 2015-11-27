@@ -73,7 +73,8 @@ describe Backend::Ecs::Adapter do
           allow(adapter.elb).to receive_message_chain(:aws, :elb) { elb_mock }
           allow(adapter.record_set).to receive_message_chain(:aws, :route53) { route53_mock }
           allow(adapter.elb).to receive(:fetch_load_balancer) { nil }
-          service.port_mappings.create(lb_port: 80, container_port: 3000)
+          @port_tcp = service.port_mappings.create(lb_port: 1111, container_port: 1111)
+          @port_http = service.port_mappings.create(container_port: 3000, protocol: "http")
         end
 
         it "create ECS resources" do
@@ -88,10 +89,31 @@ describe Backend::Ecs::Adapter do
                                      essential: true,
                                      image: 'nginx:1.9.5',
                                      environment: [
-                                       {name: "HOST_PORT_TCP_3000", value: String},
+                                       {name: "HOST_PORT_TCP_1111", value: @port_tcp.host_port.to_s},
+                                       {name: "HOST_PORT_HTTP_3000", value: @port_http.host_port.to_s},
                                      ],
                                      port_mappings: [
-                                       {container_port: 3000, protocol: "tcp", host_port: Integer}
+                                       {container_port: 1111, protocol: "tcp", host_port: @port_tcp.host_port},
+                                       {container_port: 3000, protocol: "tcp"}
+                                     ]
+                                   },
+                                   {
+                                     name: "#{service.service_name}-revpro",
+                                     cpu: 128,
+                                     memory: 128,
+                                     essential: true,
+                                     image: "k2nr/reverse-proxy",
+                                     links: ["#{service.service_name}:backend"],
+                                     environment: [
+                                       {name: "UPSTREAM_NAME", value: "backend"},
+                                       {name: "UPSTREAM_PORT", value: "3000"}
+                                     ],
+                                     port_mappings: [
+                                       {
+                                         container_port: 80,
+                                         host_port: @port_http.host_port,
+                                         protocol: "tcp"
+                                       }
                                      ]
                                    }
                                  ]
@@ -105,7 +127,7 @@ describe Backend::Ecs::Adapter do
                                    {
                                      load_balancer_name: service.service_name,
                                      container_name: service.service_name,
-                                     container_port: 3000
+                                     container_port: 1111
                                    }
                                  ],
                                  role: service.district.ecs_service_role,
@@ -118,10 +140,18 @@ describe Backend::Ecs::Adapter do
                                  scheme: 'internet-facing',
                                  security_groups: [service.district.public_elb_security_group],
                                  listeners: [
-                                   protocol: 'TCP',
-                                   load_balancer_port: 80,
-                                   instance_protocol: 'TCP',
-                                   instance_port: service.port_mappings.first.host_port
+                                   {
+                                     protocol: 'TCP',
+                                     load_balancer_port: 1111,
+                                     instance_protocol: 'TCP',
+                                     instance_port: @port_tcp.host_port
+                                   },
+                                   {
+                                     protocol: 'TCP',
+                                     load_balancer_port: 80,
+                                     instance_protocol: 'TCP',
+                                     instance_port: @port_http.host_port
+                                   }
                                  ]
                                )
                                .and_return(OpenStruct.new(dns_name: 'dns.internal'))

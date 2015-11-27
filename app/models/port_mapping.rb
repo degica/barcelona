@@ -15,7 +15,8 @@ class PortMapping < ActiveRecord::Base
   before_validation :assign_host_port
   before_validation :assign_lb_port
 
-  scope :tcp, -> { where(protocol: ["tcp", "http", "https"]) }
+  scope :lb_registerable, -> { where.not(protocol: "udp") }
+  scope :tcp, -> { where(protocol: "tcp") }
   scope :udp, -> { where(protocol: "udp") }
   scope :http, -> { where(protocol: "http") }
 
@@ -27,8 +28,6 @@ class PortMapping < ActiveRecord::Base
     }.compact
   end
 
-  private
-
   def http?
     protocol == 'http'
   end
@@ -36,6 +35,8 @@ class PortMapping < ActiveRecord::Base
   def https?
     protocol == 'https'
   end
+
+  private
 
   def host_protocol
     (http? || https?) ? "tcp" : protocol

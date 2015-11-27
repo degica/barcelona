@@ -60,14 +60,37 @@ module Backend::Ecs
         cpu: cpu,
         memory: memory,
         command: command.try(:split, " "),
-        port_mappings: port_mappings.map{ |m|
-          {
-            container_port: m.container_port,
-            host_port: m.host_port,
-            protocol: m.protocol
-          }
-        }
+        port_mappings: port_mappings.map(&:to_task_definition)
       ).compact
+    end
+
+    def reverse_proxy_definition
+      http_port_mapping = service.port_mappings.http.first
+      {
+        name: "#{service.service_name}-revpro",
+        cpu: 128,
+        memory: 128,
+        essential: true,
+        image: "k2nr/reverse-proxy",
+        links: ["#{service.service_name}:backend"],
+        environment: [
+          {name: "UPSTREAM_NAME", value: "backend"},
+          {name: "UPSTREAM_PORT", value: http_port_mapping.container_port.to_s}
+        ],
+        port_mappings: [
+          {
+            container_port: 80,
+            host_port: http_port_mapping.host_port,
+            protocol: "tcp"
+          }
+        ]
+      }
+    end
+
+    def container_definitions
+      definitions = [container_definition]
+      definitions << reverse_proxy_definition if port_mappings.http.present?
+      definitions
     end
 
     def applied?
@@ -76,7 +99,7 @@ module Backend::Ecs
 
     def register_task
       aws.ecs.register_task_definition(family: service.service_name,
-                                       container_definitions: [container_definition])
+                                       container_definitions: container_definitions)
     end
 
     def update
@@ -107,11 +130,19 @@ module Backend::Ecs
 #            container_port: port_mapping.container_port
 #          }
 #        end
+        # FIXME: ugly hack
+        container_name = service_name
+        port_mapping = port_mappings.lb_registerable.first
+        container_port = port_mapping.container_port
+        if port_mapping.http? || port_mapping.https?
+          container_name = "#{service_name}-revpro"
+          container_port = 80
+        end
         params[:load_balancers] = [
           {
             load_balancer_name: load_balancer.load_balancer_name,
-            container_name: service_name,
-            container_port: port_mappings.tcp.first.container_port
+            container_name: container_name,
+            container_port: container_port
           }
         ]
         params[:role] = district.ecs_service_role
