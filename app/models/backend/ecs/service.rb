@@ -142,7 +142,7 @@ module Backend::Ecs
         container_port = port_mapping.container_port
         if port_mapping.http? || port_mapping.https?
           container_name = "#{service_name}-revpro"
-          container_port = 80
+          container_port = port_mapping.lb_port
         end
         params[:load_balancers] = [
           {
