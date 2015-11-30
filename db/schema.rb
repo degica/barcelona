@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151125090157) do
+ActiveRecord::Schema.define(version: 20151130093003) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -121,9 +121,10 @@ ActiveRecord::Schema.define(version: 20151125090157) do
     t.integer  "lb_port"
     t.integer  "container_port"
     t.integer  "service_id"
-    t.datetime "created_at",     null: false
-    t.datetime "updated_at",     null: false
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
     t.string   "protocol"
+    t.boolean  "enable_proxy_protocol", default: false
   end
 
   add_index "port_mappings", ["service_id"], name: "index_port_mappings_on_service_id", using: :btree

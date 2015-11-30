@@ -62,6 +62,30 @@ module Backend::Ecs
           }
         }
       )
+
+      # Enable ProxyProtocol for http/https host ports
+      ports = port_mappings.where(protocol: ["http", "https"]).pluck(:host_port)
+      ports += port_mappings.where(enable_proxy_protocol: true).pluck(:host_port)
+      if ports.present?
+        aws.elb.create_load_balancer_policy(
+          load_balancer_name: service_name,
+          policy_name: "#{service_name}-ProxyProtocol",
+          policy_type_name: "ProxyProtocolPolicyType",
+          policy_attributes: [
+            {
+              attribute_name: 'ProxyProtocol',
+              attribute_value: 'true'
+            }
+          ]
+        )
+        ports.each do |port|
+          aws.elb.set_load_balancer_policies_for_backend_server(
+            load_balancer_name: service_name,
+            instance_port: port,
+            policy_names: ["#{service_name}-ProxyProtocol"]
+          )
+        end
+      end
       OpenStruct.new(load_balancer_name: service_name, dns_name: load_balancer.dns_name)
     end
 
