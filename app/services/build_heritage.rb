@@ -30,13 +30,24 @@ class BuildHeritage
 
       map = Hash[@heritage.services.pluck(:name, :id)]
       if new_params[:services_attributes].present?
+        # Add or modify services
         new_params[:services_attributes].each do |service|
           service.delete :port_mappings_attributes # Currently updating port mapping is not supported
-          name = service.delete :name
-          service[:id] = map[name]
+          name = service.require :name
+          service[:id] = map[name] if map[name].present?
+        end
+
+        # Delete services
+        to_delete = map.keys - new_params[:services_attributes].map{ |s| s[:name] }
+        to_delete.each do |name|
+          new_params[:services_attributes] << {
+            id: map[name],
+            _destroy: '1'
+          }
         end
       end
     end
+
     new_params
   end
 

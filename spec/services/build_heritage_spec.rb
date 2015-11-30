@@ -160,5 +160,65 @@ describe BuildHeritage do
         expect(heritage.env_vars[0].value).to eq "production"
       end
     end
+
+    context "deleting services" do
+      before do
+        new_params = params.dup
+        new_params[:services].delete_at 1
+        @updated_heritage = BuildHeritage.new(new_params, district: nil).execute
+        @updated_heritage.save!
+      end
+
+      it "deletes a service that is not specified in params" do
+        expect(@updated_heritage.services.count).to eq 1
+
+        service1 = @updated_heritage.services.first
+        expect(service1.id).to be_present
+        expect(service1.name).to eq "web"
+        expect(service1.cpu).to eq 128
+        expect(service1.memory).to eq 128
+        expect(service1.command).to eq "rails s"
+        expect(service1.public).to eq true
+        expect(service1.port_mappings.count).to eq 1
+        expect(service1.port_mappings.first.lb_port).to eq 80
+        expect(service1.port_mappings.first.container_port).to eq 3000
+      end
+    end
+
+    context "adding services" do
+      before do
+        new_params = params.dup
+        new_params[:services] << {
+          name: "another-service",
+        }
+        @updated_heritage = BuildHeritage.new(new_params, district: nil).execute
+        @updated_heritage.save!
+      end
+
+      it "deletes a service that is not specified in params" do
+        expect(@updated_heritage.services.count).to eq 3
+
+        service1 = @updated_heritage.services.first
+        expect(service1.id).to be_present
+        expect(service1.name).to eq "web"
+        expect(service1.cpu).to eq 128
+        expect(service1.memory).to eq 128
+        expect(service1.command).to eq "rails s"
+        expect(service1.public).to eq true
+        expect(service1.port_mappings.count).to eq 1
+        expect(service1.port_mappings.first.lb_port).to eq 80
+        expect(service1.port_mappings.first.container_port).to eq 3000
+
+        service2 = @updated_heritage.services.second
+        expect(service2.name).to eq "worker"
+        expect(service2.cpu).to eq 512
+        expect(service2.memory).to eq 512
+        expect(service2.command).to eq "rake jobs:work"
+        expect(service2.port_mappings.count).to eq 0
+
+        service3 = @updated_heritage.services.third
+        expect(service3.name).to eq "another-service"
+      end
+    end
   end
 end
