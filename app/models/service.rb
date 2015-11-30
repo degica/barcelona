@@ -4,7 +4,10 @@ class Service < ActiveRecord::Base
   belongs_to :heritage, inverse_of: :services
   has_many :port_mappings, inverse_of: :service, dependent: :destroy
 
-  validates :name, presence: true
+  validates :name,
+            presence: true,
+            uniqueness: {scope: :heritage_id},
+            format: { with: /\A[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]\z/ }
   validates :cpu, numericality: {greater_than: 0}
   validates :memory, numericality: {greater_than: 0}
 
