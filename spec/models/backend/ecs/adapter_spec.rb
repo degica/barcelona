@@ -103,7 +103,7 @@ describe Backend::Ecs::Adapter do
                 cpu: 128,
                 memory: 128,
                 essential: true,
-                image: "k2nr/reverse-proxy",
+                image: "k2nr/reverse-proxy:latest",
                 links: ["#{service.service_name}:backend"],
                 environment: [
                   {name: "UPSTREAM_NAME", value: "backend"},
