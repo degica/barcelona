@@ -14,7 +14,7 @@ class Heritage < ActiveRecord::Base
     heritage.regenerate_token if heritage.token.blank?
   end
 
-  accepts_nested_attributes_for :services
+  accepts_nested_attributes_for :services, allow_destroy: true
   accepts_nested_attributes_for :env_vars
 
   def to_param
