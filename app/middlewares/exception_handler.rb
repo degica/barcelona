@@ -89,6 +89,8 @@ class ExceptionHandler
       raise UnprocessableEntity.new(e.record.errors)
     rescue Pundit::Error => e
       raise Forbidden.new(e.message)
+    rescue ActionController::ParameterMissing => e
+      raise UnprocessableEntity.new(e.message)
     rescue
       raise InternalServerError
     end
