@@ -191,6 +191,8 @@ describe Backend::Ecs::Adapter do
               }
             }
           )
+          expect(elb_mock).to receive(:create_load_balancer_policy)
+          expect(elb_mock).to receive(:set_load_balancer_policies_for_backend_server).twice
           expect(route53_mock).to receive(:get_hosted_zone) do
             double(hosted_zone: double(name: 'bcn.'))
           end
