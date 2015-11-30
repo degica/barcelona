@@ -150,7 +150,7 @@ describe "updating a heritage" do
             command: "rake jobs:work"
           },
           {
-            name: "another_service",
+            name: "another-service",
             command: "command"
           }
         ]
@@ -174,7 +174,7 @@ describe "updating a heritage" do
       expect(heritage["services"][0]["port_mappings"][0]["container_port"]).to eq 80
       expect(heritage["services"][1]["name"]).to eq "worker"
       expect(heritage["services"][1]["command"]).to eq "rake jobs:work"
-      expect(heritage["services"][2]["name"]).to eq "another_service"
+      expect(heritage["services"][2]["name"]).to eq "another-service"
       expect(heritage["services"][2]["command"]).to eq "command"
     end
   end
