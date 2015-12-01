@@ -72,7 +72,7 @@ module Backend::Ecs
         cpu: 128,
         memory: 128,
         essential: true,
-        image: "k2nr/reverse-proxy",
+        image: service.reverse_proxy_image,
         links: ["#{service.service_name}:backend"],
         environment: [
           {name: "UPSTREAM_NAME", value: "backend"},

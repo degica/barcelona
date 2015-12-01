@@ -73,6 +73,7 @@ class HeritagesController < ApplicationController
         :cpu,
         :memory,
         :command,
+        :reverse_proxy_image,
         :public,
         {
           port_mappings: [

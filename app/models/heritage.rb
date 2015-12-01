@@ -5,7 +5,10 @@ class Heritage < ActiveRecord::Base
   has_many :events, dependent: :destroy
   belongs_to :district, inverse_of: :heritages
 
-  validates :name, presence: true, uniqueness: true
+  validates :name,
+            presence: true,
+            uniqueness: true,
+            format: { with: /\A[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]\z/ }
   validates :district, presence: true
   validates :section_name, presence: true, inclusion: { in: %w[public private] }
 
