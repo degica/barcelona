@@ -75,6 +75,7 @@ class HeritagesController < ApplicationController
         :command,
         :reverse_proxy_image,
         :public,
+        :service_type,
         {
           port_mappings: [
             :lb_port,
