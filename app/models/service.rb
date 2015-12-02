@@ -12,6 +12,7 @@ class Service < ActiveRecord::Base
             format: { with: /\A[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]\z/ }
   validates :cpu, numericality: {greater_than: 0}
   validates :memory, numericality: {greater_than: 0}
+  validates :service_type, inclusion: { in: %w(default web) }
 
   accepts_nested_attributes_for :port_mappings
 
@@ -23,6 +24,7 @@ class Service < ActiveRecord::Base
     service.hosts ||= []
   end
 
+  after_create :create_port_mappings
   after_destroy :delete_service
 
   delegate :district, to: :heritage
@@ -48,7 +50,22 @@ class Service < ActiveRecord::Base
     backend.scale(count)
   end
 
+  def web?
+    service_type == "web"
+  end
+
   private
+
+  def create_port_mappings
+    return unless web?
+
+    self.port_mappings.create!(container_port: web_container_port, protocol: 'http')
+    self.port_mappings.create!(container_port: web_container_port, protocol: 'https')
+  end
+
+  def web_container_port
+    3000
+  end
 
   def backend
     @backend ||= Backend::Ecs::Adapter.new(self)
