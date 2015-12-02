@@ -82,6 +82,11 @@ class HeritagesController < ApplicationController
             :container_port,
             :protocol,
             :enable_proxy_protocol
+          ],
+          hosts: [
+            :hostname,
+            :ssl_cert_path,
+            :ssl_key_path
           ]
         }
       ]
