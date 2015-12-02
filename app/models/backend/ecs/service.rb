@@ -72,7 +72,6 @@ module Backend::Ecs
         {name: "AWS_REGION", value: 'ap-northeast-1'},
         {name: "UPSTREAM_NAME", value: "backend"},
         {name: "UPSTREAM_PORT", value: http.container_port.to_s},
-        {name: "HTTP_HOSTS", value: service.hosts.map{ |h| h['hostname'] }.join(',')},
         service.hosts.map do |h|
           host_key = h['hostname'].gsub('.', '_').gsub('-', '__').upcase
           [
@@ -81,6 +80,9 @@ module Backend::Ecs
           ]
         end
       ].flatten
+
+      http_hosts = service.hosts.map{ |h| h['hostname'] }.join(',')
+      base[:environment] << {name: "HTTP_HOSTS", value: http_hosts} if http_hosts.present?
 
       base.merge(
         cpu: 128,
