@@ -55,6 +55,12 @@ module Backend::Ecs
           value: pm.host_port.to_s
         }
       end
+      if service.web?
+        base[:environment] << {
+          name: "PORT",
+          value: service.web_container_port.to_s
+        }
+      end
 
       base.merge(
         cpu: cpu,

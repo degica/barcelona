@@ -54,6 +54,10 @@ class Service < ActiveRecord::Base
     service_type == "web"
   end
 
+  def web_container_port
+    3000
+  end
+
   private
 
   def create_port_mappings
@@ -61,10 +65,6 @@ class Service < ActiveRecord::Base
 
     self.port_mappings.create!(container_port: web_container_port, protocol: 'http')
     self.port_mappings.create!(container_port: web_container_port, protocol: 'https')
-  end
-
-  def web_container_port
-    3000
   end
 
   def backend

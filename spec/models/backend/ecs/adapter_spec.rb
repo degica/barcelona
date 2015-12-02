@@ -95,7 +95,8 @@ describe Backend::Ecs::Adapter do
                 environment: [
                   {name: "HOST_PORT_HTTP_3000", value: port_http.host_port.to_s},
                   {name: "HOST_PORT_HTTPS_3000", value: port_https.host_port.to_s},
-                  {name: "HOST_PORT_TCP_1111", value: @port_tcp.host_port.to_s}
+                  {name: "HOST_PORT_TCP_1111", value: @port_tcp.host_port.to_s},
+                  {name: "PORT", value: "3000"}
                 ],
                 port_mappings: [
                   {container_port: 3000, protocol: "tcp"},
