@@ -2,11 +2,11 @@ require 'rails_helper'
 
 describe Backend::Ecs::Adapter do
   let(:heritage) { create :heritage }
-  let(:service) { create :web_service, heritage: heritage }
   let(:adapter) { described_class.new(service) }
 
   describe "#apply" do
     let(:ecs_mock) { double }
+    let(:service) { create :web_service, heritage: heritage }
     context "when updating service" do
       before do
         allow(adapter.ecs_service).to receive(:applied?) { true }
@@ -38,6 +38,7 @@ describe Backend::Ecs::Adapter do
       end
 
       context "when port_mappings is blank" do
+        let(:service) { create :web_service, heritage: heritage }
         it "create ECS resources" do
           expect(ecs_mock).to receive(:register_task_definition)
           .with(
@@ -68,13 +69,15 @@ describe Backend::Ecs::Adapter do
       context "when port_mappings is present" do
         let(:elb_mock) { double }
         let(:route53_mock) { double }
+        let(:service) { create :web_service, heritage: heritage, service_type: 'web' }
+        let(:port_http) { service.port_mappings.http }
+        let(:port_https) { service.port_mappings.https }
 
         before do
           allow(adapter.elb).to receive_message_chain(:aws, :elb) { elb_mock }
           allow(adapter.record_set).to receive_message_chain(:aws, :route53) { route53_mock }
           allow(adapter.elb).to receive(:fetch_load_balancer) { nil }
           @port_tcp = service.port_mappings.create(lb_port: 1111, container_port: 1111)
-          @port_http = service.port_mappings.create(container_port: 3000, protocol: "http")
         end
 
         it "create ECS resources" do
@@ -89,13 +92,13 @@ describe Backend::Ecs::Adapter do
                 essential: true,
                 image: 'nginx:1.9.5',
                 environment: [
-                  {name: "HOST_PORT_TCP_1111", value: @port_tcp.host_port.to_s},
-                  {name: "HOST_PORT_HTTP_3000", value: @port_http.host_port.to_s},
-                  {name: "HOST_PORT_HTTPS_3000", value: String},
+                  {name: "HOST_PORT_HTTP_3000", value: port_http.host_port.to_s},
+                  {name: "HOST_PORT_HTTPS_3000", value: port_https.host_port.to_s},
+                  {name: "HOST_PORT_TCP_1111", value: @port_tcp.host_port.to_s}
                 ],
                 port_mappings: [
-                  {container_port: 1111, protocol: "tcp", host_port: @port_tcp.host_port},
-                  {container_port: 3000, protocol: "tcp"}
+                  {container_port: 3000, protocol: "tcp"},
+                  {container_port: 1111, protocol: "tcp", host_port: @port_tcp.host_port}
                 ]
               },
               {
@@ -106,18 +109,19 @@ describe Backend::Ecs::Adapter do
                 image: "k2nr/reverse-proxy:latest",
                 links: ["#{service.service_name}:backend"],
                 environment: [
+                  {name: "AWS_REGION", value: "ap-northeast-1"},
                   {name: "UPSTREAM_NAME", value: "backend"},
                   {name: "UPSTREAM_PORT", value: "3000"}
                 ],
                 port_mappings: [
                   {
                     container_port: 80,
-                    host_port: @port_http.host_port,
+                    host_port: port_http.host_port,
                     protocol: "tcp"
                   },
                   {
                     container_port: 443,
-                    host_port: Integer,
+                    host_port: port_https.host_port,
                     protocol: "tcp"
                   }
                 ]
@@ -132,8 +136,8 @@ describe Backend::Ecs::Adapter do
             load_balancers: [
               {
                 load_balancer_name: service.service_name,
-                container_name: service.service_name,
-                container_port: 1111
+                container_name: service.service_name + "-revpro",
+                container_port: 80
               }
             ],
             role: service.district.ecs_service_role,
@@ -148,21 +152,21 @@ describe Backend::Ecs::Adapter do
             listeners: [
               {
                 protocol: 'TCP',
-                load_balancer_port: 1111,
-                instance_protocol: 'TCP',
-                instance_port: @port_tcp.host_port
-              },
-              {
-                protocol: 'TCP',
                 load_balancer_port: 80,
                 instance_protocol: 'TCP',
-                instance_port: @port_http.host_port
+                instance_port: port_http.host_port
               },
               {
                 protocol: 'TCP',
                 load_balancer_port: 443,
                 instance_protocol: 'TCP',
-                instance_port: Integer
+                instance_port: port_https.host_port
+              },
+              {
+                protocol: 'TCP',
+                load_balancer_port: 1111,
+                instance_protocol: 'TCP',
+                instance_port: @port_tcp.host_port
               }
             ]
           )
@@ -226,6 +230,7 @@ describe Backend::Ecs::Adapter do
   describe "#delete" do
     let(:ecs_mock) { double }
     let(:route53_mock) { double }
+    let(:service) { create :web_service, heritage: heritage }
 
     before do
       allow(adapter.ecs_service).to receive(:applied?) { true }

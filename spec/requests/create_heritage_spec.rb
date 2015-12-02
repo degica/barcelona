@@ -14,12 +14,12 @@ describe "POST /districts/:district/heritages", type: :request do
       services: [
         {
           name: "web",
+          service_type: "web",
           public: true,
           cpu: 128,
           memory: 256,
           reverse_proxy_image: 'org/custom_revpro:v1.2',
           port_mappings: [
-            {container_port: 80,   protocol: "http" },
             {container_port: 3333, protocol: "udp", lb_port: 3333 }
           ],
           hosts: [
@@ -45,18 +45,18 @@ describe "POST /districts/:district/heritages", type: :request do
     expect(heritage["services"][0]["cpu"]).to eq 128
     expect(heritage["services"][0]["memory"]).to eq 256
     expect(heritage["services"][0]["reverse_proxy_image"]).to eq "org/custom_revpro:v1.2"
-    expect(heritage["services"][0]["port_mappings"][0]["lb_port"]).to eq 80
-    expect(heritage["services"][0]["port_mappings"][0]["container_port"]).to eq 80
+    expect(heritage["services"][0]["port_mappings"][0]["lb_port"]).to eq 3333
+    expect(heritage["services"][0]["port_mappings"][0]["container_port"]).to eq 3333
     expect(heritage["services"][0]["port_mappings"][0]["host_port"]).to be_a Integer
-    expect(heritage["services"][0]["port_mappings"][0]["protocol"]).to eq "http"
-    expect(heritage["services"][0]["port_mappings"][1]["lb_port"]).to eq 443
-    expect(heritage["services"][0]["port_mappings"][1]["container_port"]).to eq 80
+    expect(heritage["services"][0]["port_mappings"][0]["protocol"]).to eq "udp"
+    expect(heritage["services"][0]["port_mappings"][1]["lb_port"]).to eq 80
+    expect(heritage["services"][0]["port_mappings"][1]["container_port"]).to eq 3000
     expect(heritage["services"][0]["port_mappings"][1]["host_port"]).to be_a Integer
-    expect(heritage["services"][0]["port_mappings"][1]["protocol"]).to eq "https"
-    expect(heritage["services"][0]["port_mappings"][2]["lb_port"]).to eq 3333
-    expect(heritage["services"][0]["port_mappings"][2]["container_port"]).to eq 3333
+    expect(heritage["services"][0]["port_mappings"][1]["protocol"]).to eq "http"
+    expect(heritage["services"][0]["port_mappings"][2]["lb_port"]).to eq 443
+    expect(heritage["services"][0]["port_mappings"][2]["container_port"]).to eq 3000
     expect(heritage["services"][0]["port_mappings"][2]["host_port"]).to be_a Integer
-    expect(heritage["services"][0]["port_mappings"][2]["protocol"]).to eq "udp"
+    expect(heritage["services"][0]["port_mappings"][2]["protocol"]).to eq "https"
     expect(heritage["services"][0]["hosts"][0]["hostname"]).to eq "awesome-app.degica.com"
     expect(heritage["services"][0]["hosts"][0]["ssl_cert_path"]).to eq "s3://degica-bucket/path/to/cert"
     expect(heritage["services"][0]["hosts"][0]["ssl_key_path"]).to eq "s3://degica-bucket/path/to/key"
