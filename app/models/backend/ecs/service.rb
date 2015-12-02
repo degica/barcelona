@@ -59,7 +59,7 @@ module Backend::Ecs
       base.merge(
         cpu: cpu,
         memory: memory,
-        command: command.try(:split, " "),
+        command: LaunchCommand.new(command).to_command,
         port_mappings: port_mappings.to_task_definition
       ).compact
     end
