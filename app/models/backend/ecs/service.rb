@@ -55,23 +55,27 @@ module Backend::Ecs
           value: pm.host_port.to_s
         }
       end
+      if service.web?
+        base[:environment] << {
+          name: "PORT",
+          value: service.web_container_port.to_s
+        }
+      end
 
       base.merge(
         cpu: cpu,
         memory: memory,
-        command: command.try(:split, " "),
+        command: LaunchCommand.new(command).to_command,
         port_mappings: port_mappings.to_task_definition
       ).compact
     end
 
     def reverse_proxy_definition
-      http = service.port_mappings.http
-      https = service.port_mappings.https
       base = service.heritage.base_task_definition("#{service.service_name}-revpro")
       base[:environment] += [
         {name: "AWS_REGION", value: 'ap-northeast-1'},
         {name: "UPSTREAM_NAME", value: "backend"},
-        {name: "UPSTREAM_PORT", value: http.container_port.to_s},
+        {name: "UPSTREAM_PORT", value: service.web_container_port.to_s},
         service.hosts.map do |h|
           host_key = h['hostname'].gsub('.', '_').gsub('-', '__').upcase
           [
@@ -84,6 +88,8 @@ module Backend::Ecs
       http_hosts = service.hosts.map{ |h| h['hostname'] }.join(',')
       base[:environment] << {name: "HTTP_HOSTS", value: http_hosts} if http_hosts.present?
 
+      http = service.port_mappings.http
+      https = service.port_mappings.https
       base.merge(
         cpu: 128,
         memory: 128,

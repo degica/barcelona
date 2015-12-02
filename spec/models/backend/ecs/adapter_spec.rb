@@ -69,7 +69,7 @@ describe Backend::Ecs::Adapter do
       context "when port_mappings is present" do
         let(:elb_mock) { double }
         let(:route53_mock) { double }
-        let(:service) { create :web_service, heritage: heritage, service_type: 'web' }
+        let(:service) { create :web_service, heritage: heritage, service_type: 'web', command: 'rails s' }
         let(:port_http) { service.port_mappings.http }
         let(:port_https) { service.port_mappings.https }
 
@@ -90,11 +90,13 @@ describe Backend::Ecs::Adapter do
                 cpu: 128,
                 memory: 128,
                 essential: true,
-                image: 'nginx:1.9.5',
+                command: ["sh", "-c", "rails s"],
+                image: service.heritage.image_path,
                 environment: [
                   {name: "HOST_PORT_HTTP_3000", value: port_http.host_port.to_s},
                   {name: "HOST_PORT_HTTPS_3000", value: port_https.host_port.to_s},
-                  {name: "HOST_PORT_TCP_1111", value: @port_tcp.host_port.to_s}
+                  {name: "HOST_PORT_TCP_1111", value: @port_tcp.host_port.to_s},
+                  {name: "PORT", value: "3000"}
                 ],
                 port_mappings: [
                   {container_port: 3000, protocol: "tcp"},

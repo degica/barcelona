@@ -24,7 +24,7 @@ class Oneoff < ActiveRecord::Base
         container_overrides: [
           {
             name: container_name,
-            command: command.try(:split, " "),
+            command: LaunchCommand.new(command).to_command,
             environment: env_vars.map { |k, v| {name: k, value: v} }
           }
         ]
