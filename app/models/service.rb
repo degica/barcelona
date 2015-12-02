@@ -4,6 +4,8 @@ class Service < ActiveRecord::Base
   belongs_to :heritage, inverse_of: :services
   has_many :port_mappings, inverse_of: :service, dependent: :destroy
 
+  serialize :hosts
+
   validates :name,
             presence: true,
             uniqueness: {scope: :heritage_id},
@@ -17,6 +19,8 @@ class Service < ActiveRecord::Base
     service.cpu ||= 512
     service.memory ||= 512
     service.reverse_proxy_image ||= DEFAULT_REVERSE_PROXY
+    service.service_type ||= 'default'
+    service.hosts ||= []
   end
 
   after_destroy :delete_service
