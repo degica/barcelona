@@ -67,17 +67,26 @@ module Backend::Ecs
     def reverse_proxy_definition
       http = service.port_mappings.http
       https = service.port_mappings.https
-      {
-        name: "#{service.service_name}-revpro",
+      base = service.heritage.base_task_definition("#{service.service_name}-revpro")
+      base[:environment] += [
+        {name: "AWS_REGION", value: 'ap-northeast-1'},
+        {name: "UPSTREAM_NAME", value: "backend"},
+        {name: "UPSTREAM_PORT", value: http.container_port.to_s},
+        {name: "HTTP_HOSTS", value: service.hosts.map{ |h| h['hostname'] }.join(',')},
+        service.hosts.map do |h|
+          host_key = h['hostname'].gsub('.', '_').gsub('-', '__').upcase
+          [
+            {name: "CERT_#{host_key}", value: h['ssl_cert_path']},
+            {name: "KEY_#{host_key}", value: h['ssl_key_path']},
+          ]
+        end
+      ].flatten
+
+      base.merge(
         cpu: 128,
         memory: 128,
-        essential: true,
         image: service.reverse_proxy_image,
         links: ["#{service.service_name}:backend"],
-        environment: [
-          {name: "UPSTREAM_NAME", value: "backend"},
-          {name: "UPSTREAM_PORT", value: http.container_port.to_s}
-        ],
         port_mappings: [
           {
             container_port: 80,
@@ -90,12 +99,12 @@ module Backend::Ecs
             protocol: "tcp"
           }
         ]
-      }
+      )
     end
 
     def container_definitions
       definitions = [container_definition]
-      definitions << reverse_proxy_definition if port_mappings.http.present?
+      definitions << reverse_proxy_definition if service.web?
       definitions
     end
 
