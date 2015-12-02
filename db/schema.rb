@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151130143657) do
+ActiveRecord::Schema.define(version: 20151202040613) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -130,15 +130,17 @@ ActiveRecord::Schema.define(version: 20151130143657) do
   add_index "port_mappings", ["service_id"], name: "index_port_mappings_on_service_id", using: :btree
 
   create_table "services", force: :cascade do |t|
-    t.string   "name",                null: false
+    t.string   "name",                                    null: false
     t.integer  "cpu"
     t.integer  "memory"
     t.text     "command"
     t.boolean  "public"
     t.integer  "heritage_id"
-    t.datetime "created_at",          null: false
-    t.datetime "updated_at",          null: false
+    t.datetime "created_at",                              null: false
+    t.datetime "updated_at",                              null: false
     t.string   "reverse_proxy_image"
+    t.text     "hosts"
+    t.string   "service_type",        default: "default"
   end
 
   add_index "services", ["heritage_id"], name: "index_services_on_heritage_id", using: :btree

@@ -75,6 +75,7 @@ class HeritagesController < ApplicationController
         :command,
         :reverse_proxy_image,
         :public,
+        :service_type,
         {
           port_mappings: [
             :lb_port,
@@ -82,6 +83,11 @@ class HeritagesController < ApplicationController
             :container_port,
             :protocol,
             :enable_proxy_protocol
+          ],
+          hosts: [
+            :hostname,
+            :ssl_cert_path,
+            :ssl_key_path
           ]
         }
       ]
