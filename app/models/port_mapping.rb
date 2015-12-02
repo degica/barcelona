@@ -18,7 +18,6 @@ class PortMapping < ActiveRecord::Base
 
   before_validation :assign_host_port
   before_validation :assign_lb_port
-  after_create :create_https, if: :http?
 
   scope :lb_registerable, -> { where.not(protocol: "udp") }
   scope :tcp, -> { where(protocol: "tcp") }
@@ -82,13 +81,6 @@ class PortMapping < ActiveRecord::Base
     if (http? && lb_port != 80) || (https? && lb_port != 443)
       errors.add(:lb_port, "cannot be changed for http/https protocol")
     end
-  end
-
-  def create_https
-    service.port_mappings.create!(
-      container_port: container_port,
-      protocol: 'https'
-    )
   end
 
   def used_host_ports
