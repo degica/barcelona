@@ -9,7 +9,6 @@ class DistrictSection
            :instance_security_group,
            :users,
            :dockercfg,
-           :logentries_token,
            to: :district
 
   def initialize(name, district)

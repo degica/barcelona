@@ -62,7 +62,6 @@ class DistrictsController < ApplicationController
       :ecs_instance_role,
       :private_hosted_zone_id,
       :s3_bucket_name,
-      :logentries_token,
       :aws_access_key_id,
       :aws_secret_access_key
     ).tap do |whitelisted|
