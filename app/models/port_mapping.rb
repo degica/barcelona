@@ -30,7 +30,7 @@ class PortMapping < ActiveRecord::Base
         host_port: pm.special_protocol? ? nil : pm.host_port,
         protocol: pm.host_protocol
       }.compact
-    end.uniq { |pm| pm[:container_port] }
+    end.uniq { |pm| "#{pm[:container_port]}/#{pm[:protocol]}" }
   end
 
   def self.http
