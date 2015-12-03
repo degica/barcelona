@@ -13,7 +13,7 @@ class District < ActiveRecord::Base
 
   attr_accessor :sections
 
-  validates :name, presence: true, uniqueness: true
+  validates :name, presence: true, uniqueness: true, immutable: true
   validates :s3_bucket_name, presence: true
   validates :vpc_id, presence: true
   validates :private_hosted_zone_id, presence: true
