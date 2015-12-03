@@ -113,7 +113,9 @@ describe Backend::Ecs::Adapter do
                 environment: [
                   {name: "AWS_REGION", value: "ap-northeast-1"},
                   {name: "UPSTREAM_NAME", value: "backend"},
-                  {name: "UPSTREAM_PORT", value: "3000"}
+                  {name: "UPSTREAM_PORT", value: "3000"},
+                  {name: "FORCE_SSL", value: "false"},
+
                 ],
                 port_mappings: [
                   {

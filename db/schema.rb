@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151203024641) do
+ActiveRecord::Schema.define(version: 20151203060634) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -140,6 +140,7 @@ ActiveRecord::Schema.define(version: 20151203024641) do
     t.string   "reverse_proxy_image"
     t.text     "hosts"
     t.string   "service_type",        default: "default"
+    t.boolean  "force_ssl"
   end
 
   add_index "services", ["heritage_id"], name: "index_services_on_heritage_id", using: :btree

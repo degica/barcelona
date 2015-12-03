@@ -76,6 +76,7 @@ module Backend::Ecs
         {name: "AWS_REGION", value: 'ap-northeast-1'},
         {name: "UPSTREAM_NAME", value: "backend"},
         {name: "UPSTREAM_PORT", value: service.web_container_port.to_s},
+        {name: "FORCE_SSL", value: (!!service.force_ssl).to_s},
         service.hosts.map do |h|
           host_key = h['hostname'].gsub('.', '_').gsub('-', '__').upcase
           [

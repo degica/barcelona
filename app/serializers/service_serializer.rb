@@ -1,7 +1,7 @@
 class ServiceSerializer < ActiveModel::Serializer
   attributes :name, :public, :command, :cpu, :memory, :endpoint, :status,
              :port_mappings, :running_count, :pending_count, :desired_count,
-             :reverse_proxy_image, :hosts, :service_type
+             :reverse_proxy_image, :hosts, :service_type, :force_ssl
 
   belongs_to :heritage
 
