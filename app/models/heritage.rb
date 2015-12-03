@@ -8,6 +8,7 @@ class Heritage < ActiveRecord::Base
   validates :name,
             presence: true,
             uniqueness: true,
+            immutable: true,
             format: { with: /\A[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]\z/ }
   validates :district, presence: true
   validates :section_name, presence: true, inclusion: { in: %w[public private] }

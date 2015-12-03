@@ -13,6 +13,7 @@ class Service < ActiveRecord::Base
   validates :cpu, numericality: {greater_than: 0}
   validates :memory, numericality: {greater_than: 0}
   validates :service_type, inclusion: { in: %w(default web) }
+  validates :name, :service_type, :public, immutable: true
 
   accepts_nested_attributes_for :port_mappings
 
