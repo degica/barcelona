@@ -1,18 +1,19 @@
 sudo: false
 language: ruby
 cache:
-  - bundler
+- bundler
 rvm:
-  - 2.2.3
+- 2.2.3
 addons:
-  postgresql: "9.4"
+  postgresql: '9.4'
 before_script:
-  - npm install -g barcelona
-  - psql -c 'create database travis_ci_test;' -U postgres
-  - cp config/database.travis.yml config/database.yml
+- npm install -g barcelona
+- psql -c 'create database travis_ci_test;' -U postgres
+- cp config/database.travis.yml config/database.yml
 script:
-  - bundle exec rake spec
+- bundle exec rake spec
 after_success:
-  - bin/deploy_barcelona
+- bin/deploy_barcelona
 notifications:
-  slack: degica:5qSWYJuIKSySc5KqlxwIoNRd
+  slack:
+    secure: rWAGc6ogy9B1E4P/oBYctaAk+EgdgboBU7GOjL3wPtFrgrMXSTzhGUrCpTFw2wgSM5t05rSG0OG/S+TycGM/ZHHo7kQod+uU/53nRbeNDDkths6b8VC2gaAUub8TwH7sJhKMzVUOtpp912usDToldFw1aU/5NIrhdA80XL1nX7+mP3imIdIthuEDZ6vvzol5KoTqvLztePMK8oykRtSy30pDYeiXTsh56a1sR+Q2nau4qphb3+Zzv3QBeEvNIoHGmnPnca16nTO+stvm75mS7ENF9vrn1gUTuAhpu1AO91mEROV43uvct3fEdJ/rAtKWo1dOzhRxqMc+rbZ//TPp5m86evTXgC/cZJS6T704CHqJ5X5FVRqHdoQqvtgs1QKQD6/YwVCkWq6YJoBPW7LEtR8HoryLlDIpnMW2iyaK7HUdTXc1lPCapOeRuLtYdM44TLP0NQAJ1s6JkDiBoqnr70A/y9J5WmGIHRy2iXSnyJgIcGB8Tw2yQ/SXvWNTgeoHkQyD4uXPrpkxNM+OiIybAQERi1JuPE14om3IBJy2xVoub2UHLHpiKSYzvpdI3ij2SetQGLYLovVi4UY4GXVBlV5oPsyouFN/IEN/M9MxDQmPsWDeWYH5+kO9WdK6+zoIIlDNIZ3OuRyQHvkZEDOixq8aHDB6rIncOSvrjwcjJ/I=
