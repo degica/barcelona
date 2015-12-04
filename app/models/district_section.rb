@@ -124,7 +124,8 @@ class DistrictSection
       "ECS_CLUSTER" => cluster_name,
       "ECS_ENGINE_AUTH_TYPE" => "dockercfg",
       "ECS_ENGINE_AUTH_DATA" => dockercfg.to_json,
-      "ECS_AVAILABLE_LOGGING_DRIVERS" => '["json-file", "syslog", "fluentd"]'
+      "ECS_AVAILABLE_LOGGING_DRIVERS" => '["json-file", "syslog", "fluentd"]',
+      "ECS_RESERVED_MEMORY" => 128
     }
     config = district.hook_plugins(:ecs_config, self, config)
     config.map {|k, v| "#{k}=#{v}"}.join("\n")
