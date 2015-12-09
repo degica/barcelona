@@ -4,13 +4,15 @@ class Plugin < ActiveRecord::Base
   serialize :plugin_attributes
 
   before_validation :default_attributes
-  before_validation :name, uniqueness: {scope: :district_id}
+  validates :name, uniqueness: {scope: :district_id}, presence: true
+  validate :validate_existence
   after_create :hook_created
   after_update :hook_updated
   after_save :save_district
   after_destroy :hook_destroyed
 
   def hook(trigger, origin, arg=nil)
+    return arg if plugin.nil?
     plugin.hook(trigger, origin, arg)
   end
 
@@ -23,9 +25,9 @@ class Plugin < ActiveRecord::Base
       klass = ("Barcelona::Plugins::" + "#{name}_plugin".classify).constantize
     rescue NameError => e
       Rails.logger.error e
-      return arg
+      return nil
     end
-    klass.new(self)
+    plugin = klass.new(self)
   end
 
   private
@@ -49,5 +51,9 @@ class Plugin < ActiveRecord::Base
   def save_district
     # trigger district callbacks so that AWS resources are properly updated
     district.save!
+  end
+
+  def validate_existence
+    errors.add(:name, "plugin doesn't exist") if plugin.nil?
   end
 end
