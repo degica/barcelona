@@ -9,7 +9,7 @@ class District < ActiveRecord::Base
   has_many :users_districts, dependent: :destroy
   has_many :users, through: :users_districts
   has_many :elastic_ips, dependent: :destroy
-  has_many :plugins, dependent: :destroy
+  has_many :plugins, dependent: :destroy, inverse_of: :district
 
   attr_accessor :sections
 
@@ -78,6 +78,7 @@ class District < ActiveRecord::Base
     }
     hook_plugins(:district_task_definition, self, base)
   end
+
   private
 
   def update_ecs_config

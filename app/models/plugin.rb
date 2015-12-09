@@ -1,5 +1,5 @@
 class Plugin < ActiveRecord::Base
-  belongs_to :district
+  belongs_to :district, inverse_of: :plugins
 
   serialize :plugin_attributes
 

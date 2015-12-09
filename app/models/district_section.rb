@@ -98,11 +98,10 @@ class DistrictSection
   end
 
   def update_ecs_config
-    return if dockercfg.blank?
     aws.s3.put_object(bucket: s3_bucket_name,
-                  key: "#{cluster_name}/ecs.config",
-                  body: ecs_config,
-                  server_side_encryption: "AES256")
+                      key: "#{cluster_name}/ecs.config",
+                      body: ecs_config,
+                      server_side_encryption: "AES256")
   end
 
   def create_ecs_cluster
@@ -122,11 +121,13 @@ class DistrictSection
   def ecs_config
     config = {
       "ECS_CLUSTER" => cluster_name,
-      "ECS_ENGINE_AUTH_TYPE" => "dockercfg",
-      "ECS_ENGINE_AUTH_DATA" => dockercfg.to_json,
       "ECS_AVAILABLE_LOGGING_DRIVERS" => '["json-file", "syslog", "fluentd"]',
       "ECS_RESERVED_MEMORY" => 128
     }
+    if dockercfg.present?
+      config["ECS_ENGINE_AUTH_TYPE"] = "dockercfg"
+      config["ECS_ENGINE_AUTH_DATA"] = dockercfg.to_json
+    end
     config = district.hook_plugins(:ecs_config, self, config)
     config.map {|k, v| "#{k}=#{v}"}.join("\n")
   end
