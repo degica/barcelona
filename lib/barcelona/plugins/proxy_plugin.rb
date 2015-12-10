@@ -80,7 +80,7 @@ EOS
 
       def on_destroyed(_, _)
         heritage = district.heritages.find_by(name: proxy_heritage_name)
-        heritage.destroy!
+        heritage.destroy! if heritage
       end
 
       def proxy_url
