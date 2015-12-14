@@ -7,6 +7,8 @@ class SystemTask
   end
 
   def run(container_instance_arns, env = {})
+    return if container_instance_arns.empty?
+
     aws.ecs.register_task_definition(task_definition)
 
     aws.ecs.start_task(
