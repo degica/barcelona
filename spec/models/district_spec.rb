@@ -15,10 +15,10 @@ describe District do
   describe "#subnets" do
     it "returns private subnets" do
       expect(ec2_mock).to receive(:describe_subnets).with(
-                            filters: [
-                              {name: "vpc-id", values: [district.vpc_id]},
-                              {name: "tag:Network", values: ["Private"]}
-                            ]) do
+        filters: [
+          {name: "vpc-id", values: [district.vpc_id]},
+          {name: "tag:Network", values: ["Private"]}
+        ]) do
         double(subnets: [double(subnet_id: "subnet_id")])
       end
       expect(district.subnets("Private").count).to eq 1
@@ -26,10 +26,10 @@ describe District do
 
     it "returns public subnets" do
       expect(ec2_mock).to receive(:describe_subnets).with(
-                            filters: [
-                              {name: "vpc-id", values: [district.vpc_id]},
-                              {name: "tag:Network", values: ["Public"]}
-                            ]) do
+        filters: [
+          {name: "vpc-id", values: [district.vpc_id]},
+          {name: "tag:Network", values: ["Public"]}
+        ]) do
         double(subnets: [double(subnet_id: "subnet_id")])
       end
       expect(district.subnets("Public").count).to eq 1
@@ -44,9 +44,9 @@ describe District do
         )
       end
       expect(ecs_mock).to receive(:describe_container_instances).with(
-                            cluster: district.name,
-                            container_instances: ["arn"]
-                          ) do
+        cluster: district.name,
+        container_instances: ["arn"]
+      ) do
         double(
           container_instances: [
             double(
@@ -88,33 +88,33 @@ describe District do
 
     before do
       expect(ec2_mock).to receive(:describe_subnets).with(
-                            filters: [
-                              {name: "vpc-id", values: [district.vpc_id]},
-                              {name: "tag:Network", values: ["Private"]}
-                            ]) do
+        filters: [
+          {name: "vpc-id", values: [district.vpc_id]},
+          {name: "tag:Network", values: ["Private"]}
+        ]) do
         double(subnets: [double(subnet_id: "subnet_id")])
       end
     end
 
     it "launches EC2 instance" do
       expect(ec2_mock).to receive(:run_instances).with(
-                            image_id: instance_of(String),
-                            min_count: 1,
-                            max_count: 1,
-                            user_data: instance_of(String),
-                            instance_type: "t2.micro",
-                            network_interfaces: [
-                              {
-                                groups: [district.instance_security_group],
-                                subnet_id: "subnet_id",
-                                device_index: 0,
-                                associate_public_ip_address: false
-                              }
-                            ],
-                            iam_instance_profile: {
-                              name: district.ecs_instance_role
-                            }
-                          ) do
+        image_id: instance_of(String),
+        min_count: 1,
+        max_count: 1,
+        user_data: instance_of(String),
+        instance_type: "t2.micro",
+        network_interfaces: [
+          {
+            groups: [district.instance_security_group],
+            subnet_id: "subnet_id",
+            device_index: 0,
+            associate_public_ip_address: false
+          }
+        ],
+        iam_instance_profile: {
+          name: district.ecs_instance_role
+        }
+      ) do
         double(instances: [double(instance_id: 'instance_id')])
       end
       expect(ec2_mock).to receive(:create_tags)

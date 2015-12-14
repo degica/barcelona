@@ -1,5 +1,5 @@
 class TerminateInstanceTask < SystemTask
-  def run(arns, env={})
+  def run(arns, env = {})
     env = {
       "STOP_TIMEOUT" => 120,
       "AWS_REGION" => "ap-northeast-1"

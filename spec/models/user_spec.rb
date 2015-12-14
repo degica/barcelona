@@ -34,7 +34,7 @@ describe User do
     context "when a user doesn't belong to allowed github teams" do
       let(:github_teams) do
         [
-          double(name: "reviewers", organization: double(login: "degica")),
+          double(name: "reviewers", organization: double(login: "degica"))
         ]
       end
 

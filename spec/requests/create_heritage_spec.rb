@@ -27,7 +27,7 @@ describe "POST /districts/:district/heritages", type: :request do
             {
               hostname: 'awesome-app.degica.com',
               ssl_cert_path: 's3://degica-bucket/path/to/cert',
-              ssl_key_path: 's3://degica-bucket/path/to/key',
+              ssl_key_path: 's3://degica-bucket/path/to/key'
             }
           ]
         }

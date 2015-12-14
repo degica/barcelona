@@ -125,7 +125,7 @@ namespace :bcn do
         {key: "RAILS_ENV",     value: "production"},
         {key: "DATABASE_URL",  value: ENV["DATABASE_URL"]},
         {key: "SECRET_KEY_BASE", value: SecureRandom.hex(64)},
-        {key: "ENCRYPTION_KEY", value: ENV["ENCRYPTION_KEY"]},
+        {key: "ENCRYPTION_KEY", value: ENV["ENCRYPTION_KEY"]}
       ],
       services_attributes: [
         {

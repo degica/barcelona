@@ -19,7 +19,7 @@ class ContainerInstance
         "bootcmd" => boot_commands,
         "runcmd" => run_commands,
         "users" => users
-      }.reject{ |k, v| v.blank? }
+      }.reject{ |_, v| v.blank? }
       raw_user_data = "#cloud-config\n" << YAML.dump(user_data)
       Base64.encode64(raw_user_data)
     end
@@ -82,7 +82,7 @@ class ContainerInstance
       tags: [
         {key: "Name", value: "barcelona-container-instance"},
         {key: "District", value: section.district.name},
-        {key: "Section", value: section.name},
+        {key: "Section", value: section.name}
       ]
     )
   end

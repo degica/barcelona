@@ -8,16 +8,16 @@ if ENV["TRAVIS_BRANCH"] != "master" || ENV["TRAVIS_PULL_REQUEST"] != "false"
 end
 
 def fetch_quay_builds
-    response = `curl -H "Authorization: Bearer #{ENV['QUAY_TOKEN']}" https://quay.io/api/v1/repository/degica/barcelona/build/ 2>/dev/null`
-    JSON.load(response)["builds"]
+  response = `curl -H "Authorization: Bearer #{ENV['QUAY_TOKEN']}" https://quay.io/api/v1/repository/degica/barcelona/build/ 2>/dev/null`
+  JSON.load(response)["builds"]
 end
 
 def wait_build
-  while true
+  loop do
     builds = fetch_quay_builds
-    target_build_phases = builds.select do |b|
+    target_build_phases = builds.select { |b|
       b["trigger_metadata"]["commit"] == ENV["TRAVIS_COMMIT"]
-    end.map do |b|
+    }.map do |b|
       b["phase"]
     end
 
@@ -35,12 +35,12 @@ def wait_build
   end
 end
 
-def get_image_id_for_tag(tag)
-    response = `curl -H "Authorization: Bearer #{ENV['QUAY_TOKEN']}" https://quay.io/api/v1/repository/degica/barcelona/tag/?specificTag=master 2>/dev/null`
-    tags = JSON.load(response)["tags"]
-    tags.select do |tag|
-      tag["end_ts"].nil?
-    end.first["docker_image_id"]
+def get_image_id_for_tag(_tag)
+  response = `curl -H "Authorization: Bearer #{ENV['QUAY_TOKEN']}" https://quay.io/api/v1/repository/degica/barcelona/tag/?specificTag=master 2>/dev/null`
+  tags = JSON.load(response)["tags"]
+  tags.find do |tag|
+    tag["end_ts"].nil?
+  end["docker_image_id"]
 end
 
 def put_tag(image_id, tag)
@@ -56,4 +56,4 @@ put_tag(get_image_id_for_tag("master"), "master.#{ENV["TRAVIS_BUILD_NUMBER"]}")
 
 puts "Triggered deployment for #{ENV["TRAVIS_COMMIT"]}"
 system "bcn deploy -e production --tag master.#{ENV["TRAVIS_BUILD_NUMBER"]} --heritage-token #{ENV["HERITAGE_TOKEN"]} 1> /dev/null"
-exit($?.exitstatus)
+exit($CHILD_STATUS.exitstatus)

@@ -11,12 +11,9 @@ class ApplicationController < ActionController::Base
 
   def authenticate
     @current_user = User.find_by_token(request.headers['HTTP_X_BARCELONA_TOKEN'])
+    @current_user ||= User::Fake.new if Rails.env.development?
     if @current_user.blank?
-      if Rails.env.development?
-        @current_user = User::Fake.new
-      else
-        raise ExceptionHandler::Unauthorized.new("User not found")
-      end
+      raise ExceptionHandler::Unauthorized.new("User not found")
     end
   end
 end

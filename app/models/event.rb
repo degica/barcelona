@@ -3,7 +3,7 @@ class Event < ActiveRecord::Base
 
   validates :uuid, uniqueness: true, presence: true
   validates :heritage, presence: true
-  validates :level, inclusion: { in: %w[good warn error]}
+  validates :level, inclusion: { in: %w(good warn error)}
 
   after_initialize :set_uuid
   before_validation :set_level

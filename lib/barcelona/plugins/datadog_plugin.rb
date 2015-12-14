@@ -1,7 +1,7 @@
 module Barcelona
   module Plugins
     class DatadogPlugin < Base
-      def on_container_instance_user_data(instance, user_data)
+      def on_container_instance_user_data(_instance, user_data)
         user_data.run_commands += [
           agent_command
         ]

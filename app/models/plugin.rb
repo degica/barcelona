@@ -11,7 +11,7 @@ class Plugin < ActiveRecord::Base
   after_save :save_district
   after_destroy :hook_destroyed
 
-  def hook(trigger, origin, arg=nil)
+  def hook(trigger, origin, arg = nil)
     return arg if plugin.nil?
     plugin.hook(trigger, origin, arg)
   end
@@ -27,7 +27,7 @@ class Plugin < ActiveRecord::Base
       Rails.logger.error e
       return nil
     end
-    plugin = klass.new(self)
+    klass.new(self)
   end
 
   private

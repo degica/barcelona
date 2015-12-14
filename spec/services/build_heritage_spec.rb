@@ -189,7 +189,7 @@ describe BuildHeritage do
       before do
         new_params = params.dup
         new_params[:services] << {
-          name: "another-service",
+          name: "another-service"
         }
         @updated_heritage = BuildHeritage.new(new_params, district: nil).execute
         @updated_heritage.save!

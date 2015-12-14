@@ -66,7 +66,7 @@ class District < ActiveRecord::Base
     end
   end
 
-  def hook_plugins(trigger, origin, arg=nil)
+  def hook_plugins(trigger, origin, arg = nil)
     plugins.reverse.reduce(arg) do |a, plugin|
       plugin.hook(trigger, origin, a)
     end

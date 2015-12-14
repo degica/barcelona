@@ -11,7 +11,7 @@ class Heritage < ActiveRecord::Base
             immutable: true,
             format: { with: /\A[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]\z/ }
   validates :district, presence: true
-  validates :section_name, presence: true, inclusion: { in: %w[public private] }
+  validates :section_name, presence: true, inclusion: { in: %w(public private) }
 
   before_validation do |heritage|
     heritage.section_name ||= 'private'
