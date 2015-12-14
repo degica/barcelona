@@ -7,10 +7,9 @@ class SystemTask
   end
 
   def run(container_instance_arns, env = {})
-    td = task_definition
     aws.ecs.register_task_definition(task_definition)
 
-    resp = aws.ecs.start_task(
+    aws.ecs.start_task(
       cluster: section.cluster_name,
       task_definition: task_family,
       overrides: {

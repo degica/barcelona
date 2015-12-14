@@ -27,7 +27,7 @@ class Plugin < ActiveRecord::Base
       Rails.logger.error e
       return nil
     end
-    plugin = klass.new(self)
+    klass.new(self)
   end
 
   private
