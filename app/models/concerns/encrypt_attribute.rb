@@ -65,7 +65,7 @@ module EncryptAttribute
       }
     end
 
-    def encrypted_attribute(name, options={})
+    def encrypted_attribute(name, options = {})
       encryption_targets[name.to_sym] = default_encryption_options.merge options
 
       define_method(name) do

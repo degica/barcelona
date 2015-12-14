@@ -24,13 +24,13 @@ class PortMapping < ActiveRecord::Base
   scope :udp, -> { where(protocol: "udp") }
 
   def self.to_task_definition
-    self.all.map do |pm|
+    self.all.map { |pm|
       {
         container_port: pm.container_port,
         host_port: pm.special_protocol? ? nil : pm.host_port,
         protocol: pm.host_protocol
       }.compact
-    end.uniq { |pm| "#{pm[:container_port]}/#{pm[:protocol]}" }
+    }.uniq { |pm| "#{pm[:container_port]}/#{pm[:protocol]}" }
   end
 
   def self.http
@@ -50,7 +50,7 @@ class PortMapping < ActiveRecord::Base
   end
 
   def special_protocol?
-    !["tcp", "udp"].include?(protocol)
+    !%w(tcp udp).include?(protocol)
   end
 
   def host_protocol
@@ -84,10 +84,10 @@ class PortMapping < ActiveRecord::Base
   end
 
   def used_host_ports
-    @used_host_ports = PortMapping
-                       .joins(service: { heritage: :district })
-                       .where("heritages.district_id" => service.heritage.district.id)
-                       .pluck(:host_port)
-                       .compact
+    @used_host_ports = PortMapping.
+                       joins(service: { heritage: :district }).
+                       where("heritages.district_id" => service.heritage.district.id).
+                       pluck(:host_port).
+                       compact
   end
 end

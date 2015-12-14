@@ -6,13 +6,13 @@ module Barcelona
       context "without proxy plugin" do
         let!(:district) do
           create :district, plugins_attributes: [
-                   {
-                     name: 'datadog',
-                     plugin_attributes: {
-                       "api_key" => "abcdef"
-                     }
-                   }
-                 ]
+            {
+              name: 'datadog',
+              plugin_attributes: {
+                "api_key" => "abcdef"
+              }
+            }
+          ]
         end
 
         it "gets hooked with container_instance_user_data trigger" do
@@ -26,16 +26,16 @@ module Barcelona
       context "with proxy plugin" do
         let!(:district) do
           create :district, plugins_attributes: [
-                   {
-                     name: "proxy",
-                   },
-                   {
-                     name: 'datadog',
-                     plugin_attributes: {
-                       "api_key" => "abcdef"
-                     }
-                   }
-                 ]
+            {
+              name: "proxy"
+            },
+            {
+              name: 'datadog',
+              plugin_attributes: {
+                "api_key" => "abcdef"
+              }
+            }
+          ]
         end
 
         it "gets hooked with container_instance_user_data trigger" do

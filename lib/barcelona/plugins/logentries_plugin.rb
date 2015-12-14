@@ -5,7 +5,7 @@ module Barcelona
       LOCAL_LOGGER_PORT = 514 # TCP port for local rsyslog
       CONTAINER_PORT = 514 # TCP container port for a logger container
 
-      def on_container_instance_user_data(instance, user_data)
+      def on_container_instance_user_data(_instance, user_data)
         user_data.add_file("/etc/rsyslog.d/barcelona-logger.conf", "root:root", "644", <<EOS)
 $ModLoad imtcp
 $InputTCPServerRun #{LOCAL_LOGGER_PORT}
@@ -19,7 +19,7 @@ EOS
         user_data
       end
 
-      def on_heritage_task_definition(heritage, task_definition)
+      def on_heritage_task_definition(_heritage, task_definition)
         task_definition.merge(
           log_configuration: {
             log_driver: "syslog",

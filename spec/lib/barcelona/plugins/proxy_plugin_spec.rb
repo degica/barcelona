@@ -5,11 +5,11 @@ module Barcelona
     describe ProxyPlugin do
       let!(:district) do
         create :district, plugins_attributes: [
-                 {
-                   name: 'proxy',
-                   plugin_attributes: {no_proxy: ["10.0.0.1"]}
-                 }
-               ]
+          {
+            name: 'proxy',
+            plugin_attributes: {no_proxy: ["10.0.0.1"]}
+          }
+        ]
       end
 
       it "gets hooked with created trigger" do
@@ -39,14 +39,14 @@ module Barcelona
         definition = heritage.base_task_definition("heritage")
         expect(definition[:name]).to eq "heritage"
         expect(definition[:environment]).to eq [
-                                              {name: "http_proxy", value: "http://main.#{district.name}-proxy.bcn:3128"},
-                                              {name: "https_proxy", value: "http://main.#{district.name}-proxy.bcn:3128"},
-                                              {name: "no_proxy", value: "10.0.0.1,localhost,127.0.0.1,169.254.169.254,.bcn"},
-                                              {name: "HTTP_PROXY", value: "http://main.#{district.name}-proxy.bcn:3128"},
-                                              {name: "HTTPS_PROXY", value: "http://main.#{district.name}-proxy.bcn:3128"},
-                                              {name: "NO_PROXY", value: "10.0.0.1,localhost,127.0.0.1,169.254.169.254,.bcn"},
-                                              {name: "ENVIRONMENT", value: "VALUE"}
-                                            ]
+          {name: "http_proxy", value: "http://main.#{district.name}-proxy.bcn:3128"},
+          {name: "https_proxy", value: "http://main.#{district.name}-proxy.bcn:3128"},
+          {name: "no_proxy", value: "10.0.0.1,localhost,127.0.0.1,169.254.169.254,.bcn"},
+          {name: "HTTP_PROXY", value: "http://main.#{district.name}-proxy.bcn:3128"},
+          {name: "HTTPS_PROXY", value: "http://main.#{district.name}-proxy.bcn:3128"},
+          {name: "NO_PROXY", value: "10.0.0.1,localhost,127.0.0.1,169.254.169.254,.bcn"},
+          {name: "ENVIRONMENT", value: "VALUE"}
+        ]
       end
 
       it "gets hooked with container_instance_user_data trigger" do

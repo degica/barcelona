@@ -13,7 +13,7 @@ class User < ActiveRecord::Base
 
   ALLOWED_TEAMS = [
     {org: 'degica', team: 'developers', role: "developer"},
-    {org: 'degica', team: 'Admin developers', role: "admin"},
+    {org: 'degica', team: 'Admin developers', role: "admin"}
   ]
 
   has_many :users_districts
@@ -49,9 +49,9 @@ class User < ActiveRecord::Base
   end
 
   def self.role_for(team:, org:)
-    ALLOWED_TEAMS.select do |t|
+    ALLOWED_TEAMS.find { |t|
       t[:team] == team && t[:org] == org
-    end.first.try(:[], :role)
+    }.try(:[], :role)
   end
 
   def new_token!

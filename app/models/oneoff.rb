@@ -42,7 +42,7 @@ class Oneoff < ActiveRecord::Base
 
   def running?
     fetch_task
-    !(["STOPPED", "MISSING"].include?(status))
+    !(%w(STOPPED MISSING).include?(status))
   end
 
   def run!(sync: false)

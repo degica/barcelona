@@ -1,5 +1,5 @@
 class HeritagesController < ApplicationController
-  before_action :load_district,  only:   [:index, :create]
+  before_action :load_district, only:   [:index, :create]
   before_action :load_heritage, except: [:index, :create, :trigger]
   skip_before_action :authenticate, only: [:trigger]
 

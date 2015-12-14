@@ -44,10 +44,10 @@ class DistrictSection
     unless container_instance_arn
       arns = aws.ecs.list_container_instances(cluster: cluster_name).container_instance_arns
       return [] if arns.blank?
-      container_instance_arn = aws.ecs
-                               .describe_container_instances(cluster: cluster_name, container_instances: [arns.sample])
-                               .container_instances[0]
-                               .container_instance_arn
+      container_instance_arn = aws.ecs.
+                               describe_container_instances(cluster: cluster_name, container_instances: [arns.sample]).
+                               container_instances[0].
+                               container_instance_arn
     end
     TerminateInstanceTask.new(self).run([container_instance_arn])
   end
@@ -55,9 +55,9 @@ class DistrictSection
   def container_instances
     arns = aws.ecs.list_container_instances(cluster: cluster_name).container_instance_arns
     return [] if arns.blank?
-    container_instances = aws.ecs
-                          .describe_container_instances(cluster: cluster_name, container_instances: arns)
-                          .container_instances
+    container_instances = aws.ecs.
+                          describe_container_instances(cluster: cluster_name, container_instances: arns).
+                          container_instances
     instances = {}
     container_instances.each do |ci|
       instance = {

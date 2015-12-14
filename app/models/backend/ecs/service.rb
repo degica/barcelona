@@ -78,10 +78,10 @@ module Backend::Ecs
         {name: "UPSTREAM_PORT", value: service.web_container_port.to_s},
         {name: "FORCE_SSL", value: (!!service.force_ssl).to_s},
         service.hosts.map do |h|
-          host_key = h['hostname'].gsub('.', '_').gsub('-', '__').upcase
+          host_key = h['hostname'].tr('.', '_').gsub('-', '__').upcase
           [
             {name: "CERT_#{host_key}", value: h['ssl_cert_path']},
-            {name: "KEY_#{host_key}", value: h['ssl_key_path']},
+            {name: "KEY_#{host_key}", value: h['ssl_key_path']}
           ]
         end
       ].flatten
@@ -147,13 +147,13 @@ module Backend::Ecs
         # If the service has multiple port mappings it just works because both the ELB and
         # ECS task definition has multiple port settings
 
-#        params[:load_balancers] = port_mappings.tcp.map do |port_mapping|
-#          {
-#            load_balancer_name: load_balancer.load_balancer_name,
-#            container_name: service_name,
-#            container_port: port_mapping.container_port
-#          }
-#        end
+        #        params[:load_balancers] = port_mappings.tcp.map do |port_mapping|
+        #          {
+        #            load_balancer_name: load_balancer.load_balancer_name,
+        #            container_name: service_name,
+        #            container_port: port_mapping.container_port
+        #          }
+        #        end
         # FIXME: ugly hack
         container_name = service_name
         port_mapping = port_mappings.lb_registerable.first

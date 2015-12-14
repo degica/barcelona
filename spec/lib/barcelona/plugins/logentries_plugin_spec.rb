@@ -5,13 +5,13 @@ module Barcelona
     describe LogentriesPlugin do
       let!(:district) do
         create :district, plugins_attributes: [
-                 {
-                   name: 'logentries',
-                   plugin_attributes: {
-                     token: "logentries_token"
-                   }
-                 }
-               ]
+          {
+            name: 'logentries',
+            plugin_attributes: {
+              token: "logentries_token"
+            }
+          }
+        ]
       end
 
       it "gets hooked with created trigger" do

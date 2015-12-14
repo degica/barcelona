@@ -10,13 +10,11 @@ module Backend::Ecs
     end
 
     def fetch_load_balancer
-      begin
-        return @fetched_load_balancer ||= aws.elb.describe_load_balancers(
-          load_balancer_names: [service_name],
-        ).load_balancer_descriptions.first
-      rescue Aws::ElasticLoadBalancing::Errors::LoadBalancerNotFound
-        return nil
-      end
+      return @fetched_load_balancer ||= aws.elb.describe_load_balancers(
+        load_balancer_names: [service_name]
+      ).load_balancer_descriptions.first
+    rescue Aws::ElasticLoadBalancing::Errors::LoadBalancerNotFound
+      return nil
     end
 
     def create
@@ -31,14 +29,14 @@ module Backend::Ecs
         subnets: subnets.map(&:subnet_id),
         scheme: public? ? 'internet-facing' : 'internal',
         security_groups: [security_group],
-        listeners: port_mappings.lb_registerable.map { |pm|
+        listeners: port_mappings.lb_registerable.map do |pm|
           {
             protocol: "TCP",
             load_balancer_port: pm.lb_port,
             instance_protocol: "TCP",
             instance_port: pm.host_port
           }
-        }
+        end
       )
       aws.elb.configure_health_check(
         load_balancer_name: service_name,
@@ -64,7 +62,7 @@ module Backend::Ecs
       )
 
       # Enable ProxyProtocol for http/https host ports
-      ports = port_mappings.where(protocol: ["http", "https"]).pluck(:host_port)
+      ports = port_mappings.where(protocol: %w(http https)).pluck(:host_port)
       ports += port_mappings.where(enable_proxy_protocol: true).pluck(:host_port)
       if ports.present?
         aws.elb.create_load_balancer_policy(

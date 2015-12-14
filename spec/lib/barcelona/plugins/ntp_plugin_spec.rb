@@ -5,11 +5,11 @@ module Barcelona
     describe NtpPlugin do
       let!(:district) do
         create :district, plugins_attributes: [
-                 {
-                   name: 'ntp',
-                   plugin_attributes: {ntp_hosts: ["10.0.0.1"]}
-                 }
-               ]
+          {
+            name: 'ntp',
+            plugin_attributes: {ntp_hosts: ["10.0.0.1"]}
+          }
+        ]
       end
 
       it "gets hooked with container_instance_user_data trigger" do

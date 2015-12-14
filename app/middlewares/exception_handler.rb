@@ -7,7 +7,7 @@ class ExceptionHandler
       @error = error
     end
 
-    def to_rack_response(debug=false)
+    def to_rack_response(debug = false)
       [status_code, headers, [body(debug)]]
     end
 
@@ -24,7 +24,7 @@ class ExceptionHandler
       if debug
         data.merge!(
           backtrace: original.backtrace,
-          debug_message: "#{original.class.to_s}: #{original.message}"
+          debug_message: "#{original.class}: #{original.message}"
         )
       end
       data.to_json

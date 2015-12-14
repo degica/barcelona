@@ -7,11 +7,11 @@ class ElasticIp < ActiveRecord::Base
   validates :allocation_id, presence: true
 
   def self.available(district)
-    allocation_ids = district.aws.ec2
-                     .describe_addresses(allocation_ids: self.pluck(:allocation_id))
-                     .addresses
-                     .select { |a| a.association_id.nil? }
-                     .map { |a| a.allocation_id }
+    allocation_ids = district.aws.ec2.
+                     describe_addresses(allocation_ids: self.pluck(:allocation_id)).
+                     addresses.
+                     select { |a| a.association_id.nil? }.
+                     map(&:allocation_id)
     self.where(allocation_id: allocation_ids)
   end
 
