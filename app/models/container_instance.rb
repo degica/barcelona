@@ -110,6 +110,11 @@ class ContainerInstance
 
     district.users.each do |user|
       user_data.add_user(user.name, authorized_keys: [user.public_key], groups: user.instance_groups)
+      if district.dockercfg.present?
+        name = user.name
+        dockercfg = {"auths" => district.dockercfg}.to_json
+        user_data.add_file("/home/#{name}/.docker/config.json", "#{name}:#{name}", "600", dockercfg)
+      end
     end
 
     user_data = district.hook_plugins(:container_instance_user_data, self, user_data)
