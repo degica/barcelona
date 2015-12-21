@@ -59,7 +59,7 @@ class ContainerInstance
 
   def launch
     resp = aws.ec2.run_instances(
-      image_id: 'ami-3077525e', # amzn-ami-2015.09.b-amazon-ecs-optimized
+      image_id: 'ami-6ca38b02', # amzn-ami-2015.09.c-amazon-ecs-optimized
       min_count: 1,
       max_count: 1,
       user_data: instance_user_data,
