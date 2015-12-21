@@ -67,7 +67,12 @@ describe District do
           reservations: [
             double(
               instances: [
-                double(instance_id: 'ec2_instance_id', private_ip_address: "10.0.0.1")
+                double(
+                  instance_id: 'ec2_instance_id',
+                  private_ip_address: "10.0.0.1",
+                  launch_time: 1.day.ago,
+                  instance_type: 't2.micro'
+                )
               ]
             )
           ]
