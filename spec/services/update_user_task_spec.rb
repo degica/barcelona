@@ -35,7 +35,7 @@ describe UpdateUserTask do
                                {
                                  name: "update_user",
                                  cpu: 32,
-                                 memory: 32,
+                                 memory: 64,
                                  essential: true,
                                  image: "k2nr/docker-user-manager",
                                  mount_points: [

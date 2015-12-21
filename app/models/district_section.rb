@@ -41,19 +41,22 @@ class DistrictSection
   end
 
   def terminate_instance(container_instance_arn: nil)
-    unless container_instance_arn
-      arns = aws.ecs.list_container_instances(cluster: cluster_name).container_instance_arns
-      return [] if arns.blank?
-      container_instance_arn = aws.ecs.
-                               describe_container_instances(cluster: cluster_name, container_instances: [arns.sample]).
-                               container_instances[0].
-                               container_instance_arn
+    if container_instance_arn.nil?
+      container_instance_arn = oldest_container_instance[:container_instance_arn]
     end
     TerminateInstanceTask.new(self).run([container_instance_arn])
   end
 
-  def container_instances
-    arns = aws.ecs.list_container_instances(cluster: cluster_name).container_instance_arns
+  def oldest_container_instance
+    container_instances.sort_by{ |ci| ci[:launch_time] }.first
+  end
+
+  def container_instances(container_instance_arns: nil)
+    arns = if container_instance_arns.nil?
+             aws.ecs.list_container_instances(cluster: cluster_name).container_instance_arns
+           else
+             container_instance_arns
+           end
     return [] if arns.blank?
     container_instances = aws.ecs.
                           describe_container_instances(cluster: cluster_name, container_instances: arns).
@@ -77,7 +80,9 @@ class DistrictSection
 
     ec2_instances.each do |ins|
       instances[ins.instance_id].merge!(
-        private_ip_address: ins.private_ip_address
+        private_ip_address: ins.private_ip_address,
+        launch_time: ins.launch_time,
+        instance_type: ins.instance_type
       )
     end
 
