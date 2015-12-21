@@ -113,11 +113,12 @@ class ContainerInstance
       if district.dockercfg.present?
         name = user.name
         dockercfg = {"auths" => district.dockercfg}.to_json
-        dockercfg_path = "/home/#{name}/.docker/config.json"
+        dockercfg_path = "/home/#{name}/.docker"
         user_data.run_commands += [
-          "echo '#{dockercfg}' > #{dockercfg_path}",
-          "chmod 600 #{dockercfg_path}",
-          "chown #{name}:#{name} #{dockercfg_path}"
+          "mkdir #{dockercfg_path}",
+          "echo '#{dockercfg}' > #{dockercfg_path}/config.json",
+          "chmod 600 #{dockercfg_path}/config.json",
+          "chown #{name}:#{name} #{dockercfg_path}/config.json"
         ]
       end
     end
