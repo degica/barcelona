@@ -1,7 +1,7 @@
 threads 2, 16
 workers 2
 preload_app!
-port 3000
+port ENV['PORT']
 
 on_worker_boot do
   ActiveSupport.on_load(:active_record) do
