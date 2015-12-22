@@ -13,10 +13,18 @@ module Backend::Ecs
     end
 
     def delete(load_balancer)
-      change_record_set("DELETE", load_balancer.dns_name)
+      change_record_set("DELETE", load_balancer.dns_name) if record_set_exist?
     end
 
     private
+
+    def record_set_exist?
+      record = aws.route53.list_resource_record_sets(
+        hosted_zone_id: district.private_hosted_zone_id,
+        start_record_name: service_record_set_name
+      ).resource_record_sets.first
+      record.present? && record.name == "#{service_record_set_name}"
+    end
 
     def change_record_set(action, elb_dns_name)
       aws.route53.change_resource_record_sets(
@@ -26,7 +34,7 @@ module Backend::Ecs
             {
               action: action,
               resource_record_set: {
-                name: [name, heritage.name, hosted_zone.name].join("."),
+                name: service_record_set_name,
                 type: "CNAME",
                 ttl: 300,
                 resource_records: [
@@ -43,6 +51,10 @@ module Backend::Ecs
 
     def hosted_zone
       @hosted_zone ||= aws.route53.get_hosted_zone(id: district.private_hosted_zone_id).hosted_zone
+    end
+
+    def service_record_set_name
+      @service_record_set_name ||= [name, heritage.name, hosted_zone.name].join(".")
     end
   end
 end
