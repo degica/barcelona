@@ -262,6 +262,13 @@ describe Backend::Ecs::Adapter do
       expect(route53_mock).to receive(:get_hosted_zone) do
         double(hosted_zone: double(name: 'bcn.'))
       end
+      expect(route53_mock).to receive(:list_resource_record_sets).
+        with(
+          hosted_zone_id: service.district.private_hosted_zone_id,
+          start_record_name: "#{service.name}.#{heritage.name}.bcn."
+        ) do
+        double(resource_record_sets: [double(name: "#{service.name}.#{heritage.name}.bcn.")])
+      end
       expect(route53_mock).to receive(:change_resource_record_sets).
         with(
           hosted_zone_id: service.district.private_hosted_zone_id,
