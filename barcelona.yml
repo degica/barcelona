@@ -6,13 +6,15 @@ environments:
     slack_url: https://hooks.slack.com/services/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
     services:
       - name: web
+        service_type: web
         public: true
         cpu: 256
         memory: 256
         command: puma -C config/puma.rb
-        port_mappings:
-          - lb_port: 80
-            container_port: 3000
+        hosts:
+          - hostname: barcelona.degica.com
+            ssl_cert_path: s3://degica2-barcelona/certs/degica.com.crt
+            ssl_key_path:  s3://degica2-barcelona/certs/degica.com.key
       - name: worker
         command: rake jobs:work
         cpu: 256
