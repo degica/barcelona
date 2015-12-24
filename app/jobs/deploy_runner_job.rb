@@ -17,7 +17,16 @@ class DeployRunnerJob < ActiveJob::Base
 
     heritage.services.each do |service|
       Rails.logger.info "Updating service #{service.service_name} ..."
-      service.apply
+      begin
+        service.apply
+      rescue => e
+        Rails.logger.error "#{e.class}: #{e.message}"
+        Rails.logger.error caller.join("\n")
+        heritage.events.create(
+          level: :error,
+          message: "Deploy failed: Something went wrong with deploying #{service.service_name}"
+        )
+      end
     end
 
     heritage.services.each do |service|
