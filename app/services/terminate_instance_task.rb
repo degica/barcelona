@@ -14,6 +14,7 @@ class TerminateInstanceTask < SystemTask
   def container_definition
     super.merge(
       image: "k2nr/ecs-instance-terminator",
+      memory: 96,
       mount_points: [
         {
           source_volume: "docker-socket",
@@ -22,6 +23,7 @@ class TerminateInstanceTask < SystemTask
       ]
     )
   end
+
 
   def volumes
     [

@@ -17,7 +17,7 @@ describe TerminateInstanceTask do
           {
             name: "terminate-instance",
             cpu: 32,
-            memory: 64,
+            memory: 32,
             essential: true,
             image: "k2nr/ecs-instance-terminator",
             environment: [],
