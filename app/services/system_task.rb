@@ -38,7 +38,7 @@ class SystemTask
     district.base_task_definition.merge(
       name: task_family,
       cpu: 32,
-      memory: 64,
+      memory: 32,
       essential: true
     )
   end
