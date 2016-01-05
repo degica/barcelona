@@ -1,4 +1,4 @@
-FROM ruby:2.2.3
+FROM ruby:2.3.0
 
 RUN apt-get update && apt-get install -y postgresql-client nodejs --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
