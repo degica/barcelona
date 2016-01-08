@@ -6,10 +6,12 @@ rvm:
 - 2.3.0
 addons:
   postgresql: '9.4'
+env:
+  global:
+    - DATABASE_URL=postgres://postgres:@localhost:5432/travis_ci_test
 before_script:
 - npm install -g barcelona
 - psql -c 'create database travis_ci_test;' -U postgres
-- cp config/database.travis.yml config/database.yml
 script:
 - bundle exec rake db:setup spec
 after_success:
