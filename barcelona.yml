@@ -19,3 +19,6 @@ environments:
         command: rake jobs:work
         cpu: 256
         memory: 256
+bcnd:
+  mainline_branch: master
+  mainline_environment: production
