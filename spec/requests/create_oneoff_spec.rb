@@ -9,7 +9,7 @@ describe "POST /heritages/:heritage/oneoffs", type: :request do
 
   it "creates a oneoff task" do
     expect_any_instance_of(Aws::ECS::Client).to receive(:run_task) do
-      double(tasks: [double(task_arn: 'arn')])
+      double(tasks: [double(task_arn: 'arn', containers: [])])
     end
 
     params = {
