@@ -17,8 +17,12 @@ class District < ActiveRecord::Base
   validates :s3_bucket_name, presence: true
   validates :vpc_id, presence: true
   validates :private_hosted_zone_id, presence: true
-  validates :aws_access_key_id, presence: true
-  validates :aws_secret_access_key, presence: true
+
+  # Allows nil when test environment
+  # This is because encrypting/decrypting value is very slow
+  # So to speed up specs we allow empty access keys
+  validates :aws_access_key_id, presence: true, if: -> { !Rails.env.test? }
+  validates :aws_secret_access_key, presence: true, if: -> { !Rails.env.test? }
 
   serialize :dockercfg, JSON
 
@@ -35,7 +39,8 @@ class District < ActiveRecord::Base
   end
 
   def aws
-    @aws ||= AwsAccessor.new(aws_access_key_id, aws_secret_access_key)
+    # these fallback "empty" value is a trick to speed up specs
+    @aws ||= AwsAccessor.new(aws_access_key_id || "empty", aws_secret_access_key || "empty")
   end
 
   def to_param

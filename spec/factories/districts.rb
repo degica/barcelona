@@ -11,7 +11,5 @@ FactoryGirl.define do
     ecs_instance_role 'ecsInstanceRole'
     private_hosted_zone_id 'Z2MY4ND3Z2EPA2'
     s3_bucket_name 'degica3-barcelona'
-    aws_access_key_id "AWSACCESSKEYID"
-    aws_secret_access_key "SECRETKEY"
   end
 end
