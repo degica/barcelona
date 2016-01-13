@@ -12,7 +12,7 @@ class UpdateUserTask < SystemTask
       "USER_NAME" => user.name,
       "USER_GROUPS" => user.instance_groups.join(","),
       "USER_PUBLIC_KEY" => user.public_key.presence,
-      "USER_DOCKERCFG" => section.dockercfg.try(:to_json)
+      "USER_DOCKERCFG" => section.dockercfg&.to_json
     }.compact
 
     arns = section.container_instances.map{ |c| c[:container_instance_arn] }

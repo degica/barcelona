@@ -39,7 +39,7 @@ module Barcelona
       end
 
       def proxy_plugin
-        @proxy_plugin ||= district.plugins.find_by(name: "proxy").try(:plugin)
+        @proxy_plugin ||= district.plugins.find_by(name: "proxy")&.plugin
       end
 
       def api_key

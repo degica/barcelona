@@ -51,7 +51,7 @@ class User < ActiveRecord::Base
   def self.role_for(team:, org:)
     ALLOWED_TEAMS.find { |t|
       t[:team] == team && t[:org] == org
-    }.try(:[], :role)
+    }&.dig(:role)
   end
 
   def new_token!

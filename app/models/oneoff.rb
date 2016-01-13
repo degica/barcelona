@@ -51,15 +51,15 @@ class Oneoff < ActiveRecord::Base
   end
 
   def status
-    task.try(:containers).try(:[], 0).try(:last_status)
+    task&.containers&.first&.last_status
   end
 
   def exit_code
-    task.try(:containers).try(:[], 0).try(:exit_code)
+    task&.containers&.first&.exit_code
   end
 
   def reason
-    task.try(:containers).try(:[], 0).try(:reason)
+    task&.containers&.first&.reason
   end
 
   private

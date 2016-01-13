@@ -36,15 +36,15 @@ module Backend::Ecs
     end
 
     def desired_count
-      ecs_service.try(:desired_count)
+      ecs_service&.desired_count
     end
 
     def running_count
-      ecs_service.try(:running_count)
+      ecs_service&.running_count
     end
 
     def pending_count
-      ecs_service.try(:pending_count)
+      ecs_service&.pending_count
     end
 
     def container_definition
