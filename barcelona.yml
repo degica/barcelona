@@ -8,7 +8,7 @@ environments:
       - name: web
         service_type: web
         public: true
-        cpu: 256
+        cpu: 128
         memory: 256
         command: puma -C config/puma.rb
         hosts:
@@ -17,7 +17,7 @@ environments:
             ssl_key_path:  s3://degica2-barcelona/certs/degica.com.key
       - name: worker
         command: rake jobs:work
-        cpu: 256
+        cpu: 128
         memory: 256
 bcnd:
   mainline_branch: master
