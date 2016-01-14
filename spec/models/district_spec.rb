@@ -12,6 +12,25 @@ describe District do
     allow(district).to receive_message_chain(:aws, :s3)  { s3_mock }
   end
 
+  describe "#validations" do
+    let(:district) { build :district }
+    before do
+      allow(Rails).to receive_message_chain(:env, :test?) {
+        false
+      }
+    end
+    context "when aws keys are nil" do
+      let(:district) { build :district }
+      it { expect(district).to_not be_valid }
+    end
+    context "when aws keys are present" do
+      let(:district) { build :district,
+                             aws_access_key_id: "AWS_ACCESS_KEY_ID",
+                             aws_secret_access_key: "AWS_SECRET_ACCESS_KEY" }
+      it { expect(district).to be_valid }
+    end
+  end
+
   describe "#subnets" do
     it "returns private subnets" do
       expect(ec2_mock).to receive(:describe_subnets).with(
