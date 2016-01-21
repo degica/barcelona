@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151203060634) do
+ActiveRecord::Schema.define(version: 20160120050738) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -47,6 +47,9 @@ ActiveRecord::Schema.define(version: 20151203060634) do
     t.text     "dockercfg"
     t.text     "encrypted_aws_access_key_id"
     t.text     "encrypted_aws_secret_access_key"
+    t.string   "cidr_block"
+    t.string   "bastion_key_pair"
+    t.string   "stack_name"
   end
 
   create_table "elastic_ips", force: :cascade do |t|
