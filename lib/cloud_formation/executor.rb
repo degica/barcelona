@@ -26,7 +26,11 @@ module CloudFormation
     def update
       client.update_stack(stack_options)
     rescue Aws::CloudFormation::Errors::ValidationError => e
-      raise e unless e.message == "No updates are to be performed."
+      if e.message == "No updates are to be performed."
+        Rails.logger.warn "No updates are to be performed."
+      else
+        raise e
+      end
     end
 
     def stack_options
