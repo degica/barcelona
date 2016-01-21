@@ -16,13 +16,13 @@ describe UpdateUserTask do
     before do
       allow(section).to receive(:container_instances).and_return [
         {
-          "status":"ACTIVE",
-          "container_instance_arn": container_instance_arn,
-          "remaining_resources": [],
-          "running_tasks_count":4,
-          "pending_tasks_count":0,
-          "private_ip_address":"10.67.1.121",
-          "ec2_instance_id":"i-b80e791d"
+          status: "ACTIVE",
+          container_instance_arn: container_instance_arn,
+          remaining_resources: [],
+          running_tasks_count: 4,
+          pending_tasks_count: 0,
+          private_ip_address: "10.67.1.121",
+          ec2_instance_id: "i-b80e791d"
         }
       ]
     end
