@@ -107,9 +107,6 @@ Style/StringLiteralsInInterpolation:
 Style/SingleLineBlockParams:
   Enabled: false
 
-Style/SingleSpaceBeforeFirstArg:
-  Enabled: false
-
 Lint/UnderscorePrefixedVariableName:
   Enabled: false
 
