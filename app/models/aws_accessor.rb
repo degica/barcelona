@@ -24,6 +24,10 @@ class AwsAccessor
     @route53 ||= Aws::Route53::Client.new(credentials: credentials)
   end
 
+  def cloudformation
+    @cloudformation ||= Aws::CloudFormation::Client.new(credentials: credentials)
+  end
+
   private
 
   def credentials
