@@ -17,12 +17,16 @@ class District < ActiveRecord::Base
   validates :s3_bucket_name, presence: true
   validates :vpc_id, presence: true
   validates :private_hosted_zone_id, presence: true
+  validates :stack_name, presence: true
+  validates :cidr_block, presence: true
 
   # Allows nil when test environment
   # This is because encrypting/decrypting value is very slow
   # So to speed up specs we allow empty access keys
   validates :aws_access_key_id, presence: true, if: -> { !Rails.env.test? }
   validates :aws_secret_access_key, presence: true, if: -> { !Rails.env.test? }
+
+  validate :validate_cidr_block
 
   serialize :dockercfg, JSON
 
@@ -36,6 +40,8 @@ class District < ActiveRecord::Base
       public: DistrictSection.new(:public, self),
       private: DistrictSection.new(:private, self)
     }
+    district.cidr_block ||= "10.#{Random.rand(256)}.0.0/16"
+    district.stack_name ||= "barcelona-#{district.name}"
   end
 
   def aws
@@ -84,6 +90,14 @@ class District < ActiveRecord::Base
     hook_plugins(:district_task_definition, self, base)
   end
 
+  def apply_network_stack
+    stack_executor.create_or_update
+  end
+
+  def delete_network_stack
+    stack_executor.delete
+  end
+
   private
 
   def update_ecs_config
@@ -106,5 +120,26 @@ class District < ActiveRecord::Base
     sections.each do |_, section|
       section.delete_ecs_cluster
     end
+  end
+
+  def network_stack
+    Barcelona::Network::NetworkStack.new(
+      stack_name,
+      cidr_block: cidr_block,
+      bastion_key_pair: bastion_key_pair
+    )
+  end
+
+  def stack_executor
+    CloudFormation::Executor.new(network_stack, aws.cloudformation)
+  end
+
+
+  def validate_cidr_block
+    if IPAddr.new(cidr_block).to_range.count < 65536
+      errors.add(:cidr_block, "subnet mask bits must be smaller than or equal to 16")
+    end
+  rescue IPAddr::InvalidAddressError
+    errors.add(:cidr_block, "is not a valid IPv4 format")
   end
 end
