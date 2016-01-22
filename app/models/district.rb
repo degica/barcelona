@@ -3,6 +3,7 @@ class District < ActiveRecord::Base
 
   before_save :update_ecs_config
   before_create :create_ecs_cluster
+  after_create :create_network_stack
   after_destroy :delete_ecs_cluster
 
   has_many :heritages, inverse_of: :district, dependent: :destroy
@@ -90,6 +91,10 @@ class District < ActiveRecord::Base
     hook_plugins(:district_task_definition, self, base)
   end
 
+  def create_network_stack
+    stack_executor.create
+  end
+
   def apply_network_stack
     stack_executor.create_or_update
   end
@@ -133,7 +138,6 @@ class District < ActiveRecord::Base
   def stack_executor
     CloudFormation::Executor.new(network_stack, aws.cloudformation)
   end
-
 
   def validate_cidr_block
     if IPAddr.new(cidr_block).to_range.count < 65536
