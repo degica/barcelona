@@ -1,6 +1,9 @@
 class District < ActiveRecord::Base
   include EncryptAttribute
 
+  attr_writer :vpc_id, :public_elb_security_group, :private_elb_security_group,
+              :instance_security_group, :private_hosted_zone_id
+
   before_save :update_ecs_config
   before_create :create_ecs_cluster
   after_create :create_network_stack
@@ -16,8 +19,6 @@ class District < ActiveRecord::Base
 
   validates :name, presence: true, uniqueness: true, immutable: true
   validates :s3_bucket_name, presence: true
-  validates :vpc_id, presence: true
-  validates :private_hosted_zone_id, presence: true
   validates :stack_name, presence: true
   validates :cidr_block, presence: true
 
@@ -52,6 +53,30 @@ class District < ActiveRecord::Base
 
   def to_param
     name
+  end
+
+  def vpc_id
+    @vpc_id ||= stack_resources["VPC"]
+  end
+
+  def public_elb_security_group
+    @public_elb_security_group ||= stack_resources["PublicELBSecurityGroup"]
+  end
+
+  def private_elb_security_group
+    @private_elb_security_group ||= stack_resources["PrivateELBSecurityGroup"]
+  end
+
+  def instance_security_group
+    @instance_security_group ||= stack_resources["InstanceSecurityGroup"]
+  end
+
+  def private_hosted_zone_id
+    @private_hosted_zone_id ||= stack_resources["LocalHostedZone"]
+  end
+
+  def stack_resources
+    @stack_resources ||= stack_executor.resource_ids
   end
 
   def subnets(section)

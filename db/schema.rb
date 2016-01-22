@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160120050738) do
+ActiveRecord::Schema.define(version: 20160122120536) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -34,15 +34,10 @@ ActiveRecord::Schema.define(version: 20160120050738) do
 
   create_table "districts", force: :cascade do |t|
     t.string   "name"
-    t.string   "vpc_id"
-    t.string   "public_elb_security_group"
-    t.string   "private_elb_security_group"
-    t.string   "instance_security_group"
     t.string   "ecs_service_role"
     t.string   "ecs_instance_role"
     t.datetime "created_at",                      null: false
     t.datetime "updated_at",                      null: false
-    t.string   "private_hosted_zone_id"
     t.string   "s3_bucket_name"
     t.text     "dockercfg"
     t.text     "encrypted_aws_access_key_id"
