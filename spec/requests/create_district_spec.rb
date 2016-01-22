@@ -6,8 +6,6 @@ describe "POST /districts", type: :request do
   let(:params) do
     {
       name: "district",
-      vpc_id: "vpcid",
-      private_hosted_zone_id: "hosted_zone",
       aws_access_key_id: "awsaccessskeyid",
       aws_secret_access_key: "secret key",
       s3_bucket_name: "degica-barcelona"
@@ -26,7 +24,7 @@ describe "POST /districts", type: :request do
     let(:user) { create :user, roles: ["admin"] }
     it "creates a district" do
       post "/v1/districts", params, auth
-      expect(response.status).to eq 200
+      expect(response.status).to eq 201
     end
   end
 end

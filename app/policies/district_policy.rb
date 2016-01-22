@@ -22,4 +22,8 @@ class DistrictPolicy < ApplicationPolicy
   def terminate_instance?
     user.developer?
   end
+
+  def apply_stack?
+    user.admin?
+  end
 end

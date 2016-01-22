@@ -4,6 +4,7 @@ Rails.application.routes.draw do
       member do
         post :launch_instances
         post :terminate_instance
+        post :apply_stack
       end
 
       resources :plugins, except: [:new, :edit]
