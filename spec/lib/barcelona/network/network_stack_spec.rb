@@ -204,12 +204,12 @@ describe Barcelona::Network::NetworkStack do
         "Type"=>"AWS::IAM::Role",
         "Properties" => {
           "AssumeRolePolicyDocument" => {
-            "Version" => "2012-10-17",
+            "Version" => "2008-10-17",
             "Statement" => [
               {
                 "Effect"=>"Allow",
                 "Principal" => {
-                  "Service" => ["ec2.amazonaws.com"]
+                  "Service" => ["ecs.amazonaws.com"]
                 },
                 "Action" => ["sts:AssumeRole"]
               }

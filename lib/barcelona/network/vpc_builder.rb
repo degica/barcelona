@@ -205,12 +205,12 @@ module Barcelona
 
         add_resource("AWS::IAM::Role", "ECSServiceRole") do |j|
           j.AssumeRolePolicyDocument do |j|
-            j.Version "2012-10-17"
+            j.Version "2008-10-17"
             j.Statement [
               {
                 "Effect" => "Allow",
                 "Principal" => {
-                  "Service" => ["ec2.amazonaws.com"]
+                  "Service" => ["ecs.amazonaws.com"]
                 },
                 "Action" => ["sts:AssumeRole"]
               }
