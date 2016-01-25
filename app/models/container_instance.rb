@@ -73,7 +73,7 @@ class ContainerInstance
         }
       ],
       iam_instance_profile: {
-        name: section.ecs_instance_role
+        name: section.ecs_instance_profile
       }
     )
     instance_id = resp.instances[0].instance_id

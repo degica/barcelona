@@ -59,12 +59,7 @@ class DistrictsController < ApplicationController
   def create_params
     params.permit(
       :name,
-      :ecs_service_role,
-      :ecs_instance_role,
-      :s3_bucket_name,
-      :cidr_block,
       :bastion_key_pair,
-      :stack_name,
       :aws_access_key_id,
       :aws_secret_access_key
     ).tap do |whitelisted|

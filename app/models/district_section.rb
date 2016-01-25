@@ -5,7 +5,7 @@ class DistrictSection
            :vpc_id,
            :s3_bucket_name,
            :private_hosted_zone_id,
-           :ecs_instance_role,
+           :ecs_instance_profile,
            :instance_security_group,
            :users,
            :dockercfg,
