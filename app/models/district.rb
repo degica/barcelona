@@ -1,8 +1,15 @@
 class District < ActiveRecord::Base
   include EncryptAttribute
 
-  before_save :update_ecs_config
-  before_create :create_ecs_cluster
+  attr_writer :vpc_id, :public_elb_security_group, :private_elb_security_group,
+              :instance_security_group, :private_hosted_zone_id,
+              :ecs_instance_profile, :ecs_service_role
+
+  before_validation :set_default_attributes
+  after_create :create_s3_bucket
+  after_create :create_ecs_cluster
+  after_create :create_network_stack
+  after_save :update_ecs_config
   after_destroy :delete_ecs_cluster
 
   has_many :heritages, inverse_of: :district, dependent: :destroy
@@ -14,11 +21,7 @@ class District < ActiveRecord::Base
   attr_accessor :sections
 
   validates :name, presence: true, uniqueness: true, immutable: true
-  validates :s3_bucket_name, presence: true
-  validates :vpc_id, presence: true
-  validates :private_hosted_zone_id, presence: true
-  validates :stack_name, presence: true
-  validates :cidr_block, presence: true
+  validates :s3_bucket_name, :stack_name, :cidr_block, presence: true
 
   # Allows nil when test environment
   # This is because encrypting/decrypting value is very slow
@@ -40,8 +43,6 @@ class District < ActiveRecord::Base
       public: DistrictSection.new(:public, self),
       private: DistrictSection.new(:private, self)
     }
-    district.cidr_block ||= "10.#{Random.rand(256)}.0.0/16"
-    district.stack_name ||= "barcelona-#{district.name}"
   end
 
   def aws
@@ -51,6 +52,38 @@ class District < ActiveRecord::Base
 
   def to_param
     name
+  end
+
+  def vpc_id
+    @vpc_id ||= stack_resources["VPC"]
+  end
+
+  def public_elb_security_group
+    @public_elb_security_group ||= stack_resources["PublicELBSecurityGroup"]
+  end
+
+  def private_elb_security_group
+    @private_elb_security_group ||= stack_resources["PrivateELBSecurityGroup"]
+  end
+
+  def instance_security_group
+    @instance_security_group ||= stack_resources["InstanceSecurityGroup"]
+  end
+
+  def private_hosted_zone_id
+    @private_hosted_zone_id ||= stack_resources["LocalHostedZone"]
+  end
+
+  def ecs_service_role
+    @ecs_service_role ||= stack_resources["ECSServiceRole"]
+  end
+
+  def ecs_instance_profile
+    @ecs_instance_profile ||= stack_resources["ECSInstanceProfile"]
+  end
+
+  def stack_resources
+    @stack_resources ||= stack_executor.resource_ids
   end
 
   def subnets(section)
@@ -90,6 +123,10 @@ class District < ActiveRecord::Base
     hook_plugins(:district_task_definition, self, base)
   end
 
+  def create_network_stack
+    stack_executor.create
+  end
+
   def apply_network_stack
     stack_executor.create_or_update
   end
@@ -99,6 +136,18 @@ class District < ActiveRecord::Base
   end
 
   private
+
+  def set_default_attributes
+    self.s3_bucket_name ||= "barcelona-#{name}-#{Time.now.to_i}"
+    self.cidr_block     ||= "10.#{Random.rand(256)}.0.0/16"
+    self.stack_name     ||= "barcelona-#{name}"
+  end
+
+  def create_s3_bucket
+    aws.s3.create_bucket(bucket: s3_bucket_name)
+  rescue => e
+    Rails.logger.error e
+  end
 
   def update_ecs_config
     sections.each do |_, section|
@@ -133,7 +182,6 @@ class District < ActiveRecord::Base
   def stack_executor
     CloudFormation::Executor.new(network_stack, aws.cloudformation)
   end
-
 
   def validate_cidr_block
     if IPAddr.new(cidr_block).to_range.count < 65536

@@ -182,23 +182,113 @@ module Barcelona
           ]
         end
 
-        add_resource("AWS::EC2::Instance", "BastionServer",
-                     depends_on: ["VPCGatewayAttachment"]) do |j|
-          j.InstanceType "t2.micro"
-          j.SourceDestCheck false
-          j.ImageId "ami-383c1956"
-          j.KeyName options[:bastion_key_pair] if options[:bastion_key_pair]
-          j.NetworkInterfaces [
+        if options[:bastion_key_pair]
+          add_resource("AWS::EC2::Instance", "BastionServer",
+                       depends_on: ["VPCGatewayAttachment"]) do |j|
+            j.InstanceType "t2.micro"
+            j.SourceDestCheck false
+            j.ImageId "ami-383c1956"
+            j.KeyName options[:bastion_key_pair]
+            j.NetworkInterfaces [
+              {
+                "AssociatePublicIpAddress" => true,
+                "DeviceIndex" => 0,
+                "SubnetId" => ref("SubnetDmz1"),
+                "GroupSet" => [ref("SecurityGroupBastion")]
+              }
+            ]
+            j.Tags [
+              tag("Name", join("-", cf_stack_name, "bastion"))
+            ]
+          end
+        end
+
+        add_resource("AWS::IAM::Role", "ECSServiceRole") do |j|
+          j.AssumeRolePolicyDocument do |j|
+            j.Version "2012-10-17"
+            j.Statement [
+              {
+                "Effect" => "Allow",
+                "Principal" => {
+                  "Service" => ["ec2.amazonaws.com"]
+                },
+                "Action" => ["sts:AssumeRole"]
+              }
+            ]
+          end
+          j.Path "/"
+          j.Policies [
             {
-              "AssociatePublicIpAddress" => true,
-              "DeviceIndex" => 0,
-              "SubnetId" => ref("SubnetDmz1"),
-              "GroupSet" => [ref("SecurityGroupBastion")]
+              "PolicyName" => "barcelona-ecs-container-instance-role",
+              "PolicyDocument" => {
+                "Version" => "2012-10-17",
+                "Statement" => [
+                  {
+                    "Effect" => "Allow",
+                    "Action" => [
+                      "elasticloadbalancing:Describe*",
+                      "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
+                      "elasticloadbalancing:RegisterInstancesWithLoadBalancer",
+                      "ec2:Describe*",
+                      "ec2:AuthorizeSecurityGroupIngress"
+                    ],
+                    "Resource" => ["*"]
+                  }
+                ]
+              }
             }
           ]
-          j.Tags [
-            tag("Name", join("-", cf_stack_name, "bastion"))
+        end
+
+        add_resource("AWS::IAM::Role", "ECSInstanceRole") do |j|
+          j.AssumeRolePolicyDocument do |j|
+            j.Version "2012-10-17"
+            j.Statement [
+              {
+                "Effect" => "Allow",
+                "Principal" => {
+                  "Service" => ["ec2.amazonaws.com"]
+                },
+                "Action" => ["sts:AssumeRole"]
+              }
+            ]
+          end
+          j.Path "/"
+          j.Policies [
+            {
+              "PolicyName" => "barcelona-ecs-container-instance-role",
+              "PolicyDocument" => {
+                "Version" => "2012-10-17",
+                "Statement" => [
+                  {
+                    "Effect" => "Allow",
+                    "Action" => [
+                      "ec2:AssociateAddress",
+                      "ec2:TerminateInstances",
+                      "ec2:DescribeInstances",
+                      "ecs:CreateCluster",
+                      "ecs:DeregisterContainerInstance",
+                      "ecs:DiscoverPollEndpoint",
+                      "ecs:Poll",
+                      "ecs:RegisterContainerInstance",
+                      "ecs:StartTelemetrySession",
+                      "ecs:Submit*",
+                      "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
+                      "elasticloadbalancing:DescribeLoadBalancers",
+                      "s3:Get*",
+                      "s3:List*"
+                    ],
+                    "Resource" => ["*"]
+                  }
+                ]
+              }
+            }
           ]
+        end
+
+        add_resource("AWS::IAM::InstanceProfile", "ECSInstanceProfile") do |j|
+          j.Path "/"
+          j.Roles [ref("ECSInstanceRole")]
         end
       end
     end

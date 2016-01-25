@@ -136,7 +136,7 @@ describe District do
           }
         ],
         iam_instance_profile: {
-          name: district.ecs_instance_role
+          name: district.ecs_instance_profile
         }
       ) do
         double(instances: [double(instance_id: 'instance_id')])

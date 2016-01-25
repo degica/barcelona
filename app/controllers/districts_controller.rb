@@ -13,7 +13,7 @@ class DistrictsController < ApplicationController
 
   def create
     @district = District.create!(create_params)
-    render json: @district
+    render json: @district, status: 201
   end
 
   def update
@@ -40,6 +40,11 @@ class DistrictsController < ApplicationController
     render status: 204, nothing: true
   end
 
+  def apply_stack
+    @district.apply_network_stack
+    render status: 202, nothing: true
+  end
+
   def destroy
     @district.destroy!
     render status: 204, nothing: true
@@ -54,14 +59,7 @@ class DistrictsController < ApplicationController
   def create_params
     params.permit(
       :name,
-      :vpc_id,
-      :public_elb_security_group,
-      :private_elb_security_group,
-      :instance_security_group,
-      :ecs_service_role,
-      :ecs_instance_role,
-      :private_hosted_zone_id,
-      :s3_bucket_name,
+      :bastion_key_pair,
       :aws_access_key_id,
       :aws_secret_access_key
     ).tap do |whitelisted|
