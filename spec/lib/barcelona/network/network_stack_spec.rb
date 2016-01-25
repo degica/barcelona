@@ -147,6 +147,98 @@ describe Barcelona::Network::NetworkStack do
                       "Tags" => [
                         {"Key" => "Name",
                          "Value" => {"Fn::Join" => ["-", [{"Ref" => "AWS::StackName"}, "bastion"]]}}]}},
+                  "ECSInstanceProfile" => {
+                    "Type"=>"AWS::IAM::InstanceProfile",
+                    "Properties" => {
+                      "Path" => "/",
+                      "Roles" => [{"Ref"=>"ECSInstanceRole"}]
+                    }
+                  },
+                  "ECSInstanceRole" => {
+                    "Type"=>"AWS::IAM::Role",
+                    "Properties" => {
+                      "AssumeRolePolicyDocument" => {
+                        "Version"=>"2012-10-17",
+                        "Statement" => [
+                          {
+                            "Effect"=>"Allow",
+                            "Principal" => {"Service"=>["ec2.amazonaws.com"]},
+                            "Action"=>["sts:AssumeRole"]
+                          }
+                        ]
+                      },
+                      "Path"=>"/",
+                      "Policies" => [
+                        {
+                          "PolicyName" => "barcelona-ecs-container-instance-role",
+                          "PolicyDocument" => {
+                            "Version" => "2012-10-17",
+                            "Statement" => [
+                              {
+                                "Effect"=>"Allow",
+                                "Action" => [
+                                  "ec2:AssociateAddress",
+                                  "ec2:TerminateInstances",
+                                  "ec2:DescribeInstances",
+                                  "ecs:CreateCluster",
+                                  "ecs:DeregisterContainerInstance",
+                                  "ecs:DiscoverPollEndpoint",
+                                  "ecs:Poll",
+                                  "ecs:RegisterContainerInstance",
+                                  "ecs:StartTelemetrySession",
+                                  "ecs:Submit*",
+                                  "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
+                                  "elasticloadbalancing:DescribeLoadBalancers",
+                                  "s3:Get*",
+                                  "s3:List*"
+                                ],
+                                "Resource"=>["*"]
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "ECSServiceRole" => {
+                    "Type"=>"AWS::IAM::Role",
+                    "Properties" => {
+                      "AssumeRolePolicyDocument" => {
+                        "Version" => "2012-10-17",
+                        "Statement" => [
+                          {
+                            "Effect"=>"Allow",
+                            "Principal" => {
+                              "Service" => ["ec2.amazonaws.com"]
+                            },
+                            "Action" => ["sts:AssumeRole"]
+                          }
+                        ]
+                      },
+                      "Path" => "/",
+                      "Policies" => [
+                        {
+                          "PolicyName" => "barcelona-ecs-container-instance-role",
+                          "PolicyDocument" => {
+                            "Version"=>"2012-10-17",
+                            "Statement" => [
+                              {
+                                "Effect"=>"Allow",
+                                "Action"=>[
+                                  "elasticloadbalancing:Describe*",
+                                  "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
+                                  "elasticloadbalancing:RegisterInstancesWithLoadBalancer",
+                                  "ec2:Describe*",
+                                  "ec2:AuthorizeSecurityGroupIngress"
+                                ],
+                                "Resource"=>["*"]
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  },
                   "RouteTableDmz" => {
                     "Type" => "AWS::EC2::RouteTable",
                     "Properties" => {

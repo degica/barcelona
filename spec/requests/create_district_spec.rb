@@ -7,8 +7,7 @@ describe "POST /districts", type: :request do
     {
       name: "district",
       aws_access_key_id: "awsaccessskeyid",
-      aws_secret_access_key: "secret key",
-      s3_bucket_name: "degica-barcelona"
+      aws_secret_access_key: "secret key"
     }
   end
 
