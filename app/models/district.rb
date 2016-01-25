@@ -135,6 +135,10 @@ class District < ActiveRecord::Base
     stack_executor.delete
   end
 
+  def stack_status
+    stack_executor.stack_status
+  end
+
   private
 
   def set_default_attributes
