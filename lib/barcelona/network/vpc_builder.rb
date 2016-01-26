@@ -39,10 +39,14 @@ module Barcelona
 
         case options[:nat_type]
         when :managed_gateway then
-          add_builder NatBuilder.new(route_table_logical_id: "RouteTableTrusted1")
+          add_builder NatBuilder.new(
+                        nat_id: "1",
+                        route_table_logical_ids: ["RouteTableTrusted1", "RouteTableTrusted2"])
         when :managed_gateway_multi_az then
           2.times do |az_index|
-            add_builder NatBuilder.new(route_table_logical_id: "RouteTableTrusted#{az_index}")
+            add_builder NatBuilder.new(
+                          nat_id: az_index.to_s,
+                          route_table_logical_ids: ["RouteTableTrusted#{az_index}"])
           end
         when nil then
         # Do not create NAT and route
