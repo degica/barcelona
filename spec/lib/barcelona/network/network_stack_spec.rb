@@ -239,7 +239,7 @@ describe Barcelona::Network::NetworkStack do
           ]
         }
       },
-      "RouteTableDmz" => {
+      "RouteTableDmz1" => {
         "Type" => "AWS::EC2::RouteTable",
         "Properties" => {
           "VpcId" => {"Ref" => "VPC"},
@@ -247,14 +247,14 @@ describe Barcelona::Network::NetworkStack do
             {"Key" => "Name", "Value" => {"Fn::Join" => ["-", [{"Ref" => "AWS::StackName"}, "public"]]}},
             {"Key" => "Application", "Value" => {"Ref" => "AWS::StackName"}},
             {"Key" => "Network", "Value" => "Public"}]}},
-      "RouteDmz" => {
+      "RouteDmz1" => {
         "Type" => "AWS::EC2::Route",
         "DependsOn" => ["VPCGatewayAttachment"],
         "Properties" => {
-          "RouteTableId" => {"Ref" => "RouteTableDmz"},
+          "RouteTableId" => {"Ref" => "RouteTableDmz1"},
           "DestinationCidrBlock" => "0.0.0.0/0",
           "GatewayId" => {"Ref" => "InternetGateway"}}},
-      "NetworkAclDmz" => {
+      "NetworkAclDmz1" => {
         "Type" => "AWS::EC2::NetworkAcl",
         "Properties" => {
           "VpcId" => {"Ref" => "VPC"},
@@ -262,80 +262,80 @@ describe Barcelona::Network::NetworkStack do
             {"Key" => "Name", "Value" => {"Fn::Join" => ["-", [{"Ref" => "AWS::StackName"}, "public"]]}},
             {"Key" => "Application", "Value" => {"Ref" => "AWS::StackName"}},
             {"Key" => "Network", "Value" => "Public"}]}},
-      "InboundNetworkAclEntryDmz0" => {
+      "InboundNetworkAclEntryDmz10" => {
         "Type" => "AWS::EC2::NetworkAclEntry",
         "Properties" => {
-          "NetworkAclId" => {"Ref" => "NetworkAclDmz"},
+          "NetworkAclId" => {"Ref" => "NetworkAclDmz1"},
           "RuleNumber" => 100,
           "RuleAction" => "allow",
           "Egress" => false,
           "CidrBlock" => "0.0.0.0/0",
           "PortRange" => {"From" => 22, "To" => 22},
           "Protocol" => 6}},
-      "InboundNetworkAclEntryDmz1" => {
+      "InboundNetworkAclEntryDmz11" => {
         "Type" => "AWS::EC2::NetworkAclEntry",
         "Properties" => {
-          "NetworkAclId" => {"Ref" => "NetworkAclDmz"},
+          "NetworkAclId" => {"Ref" => "NetworkAclDmz1"},
           "RuleNumber" => 101,
           "RuleAction" => "allow",
           "Egress" => false,
           "CidrBlock" => "0.0.0.0/0",
           "PortRange" => {"From" => 80, "To" => 80},
           "Protocol" => 6}},
-      "InboundNetworkAclEntryDmz2" => {
+      "InboundNetworkAclEntryDmz12" => {
         "Type" => "AWS::EC2::NetworkAclEntry",
         "Properties" => {
-          "NetworkAclId" => {"Ref" => "NetworkAclDmz"},
+          "NetworkAclId" => {"Ref" => "NetworkAclDmz1"},
           "RuleNumber" => 102,
           "RuleAction" => "allow",
           "Egress" => false,
           "CidrBlock" => "0.0.0.0/0",
           "PortRange" => {"From" => 443, "To" => 443},
           "Protocol" => 6}},
-      "InboundNetworkAclEntryDmz3" => {
+      "InboundNetworkAclEntryDmz13" => {
         "Type" => "AWS::EC2::NetworkAclEntry",
         "Properties" => {
-          "NetworkAclId" => {"Ref" => "NetworkAclDmz"},
+          "NetworkAclId" => {"Ref" => "NetworkAclDmz1"},
           "RuleNumber" => 103,
           "RuleAction" => "allow",
           "Egress" => false,
           "CidrBlock" => "0.0.0.0/0",
           "PortRange" => {"From" => 1024, "To" => 65535},
           "Protocol" => 6}},
-      "InboundNetworkAclEntryDmz4" => {
+      "InboundNetworkAclEntryDmz14" => {
         "Type" => "AWS::EC2::NetworkAclEntry",
         "Properties" => {
-          "NetworkAclId" => {"Ref" => "NetworkAclDmz"},
+          "NetworkAclId" => {"Ref" => "NetworkAclDmz1"},
           "RuleNumber" => 104,
           "RuleAction" => "allow",
           "Egress" => false,
           "CidrBlock" => "0.0.0.0/0",
           "PortRange" => {"From" => 1024, "To" => 65535},
           "Protocol" => 17}},
-      "InboundNetworkAclEntryDmz5" => {
+      "InboundNetworkAclEntryDmz15" => {
         "Type" => "AWS::EC2::NetworkAclEntry",
         "Properties" => {
-          "NetworkAclId" => {"Ref" => "NetworkAclDmz"},
+          "NetworkAclId" => {"Ref" => "NetworkAclDmz1"},
           "RuleNumber" => 105,
           "RuleAction" => "allow",
           "Egress" => false,
           "CidrBlock" => "0.0.0.0/0",
           "PortRange" => {"From" => 123, "To" => 123},
           "Protocol" => 17}},
-      "InboundNetworkAclEntryDmzICMP" => {
+      "InboundNetworkAclEntryDmz1ICMP" => {
         "Type" => "AWS::EC2::NetworkAclEntry",
         "Properties" => {
-          "NetworkAclId" => {"Ref" => "NetworkAclDmz"},
+          "NetworkAclId" => {"Ref" => "NetworkAclDmz1"},
           "RuleNumber" => 200,
           "RuleAction" => "allow",
           "Egress" => false,
           "CidrBlock" => "0.0.0.0/0",
           "Icmp" => {"Type" => -1, "Code" => -1},
           "Protocol" => 1}},
-      "OutboundNetworkAclEntryDmz" => {
+      "OutboundNetworkAclEntryDmz1" => {
         "Type" => "AWS::EC2::NetworkAclEntry",
         "Properties" => {
-          "NetworkAclId" => {"Ref" => "NetworkAclDmz"},
+          "NetworkAclId" => {"Ref" => "NetworkAclDmz1"},
           "RuleNumber" => 100,
           "Protocol" => -1,
           "RuleAction" => "allow",
@@ -351,18 +351,121 @@ describe Barcelona::Network::NetworkStack do
           {"Fn::Select" => [0, {"Fn::GetAZs" => {"Ref" => "AWS::Region"}}]},
           "Tags" => [
             {"Key" => "Name",
-             "Value" => {"Fn::Join" => ["-", [{"Ref" => "AWS::StackName"}, "Dmz"]]}},
+             "Value" => {"Fn::Join" => ["-", [{"Ref" => "AWS::StackName"}, "Dmz1"]]}},
             {"Key" => "Application", "Value" => {"Ref" => "AWS::StackName"}},
             {"Key" => "Network", "Value" => "Public"}]}},
       "SubnetRouteTableAssociationDmz1" => {
         "Type" => "AWS::EC2::SubnetRouteTableAssociation",
         "Properties" => {
           "SubnetId" => {"Ref" => "SubnetDmz1"},
-          "RouteTableId" => {"Ref" => "RouteTableDmz"}}},
+          "RouteTableId" => {"Ref" => "RouteTableDmz1"}}},
       "SubnetNetworkAclAssociationDmz1" => {
         "Type" => "AWS::EC2::SubnetNetworkAclAssociation",
         "Properties" => {"SubnetId" => {"Ref" => "SubnetDmz1"},
-                         "NetworkAclId" => {"Ref" => "NetworkAclDmz"}}},
+                         "NetworkAclId" => {"Ref" => "NetworkAclDmz1"}}},
+      "RouteTableDmz2" => {
+        "Type" => "AWS::EC2::RouteTable",
+        "Properties" => {
+          "VpcId" => {"Ref" => "VPC"},
+          "Tags" => [
+            {"Key" => "Name", "Value" => {"Fn::Join" => ["-", [{"Ref" => "AWS::StackName"}, "public"]]}},
+            {"Key" => "Application", "Value" => {"Ref" => "AWS::StackName"}},
+            {"Key" => "Network", "Value" => "Public"}]}},
+      "RouteDmz2" => {
+        "Type" => "AWS::EC2::Route",
+        "DependsOn" => ["VPCGatewayAttachment"],
+        "Properties" => {
+          "RouteTableId" => {"Ref" => "RouteTableDmz2"},
+          "DestinationCidrBlock" => "0.0.0.0/0",
+          "GatewayId" => {"Ref" => "InternetGateway"}}},
+      "NetworkAclDmz2" => {
+        "Type" => "AWS::EC2::NetworkAcl",
+        "Properties" => {
+          "VpcId" => {"Ref" => "VPC"},
+          "Tags" => [
+            {"Key" => "Name", "Value" => {"Fn::Join" => ["-", [{"Ref" => "AWS::StackName"}, "public"]]}},
+            {"Key" => "Application", "Value" => {"Ref" => "AWS::StackName"}},
+            {"Key" => "Network", "Value" => "Public"}]}},
+      "InboundNetworkAclEntryDmz20" => {
+        "Type" => "AWS::EC2::NetworkAclEntry",
+        "Properties" => {
+          "NetworkAclId" => {"Ref" => "NetworkAclDmz2"},
+          "RuleNumber" => 100,
+          "RuleAction" => "allow",
+          "Egress" => false,
+          "CidrBlock" => "0.0.0.0/0",
+          "PortRange" => {"From" => 22, "To" => 22},
+          "Protocol" => 6}},
+      "InboundNetworkAclEntryDmz21" => {
+        "Type" => "AWS::EC2::NetworkAclEntry",
+        "Properties" => {
+          "NetworkAclId" => {"Ref" => "NetworkAclDmz2"},
+          "RuleNumber" => 101,
+          "RuleAction" => "allow",
+          "Egress" => false,
+          "CidrBlock" => "0.0.0.0/0",
+          "PortRange" => {"From" => 80, "To" => 80},
+          "Protocol" => 6}},
+      "InboundNetworkAclEntryDmz22" => {
+        "Type" => "AWS::EC2::NetworkAclEntry",
+        "Properties" => {
+          "NetworkAclId" => {"Ref" => "NetworkAclDmz2"},
+          "RuleNumber" => 102,
+          "RuleAction" => "allow",
+          "Egress" => false,
+          "CidrBlock" => "0.0.0.0/0",
+          "PortRange" => {"From" => 443, "To" => 443},
+          "Protocol" => 6}},
+      "InboundNetworkAclEntryDmz23" => {
+        "Type" => "AWS::EC2::NetworkAclEntry",
+        "Properties" => {
+          "NetworkAclId" => {"Ref" => "NetworkAclDmz2"},
+          "RuleNumber" => 103,
+          "RuleAction" => "allow",
+          "Egress" => false,
+          "CidrBlock" => "0.0.0.0/0",
+          "PortRange" => {"From" => 1024, "To" => 65535},
+          "Protocol" => 6}},
+      "InboundNetworkAclEntryDmz24" => {
+        "Type" => "AWS::EC2::NetworkAclEntry",
+        "Properties" => {
+          "NetworkAclId" => {"Ref" => "NetworkAclDmz2"},
+          "RuleNumber" => 104,
+          "RuleAction" => "allow",
+          "Egress" => false,
+          "CidrBlock" => "0.0.0.0/0",
+          "PortRange" => {"From" => 1024, "To" => 65535},
+          "Protocol" => 17}},
+      "InboundNetworkAclEntryDmz25" => {
+        "Type" => "AWS::EC2::NetworkAclEntry",
+        "Properties" => {
+          "NetworkAclId" => {"Ref" => "NetworkAclDmz2"},
+          "RuleNumber" => 105,
+          "RuleAction" => "allow",
+          "Egress" => false,
+          "CidrBlock" => "0.0.0.0/0",
+          "PortRange" => {"From" => 123, "To" => 123},
+          "Protocol" => 17}},
+      "InboundNetworkAclEntryDmz2ICMP" => {
+        "Type" => "AWS::EC2::NetworkAclEntry",
+        "Properties" => {
+          "NetworkAclId" => {"Ref" => "NetworkAclDmz2"},
+          "RuleNumber" => 200,
+          "RuleAction" => "allow",
+          "Egress" => false,
+          "CidrBlock" => "0.0.0.0/0",
+          "Icmp" => {"Type" => -1, "Code" => -1},
+          "Protocol" => 1}},
+      "OutboundNetworkAclEntryDmz2" => {
+        "Type" => "AWS::EC2::NetworkAclEntry",
+        "Properties" => {
+          "NetworkAclId" => {"Ref" => "NetworkAclDmz2"},
+          "RuleNumber" => 100,
+          "Protocol" => -1,
+          "RuleAction" => "allow",
+          "Egress" => true,
+          "CidrBlock" => "0.0.0.0/0",
+          "PortRange" => {"From" => 0, "To" => 65535}}},
       "SubnetDmz2" => {
         "Type" => "AWS::EC2::Subnet",
         "Properties" => {
@@ -370,20 +473,20 @@ describe Barcelona::Network::NetworkStack do
           "CidrBlock" => "10.0.130.0/24",
           "AvailabilityZone" => {"Fn::Select" => [1, {"Fn::GetAZs" => {"Ref" => "AWS::Region"}}]},
           "Tags" => [
-            {"Key" => "Name", "Value" => {"Fn::Join" => ["-", [{"Ref" => "AWS::StackName"}, "Dmz"]]}},
+            {"Key" => "Name", "Value" => {"Fn::Join" => ["-", [{"Ref" => "AWS::StackName"}, "Dmz2"]]}},
             {"Key" => "Application", "Value" => {"Ref" => "AWS::StackName"}},
             {"Key" => "Network", "Value" => "Public"}]}},
       "SubnetRouteTableAssociationDmz2" => {
         "Type" => "AWS::EC2::SubnetRouteTableAssociation",
         "Properties" => {
           "SubnetId" => {"Ref" => "SubnetDmz2"},
-          "RouteTableId" => {"Ref" => "RouteTableDmz"}}},
+          "RouteTableId" => {"Ref" => "RouteTableDmz2"}}},
       "SubnetNetworkAclAssociationDmz2" => {
         "Type" => "AWS::EC2::SubnetNetworkAclAssociation",
         "Properties" => {
           "SubnetId" => {"Ref" => "SubnetDmz2"},
-          "NetworkAclId" => {"Ref" => "NetworkAclDmz"}}},
-      "RouteTableTrusted" => {
+          "NetworkAclId" => {"Ref" => "NetworkAclDmz2"}}},
+      "RouteTableTrusted1" => {
         "Type" => "AWS::EC2::RouteTable",
         "Properties" => {
           "VpcId" => {"Ref" => "VPC"},
@@ -391,7 +494,7 @@ describe Barcelona::Network::NetworkStack do
             {"Key" => "Name", "Value" => {"Fn::Join" => ["-", [{"Ref" => "AWS::StackName"}, "private"]]}},
             {"Key" => "Application", "Value" => {"Ref" => "AWS::StackName"}},
             {"Key" => "Network", "Value" => "Private"}]}},
-      "NetworkAclTrusted" => {
+      "NetworkAclTrusted1" => {
         "Type" => "AWS::EC2::NetworkAcl",
         "Properties" => {
           "VpcId" => {"Ref" => "VPC"},
@@ -399,80 +502,80 @@ describe Barcelona::Network::NetworkStack do
             {"Key" => "Name", "Value" => {"Fn::Join" => ["-", [{"Ref" => "AWS::StackName"}, "private"]]}},
             {"Key" => "Application", "Value" => {"Ref" => "AWS::StackName"}},
             {"Key" => "Network", "Value" => "Private"}]}},
-      "InboundNetworkAclEntryTrusted0" => {
+      "InboundNetworkAclEntryTrusted10" => {
         "Type" => "AWS::EC2::NetworkAclEntry",
         "Properties" => {
-          "NetworkAclId" => {"Ref" => "NetworkAclTrusted"},
+          "NetworkAclId" => {"Ref" => "NetworkAclTrusted1"},
           "RuleNumber" => 100,
           "RuleAction" => "allow",
           "Egress" => false,
           "CidrBlock" => "10.0.0.0/8",
           "PortRange" => {"From" => 22, "To" => 22},
           "Protocol" => 6}},
-      "InboundNetworkAclEntryTrusted1" => {
+      "InboundNetworkAclEntryTrusted11" => {
         "Type" => "AWS::EC2::NetworkAclEntry",
         "Properties" => {
-          "NetworkAclId" => {"Ref" => "NetworkAclTrusted"},
+          "NetworkAclId" => {"Ref" => "NetworkAclTrusted1"},
           "RuleNumber" => 101,
           "RuleAction" => "allow",
           "Egress" => false,
           "CidrBlock" => "0.0.0.0/0",
           "PortRange" => {"From" => 80, "To" => 80},
           "Protocol" => 6}},
-      "InboundNetworkAclEntryTrusted2" => {
+      "InboundNetworkAclEntryTrusted12" => {
         "Type" => "AWS::EC2::NetworkAclEntry",
         "Properties" => {
-          "NetworkAclId" => {"Ref" => "NetworkAclTrusted"},
+          "NetworkAclId" => {"Ref" => "NetworkAclTrusted1"},
           "RuleNumber" => 102,
           "RuleAction" => "allow",
           "Egress" => false,
           "CidrBlock" => "0.0.0.0/0",
           "PortRange" => {"From" => 443, "To" => 443},
           "Protocol" => 6}},
-      "InboundNetworkAclEntryTrusted3" => {
+      "InboundNetworkAclEntryTrusted13" => {
         "Type" => "AWS::EC2::NetworkAclEntry",
         "Properties" => {
-          "NetworkAclId" => {"Ref" => "NetworkAclTrusted"},
+          "NetworkAclId" => {"Ref" => "NetworkAclTrusted1"},
           "RuleNumber" => 103,
           "RuleAction" => "allow",
           "Egress" => false,
           "CidrBlock" => "0.0.0.0/0",
           "PortRange" => {"From" => 1024, "To" => 65535},
           "Protocol" => 6}},
-      "InboundNetworkAclEntryTrusted4" => {
+      "InboundNetworkAclEntryTrusted14" => {
         "Type" => "AWS::EC2::NetworkAclEntry",
         "Properties" => {
-          "NetworkAclId" => {"Ref" => "NetworkAclTrusted"},
+          "NetworkAclId" => {"Ref" => "NetworkAclTrusted1"},
           "RuleNumber" => 104,
           "RuleAction" => "allow",
           "Egress" => false,
           "CidrBlock" => "0.0.0.0/0",
           "PortRange" => {"From" => 1024, "To" => 65535},
           "Protocol" => 17}},
-      "InboundNetworkAclEntryTrusted5" => {
+      "InboundNetworkAclEntryTrusted15" => {
         "Type" => "AWS::EC2::NetworkAclEntry",
         "Properties" => {
-          "NetworkAclId" => {"Ref" => "NetworkAclTrusted"},
+          "NetworkAclId" => {"Ref" => "NetworkAclTrusted1"},
           "RuleNumber" => 105,
           "RuleAction" => "allow",
           "Egress" => false,
           "CidrBlock" => "0.0.0.0/0",
           "PortRange" => {"From" => 123, "To" => 123},
           "Protocol" => 17}},
-      "InboundNetworkAclEntryTrustedICMP" => {
+      "InboundNetworkAclEntryTrusted1ICMP" => {
         "Type" => "AWS::EC2::NetworkAclEntry",
         "Properties" => {
-          "NetworkAclId" => {"Ref" => "NetworkAclTrusted"},
+          "NetworkAclId" => {"Ref" => "NetworkAclTrusted1"},
           "RuleNumber" => 200,
           "RuleAction" => "allow",
           "Egress" => false,
           "CidrBlock" => "0.0.0.0/0",
           "Icmp" => {"Type" => -1, "Code" => -1},
           "Protocol" => 1}},
-      "OutboundNetworkAclEntryTrusted" => {
+      "OutboundNetworkAclEntryTrusted1" => {
         "Type" => "AWS::EC2::NetworkAclEntry",
         "Properties" => {
-          "NetworkAclId" => {"Ref" => "NetworkAclTrusted"},
+          "NetworkAclId" => {"Ref" => "NetworkAclTrusted1"},
           "RuleNumber" => 100,
           "Protocol" => -1,
           "RuleAction" => "allow",
@@ -486,19 +589,115 @@ describe Barcelona::Network::NetworkStack do
           "CidrBlock" => "10.0.1.0/24",
           "AvailabilityZone" => {"Fn::Select" => [0, {"Fn::GetAZs" => {"Ref" => "AWS::Region"}}]},
           "Tags" => [
-            {"Key" => "Name", "Value" => {"Fn::Join" => ["-", [{"Ref" => "AWS::StackName"}, "Trusted"]]}},
+            {"Key" => "Name", "Value" => {"Fn::Join" => ["-", [{"Ref" => "AWS::StackName"}, "Trusted1"]]}},
             {"Key" => "Application", "Value" => {"Ref" => "AWS::StackName"}},
             {"Key" => "Network", "Value" => "Private"}]}},
       "SubnetRouteTableAssociationTrusted1" => {
         "Type" => "AWS::EC2::SubnetRouteTableAssociation",
         "Properties" => {
           "SubnetId" => {"Ref" => "SubnetTrusted1"},
-          "RouteTableId" => {"Ref" => "RouteTableTrusted"}}},
+          "RouteTableId" => {"Ref" => "RouteTableTrusted1"}}},
       "SubnetNetworkAclAssociationTrusted1" => {
         "Type" => "AWS::EC2::SubnetNetworkAclAssociation",
         "Properties" => {
           "SubnetId" => {"Ref" => "SubnetTrusted1"},
-          "NetworkAclId" => {"Ref" => "NetworkAclTrusted"}}},
+          "NetworkAclId" => {"Ref" => "NetworkAclTrusted1"}}},
+      "RouteTableTrusted2" => {
+        "Type" => "AWS::EC2::RouteTable",
+        "Properties" => {
+          "VpcId" => {"Ref" => "VPC"},
+          "Tags" => [
+            {"Key" => "Name", "Value" => {"Fn::Join" => ["-", [{"Ref" => "AWS::StackName"}, "private"]]}},
+            {"Key" => "Application", "Value" => {"Ref" => "AWS::StackName"}},
+            {"Key" => "Network", "Value" => "Private"}]}},
+      "NetworkAclTrusted2" => {
+        "Type" => "AWS::EC2::NetworkAcl",
+        "Properties" => {
+          "VpcId" => {"Ref" => "VPC"},
+          "Tags" => [
+            {"Key" => "Name", "Value" => {"Fn::Join" => ["-", [{"Ref" => "AWS::StackName"}, "private"]]}},
+            {"Key" => "Application", "Value" => {"Ref" => "AWS::StackName"}},
+            {"Key" => "Network", "Value" => "Private"}]}},
+      "InboundNetworkAclEntryTrusted20" => {
+        "Type" => "AWS::EC2::NetworkAclEntry",
+        "Properties" => {
+          "NetworkAclId" => {"Ref" => "NetworkAclTrusted2"},
+          "RuleNumber" => 100,
+          "RuleAction" => "allow",
+          "Egress" => false,
+          "CidrBlock" => "10.0.0.0/8",
+          "PortRange" => {"From" => 22, "To" => 22},
+          "Protocol" => 6}},
+      "InboundNetworkAclEntryTrusted21" => {
+        "Type" => "AWS::EC2::NetworkAclEntry",
+        "Properties" => {
+          "NetworkAclId" => {"Ref" => "NetworkAclTrusted2"},
+          "RuleNumber" => 101,
+          "RuleAction" => "allow",
+          "Egress" => false,
+          "CidrBlock" => "0.0.0.0/0",
+          "PortRange" => {"From" => 80, "To" => 80},
+          "Protocol" => 6}},
+      "InboundNetworkAclEntryTrusted22" => {
+        "Type" => "AWS::EC2::NetworkAclEntry",
+        "Properties" => {
+          "NetworkAclId" => {"Ref" => "NetworkAclTrusted2"},
+          "RuleNumber" => 102,
+          "RuleAction" => "allow",
+          "Egress" => false,
+          "CidrBlock" => "0.0.0.0/0",
+          "PortRange" => {"From" => 443, "To" => 443},
+          "Protocol" => 6}},
+      "InboundNetworkAclEntryTrusted23" => {
+        "Type" => "AWS::EC2::NetworkAclEntry",
+        "Properties" => {
+          "NetworkAclId" => {"Ref" => "NetworkAclTrusted2"},
+          "RuleNumber" => 103,
+          "RuleAction" => "allow",
+          "Egress" => false,
+          "CidrBlock" => "0.0.0.0/0",
+          "PortRange" => {"From" => 1024, "To" => 65535},
+          "Protocol" => 6}},
+      "InboundNetworkAclEntryTrusted24" => {
+        "Type" => "AWS::EC2::NetworkAclEntry",
+        "Properties" => {
+          "NetworkAclId" => {"Ref" => "NetworkAclTrusted2"},
+          "RuleNumber" => 104,
+          "RuleAction" => "allow",
+          "Egress" => false,
+          "CidrBlock" => "0.0.0.0/0",
+          "PortRange" => {"From" => 1024, "To" => 65535},
+          "Protocol" => 17}},
+      "InboundNetworkAclEntryTrusted25" => {
+        "Type" => "AWS::EC2::NetworkAclEntry",
+        "Properties" => {
+          "NetworkAclId" => {"Ref" => "NetworkAclTrusted2"},
+          "RuleNumber" => 105,
+          "RuleAction" => "allow",
+          "Egress" => false,
+          "CidrBlock" => "0.0.0.0/0",
+          "PortRange" => {"From" => 123, "To" => 123},
+          "Protocol" => 17}},
+      "InboundNetworkAclEntryTrusted2ICMP" => {
+        "Type" => "AWS::EC2::NetworkAclEntry",
+        "Properties" => {
+          "NetworkAclId" => {"Ref" => "NetworkAclTrusted2"},
+          "RuleNumber" => 200,
+          "RuleAction" => "allow",
+          "Egress" => false,
+          "CidrBlock" => "0.0.0.0/0",
+          "Icmp" => {"Type" => -1, "Code" => -1},
+          "Protocol" => 1}},
+      "OutboundNetworkAclEntryTrusted2" => {
+        "Type" => "AWS::EC2::NetworkAclEntry",
+        "Properties" => {
+          "NetworkAclId" => {"Ref" => "NetworkAclTrusted2"},
+          "RuleNumber" => 100,
+          "Protocol" => -1,
+          "RuleAction" => "allow",
+          "Egress" => true,
+          "CidrBlock" => "0.0.0.0/0",
+          "PortRange" => {"From" => 0, "To" => 65535}}},
       "SubnetTrusted2" => {
         "Type" => "AWS::EC2::Subnet",
         "Properties" => {
@@ -507,19 +706,19 @@ describe Barcelona::Network::NetworkStack do
           "AvailabilityZone" => {
             "Fn::Select" => [1, {"Fn::GetAZs" => {"Ref" => "AWS::Region"}}]},
           "Tags" => [
-            {"Key" => "Name", "Value" => {"Fn::Join" => ["-", [{"Ref" => "AWS::StackName"}, "Trusted"]]}},
+            {"Key" => "Name", "Value" => {"Fn::Join" => ["-", [{"Ref" => "AWS::StackName"}, "Trusted2"]]}},
             {"Key" => "Application", "Value" => {"Ref" => "AWS::StackName"}},
             {"Key" => "Network", "Value" => "Private"}]}},
       "SubnetRouteTableAssociationTrusted2" => {
         "Type" => "AWS::EC2::SubnetRouteTableAssociation",
         "Properties" => {
           "SubnetId" => {"Ref" => "SubnetTrusted2"},
-          "RouteTableId" => {"Ref" => "RouteTableTrusted"}}},
+          "RouteTableId" => {"Ref" => "RouteTableTrusted2"}}},
       "SubnetNetworkAclAssociationTrusted2" => {
         "Type" => "AWS::EC2::SubnetNetworkAclAssociation",
         "Properties" => {
           "SubnetId" => {"Ref" => "SubnetTrusted2"},
-          "NetworkAclId" => {"Ref" => "NetworkAclTrusted"}}}}
+          "NetworkAclId" => {"Ref" => "NetworkAclTrusted2"}}}}
     expect(generated["Resources"]).to eq expected
   end
 end

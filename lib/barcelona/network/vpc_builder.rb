@@ -1,35 +1,54 @@
 module Barcelona
   module Network
     class VPCBuilder < CloudFormation::Builder
+      class UnsupportedNatType < StandardError; end
+
       def initialize(options)
         super
-        add_builder SubnetBuilder.new(
-                      name: 'dmz',
-                      vpc_cidr_block: options[:cidr_block],
-                      public: true,
-                      nat_type: nil,
-                      network_acl_entries: [
-                        {from: 22,   to: 22,    protocol: "tcp", cidr: "0.0.0.0/0"},
-                        {from: 80,   to: 80,    protocol: "tcp", cidr: "0.0.0.0/0"},
-                        {from: 443,  to: 443,   protocol: "tcp", cidr: "0.0.0.0/0"},
-                        {from: 1024, to: 65535, protocol: "tcp", cidr: "0.0.0.0/0"},
-                        {from: 1024, to: 65535, protocol: "udp", cidr: "0.0.0.0/0"},
-                        {from: 123,  to: 123,   protocol: "udp", cidr: "0.0.0.0/0"}
-                      ]
-                    )
-        add_builder SubnetBuilder.new(
-                      name: 'trusted',
-                      vpc_cidr_block: options[:cidr_block],
-                      public: false,
-                      network_acl_entries: [
-                        {from: 22,   to: 22,    protocol: "tcp", cidr: "10.0.0.0/8"},
-                        {from: 80,   to: 80,    protocol: "tcp", cidr: "0.0.0.0/0"},
-                        {from: 443,  to: 443,   protocol: "tcp", cidr: "0.0.0.0/0"},
-                        {from: 1024, to: 65535, protocol: "tcp", cidr: "0.0.0.0/0"},
-                        {from: 1024, to: 65535, protocol: "udp", cidr: "0.0.0.0/0"},
-                        {from: 123,  to: 123,   protocol: "udp", cidr: "0.0.0.0/0"}
-                      ]
-                    )
+        2.times do |az_index|
+          add_builder SubnetBuilder.new(
+                        name: 'dmz',
+                        vpc_cidr_block: options[:cidr_block],
+                        public: true,
+                        az_index: az_index,
+                        nat_type: nil,
+                        network_acl_entries: [
+                          {from: 22,   to: 22,    protocol: "tcp", cidr: "0.0.0.0/0"},
+                          {from: 80,   to: 80,    protocol: "tcp", cidr: "0.0.0.0/0"},
+                          {from: 443,  to: 443,   protocol: "tcp", cidr: "0.0.0.0/0"},
+                          {from: 1024, to: 65535, protocol: "tcp", cidr: "0.0.0.0/0"},
+                          {from: 1024, to: 65535, protocol: "udp", cidr: "0.0.0.0/0"},
+                          {from: 123,  to: 123,   protocol: "udp", cidr: "0.0.0.0/0"}
+                        ]
+                      )
+          add_builder SubnetBuilder.new(
+                        name: 'trusted',
+                        vpc_cidr_block: options[:cidr_block],
+                        public: false,
+                        az_index: az_index,
+                        network_acl_entries: [
+                          {from: 22,   to: 22,    protocol: "tcp", cidr: "10.0.0.0/8"},
+                          {from: 80,   to: 80,    protocol: "tcp", cidr: "0.0.0.0/0"},
+                          {from: 443,  to: 443,   protocol: "tcp", cidr: "0.0.0.0/0"},
+                          {from: 1024, to: 65535, protocol: "tcp", cidr: "0.0.0.0/0"},
+                          {from: 1024, to: 65535, protocol: "udp", cidr: "0.0.0.0/0"},
+                          {from: 123,  to: 123,   protocol: "udp", cidr: "0.0.0.0/0"}
+                        ]
+                      )
+        end
+
+        case options[:nat_type]
+        when :managed_gateway then
+          add_builder NatBuilder.new(route_table_logical_id: "RouteTableTrusted1")
+        when :managed_gateway_multi_az then
+          2.times do |az_index|
+            add_builder NatBuilder.new(route_table_logical_id: "RouteTableTrusted#{az_index}")
+          end
+        when nil then
+        # Do not create NAT and route
+        else
+          raise UnsupportedNatType
+        end
       end
 
       def build_resources
