@@ -26,48 +26,6 @@ module Barcelona
             j.DestinationCidrBlock "0.0.0.0/0"
             j.GatewayId ref("InternetGateway")
           end
-
-          if nat_type == 'instance'
-            add_resource("AWS::EC2::SecurityGroup", "SecurityGroupNAT") do |j|
-              j.GroupDescription "Security Group for NAT instances"
-              j.VpcId ref("VPC")
-              j.SecurityGroupIngress [
-                {
-                  "IpProtocol" => -1,
-                  "FromPort" => -1,
-                  "ToPort" => -1,
-                  "CidrIp" => vpc_cidr_block
-                }
-              ]
-            end
-
-            add_resource("AWS::EC2::Instance", "NATInstance",
-                         depends_on: ["VPCGatewayAttachment"]) do |j|
-              j.InstanceType "t2.micro"
-              j.SourceDestCheck false
-              j.ImageId "ami-03cf3903"
-              j.KeyName options.dig(:nat, :key_name)
-              j.NetworkInterfaces [
-                {
-                  "AssociatePublicIpAddress" => true,
-                  DeviceIndex => 0,
-                  SubnetId => ref("#{subnet_base_name}1"),
-                  GroupSet => [ref("SecurityGroupNAT")]
-                }
-              ]
-              j.Tags [
-                tag("Application", cf_stack_name)
-              ]
-            end
-          end
-        else
-          if nat_type
-            add_resource("AWS::EC2::Route", "RouteNAT") do |j|
-              j.RouteTableId ref(route_table_name)
-              j.DestinationCidrBlock "0.0.0.0"
-              j.InstanceId ref("NATInstance")
-            end
-          end
         end
 
         add_resource("AWS::EC2::NetworkAcl", network_acl_name) do |j|
@@ -124,30 +82,27 @@ module Barcelona
           end
         end
 
-        2.times do |i|
-          subnet_name = "#{subnet_base_name}#{i + 1}"
-          add_resource("AWS::EC2::Subnet", subnet_name) do |j|
-            j.VpcId ref("VPC")
-            j.CidrBlock subnet_cidr_block(i + 1)
-            j.AvailabilityZone select(i, azs)
-            j.Tags [
-              tag("Name", join("-", cf_stack_name, name.camelize)),
-              tag("Application", cf_stack_name),
-              tag("Network", network_type.camelize)
-            ]
-          end
+        add_resource("AWS::EC2::Subnet", subnet_name) do |j|
+          j.VpcId ref("VPC")
+          j.CidrBlock subnet_cidr_block
+          j.AvailabilityZone select(az_index, azs)
+          j.Tags [
+            tag("Name", join("-", cf_stack_name, name.camelize)),
+            tag("Application", cf_stack_name),
+            tag("Network", network_type.camelize)
+          ]
+        end
 
-          add_resource("AWS::EC2::SubnetRouteTableAssociation",
-                       "SubnetRouteTableAssociation#{name.camelize}#{i + 1}") do |j|
-            j.SubnetId ref(subnet_name)
-            j.RouteTableId ref(route_table_name)
-          end
+        add_resource("AWS::EC2::SubnetRouteTableAssociation",
+                     "SubnetRouteTableAssociation#{name.camelize}") do |j|
+          j.SubnetId ref(subnet_name)
+          j.RouteTableId ref(route_table_name)
+        end
 
-          add_resource("AWS::EC2::SubnetNetworkAclAssociation",
-                       "SubnetNetworkAclAssociation#{name.camelize}#{i + 1}") do |j|
-            j.SubnetId ref(subnet_name)
-            j.NetworkAclId ref(network_acl_name)
-          end
+        add_resource("AWS::EC2::SubnetNetworkAclAssociation",
+                     "SubnetNetworkAclAssociation#{name.camelize}") do |j|
+          j.SubnetId ref(subnet_name)
+          j.NetworkAclId ref(network_acl_name)
         end
       end
 
@@ -159,7 +114,7 @@ module Barcelona
         options[:network_acl_entries]
       end
 
-      def subnet_base_name
+      def subnet_name
         "Subnet#{name.camelize}"
       end
 
@@ -171,15 +126,19 @@ module Barcelona
         options[:vpc_cidr_block]
       end
 
-      def subnet_cidr_block(az_id)
+      def subnet_cidr_block
         base = public? ? 128 : 0 # 16th bit is public flag
-        base += az_id # 22-23th bits are AZ ID
+        base += options[:az_index] + 1 # 22-23th bits are AZ ID
         base = base << 8
         (IPAddr.new(vpc_cidr_block) | base).to_s + '/24'
       end
 
       def name
-        options[:name]
+        @name ||= options[:name] + (az_index + 1).to_s
+      end
+
+      def az_index
+        options[:az_index]
       end
 
       def network_type
