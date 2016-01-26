@@ -6,6 +6,7 @@ class District < ActiveRecord::Base
               :ecs_instance_profile, :ecs_service_role
 
   before_validation :set_default_attributes
+  before_create :assign_default_users
   after_create :create_s3_bucket
   after_create :create_ecs_cluster
   after_create :create_network_stack
@@ -193,5 +194,9 @@ class District < ActiveRecord::Base
     end
   rescue IPAddr::InvalidAddressError
     errors.add(:cidr_block, "is not a valid IPv4 format")
+  end
+
+  def assign_default_users
+    self.users = User.all
   end
 end
