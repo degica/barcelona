@@ -31,6 +31,17 @@ describe District do
     end
   end
 
+  describe "callbacks" do
+    it "assigns default users" do
+      user1 = User.create!(name: 'user1')
+      user2 = User.create!(name: 'user2')
+      district1 = District.create!(name: 'name')
+      district1.reload
+      expect(district1.users).to include(user1)
+      expect(district1.users).to include(user2)
+    end
+  end
+
   describe "#subnets" do
     it "returns private subnets" do
       expect(ec2_mock).to receive(:describe_subnets).with(
