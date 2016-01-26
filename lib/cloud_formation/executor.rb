@@ -45,7 +45,7 @@ module CloudFormation
       case stack_status
       when nil, "DELETE_COMPLETE" then
         create
-      when "CREATE_COMPLETE", "UPDATE_COMPLETE", "ROLLBACK_COMPLETE"
+      when "CREATE_COMPLETE", "UPDATE_COMPLETE", "ROLLBACK_COMPLETE", "UPDATE_ROLLBACK_COMPLETE"
         update
       else
         raise "Applying stack template in progress"
