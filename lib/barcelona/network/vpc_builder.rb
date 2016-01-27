@@ -7,46 +7,60 @@ module Barcelona
         super
         2.times do |az_index|
           add_builder SubnetBuilder.new(
-                        name: 'dmz',
-                        vpc_cidr_block: options[:cidr_block],
-                        public: true,
-                        az_index: az_index,
-                        nat_type: nil,
-                        network_acl_entries: [
-                          {from: 22,   to: 22,    protocol: "tcp", cidr: "0.0.0.0/0"},
-                          {from: 80,   to: 80,    protocol: "tcp", cidr: "0.0.0.0/0"},
-                          {from: 443,  to: 443,   protocol: "tcp", cidr: "0.0.0.0/0"},
-                          {from: 1024, to: 65535, protocol: "tcp", cidr: "0.0.0.0/0"},
-                          {from: 1024, to: 65535, protocol: "udp", cidr: "0.0.0.0/0"},
-                          {from: 123,  to: 123,   protocol: "udp", cidr: "0.0.0.0/0"}
-                        ]
-                      )
+            name: 'dmz',
+            vpc_cidr_block: options[:cidr_block],
+            public: true,
+            az_index: az_index,
+            nat_type: nil,
+            network_acl_entries: [
+              {from: 22,   to: 22,    protocol: "tcp", cidr: "0.0.0.0/0"},
+              {from: 80,   to: 80,    protocol: "tcp", cidr: "0.0.0.0/0"},
+              {from: 443,  to: 443,   protocol: "tcp", cidr: "0.0.0.0/0"},
+              {from: 1024, to: 65535, protocol: "tcp", cidr: "0.0.0.0/0"},
+              {from: 1024, to: 65535, protocol: "udp", cidr: "0.0.0.0/0"},
+              {from: 123,  to: 123,   protocol: "udp", cidr: "0.0.0.0/0"}
+            ]
+          )
           add_builder SubnetBuilder.new(
-                        name: 'trusted',
-                        vpc_cidr_block: options[:cidr_block],
-                        public: false,
-                        az_index: az_index,
-                        network_acl_entries: [
-                          {from: 22,   to: 22,    protocol: "tcp", cidr: "10.0.0.0/8"},
-                          {from: 80,   to: 80,    protocol: "tcp", cidr: "0.0.0.0/0"},
-                          {from: 443,  to: 443,   protocol: "tcp", cidr: "0.0.0.0/0"},
-                          {from: 1024, to: 65535, protocol: "tcp", cidr: "0.0.0.0/0"},
-                          {from: 1024, to: 65535, protocol: "udp", cidr: "0.0.0.0/0"},
-                          {from: 123,  to: 123,   protocol: "udp", cidr: "0.0.0.0/0"}
-                        ]
-                      )
+            name: 'trusted',
+            vpc_cidr_block: options[:cidr_block],
+            public: false,
+            az_index: az_index,
+            network_acl_entries: [
+              {from: 22,   to: 22,    protocol: "tcp", cidr: "10.0.0.0/8"},
+              {from: 80,   to: 80,    protocol: "tcp", cidr: "0.0.0.0/0"},
+              {from: 443,  to: 443,   protocol: "tcp", cidr: "0.0.0.0/0"},
+              {from: 1024, to: 65535, protocol: "tcp", cidr: "0.0.0.0/0"},
+              {from: 1024, to: 65535, protocol: "udp", cidr: "0.0.0.0/0"},
+              {from: 123,  to: 123,   protocol: "udp", cidr: "0.0.0.0/0"}
+            ]
+          )
         end
 
         case options[:nat_type]
-        when :managed_gateway then
+        when "instance" then
           add_builder NatBuilder.new(
-                        nat_id: "1",
-                        route_table_logical_ids: ["RouteTableTrusted1", "RouteTableTrusted2"])
-        when :managed_gateway_multi_az then
-          2.times do |az_index|
+            type: :instance,
+            vpc_cidr_block: options[:cidr_block],
+            public_subnet_logical_id: 'SubnetDmz1',
+            instance_type: options[:nat_instance_type],
+            nat_id: "1",
+            route_table_logical_ids: %w(RouteTableTrusted1 RouteTableTrusted2))
+        when "managed_gateway" then
+          add_builder NatBuilder.new(
+            type: :managed_gateway,
+            vpc_cidr_block: options[:cidr_block],
+            public_subnet_logical_id: 'SubnetDmz1',
+            nat_id: "1",
+            route_table_logical_ids: %w(RouteTableTrusted1 RouteTableTrusted2))
+        when "managed_gateway_multi_az" then
+          [1, 2].each do |az_index|
             add_builder NatBuilder.new(
-                          nat_id: az_index.to_s,
-                          route_table_logical_ids: ["RouteTableTrusted#{az_index}"])
+              type: :managed_gateway,
+              vpc_cidr_block: options[:cidr_block],
+              public_subnet_logical_id: "SubnetDmz#{az_index}",
+              nat_id: az_index.to_s,
+              route_table_logical_ids: ["RouteTableTrusted#{az_index}"])
           end
         when nil then
         # Do not create NAT and route

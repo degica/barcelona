@@ -23,6 +23,7 @@ class District < ActiveRecord::Base
 
   validates :name, presence: true, uniqueness: true, immutable: true
   validates :s3_bucket_name, :stack_name, :cidr_block, presence: true
+  validates :nat_type, inclusion: {in: %w(instance managed_gateway managed_gateway_multi_az)}, allow_nil: true
 
   # Allows nil when test environment
   # This is because encrypting/decrypting value is very slow
@@ -180,7 +181,8 @@ class District < ActiveRecord::Base
     Barcelona::Network::NetworkStack.new(
       stack_name,
       cidr_block: cidr_block,
-      bastion_key_pair: bastion_key_pair
+      bastion_key_pair: bastion_key_pair,
+      nat_type: nat_type
     )
   end
 

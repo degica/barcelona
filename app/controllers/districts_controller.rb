@@ -60,6 +60,7 @@ class DistrictsController < ApplicationController
     params.permit(
       :name,
       :bastion_key_pair,
+      :nat_type,
       :aws_access_key_id,
       :aws_secret_access_key
     ).tap do |whitelisted|
