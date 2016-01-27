@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160123125008) do
+ActiveRecord::Schema.define(version: 20160127014237) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -43,6 +43,7 @@ ActiveRecord::Schema.define(version: 20160123125008) do
     t.string   "cidr_block"
     t.string   "bastion_key_pair"
     t.string   "stack_name"
+    t.string   "nat_type"
   end
 
   create_table "elastic_ips", force: :cascade do |t|
