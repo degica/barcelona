@@ -9,6 +9,7 @@ class Plugin < ActiveRecord::Base
   after_create :hook_created
   after_update :hook_updated
   after_save :save_district
+  after_destroy :save_district
   after_destroy :hook_destroyed
 
   def hook(trigger, origin, arg = nil)

@@ -30,6 +30,7 @@ module Barcelona
       end
 
       it "gets hooked with destroyed trigger" do
+        expect(district).to receive(:update_ecs_config)
         district.plugins.first.destroy!
         expect(Heritage.count).to be_zero
       end
