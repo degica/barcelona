@@ -22,7 +22,6 @@ module Barcelona
             j.InstanceType options[:instance_type] || 't2.nano'
             j.SourceDestCheck false
             j.ImageId "ami-03cf3903"
-            j.KeyName 'staging-bastion'
             j.NetworkInterfaces [
               {
                 "AssociatePublicIpAddress" => true,
