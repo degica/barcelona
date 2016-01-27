@@ -721,4 +721,19 @@ describe Barcelona::Network::NetworkStack do
           "NetworkAclId" => {"Ref" => "NetworkAclTrusted2"}}}}
     expect(generated["Resources"]).to eq expected
   end
+
+  context "when nat_type is instance" do
+    it "includes NAT resources" do
+      stack = described_class.new(
+        "test-stack",
+        cidr_block: '10.0.0.0/16',
+        bastion_key_pair: 'bastion',
+        nat_type: "instance"
+      )
+      generated = JSON.load(stack.target!)
+      expect(generated["Resources"]["NAT1"]).to be_present
+      expect(generated["Resources"]["SecurityGroupNAT"]).to be_present
+      expect(generated["Resources"]["RouteNATForRouteTableTrusted1"]).to be_present
+    end
+  end
 end
