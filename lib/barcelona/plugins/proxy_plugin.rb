@@ -78,11 +78,6 @@ EOS
         proxy_heritage.save_and_deploy!
       end
 
-      def on_destroyed(_, _)
-        heritage = district.heritages.find_by(name: proxy_heritage_name)
-        heritage.destroy! if heritage
-      end
-
       def proxy_url
         "http://#{proxy_host}:#{proxy_port}"
       end
