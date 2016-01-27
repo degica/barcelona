@@ -38,7 +38,6 @@ EOS
         params = {
           name: logger_heritage_name,
           image_name: "k2nr/rsyslog-logentries",
-          section_name: "public",
           env_vars: {
             "LE_TOKEN" => token
           },
