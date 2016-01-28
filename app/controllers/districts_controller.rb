@@ -24,10 +24,7 @@ class DistrictsController < ApplicationController
   def launch_instances
     count = params.require(:count)
     instance_type = params[:instance_type] || 't2.micro'
-    associate_eip = params[:associate_eip].to_s == "true"
-    @district.launch_instances(count: count.to_i,
-                               instance_type: instance_type,
-                               associate_eip: associate_eip)
+    @district.launch_instances(count: count.to_i, instance_type: instance_type)
     render status: 204, nothing: true
   end
 

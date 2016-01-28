@@ -84,12 +84,6 @@ class ContainerInstance
     user_data.boot_commands += [
       "echo exclude=ecs-init >> /etc/yum.conf"
     ]
-    if options[:eip_allocation_id]
-      user_data.run_commands += [
-        "INSTANCE_ID=`curl http://169.254.169.254/latest/meta-data/instance-id`",
-        "aws ec2 associate-address --region ap-northeast-1 --instance-id $INSTANCE_ID --allocation-id #{options[:eip_allocation_id]}"
-      ]
-    end
     user_data.run_commands += [
       "aws s3 cp s3://#{district.s3_bucket_name}/#{district.name}/ecs.config /etc/ecs/ecs.config",
       "sed -i 's/^#\\s%wheel\\s*ALL=(ALL)\\s*NOPASSWD:\\sALL$/%wheel\\tALL=(ALL)\\tNOPASSWD:\\tALL/g' /etc/sudoers"

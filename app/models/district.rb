@@ -16,7 +16,6 @@ class District < ActiveRecord::Base
   has_many :heritages, inverse_of: :district, dependent: :destroy
   has_many :users_districts, dependent: :destroy
   has_many :users, through: :users_districts
-  has_many :elastic_ips, dependent: :destroy
   has_many :plugins, dependent: :destroy, inverse_of: :district
 
   validates :name, presence: true, uniqueness: true, immutable: true
@@ -88,17 +87,9 @@ class District < ActiveRecord::Base
     ).subnets
   end
 
-  def launch_instances(count: 1, instance_type:, associate_eip: false)
-    if associate_eip
-      available_eips = district.elastic_ips.available(self).to_a
-      raise "Elastic IP not available" if available_eips.count < count
-    end
-
+  def launch_instances(count: 1, instance_type:)
     count.times do |i|
-      allocation_id = available_eips[i].allocation_id if associate_eip
-      instance = ContainerInstance.new(self,
-                                       instance_type: instance_type,
-                                       eip_allocation_id: allocation_id)
+      instance = ContainerInstance.new(self, instance_type: instance_type)
       instance.launch
     end
   end
