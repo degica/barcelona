@@ -10,7 +10,7 @@ describe Plugin do
     end
 
     context "when plugin class exists" do
-      let(:name) { "proxy" }
+      let(:name) { "logentries" }
       it { expect(plugin).to be_valid }
     end
   end
@@ -19,15 +19,15 @@ describe Plugin do
     context "when plugin class doesnt exist" do
       let(:name) { "wrong" }
       it "calls plugin method" do
-        expect_any_instance_of(Barcelona::Plugins::ProxyPlugin).to_not receive(:hook)
+        expect_any_instance_of(Barcelona::Plugins::LogentriesPlugin).to_not receive(:hook)
         expect(plugin.hook(:trigger, nil, "argument")).to eq "argument"
       end
     end
 
     context "when plugin class exists" do
-      let(:name) { "proxy" }
+      let(:name) { "logentries" }
       it "calls plugin method" do
-        expect_any_instance_of(Barcelona::Plugins::ProxyPlugin).to receive(:hook)
+        expect_any_instance_of(Barcelona::Plugins::LogentriesPlugin).to receive(:hook)
         plugin.hook(:trigger, nil)
       end
     end
