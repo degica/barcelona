@@ -138,6 +138,17 @@ describe District do
         max_count: 1,
         user_data: instance_of(String),
         instance_type: "t2.micro",
+        block_device_mappings: [
+          {
+            virtual_name: 'Root',
+            device_name: '/dev/xvda',
+            ebs: {
+              volume_size: 80,
+              delete_on_termination: true,
+              volume_type: "gp2"
+            }
+          }
+        ],
         network_interfaces: [
           {
             groups: [district.instance_security_group],
