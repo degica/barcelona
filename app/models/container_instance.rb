@@ -57,6 +57,17 @@ class ContainerInstance
       max_count: 1,
       user_data: instance_user_data,
       instance_type: options[:instance_type],
+      block_device_mappings: [
+        {
+          virtual_name: 'Root',
+          device_name: '/dev/xvda',
+          ebs: {
+            volume_size: 80,
+            delete_on_termination: true,
+            volume_type: "gp2"
+          }
+        }
+      ],
       network_interfaces: [
         {
           groups: [district.instance_security_group].compact,
