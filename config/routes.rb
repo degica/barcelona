@@ -8,7 +8,6 @@ Rails.application.routes.draw do
       end
 
       resources :plugins, except: [:new, :edit]
-      resources :elastic_ips, only: [:index, :create]
 
       resources :heritages, shallow: true, except: [:new, :edit] do
         post   :env_vars, on: :member, to: "heritages#set_env_vars"

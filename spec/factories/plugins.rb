@@ -1,5 +1,6 @@
 FactoryGirl.define do
   factory :plugin do
-    name "proxy"
+    name "logentries"
+    plugin_attributes(token: 'logentriestoken')
   end
 end

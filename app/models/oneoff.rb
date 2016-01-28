@@ -18,7 +18,7 @@ class Oneoff < ActiveRecord::Base
       container_definitions: [task_definition]
     )
     resp = aws.ecs.run_task(
-      cluster: heritage.section.cluster_name,
+      cluster: district.name,
       task_definition: task_family,
       overrides: {
         container_overrides: [
@@ -71,7 +71,7 @@ class Oneoff < ActiveRecord::Base
 
   def fetch_task
     @task = aws.ecs.describe_tasks(
-      cluster: heritage.section.cluster_name,
+      cluster: district.name,
       tasks: [task_arn]
     ).tasks[0]
   end

@@ -17,6 +17,7 @@ describe "GET /districts/:district", type: :request do
     expect(response.status).to eq 200
     district = JSON.load(response.body)["district"]
     expect(district["stack_status"]).to eq "CREATE_COMPLETE"
-    expect(district["plugins"]).to eq([{"name" => plugin.name, "plugin_attributes" => {}}])
+    expect(district["plugins"]).to eq([{"name" => plugin.name,
+                                        "plugin_attributes" => JSON.load(plugin.plugin_attributes.to_json)}])
   end
 end

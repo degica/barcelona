@@ -19,27 +19,13 @@ module Barcelona
          "-v", "/proc/:/host/proc/:ro",
          "-v", "/sys/fs/cgroup/:/host/sys/fs/cgroup:ro",
          "-e", "API_KEY=#{api_key}",
-         proxy_env,
          tags,
          "datadog/docker-dd-agent:latest"
         ].flatten.compact.join(" ")
       end
 
-      def proxy_env
-        if proxy_plugin.present?
-          [
-            "-e", "PROXY_HOST=#{proxy_plugin.proxy_host}",
-            "-e", "PROXY_PORT=#{proxy_plugin.proxy_port}"
-          ]
-        end
-      end
-
       def tags
         "-e TAGS=\"barcelona,district:#{district.name}\""
-      end
-
-      def proxy_plugin
-        @proxy_plugin ||= district.plugins.find_by(name: "proxy")&.plugin
       end
 
       def api_key

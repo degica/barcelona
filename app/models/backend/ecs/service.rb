@@ -10,7 +10,7 @@ module Backend::Ecs
     end
 
     def scale(desired_count)
-      aws.ecs.update_service(cluster: section.cluster_name,
+      aws.ecs.update_service(cluster: cluster_name,
                              service: service_name,
                              desired_count: desired_count)
     end
@@ -18,7 +18,7 @@ module Backend::Ecs
     def delete
       return unless applied?
       scale(0)
-      aws.ecs.delete_service(cluster: section.cluster_name, service: service.service_name)
+      aws.ecs.delete_service(cluster: cluster_name, service: service.service_name)
     end
 
     def status
@@ -128,7 +128,7 @@ module Backend::Ecs
 
     def update
       aws.ecs.update_service(
-        cluster: section.cluster_name,
+        cluster: cluster_name,
         service: service.service_name,
         task_definition: service.service_name
       )
@@ -136,7 +136,7 @@ module Backend::Ecs
 
     def create(load_balancer)
       params = {
-        cluster: section.cluster_name,
+        cluster: cluster_name,
         service_name: service.service_name,
         task_definition: service.service_name,
         desired_count: 1
@@ -180,15 +180,15 @@ module Backend::Ecs
 
     def fetch_ecs_service
       @ecs_service = aws.ecs.describe_services(
-        cluster: section.cluster_name,
+        cluster: cluster_name,
         services: [service.service_name]
       ).services.first
     end
 
     private
 
-    def section
-      service.heritage.section
+    def cluster_name
+      district.name
     end
   end
 end

@@ -16,10 +16,7 @@ class District < ActiveRecord::Base
   has_many :heritages, inverse_of: :district, dependent: :destroy
   has_many :users_districts, dependent: :destroy
   has_many :users, through: :users_districts
-  has_many :elastic_ips, dependent: :destroy
   has_many :plugins, dependent: :destroy, inverse_of: :district
-
-  attr_accessor :sections
 
   validates :name, presence: true, uniqueness: true, immutable: true
   validates :s3_bucket_name, :stack_name, :cidr_block, presence: true
@@ -39,13 +36,6 @@ class District < ActiveRecord::Base
   encrypted_attribute :aws_secret_access_key, secret_key: ENV['ENCRYPTION_KEY']
 
   accepts_nested_attributes_for :plugins
-
-  after_initialize do |district|
-    district.sections = {
-      public: DistrictSection.new(:public, self),
-      private: DistrictSection.new(:private, self)
-    }
-  end
 
   def aws
     # these fallback "empty" value is a trick to speed up specs
@@ -88,28 +78,69 @@ class District < ActiveRecord::Base
     @stack_resources ||= stack_executor.resource_ids
   end
 
-  def subnets(section)
-    sections[section.downcase.to_sym].subnets
+  def subnets(network = "Private")
+    @subnets ||= aws.ec2.describe_subnets(
+      filters: [
+        {name: "vpc-id", values: [vpc_id]},
+        {name: 'tag:Network', values: [network]}
+      ]
+    ).subnets
   end
 
-  def launch_instances(count: 1, instance_type:, associate_eip: false, section: :private)
-    sections[section.to_sym].launch_instances(count: count,
-                                              instance_type: instance_type,
-                                              associate_eip: associate_eip)
+  def launch_instances(count: 1, instance_type:)
+    count.times do |i|
+      instance = ContainerInstance.new(self, instance_type: instance_type)
+      instance.launch
+    end
   end
 
-  def terminate_instance(section: :private, container_instance_arn: nil)
-    sections[section.to_sym].terminate_instance(container_instance_arn: container_instance_arn)
+  def terminate_instance(container_instance_arn: nil)
+    if container_instance_arn.nil?
+      container_instance_arn = oldest_container_instance[:container_instance_arn]
+    end
+    TerminateInstanceTask.new(self).run([container_instance_arn])
   end
 
-  def container_instances(section: :private)
-    sections[section].container_instances
+  def oldest_container_instance
+    container_instances.sort_by{ |ci| ci[:launch_time] }.first
+  end
+
+  def container_instances
+    arns = aws.ecs.list_container_instances(cluster: name).container_instance_arns
+    return [] if arns.blank?
+    container_instances = aws.ecs.
+                          describe_container_instances(cluster: name, container_instances: arns).
+                          container_instances
+    instances = {}
+    container_instances.each do |ci|
+      instance = {
+        status: ci.status,
+        container_instance_arn: ci.container_instance_arn,
+        remaining_resources: ci.remaining_resources,
+        registered_resources: ci.registered_resources,
+        running_tasks_count: ci.running_tasks_count,
+        pending_tasks_count: ci.pending_tasks_count
+      }
+      instances[ci.ec2_instance_id] = instance
+    end
+
+    ec2_instances = aws.ec2.describe_instances(
+      instance_ids: container_instances.map(&:ec2_instance_id)
+    ).reservations.map(&:instances).flatten
+
+    ec2_instances.each do |ins|
+      instances[ins.instance_id].merge!(
+        private_ip_address: ins.private_ip_address,
+        launch_time: ins.launch_time,
+        instance_type: ins.instance_type
+      )
+    end
+
+    instances.map { |ec2_id, ins| ins.merge(ec2_instance_id: ec2_id) }
   end
 
   def update_instance_user_account(user)
-    sections.each do |_, section|
-      section.update_instance_user_account(user)
-    end
+    UpdateUserTask.new(self, user).run
   end
 
   def hook_plugins(trigger, origin, arg = nil)
@@ -143,6 +174,24 @@ class District < ActiveRecord::Base
 
   private
 
+  def ecs_config
+    config = {
+      "ECS_CLUSTER" => name,
+      "ECS_AVAILABLE_LOGGING_DRIVERS" => '["json-file", "syslog", "fluentd"]',
+      "ECS_RESERVED_MEMORY" => 128
+    }
+    if dockercfg.present?
+      config["ECS_ENGINE_AUTH_TYPE"] = "dockercfg"
+      config["ECS_ENGINE_AUTH_DATA"] = dockercfg.to_json
+    end
+    config = hook_plugins(:ecs_config, self, config)
+    config.map {|k, v| "#{k}=#{v}"}.join("\n")
+  end
+
+  def users_body
+    users.map{|u| "#{u.name},#{u.public_key}"}.join("\n")
+  end
+
   def set_default_attributes
     self.s3_bucket_name ||= "barcelona-#{name}-#{Time.now.to_i}"
     self.cidr_block     ||= "10.#{Random.rand(256)}.0.0/16"
@@ -156,15 +205,14 @@ class District < ActiveRecord::Base
   end
 
   def update_ecs_config
-    sections.each do |_, section|
-      section.update_ecs_config
-    end
+    aws.s3.put_object(bucket: s3_bucket_name,
+                      key: "#{name}/ecs.config",
+                      body: ecs_config,
+                      server_side_encryption: "AES256")
   end
 
   def create_ecs_cluster
-    sections.each do |_, section|
-      section.create_ecs_cluster
-    end
+    aws.ecs.create_cluster(cluster_name: name)
   end
 
   def users_body
@@ -172,9 +220,7 @@ class District < ActiveRecord::Base
   end
 
   def delete_ecs_cluster
-    sections.each do |_, section|
-      section.delete_ecs_cluster
-    end
+    aws.ecs.delete_cluster(cluster: name)
   end
 
   def network_stack

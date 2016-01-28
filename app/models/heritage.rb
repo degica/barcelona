@@ -11,10 +11,8 @@ class Heritage < ActiveRecord::Base
             immutable: true,
             format: { with: /\A[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]\z/ }
   validates :district, presence: true
-  validates :section_name, presence: true, inclusion: { in: %w(public private) }
 
   before_validation do |heritage|
-    heritage.section_name ||= 'private'
     heritage.regenerate_token if heritage.token.blank?
   end
 
@@ -41,10 +39,6 @@ class Heritage < ActiveRecord::Base
   def save_and_deploy!(without_before_deploy: false)
     save!
     update_services(without_before_deploy)
-  end
-
-  def section
-    district.sections[section_name.to_sym]
   end
 
   def regenerate_token

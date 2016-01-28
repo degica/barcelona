@@ -42,18 +42,11 @@ class ContainerInstance
     end
   end
 
-  attr_accessor :section, :options
+  attr_accessor :district, :options
+  delegate :aws, to: :district
 
-  def aws
-    section.aws
-  end
-
-  def district
-    section.district
-  end
-
-  def initialize(section, options)
-    @section = section
+  def initialize(district, options)
+    @district = district
     @options = options
   end
 
@@ -66,14 +59,14 @@ class ContainerInstance
       instance_type: options[:instance_type],
       network_interfaces: [
         {
-          groups: [section.instance_security_group].compact,
-          subnet_id: section.subnets.sample.subnet_id,
+          groups: [district.instance_security_group].compact,
+          subnet_id: district.subnets.sample.subnet_id,
           device_index: 0,
-          associate_public_ip_address: section.public?
+          associate_public_ip_address: false
         }
       ],
       iam_instance_profile: {
-        name: section.ecs_instance_profile
+        name: district.ecs_instance_profile
       }
     )
     instance_id = resp.instances[0].instance_id
@@ -81,8 +74,7 @@ class ContainerInstance
       resources: [instance_id],
       tags: [
         {key: "Name", value: "barcelona-container-instance"},
-        {key: "District", value: section.district.name},
-        {key: "Section", value: section.name}
+        {key: "District", value: district.name}
       ]
     )
   end
@@ -92,14 +84,8 @@ class ContainerInstance
     user_data.boot_commands += [
       "echo exclude=ecs-init >> /etc/yum.conf"
     ]
-    if options[:eip_allocation_id]
-      user_data.run_commands += [
-        "INSTANCE_ID=`curl http://169.254.169.254/latest/meta-data/instance-id`",
-        "aws ec2 associate-address --region ap-northeast-1 --instance-id $INSTANCE_ID --allocation-id #{options[:eip_allocation_id]}"
-      ]
-    end
     user_data.run_commands += [
-      "aws s3 cp s3://#{section.s3_bucket_name}/#{section.cluster_name}/ecs.config /etc/ecs/ecs.config",
+      "aws s3 cp s3://#{district.s3_bucket_name}/#{district.name}/ecs.config /etc/ecs/ecs.config",
       "sed -i 's/^#\\s%wheel\\s*ALL=(ALL)\\s*NOPASSWD:\\sALL$/%wheel\\tALL=(ALL)\\tNOPASSWD:\\tALL/g' /etc/sudoers"
     ]
 
