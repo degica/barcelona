@@ -1,21 +1,21 @@
 class UpdateUserTask < SystemTask
   attr_accessor :user
 
-  def initialize(section, user)
-    super(section)
+  def initialize(district, user)
+    super(district)
     @user = user
   end
 
   def run
-    Rails.logger.info "Updating user #{user.name} for #{section.cluster_name}"
+    Rails.logger.info "Updating user #{user.name} for #{district.name}"
     env = {
       "USER_NAME" => user.name,
       "USER_GROUPS" => user.instance_groups.join(","),
       "USER_PUBLIC_KEY" => user.public_key.presence,
-      "USER_DOCKERCFG" => section.dockercfg&.to_json
+      "USER_DOCKERCFG" => district.dockercfg&.to_json
     }.compact
 
-    arns = section.container_instances.map{ |c| c[:container_instance_arn] }
+    arns = district.container_instances.map{ |c| c[:container_instance_arn] }
     super(arns, env)
   end
 

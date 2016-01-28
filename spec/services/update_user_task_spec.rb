@@ -3,8 +3,7 @@ require 'rails_helper'
 describe UpdateUserTask do
   let(:user) { create :user, public_key: 'ssh-rsa aaaabbbb' }
   let(:district) { create :district, dockercfg: {"quay.io" => {"auth" => "abcdef"}} }
-  let(:section) { district.sections[:private] }
-  let(:task) { described_class.new(section, user) }
+  let(:task) { described_class.new(district, user) }
   let(:ecs_mock) { double }
   let(:container_instance_arn) { "arn:aws:ecs:ap-northeast-1:822761295011:container-instance/13da152c-605b-4b37-9ef0-de87be9e50f2" }
 
@@ -12,9 +11,9 @@ describe UpdateUserTask do
     allow(task).to receive_message_chain(:aws, :ecs) { ecs_mock }
   end
 
-  context "the section has one containter instance running" do
+  context "the district has one containter instance running" do
     before do
-      allow(section).to receive(:container_instances).and_return [
+      allow(district).to receive(:container_instances).and_return [
         {
           status: "ACTIVE",
           container_instance_arn: container_instance_arn,
@@ -69,7 +68,7 @@ describe UpdateUserTask do
 
       expect(ecs_mock).to receive(:start_task)
                            .with(
-                             cluster: section.cluster_name,
+                             cluster: district.name,
                              task_definition: "update_user",
                              overrides: {
                                container_overrides: [
@@ -79,7 +78,7 @@ describe UpdateUserTask do
                                      {name: "USER_NAME", value: user.name},
                                      {name: "USER_GROUPS", value: "docker"},
                                      {name: "USER_PUBLIC_KEY", value: user.public_key},
-                                     {name: "USER_DOCKERCFG", value: section.dockercfg.to_json}
+                                     {name: "USER_DOCKERCFG", value: district.dockercfg.to_json}
                                    ]
                                  }
                                ]
@@ -90,9 +89,9 @@ describe UpdateUserTask do
     end
   end
 
-  context "the section has no containter instance running" do
+  context "the district has no containter instance running" do
     before do
-      allow(section).to receive(:container_instances).and_return [
+      allow(district).to receive(:container_instances).and_return [
       ]
     end
     it "does nothing" do

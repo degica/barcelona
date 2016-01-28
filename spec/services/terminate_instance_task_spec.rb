@@ -2,8 +2,7 @@ require 'rails_helper'
 
 describe TerminateInstanceTask do
   let(:district) { create :district, dockercfg: {"quay.io" => {"auth" => "abcdef"}} }
-  let(:section) { district.sections[:private] }
-  let(:task) { described_class.new(section) }
+  let(:task) { described_class.new(district) }
   let(:ecs_mock) { double }
 
   before do
@@ -41,7 +40,7 @@ describe TerminateInstanceTask do
 
     expect(ecs_mock).to receive(:start_task).
       with(
-        cluster: section.cluster_name,
+        cluster: district.name,
         task_definition: "terminate-instance",
         overrides: {
           container_overrides: [

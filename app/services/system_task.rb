@@ -1,9 +1,9 @@
 class SystemTask
-  attr_accessor :section
-  delegate :aws, :district, to: :section
+  attr_accessor :district
+  delegate :aws, to: :district
 
-  def initialize(section)
-    @section = section
+  def initialize(district)
+    @district = district
   end
 
   def run(container_instance_arns, env = {})
@@ -12,7 +12,7 @@ class SystemTask
     aws.ecs.register_task_definition(task_definition)
 
     aws.ecs.start_task(
-      cluster: section.cluster_name,
+      cluster: district.name,
       task_definition: task_family,
       overrides: {
         container_overrides: [

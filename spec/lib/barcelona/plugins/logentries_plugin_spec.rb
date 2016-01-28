@@ -51,8 +51,7 @@ module Barcelona
       end
 
       it "gets hooked with container_instance_user_data trigger" do
-        section = district.sections[:private]
-        ci = ContainerInstance.new(section, instance_type: 't2.micro')
+        ci = ContainerInstance.new(district, instance_type: 't2.micro')
         user_data = YAML.load(Base64.decode64(ci.instance_user_data))
         expect(user_data["write_files"][0]["path"]).to eq "/etc/rsyslog.d/barcelona-logger.conf"
         expect(user_data["write_files"][0]["owner"]).to eq "root:root"
