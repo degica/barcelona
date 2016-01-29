@@ -21,19 +21,6 @@ class DistrictsController < ApplicationController
     render json: @district
   end
 
-  def launch_instances
-    count = params.require(:count)
-    instance_type = params[:instance_type] || 't2.micro'
-    @district.launch_instances(count: count.to_i, instance_type: instance_type)
-    render status: 204, nothing: true
-  end
-
-  def terminate_instance
-    arn = params[:container_instance_arn]
-    @district.terminate_instance(container_instance_arn: arn)
-    render status: 204, nothing: true
-  end
-
   def apply_stack
     @district.apply_network_stack
     render status: 202, nothing: true

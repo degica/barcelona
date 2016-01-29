@@ -2,8 +2,6 @@ Rails.application.routes.draw do
   scope :v1 do
     resources :districts, except: [:new, :edit] do
       member do
-        post :launch_instances
-        post :terminate_instance
         post :apply_stack
       end
 

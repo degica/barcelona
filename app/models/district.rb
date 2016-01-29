@@ -89,24 +89,6 @@ class District < ActiveRecord::Base
     ).subnets
   end
 
-  def launch_instances(count: 1, instance_type:)
-    count.times do |i|
-      instance = ContainerInstance.new(self, instance_type: instance_type)
-      instance.launch
-    end
-  end
-
-  def terminate_instance(container_instance_arn: nil)
-    if container_instance_arn.nil?
-      container_instance_arn = oldest_container_instance[:container_instance_arn]
-    end
-    TerminateInstanceTask.new(self).run([container_instance_arn])
-  end
-
-  def oldest_container_instance
-    container_instances.sort_by{ |ci| ci[:launch_time] }.first
-  end
-
   def container_instances
     arns = aws.ecs.list_container_instances(cluster: name).container_instance_arns
     return [] if arns.blank?
