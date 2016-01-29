@@ -90,7 +90,7 @@ describe Backend::Ecs::Adapter do
                   cpu: 128,
                   memory: 128,
                   essential: true,
-                  command: ["sh", "-c", "rails s"],
+                  command: ["sh", "-c", "exec rails s"],
                   image: service.heritage.image_path,
                   environment: [
                     {name: "HOST_PORT_HTTP_3000", value: port_http.host_port.to_s},

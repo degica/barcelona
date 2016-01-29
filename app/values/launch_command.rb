@@ -7,7 +7,7 @@ class LaunchCommand
     if @command.blank?
       nil
     else
-      ["sh", "-c", @command]
+      ["sh", "-c", "exec " + @command]
     end
   end
 end
