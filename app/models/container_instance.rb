@@ -50,47 +50,6 @@ class ContainerInstance
     @options = options
   end
 
-  def launch
-    resp = aws.ec2.run_instances(
-      image_id: 'ami-e9724c87', # amzn-ami-2015.09.e-amazon-ecs-optimized
-      min_count: 1,
-      max_count: 1,
-      user_data: instance_user_data,
-      instance_type: options[:instance_type],
-      instance_initiated_shutdown_behavior: "terminate",
-      block_device_mappings: [
-        {
-          virtual_name: 'Root',
-          device_name: '/dev/xvda',
-          ebs: {
-            volume_size: 80,
-            delete_on_termination: true,
-            volume_type: "gp2"
-          }
-        }
-      ],
-      network_interfaces: [
-        {
-          groups: [district.instance_security_group].compact,
-          subnet_id: district.subnets.sample.subnet_id,
-          device_index: 0,
-          associate_public_ip_address: false
-        }
-      ],
-      iam_instance_profile: {
-        name: district.ecs_instance_profile
-      }
-    )
-    instance_id = resp.instances[0].instance_id
-    aws.ec2.create_tags(
-      resources: [instance_id],
-      tags: [
-        {key: "Name", value: "barcelona-container-instance"},
-        {key: "District", value: district.name}
-      ]
-    )
-  end
-
   def instance_user_data
     user_data = UserData.new
     user_data.boot_commands += [
