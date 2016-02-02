@@ -202,10 +202,6 @@ class District < ActiveRecord::Base
     aws.ecs.create_cluster(cluster_name: name)
   end
 
-  def users_body
-    users.map{|u| "#{u.name},#{u.public_key}"}.join("\n")
-  end
-
   def delete_ecs_cluster
     aws.ecs.delete_cluster(cluster: name)
   end
