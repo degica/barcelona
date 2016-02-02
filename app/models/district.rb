@@ -19,8 +19,10 @@ class District < ActiveRecord::Base
   has_many :plugins, dependent: :destroy, inverse_of: :district
 
   validates :name, presence: true, uniqueness: true, immutable: true
-  validates :s3_bucket_name, :stack_name, :cidr_block, presence: true
+  validates :s3_bucket_name, :stack_name, :cidr_block, presence: true, immutable: true
   validates :nat_type, inclusion: {in: %w(instance managed_gateway managed_gateway_multi_az)}, allow_nil: true
+  validates :cluster_backend, inclusion: {in: %w(autoscaling)}
+  validates :cluster_size, numericality: {greater_than_or_equal_to: 0}
 
   # Allows nil when test environment
   # This is because encrypting/decrypting value is very slow
@@ -85,24 +87,6 @@ class District < ActiveRecord::Base
         {name: 'tag:Network', values: [network]}
       ]
     ).subnets
-  end
-
-  def launch_instances(count: 1, instance_type:)
-    count.times do |i|
-      instance = ContainerInstance.new(self, instance_type: instance_type)
-      instance.launch
-    end
-  end
-
-  def terminate_instance(container_instance_arn: nil)
-    if container_instance_arn.nil?
-      container_instance_arn = oldest_container_instance[:container_instance_arn]
-    end
-    TerminateInstanceTask.new(self).run([container_instance_arn])
-  end
-
-  def oldest_container_instance
-    container_instances.sort_by{ |ci| ci[:launch_time] }.first
   end
 
   def container_instances
@@ -196,6 +180,9 @@ class District < ActiveRecord::Base
     self.s3_bucket_name ||= "barcelona-#{name}-#{Time.now.to_i}"
     self.cidr_block     ||= "10.#{Random.rand(256)}.0.0/16"
     self.stack_name     ||= "barcelona-#{name}"
+    self.cluster_backend  ||= 'autoscaling'
+    self.cluster_size     ||= 1
+    self.cluster_instance_type ||= "t2.micro"
   end
 
   def create_s3_bucket
@@ -215,10 +202,6 @@ class District < ActiveRecord::Base
     aws.ecs.create_cluster(cluster_name: name)
   end
 
-  def users_body
-    users.map{|u| "#{u.name},#{u.public_key}"}.join("\n")
-  end
-
   def delete_ecs_cluster
     aws.ecs.delete_cluster(cluster: name)
   end
@@ -228,7 +211,12 @@ class District < ActiveRecord::Base
       stack_name,
       cidr_block: cidr_block,
       bastion_key_pair: bastion_key_pair,
-      nat_type: nat_type
+      nat_type: nat_type,
+      autoscaling: {
+        container_instance: ContainerInstance.new(self),
+        instance_type: cluster_instance_type,
+        desired_capacity: cluster_size
+      }
     )
   end
 

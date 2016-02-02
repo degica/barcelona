@@ -3,7 +3,7 @@ module Barcelona
     class VPCBuilder < CloudFormation::Builder
       class UnsupportedNatType < StandardError; end
 
-      def initialize(options)
+      def initialize(*args)
         super
         2.times do |az_index|
           add_builder SubnetBuilder.new(
@@ -36,6 +36,8 @@ module Barcelona
             ]
           )
         end
+
+        add_builder AutoscalingBuilder.new(options[:autoscaling]) if options[:autoscaling]
 
         case options[:nat_type]
         when "instance" then
@@ -300,16 +302,14 @@ module Barcelona
                   {
                     "Effect" => "Allow",
                     "Action" => [
-                      "ec2:AssociateAddress",
-                      "ec2:TerminateInstances",
                       "ec2:DescribeInstances",
-                      "ecs:CreateCluster",
                       "ecs:DeregisterContainerInstance",
                       "ecs:DiscoverPollEndpoint",
                       "ecs:Poll",
                       "ecs:RegisterContainerInstance",
                       "ecs:StartTelemetrySession",
                       "ecs:Submit*",
+                      "ecs:DescribeClusters",
                       "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
                       "elasticloadbalancing:DescribeLoadBalancers",
                       "s3:Get*",

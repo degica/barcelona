@@ -1,6 +1,8 @@
 FactoryGirl.define do
   factory :user do
-    name "kajihiro"
+    sequence :name do |n|
+      "user#{n}"
+    end
     roles ["developer"]
     token { SecureRandom.hex }
   end

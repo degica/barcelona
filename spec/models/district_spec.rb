@@ -33,8 +33,8 @@ describe District do
 
   describe "callbacks" do
     it "assigns default users" do
-      user1 = User.create!(name: 'user1')
-      user2 = User.create!(name: 'user2')
+      user1 = create :user
+      user2 = create :user
       district1 = District.create!(name: 'name')
       district1.reload
       expect(district1.users).to include(user1)
@@ -115,56 +115,6 @@ describe District do
       expect(result.first).to have_key :container_instance_arn
       expect(result.first).to have_key :ec2_instance_id
       expect(result.first).to have_key :private_ip_address
-    end
-  end
-
-  describe "#launch_instances" do
-    subject { district.launch_instances(count: 1, instance_type: 't2.micro') }
-
-    before do
-      expect(ec2_mock).to receive(:describe_subnets).with(
-        filters: [
-          {name: "vpc-id", values: [district.vpc_id]},
-          {name: "tag:Network", values: ["Private"]}
-        ]) do
-        double(subnets: [double(subnet_id: "subnet_id")])
-      end
-    end
-
-    it "launches EC2 instance" do
-      expect(ec2_mock).to receive(:run_instances).with(
-        image_id: instance_of(String),
-        min_count: 1,
-        max_count: 1,
-        user_data: instance_of(String),
-        instance_type: "t2.micro",
-        block_device_mappings: [
-          {
-            virtual_name: 'Root',
-            device_name: '/dev/xvda',
-            ebs: {
-              volume_size: 80,
-              delete_on_termination: true,
-              volume_type: "gp2"
-            }
-          }
-        ],
-        network_interfaces: [
-          {
-            groups: [district.instance_security_group],
-            subnet_id: "subnet_id",
-            device_index: 0,
-            associate_public_ip_address: false
-          }
-        ],
-        iam_instance_profile: {
-          name: district.ecs_instance_profile
-        }
-      ) do
-        double(instances: [double(instance_id: 'instance_id')])
-      end
-      expect(ec2_mock).to receive(:create_tags)
-      subject
     end
   end
 end

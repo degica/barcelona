@@ -5,8 +5,8 @@ describe ContainerInstance do
   let(:district) { create :district, users: [user] }
   describe "#instance_user_data" do
     it "generates user data" do
-      ci = ContainerInstance.new(district, instance_type: "t2.micro")
-      user_data = Base64.decode64(ci.instance_user_data)
+      ci = ContainerInstance.new(district)
+      user_data = Base64.decode64(ci.user_data.build)
       expect(user_data).to be_a String
     end
   end

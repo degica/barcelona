@@ -1,0 +1,12 @@
+environments:
+  production:
+    name: rails-app
+    image_name: k2nr/rails-docker-sample
+    before_deploy: rake db:migrate
+    services:
+      - name: web
+        service_type: web
+        public: true
+        cpu: 128
+        memory: 256
+        command: rails s -p $PORT

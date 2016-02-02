@@ -13,7 +13,7 @@ module CloudFormation
         j.Description "AWS CloudFormation for Barcelona network stack"
         j.AWSTemplateFormatVersion "2010-09-09"
         j.Resources do |j|
-          builder = Builder.new
+          builder = Builder.new(self)
           yield builder if block_given?
           builder.build(j)
         end

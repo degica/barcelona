@@ -51,12 +51,12 @@ module Barcelona
       end
 
       it "gets hooked with container_instance_user_data trigger" do
-        ci = ContainerInstance.new(district, instance_type: 't2.micro')
-        user_data = YAML.load(Base64.decode64(ci.instance_user_data))
-        expect(user_data["write_files"][0]["path"]).to eq "/etc/rsyslog.d/barcelona-logger.conf"
-        expect(user_data["write_files"][0]["owner"]).to eq "root:root"
-        expect(user_data["write_files"][0]["permissions"]).to eq "644"
-        expect(user_data["write_files"][0]["content"]).to be_a String
+        ci = ContainerInstance.new(district)
+        user_data = YAML.load(Base64.decode64(ci.user_data.build))
+        expect(user_data["write_files"].last["path"]).to eq "/etc/rsyslog.d/barcelona-logger.conf"
+        expect(user_data["write_files"].last["owner"]).to eq "root:root"
+        expect(user_data["write_files"].last["permissions"]).to eq "644"
+        expect(user_data["write_files"].last["content"]).to be_a String
       end
     end
   end

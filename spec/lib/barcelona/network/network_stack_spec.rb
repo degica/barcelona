@@ -1,6 +1,8 @@
 require "rails_helper"
 
 describe Barcelona::Network::NetworkStack do
+  let(:district) { create :district }
+
   it "generates network stack CF template" do
     stack = described_class.new(
       "test-stack",
@@ -177,16 +179,14 @@ describe Barcelona::Network::NetworkStack do
                   {
                     "Effect"=>"Allow",
                     "Action" => [
-                      "ec2:AssociateAddress",
-                      "ec2:TerminateInstances",
                       "ec2:DescribeInstances",
-                      "ecs:CreateCluster",
                       "ecs:DeregisterContainerInstance",
                       "ecs:DiscoverPollEndpoint",
                       "ecs:Poll",
                       "ecs:RegisterContainerInstance",
                       "ecs:StartTelemetrySession",
                       "ecs:Submit*",
+                      "ecs:DescribeClusters",
                       "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
                       "elasticloadbalancing:DescribeLoadBalancers",
                       "s3:Get*",
@@ -734,6 +734,24 @@ describe Barcelona::Network::NetworkStack do
       expect(generated["Resources"]["NAT1"]).to be_present
       expect(generated["Resources"]["SecurityGroupNAT"]).to be_present
       expect(generated["Resources"]["RouteNATForRouteTableTrusted1"]).to be_present
+    end
+  end
+
+  context "when autoscaling is set" do
+    it "includes NAT resources" do
+      stack = described_class.new(
+        "test-stack",
+        cidr_block: '10.0.0.0/16',
+        bastion_key_pair: 'bastion',
+        autoscaling: {
+          container_instance: ContainerInstance.new(district),
+          desired_capacity: 1,
+          instance_type: 't2.micro'
+        }
+      )
+      generated = JSON.load(stack.target!)
+      expect(generated["Resources"]["ContainerInstanceLaunchConfiguration"]).to be_present
+      expect(generated["Resources"]["ContainerInstanceAutoScalingGroup"]).to be_present
     end
   end
 end

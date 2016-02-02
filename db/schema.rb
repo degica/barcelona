@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160128031332) do
+ActiveRecord::Schema.define(version: 20160202021528) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -44,6 +44,9 @@ ActiveRecord::Schema.define(version: 20160128031332) do
     t.string   "bastion_key_pair"
     t.string   "stack_name"
     t.string   "nat_type"
+    t.string   "cluster_backend"
+    t.integer  "cluster_size"
+    t.string   "cluster_instance_type"
   end
 
   create_table "env_vars", force: :cascade do |t|
