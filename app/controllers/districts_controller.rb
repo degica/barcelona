@@ -55,6 +55,9 @@ class DistrictsController < ApplicationController
       :name,
       :bastion_key_pair,
       :nat_type,
+      :cluster_backend,
+      :cluster_size,
+      :cluster_instance_type,
       :aws_access_key_id,
       :aws_secret_access_key
     ).tap do |whitelisted|

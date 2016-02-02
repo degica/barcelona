@@ -7,7 +7,7 @@ class ContainerInstance
       @boot_commands = []
       @run_commands = []
       @users = []
-      @packages = ["aws-cli", "jq"]
+      @packages = ["aws-cli", "jq", "aws-cfn-bootstrap"]
     end
 
     def build
@@ -42,15 +42,13 @@ class ContainerInstance
     end
   end
 
-  attr_accessor :district, :options
-  delegate :aws, to: :district
+  attr_accessor :district
 
-  def initialize(district, options)
+  def initialize(district)
     @district = district
-    @options = options
   end
 
-  def instance_user_data
+  def user_data
     user_data = UserData.new
     user_data.boot_commands += [
       "echo exclude=ecs-init >> /etc/yum.conf"
@@ -70,42 +68,28 @@ class ContainerInstance
 
 set -e
 
-notify() {
-  curl -X POST https://hooks.slack.com/services/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 -d "{\\"text\\": \\"$1\\"}"
-}
-
 stop() {
   AWS_REGION=ap-northeast-1
   ec2_instance_id=`curl http://169.254.169.254/latest/meta-data/instance-id`
   ecs_cluster=`curl http://localhost:51678/v1/metadata | jq -r .Cluster`
   container_instance_arn=`curl http://localhost:51678/v1/metadata | jq -r .ContainerInstanceArn | cut -d / -f2`
 
-  notify "EC2 instance ID: $ec2_instance_id"
-  notify "ECS cluster: $ecs_cluster"
-  notify "ECS Container Instance ARN: $container_instance_arn"
-
   aws ecs deregister-container-instance --region $AWS_REGION --cluster $ecs_cluster --container-instance $container_instance_arn --force
-  notify "Deregistered from $ecs_cluster"
 
   elb_names=`aws elb describe-load-balancers --region $AWS_REGION | jq -r ".LoadBalancerDescriptions | map(select(contains({Instances: [{InstanceId: \\"$ec2_instance_id\\"}]}))) | map(.LoadBalancerName) | join(\\" \\")"`
 
   for elb in $elb_names
   do
-      notify "Deregistering the instance from $elb"
       aws elb deregister-instances-from-load-balancer --region $AWS_REGION --load-balancer-name $elb --instances $ec2_instance_id
   done
 
   while [[ -n "$elb_names" ]]
   do
-      echo $elb_names
-      notify "Waiting for the instance to be deregistered"
       elb_names=`aws elb describe-load-balancers --region $AWS_REGION | jq -r ".LoadBalancerDescriptions | map(select(contains({Instances: [{InstanceId: \\"$ec2_instance_id\\"}]}))) | map(.LoadBalancerName) | join(\\" \\")"`
       sleep 3
   done
 
-  notify "Stopping docker containers..."
-  container_ids=`docker stop -t 90 $(docker ps -q)`
-  notify "Stopped $container_ids"
+  docker stop -t 90 $(docker ps -q)
 }
 
 case "$1" in
@@ -136,7 +120,5 @@ EOS
     end
 
     user_data = district.hook_plugins(:container_instance_user_data, self, user_data)
-
-    user_data.build
   end
 end
