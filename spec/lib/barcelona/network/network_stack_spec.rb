@@ -179,10 +179,7 @@ describe Barcelona::Network::NetworkStack do
                   {
                     "Effect"=>"Allow",
                     "Action" => [
-                      "ec2:AssociateAddress",
-                      "ec2:TerminateInstances",
                       "ec2:DescribeInstances",
-                      "ecs:CreateCluster",
                       "ecs:DeregisterContainerInstance",
                       "ecs:DiscoverPollEndpoint",
                       "ecs:Poll",
