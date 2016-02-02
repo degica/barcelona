@@ -24,6 +24,16 @@ describe "POST /districts", type: :request do
     it "creates a district" do
       post "/v1/districts", params, auth
       expect(response.status).to eq 201
+
+      body = JSON.load(response.body)
+      expect(body["district"]["name"]).to eq "district"
+      expect(body["district"]["cidr_block"]).to match %r{10\.[0-9]+\.0.0\/16}
+      expect(body["district"]["stack_name"]).to eq "barcelona-district"
+      expect(body["district"]["s3_bucket_name"]).to match %r{barcelona-district-[0-9]+}
+      expect(body["district"]["nat_type"]).to eq "instance"
+      expect(body["district"]["cluster_size"]).to eq 1
+      expect(body["district"]["cluster_backend"]).to eq "autoscaling"
+      expect(body["district"]["cluster_instance_type"]).to eq "t2.micro"
     end
   end
 end
