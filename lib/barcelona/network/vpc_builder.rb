@@ -37,6 +37,8 @@ module Barcelona
           )
         end
 
+        add_builder AutoscalingBuilder.new(options[:autoscaling]) if options[:autoscaling]
+
         case options[:nat_type]
         when "instance" then
           add_builder NatBuilder.new(
