@@ -9,8 +9,8 @@ class District < ActiveRecord::Base
   before_create :assign_default_users
   after_create :create_s3_bucket
   after_create :create_ecs_cluster
-  after_create :create_network_stack
   after_save :update_ecs_config
+  after_save :create_or_update_network_stack
   after_destroy :delete_ecs_cluster
 
   has_many :heritages, inverse_of: :district, dependent: :destroy
@@ -140,11 +140,7 @@ class District < ActiveRecord::Base
     hook_plugins(:district_task_definition, self, base)
   end
 
-  def create_network_stack
-    stack_executor.create
-  end
-
-  def apply_network_stack
+  def create_or_update_network_stack
     stack_executor.create_or_update
   end
 
@@ -180,6 +176,7 @@ class District < ActiveRecord::Base
     self.s3_bucket_name ||= "barcelona-#{name}-#{Time.now.to_i}"
     self.cidr_block     ||= "10.#{Random.rand(256)}.0.0/16"
     self.stack_name     ||= "barcelona-#{name}"
+    self.nat_type       ||= "instance"
     self.cluster_backend  ||= 'autoscaling'
     self.cluster_size     ||= 1
     self.cluster_instance_type ||= "t2.micro"
