@@ -186,6 +186,7 @@ describe Barcelona::Network::NetworkStack do
                       "ecs:RegisterContainerInstance",
                       "ecs:StartTelemetrySession",
                       "ecs:Submit*",
+                      "ecs:DescribeClusters",
                       "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
                       "elasticloadbalancing:DescribeLoadBalancers",
                       "s3:Get*",

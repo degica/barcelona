@@ -54,6 +54,7 @@ class ContainerInstance
       "echo exclude=ecs-init >> /etc/yum.conf"
     ]
     user_data.run_commands += [
+      "AWS_REGION=ap-northeast-1",
       "aws s3 cp s3://#{district.s3_bucket_name}/#{district.name}/ecs.config /etc/ecs/ecs.config",
       "sed -i 's/^#\\s%wheel\\s*ALL=(ALL)\\s*NOPASSWD:\\sALL$/%wheel\\tALL=(ALL)\\tNOPASSWD:\\tALL/g' /etc/sudoers",
       "chkconfig --add barcelona",
