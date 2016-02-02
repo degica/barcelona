@@ -33,8 +33,8 @@ describe District do
 
   describe "callbacks" do
     it "assigns default users" do
-      user1 = User.create!(name: 'user1')
-      user2 = User.create!(name: 'user2')
+      user1 = create :user
+      user2 = create :user
       district1 = District.create!(name: 'name')
       district1.reload
       expect(district1.users).to include(user1)
