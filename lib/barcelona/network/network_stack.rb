@@ -9,7 +9,7 @@ module Barcelona::Network
 
     def build
       super do |builder|
-        builder.add_builder VPCBuilder.new(options)
+        builder.add_builder VPCBuilder.new(self, options)
       end
     end
 

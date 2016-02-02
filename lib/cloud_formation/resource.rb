@@ -15,14 +15,15 @@ module CloudFormation
 
     def build(top_level, &block)
       top_level.__send__(name) do |j|
-        j.Type type
-        j.DependsOn options[:depends_on] if options[:depends_on]
-        j.Properties do |j|
-          if respond_to? :define_properties
-            define_properties(j, &block)
-          end
-          yield j if block_given?
-        end
+        define_resource(j, &block)
+      end
+    end
+
+    def define_resource(json)
+      json.Type type
+      json.DependsOn options[:depends_on] if options[:depends_on]
+      json.Properties do |j|
+        yield j if block_given?
       end
     end
 

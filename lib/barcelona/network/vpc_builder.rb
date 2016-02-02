@@ -3,7 +3,7 @@ module Barcelona
     class VPCBuilder < CloudFormation::Builder
       class UnsupportedNatType < StandardError; end
 
-      def initialize(options)
+      def initialize(*args)
         super
         2.times do |az_index|
           add_builder SubnetBuilder.new(

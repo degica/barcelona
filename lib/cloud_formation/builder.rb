@@ -1,9 +1,10 @@
 module CloudFormation
   class Builder
     include Helper
-    attr_accessor :top_level, :options, :children
-    def initialize(options = {})
-      @options = options
+    attr_accessor :top_level, :options, :children, :stack
+    def initialize(*args)
+      @options = args.extract_options!
+      @stack = args.first
       @children = []
     end
 
@@ -19,6 +20,7 @@ module CloudFormation
     end
 
     def add_builder(builder)
+      builder.stack ||= self.stack
       self.children << builder
     end
 
