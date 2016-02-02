@@ -19,7 +19,7 @@ class District < ActiveRecord::Base
   has_many :plugins, dependent: :destroy, inverse_of: :district
 
   validates :name, presence: true, uniqueness: true, immutable: true
-  validates :s3_bucket_name, :stack_name, :cidr_block, presence: true
+  validates :s3_bucket_name, :stack_name, :cidr_block, presence: true, immutable: true
   validates :nat_type, inclusion: {in: %w(instance managed_gateway managed_gateway_multi_az)}, allow_nil: true
   validates :cluster_backend, inclusion: {in: %w(autoscaling)}
   validates :cluster_size, numericality: {greater_than_or_equal_to: 0}
