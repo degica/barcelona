@@ -21,6 +21,8 @@ class District < ActiveRecord::Base
   validates :name, presence: true, uniqueness: true, immutable: true
   validates :s3_bucket_name, :stack_name, :cidr_block, presence: true
   validates :nat_type, inclusion: {in: %w(instance managed_gateway managed_gateway_multi_az)}, allow_nil: true
+  validates :cluster_backend, inclusion: {in: %w(autoscaling)}
+  validates :cluster_size, numericality: {greater_than_or_equal_to: 0}
 
   # Allows nil when test environment
   # This is because encrypting/decrypting value is very slow
@@ -196,6 +198,9 @@ class District < ActiveRecord::Base
     self.s3_bucket_name ||= "barcelona-#{name}-#{Time.now.to_i}"
     self.cidr_block     ||= "10.#{Random.rand(256)}.0.0/16"
     self.stack_name     ||= "barcelona-#{name}"
+    self.cluster_backend  ||= 'autoscaling'
+    self.cluster_size     ||= 1
+    self.cluster_instance_type ||= "t2.micro"
   end
 
   def create_s3_bucket
