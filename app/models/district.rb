@@ -176,6 +176,7 @@ class District < ActiveRecord::Base
     self.s3_bucket_name ||= "barcelona-#{name}-#{Time.now.to_i}"
     self.cidr_block     ||= "10.#{Random.rand(256)}.0.0/16"
     self.stack_name     ||= "barcelona-#{name}"
+    self.nat_type       ||= "instance"
     self.cluster_backend  ||= 'autoscaling'
     self.cluster_size     ||= 1
     self.cluster_instance_type ||= "t2.micro"
