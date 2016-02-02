@@ -22,7 +22,7 @@ class DistrictsController < ApplicationController
   end
 
   def apply_stack
-    @district.apply_network_stack
+    @district.create_or_update_network_stack
     render status: 202, nothing: true
   end
 
