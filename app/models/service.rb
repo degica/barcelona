@@ -61,6 +61,16 @@ class Service < ActiveRecord::Base
     3000
   end
 
+  def http_port_mapping
+    nil unless web?
+    port_mappings.find_by(protocol: 'http')
+  end
+
+  def https_port_mapping
+    nil unless web?
+    port_mappings.find_by(protocol: 'https')
+  end
+
   private
 
   def create_port_mappings
