@@ -5,6 +5,7 @@ class Service < ActiveRecord::Base
   has_many :port_mappings, inverse_of: :service, dependent: :destroy
 
   serialize :hosts
+  serialize :health_check
 
   validates :name,
             presence: true,
@@ -23,6 +24,7 @@ class Service < ActiveRecord::Base
     service.reverse_proxy_image ||= DEFAULT_REVERSE_PROXY
     service.service_type ||= 'default'
     service.hosts ||= []
+    service.health_check ||= {}
   end
 
   after_create :create_port_mappings
