@@ -38,7 +38,7 @@ describe Backend::Ecs::Adapter do
       end
 
       context "when port_mappings is blank" do
-        let(:service) { create :web_service, heritage: heritage }
+        let(:service) { create :service, heritage: heritage }
         it "create ECS resources" do
           expect(ecs_mock).to receive(:register_task_definition).
             with(
@@ -69,7 +69,7 @@ describe Backend::Ecs::Adapter do
       context "when port_mappings is present" do
         let(:elb_mock) { double }
         let(:route53_mock) { double }
-        let(:service) { create :web_service, heritage: heritage, service_type: 'web', command: 'rails s' }
+        let(:service) { create :web_service, heritage: heritage, command: 'rails s' }
         let(:port_http) { service.port_mappings.http }
         let(:port_https) { service.port_mappings.https }
 
