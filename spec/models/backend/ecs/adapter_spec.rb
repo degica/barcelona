@@ -6,11 +6,13 @@ describe Backend::Ecs::Adapter do
 
   describe "#apply" do
     let(:ecs_mock) { double }
+    let(:elb_mock) { double }
     let(:service) { create :web_service, heritage: heritage }
     context "when updating service" do
       before do
         allow(adapter.ecs_service).to receive(:applied?) { true }
         allow(adapter.ecs_service).to receive_message_chain(:aws, :ecs) { ecs_mock }
+        allow(adapter.elb).to receive_message_chain(:aws, :elb) { elb_mock }
       end
 
       context "when port_mappings is blank" do
@@ -18,13 +20,28 @@ describe Backend::Ecs::Adapter do
           expect(ecs_mock).to receive(:register_task_definition).
             with(
               family: service.service_name,
-              container_definitions: [adapter.ecs_service.container_definition]
+              container_definitions: adapter.ecs_service.container_definitions
             )
           expect(ecs_mock).to receive(:update_service).
             with(
               cluster: service.district.name,
               service: service.service_name,
               task_definition: service.service_name
+            )
+          expect(elb_mock).to receive(:describe_load_balancers).
+            with(load_balancer_names: [service.service_name]) do
+            double(load_balancer_descriptions: [double(dns_name: 'service.local')])
+          end
+          expect(elb_mock).to receive(:configure_health_check).
+            with(
+              load_balancer_name: service.service_name,
+              health_check: {
+                target: "TCP:#{service.port_mappings.first.host_port}",
+                interval: 5,
+                timeout: 4,
+                unhealthy_threshold: 2,
+                healthy_threshold: 2
+              }
             )
           expect{adapter.apply}.to_not raise_error
         end
@@ -38,7 +55,7 @@ describe Backend::Ecs::Adapter do
       end
 
       context "when port_mappings is blank" do
-        let(:service) { create :web_service, heritage: heritage }
+        let(:service) { create :service, heritage: heritage }
         it "create ECS resources" do
           expect(ecs_mock).to receive(:register_task_definition).
             with(
@@ -69,7 +86,7 @@ describe Backend::Ecs::Adapter do
       context "when port_mappings is present" do
         let(:elb_mock) { double }
         let(:route53_mock) { double }
-        let(:service) { create :web_service, heritage: heritage, service_type: 'web', command: 'rails s' }
+        let(:service) { create :web_service, heritage: heritage, command: 'rails s' }
         let(:port_http) { service.port_mappings.http }
         let(:port_https) { service.port_mappings.https }
 

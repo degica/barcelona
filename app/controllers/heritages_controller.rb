@@ -94,6 +94,11 @@ class HeritagesController < ApplicationController
       ]
     ]).tap do |whitelisted|
       whitelisted[:env_vars] = params[:env_vars] if params[:env_vars].present?
+      if params[:services].present?
+        params[:services].each_with_index do |s, i|
+          whitelisted[:services][i][:health_check] = s[:health_check] if s[:health_check].present?
+        end
+      end
     end
   end
 

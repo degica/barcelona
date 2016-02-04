@@ -131,6 +131,7 @@ ActiveRecord::Schema.define(version: 20160202021528) do
     t.text     "hosts"
     t.string   "service_type",        default: "default"
     t.boolean  "force_ssl"
+    t.text     "health_check"
   end
 
   add_index "services", ["heritage_id"], name: "index_services_on_heritage_id", using: :btree
