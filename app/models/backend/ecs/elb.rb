@@ -29,6 +29,10 @@ module Backend::Ecs
       OpenStruct.new(load_balancer_name: service_name, dns_name: load_balancer.dns_name)
     end
 
+    def exist?
+      fetch_load_balancer.present?
+    end
+
     def update
       load_balancer = fetch_load_balancer
       raise "ELB not created" if load_balancer.nil?
