@@ -51,7 +51,18 @@ class ContainerInstance
   def user_data
     user_data = UserData.new
     user_data.boot_commands += [
-      "echo exclude=ecs-init >> /etc/yum.conf"
+      "echo exclude=ecs-init >> /etc/yum.conf",
+      "MEMSIZE=`cat /proc/meminfo | grep MemTotal | awk '{print $2}'`",
+      "if [ $MEMSIZE -lt 2097152 ]; then",
+      "  SIZE=$((MEMSIZE * 2))k",
+      "elif [ $MEMSIZE -lt 8388608 ]; then",
+      "  SIZE=${MEMSIZE}k",
+      "elif [ $MEMSIZE -lt 67108864 ]; then",
+      "  SIZE=$((MEMSIZE / 2))k",
+      "else",
+      "  SIZE=4194304k",
+      "fi",
+      "fallocate -l $SIZE /swap.img && mkswap /swap.img && chmod 600 /swap.img && swapon /swap.img"
     ]
     user_data.run_commands += [
       "set -e",
