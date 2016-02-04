@@ -12,7 +12,7 @@ module Backend::Ecs
       ecs_service.register_task
       if ecs_service.applied?
         ecs_service.update
-        elb.update
+        elb.update if elb.exist?
       else
         load_balancer = elb.create
         record_set.create(load_balancer) if load_balancer.present?
