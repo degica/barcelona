@@ -24,7 +24,7 @@ describe "POST /districts/:district/heritages", type: :request do
             {container_port: 3333, protocol: "udp", lb_port: 3333 }
           ],
           health_check: {
-            protocol: 'http',
+            protocol: 'tcp',
             port: 1111
           },
           hosts: [
@@ -63,7 +63,7 @@ describe "POST /districts/:district/heritages", type: :request do
     expect(heritage["services"][0]["port_mappings"][2]["container_port"]).to eq 3000
     expect(heritage["services"][0]["port_mappings"][2]["host_port"]).to be_a Integer
     expect(heritage["services"][0]["port_mappings"][2]["protocol"]).to eq "https"
-    expect(heritage["services"][0]["health_check"]["protocol"]).to eq "http"
+    expect(heritage["services"][0]["health_check"]["protocol"]).to eq "tcp"
     expect(heritage["services"][0]["health_check"]["port"]).to eq 1111
     expect(heritage["services"][0]["hosts"][0]["hostname"]).to eq "awesome-app.degica.com"
     expect(heritage["services"][0]["hosts"][0]["ssl_cert_path"]).to eq "s3://degica-bucket/path/to/cert"

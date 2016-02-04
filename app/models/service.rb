@@ -15,6 +15,7 @@ class Service < ActiveRecord::Base
   validates :memory, numericality: {greater_than: 0}
   validates :service_type, inclusion: { in: %w(default web) }
   validates :name, :service_type, :public, immutable: true
+  validate :validate_health_check
 
   accepts_nested_attributes_for :port_mappings
 
@@ -82,5 +83,11 @@ class Service < ActiveRecord::Base
 
   def backend
     @backend ||= Backend::Ecs::Adapter.new(self)
+  end
+
+  def validate_health_check
+    self.health_check = {} if health_check.nil?
+    health_check[:protocol] ||= "tcp"
+    errors.add(:protocol, "is not supported") if health_check[:protocol] != "tcp"
   end
 end
