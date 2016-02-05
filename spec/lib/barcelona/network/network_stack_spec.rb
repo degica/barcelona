@@ -64,7 +64,11 @@ describe Barcelona::Network::NetworkStack do
             {"IpProtocol" => "tcp",
              "FromPort" => 443,
              "ToPort" => 443,
-             "CidrIp" => "0.0.0.0/0"}]}},
+             "CidrIp" => "0.0.0.0/0"},
+            {"IpProtocol" => "-1",
+             "FromPort" => "-1",
+             "ToPort" => "-1",
+             "CidrIp" => "10.0.0.0/16"}]}},
       "PrivateELBSecurityGroup" => {
         "Type" => "AWS::EC2::SecurityGroup",
         "Properties" => {"GroupDescription" => "SG for Private ELB",

@@ -127,6 +127,12 @@ module Barcelona
               "FromPort" => 443,
               "ToPort" => 443,
               "CidrIp" => "0.0.0.0/0"
+            },
+            {
+              "IpProtocol" => "-1",
+              "FromPort" => "-1",
+              "ToPort" => "-1",
+              "CidrIp" => options[:cidr_block]
             }
           ]
         end
