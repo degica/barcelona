@@ -16,4 +16,10 @@ class ApplicationController < ActionController::Base
       raise ExceptionHandler::Unauthorized.new("User not found")
     end
   end
+
+  # Add additional info to lograge logs
+  def append_info_to_payload(payload)
+    super
+    payload[:user] = current_user.try(:name)
+  end
 end
