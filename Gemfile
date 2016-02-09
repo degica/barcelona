@@ -14,6 +14,7 @@ gem 'rails_12factor', group: :production
 gem 'slack-notifier'
 gem 'pundit'
 gem 'jbuilder'
+gem 'lograge'
 
 group :development, :test do
   gem 'pry-rails'

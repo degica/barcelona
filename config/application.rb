@@ -40,5 +40,18 @@ module Barcelona
     config.eager_load_paths += [
       "#{Rails.root}/lib"
     ]
+
+    ### Log configurations
+
+    config.filter_parameters += [:token, :aws_secret_access_key, :env_vars, :public_key, :roles]
+
+    config.lograge.enabled = true
+    config.lograge.custom_options = -> event do
+      params = event.payload[:params].except('controller', 'action')
+      {
+        user: event.payload[:user],
+        params: params
+      }.compact
+    end
   end
 end
