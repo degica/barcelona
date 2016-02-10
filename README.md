@@ -34,9 +34,9 @@ District manages the above AWS resources and EC2 instances running as an ECS cot
   - delayed_job
 - cron
 
-So the `komoju-core-app` heritage has 3 services: `web`, `worker`, `cron`. each service can independently scale out/in for example web with scale 4, worker with scale 2, cron with scale 1.
+So the `komoju-core-app` heritage has 3 services: `web`, `worker`, `cron`. Each service can independently scale out/in for example web with scale 4, worker with scale 2, cron with scale 1.
 
-Once you create a heritage, Barcelona make AWS ECS's `create-service` request and ECS pull and run the specified docker image on the ECS container instances.
+Once you create a heritage, Barcelona makes a `create-service` request to AWS ECS and ECS pulls and runs the specified docker image on the ECS container instances.
 
 Additionally, We also may want another heritage `komoju-core-front` which runs nginx as a reverse-proxy for `komoju-core-app`.
 
