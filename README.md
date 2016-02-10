@@ -9,7 +9,7 @@ Prior to alpha status.
 ## Philosophy
 
 Barcelona tries to be tied with AWS managed services(ECS, ELB, VPC) so that we have less amount of ops tasks.
-Barcelona will not offer new concpets. It's a simple wrapper service on top of AWS EC2 Container Service(ECS). All data or configurations in Barcelona are directly linked to AWS resource.
+Barcelona will not offer new concepts. It's a simple wrapper service on top of AWS EC2 Container Service(ECS). All data or configurations in Barcelona are directly linked to AWS resource.
 
 ### District
 
@@ -44,7 +44,7 @@ Additionally, We also may want another heritage `komoju-core-front` which runs n
 
 ### Authentication
 
-Currently only users in `developers` team of `degica` organinzation can login.
+Currently only users in the `developers` team of `degica` organization can login.
 
 1. [Create Github access token](https://github.com/settings/tokens) with permission `read:org`
 2. login by `curl -XPOST -H "X-GitHub-Token: [your GitHub access token]" http://localhost:3000/login`
