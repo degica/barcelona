@@ -9,7 +9,7 @@ Prior to alpha status.
 ## Philosophy
 
 Barcelona tries to be tied with AWS managed services(ECS, ELB, VPC) so that we have less amount of ops tasks.
-Barcelona will not offer new concpets. It's a simple wrapper service on top of AWS EC2 Container Service(ECS). All data or configurations in Barcelona are directly linked to AWS resource.
+Barcelona will not offer new concepts. It's a simple wrapper service on top of AWS EC2 Container Service(ECS). All data or configurations in Barcelona are directly linked to AWS resource.
 
 ### District
 
@@ -34,9 +34,9 @@ District manages the above AWS resources and EC2 instances running as an ECS cot
   - delayed_job
 - cron
 
-So the `komoju-core-app` heritage has 3 services: `web`, `worker`, `cron`. each service can independently scale out/in for example web with scale 4, worker with scale 2, cron with scale 1.
+So the `komoju-core-app` heritage has 3 services: `web`, `worker`, `cron`. Each service can independently scale out/in for example web with scale 4, worker with scale 2, cron with scale 1.
 
-Once you create a heritage, Barcelona make AWS ECS's `create-service` request and ECS pull and run the specified docker image on the ECS container instances.
+Once you create a heritage, Barcelona makes a `create-service` request to AWS ECS and ECS pulls and runs the specified docker image on the ECS container instances.
 
 Additionally, We also may want another heritage `komoju-core-front` which runs nginx as a reverse-proxy for `komoju-core-app`.
 
@@ -44,7 +44,7 @@ Additionally, We also may want another heritage `komoju-core-front` which runs n
 
 ### Authentication
 
-Currently only users in `developers` team of `degica` organinzation can login.
+Currently only users in the `developers` team of `degica` organization can login.
 
 1. [Create Github access token](https://github.com/settings/tokens) with permission `read:org`
 2. login by `curl -XPOST -H "X-GitHub-Token: [your GitHub access token]" http://localhost:3000/login`
