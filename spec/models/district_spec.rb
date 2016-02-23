@@ -38,9 +38,10 @@ describe District do
 
     it "deletes all associated plugins" do
       district.save!
-      plugin = district.plugins.create(name: 'ntp', plugin_attributes: {ntp_hosts: ["10.0.0.1"]})
-      expect(plugin).to_not receive(:save_district)
+      district.plugins.create(name: 'ntp', plugin_attributes: {ntp_hosts: ["10.0.0.1"]})
+      expect(district).to_not receive(:save!)
       district.destroy!
+      expect(Plugin.count).to be_zero
     end
   end
 
