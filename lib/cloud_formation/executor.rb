@@ -45,8 +45,12 @@ module CloudFormation
       case stack_status
       when nil, "DELETE_COMPLETE" then
         create
-      when "CREATE_COMPLETE", "UPDATE_COMPLETE", "ROLLBACK_COMPLETE", "UPDATE_ROLLBACK_COMPLETE"
+      when "CREATE_COMPLETE", "UPDATE_COMPLETE", "UPDATE_ROLLBACK_COMPLETE"
         update
+      when "ROLLBACK_COMPLETE"
+        # ROLLBACK_COMPLETE only happens when creating stack failed
+        # The only way to solve is to delete and re-create the stack
+        raise "Can't update creation-rollbacked stack"
       else
         raise "Applying stack template in progress"
       end
