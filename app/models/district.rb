@@ -16,7 +16,7 @@ class District < ActiveRecord::Base
   has_many :heritages, inverse_of: :district, dependent: :destroy
   has_many :users_districts, dependent: :destroy
   has_many :users, through: :users_districts
-  has_many :plugins, dependent: :destroy, inverse_of: :district
+  has_many :plugins, dependent: :delete_all, inverse_of: :district
 
   validates :name, presence: true, uniqueness: true, immutable: true
   validates :s3_bucket_name, :stack_name, :cidr_block, presence: true, immutable: true

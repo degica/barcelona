@@ -6,11 +6,6 @@ describe District do
   let(:ecs_mock) { double }
   let(:s3_mock)  { double }
 
-  before do
-    allow(district).to receive_message_chain(:aws, :ec2) { ec2_mock }
-    allow(district).to receive_message_chain(:aws, :ecs) { ecs_mock }
-    allow(district).to receive_message_chain(:aws, :s3)  { s3_mock }
-  end
 
   describe "#validations" do
     let(:district) { build :district }
@@ -40,9 +35,22 @@ describe District do
       expect(district1.users).to include(user1)
       expect(district1.users).to include(user2)
     end
+
+    it "deletes all associated plugins" do
+      district.save!
+      plugin = district.plugins.create(name: 'ntp', plugin_attributes: {ntp_hosts: ["10.0.0.1"]})
+      expect(plugin).to_not receive(:save_district)
+      district.destroy!
+    end
   end
 
   describe "#subnets" do
+    before do
+      allow(district).to receive_message_chain(:aws, :ec2) { ec2_mock }
+      allow(district).to receive_message_chain(:aws, :ecs) { ecs_mock }
+      allow(district).to receive_message_chain(:aws, :s3)  { s3_mock }
+    end
+
     it "returns private subnets" do
       expect(ec2_mock).to receive(:describe_subnets).with(
         filters: [
@@ -67,6 +75,12 @@ describe District do
   end
 
   describe "#container_instances" do
+    before do
+      allow(district).to receive_message_chain(:aws, :ec2) { ec2_mock }
+      allow(district).to receive_message_chain(:aws, :ecs) { ecs_mock }
+      allow(district).to receive_message_chain(:aws, :s3)  { s3_mock }
+    end
+
     it "returns container instances and ec2 instances information" do
       expect(ecs_mock).to receive(:list_container_instances) do
         double(
