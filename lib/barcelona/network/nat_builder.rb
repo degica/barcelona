@@ -36,15 +36,14 @@ module Barcelona
             ]
           end
         when :managed_gateway
-          # TODO CF doesn't support managed NAT gateway yet
-          raise "Managed NAT resource is not supported"
-
-          add_resource("AWS::EC2::EIP", "EIPFor#{nat_name}",
+          add_resource("AWS::EC2::EIP", eip_name,
                        depends_on: ["VPCGatewayAttachment"]) do |j|
             j.Domain "vpc"
           end
 
-          add_resource("AWS::EC2::NATGateway", nat_name) do |j|
+          add_resource("AWS::EC2::NatGateway", nat_name) do |j|
+            j.AllocationId get_attr(eip_name, "AllocationId")
+            j.SubnetId ref(options[:public_subnet_logical_id])
           end
         else
           raise "Unrecognized NAT type"
@@ -54,13 +53,22 @@ module Barcelona
           add_resource("AWS::EC2::Route", "RouteNATFor#{rt}") do |j|
             j.RouteTableId ref(rt)
             j.DestinationCidrBlock "0.0.0.0/0"
-            j.InstanceId ref(nat_name)
+            case options[:type]
+            when :instance
+              j.InstanceId ref(nat_name)
+            when :managed_gateway
+              j.NatGatewayId ref(nat_name)
+            end
           end
         end
       end
 
+      def eip_name
+        "EIPFor#{nat_name}"
+      end
+
       def nat_name
-        "NAT#{options[:nat_id]}"
+        "NAT#{options[:type].to_s.classify}#{options[:nat_id]}"
       end
     end
   end

@@ -27,5 +27,9 @@ module CloudFormation
     def azs
       {"Fn::GetAZs" => region}
     end
+
+    def get_attr(*path)
+      {"Fn::GetAtt" => path}
+    end
   end
 end
