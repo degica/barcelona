@@ -735,9 +735,45 @@ describe Barcelona::Network::NetworkStack do
         nat_type: "instance"
       )
       generated = JSON.load(stack.target!)
-      expect(generated["Resources"]["NAT1"]).to be_present
+      expect(generated["Resources"]["NATInstance1"]).to be_present
       expect(generated["Resources"]["SecurityGroupNAT"]).to be_present
       expect(generated["Resources"]["RouteNATForRouteTableTrusted1"]).to be_present
+    end
+  end
+
+  context "when nat_type is managed_gateway" do
+    it "includes NAT resources" do
+      stack = described_class.new(
+        "test-stack",
+        cidr_block: '10.0.0.0/16',
+        bastion_key_pair: 'bastion',
+        nat_type: "managed_gateway"
+      )
+      generated = JSON.load(stack.target!)
+      expect(generated["Resources"]["EIPForNATManagedGateway1"]).to be_present
+      expect(generated["Resources"]["EIPForNATManagedGateway1"]["DeletionPolicy"]).to eq "Retain"
+      expect(generated["Resources"]["NATManagedGateway1"]).to be_present
+      expect(generated["Resources"]["RouteNATForRouteTableTrusted1"]).to be_present
+    end
+  end
+
+  context "when nat_type is managed_gateway_multi_az" do
+    it "includes NAT resources" do
+      stack = described_class.new(
+        "test-stack",
+        cidr_block: '10.0.0.0/16',
+        bastion_key_pair: 'bastion',
+        nat_type: "managed_gateway_multi_az"
+      )
+      generated = JSON.load(stack.target!)
+      expect(generated["Resources"]["EIPForNATManagedGateway1"]).to be_present
+      expect(generated["Resources"]["EIPForNATManagedGateway1"]["DeletionPolicy"]).to eq "Retain"
+      expect(generated["Resources"]["NATManagedGateway1"]).to be_present
+      expect(generated["Resources"]["RouteNATForRouteTableTrusted1"]).to be_present
+      expect(generated["Resources"]["EIPForNATManagedGateway2"]).to be_present
+      expect(generated["Resources"]["EIPForNATManagedGateway2"]["DeletionPolicy"]).to eq "Retain"
+      expect(generated["Resources"]["NATManagedGateway2"]).to be_present
+      expect(generated["Resources"]["RouteNATForRouteTableTrusted2"]).to be_present
     end
   end
 
