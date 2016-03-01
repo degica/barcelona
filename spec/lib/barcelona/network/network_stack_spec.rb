@@ -751,6 +751,7 @@ describe Barcelona::Network::NetworkStack do
       )
       generated = JSON.load(stack.target!)
       expect(generated["Resources"]["EIPForNATManagedGateway1"]).to be_present
+      expect(generated["Resources"]["EIPForNATManagedGateway1"]["DeletionPolicy"]).to eq "Retain"
       expect(generated["Resources"]["NATManagedGateway1"]).to be_present
       expect(generated["Resources"]["RouteNATForRouteTableTrusted1"]).to be_present
     end
@@ -766,9 +767,11 @@ describe Barcelona::Network::NetworkStack do
       )
       generated = JSON.load(stack.target!)
       expect(generated["Resources"]["EIPForNATManagedGateway1"]).to be_present
+      expect(generated["Resources"]["EIPForNATManagedGateway1"]["DeletionPolicy"]).to eq "Retain"
       expect(generated["Resources"]["NATManagedGateway1"]).to be_present
       expect(generated["Resources"]["RouteNATForRouteTableTrusted1"]).to be_present
       expect(generated["Resources"]["EIPForNATManagedGateway2"]).to be_present
+      expect(generated["Resources"]["EIPForNATManagedGateway2"]["DeletionPolicy"]).to eq "Retain"
       expect(generated["Resources"]["NATManagedGateway2"]).to be_present
       expect(generated["Resources"]["RouteNATForRouteTableTrusted2"]).to be_present
     end

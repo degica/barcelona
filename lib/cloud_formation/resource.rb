@@ -22,6 +22,7 @@ module CloudFormation
     def define_resource(json)
       json.Type type
       json.DependsOn options[:depends_on] if options[:depends_on]
+      json.DeletionPolicy "Retain" if options[:retain]
       json.Properties do |j|
         yield j if block_given?
       end

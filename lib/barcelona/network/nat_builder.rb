@@ -37,6 +37,7 @@ module Barcelona
           end
         when :managed_gateway
           add_resource("AWS::EC2::EIP", eip_name,
+                       retain: true,
                        depends_on: ["VPCGatewayAttachment"]) do |j|
             j.Domain "vpc"
           end
