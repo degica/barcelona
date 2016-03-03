@@ -34,7 +34,6 @@ class District < ActiveRecord::Base
 
   serialize :dockercfg, JSON
 
-  encrypted_attribute :aws_access_key_id, secret_key: ENV['ENCRYPTION_KEY']
   encrypted_attribute :aws_secret_access_key, secret_key: ENV['ENCRYPTION_KEY']
 
   accepts_nested_attributes_for :plugins
