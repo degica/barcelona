@@ -11,8 +11,7 @@ env:
     - DATABASE_URL=postgres://postgres:@localhost:5432/travis_ci_test
 before_script:
 - npm install -g barcelona
-- gem install specific_install
-- gem specific_install https://github.com/degica/bcnd.git
+- gem install bcnd --no-ri --no-rdoc
 - psql -c 'create database travis_ci_test;' -U postgres
 script:
 - bundle exec rake db:setup spec
