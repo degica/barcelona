@@ -17,7 +17,7 @@ module Barcelona
          "-h", "`hostname`",
          "-v", "/var/run/docker.sock:/var/run/docker.sock",
          "-v", "/proc/:/host/proc/:ro",
-         "-v", "/sys/fs/cgroup/:/host/sys/fs/cgroup:ro",
+         "-v", "/cgroup/:/host/sys/fs/cgroup:ro",
          "-e", "API_KEY=#{api_key}",
          tags,
          "datadog/docker-dd-agent:latest"
@@ -25,7 +25,7 @@ module Barcelona
       end
 
       def tags
-        "-e TAGS=\"barcelona,district:#{district.name}\""
+        "-e TAGS=\"barcelona,barcelona-dd-agent,district:#{district.name}\""
       end
 
       def api_key
