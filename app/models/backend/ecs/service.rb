@@ -47,6 +47,15 @@ module Backend::Ecs
       ecs_service&.pending_count
     end
 
+    def deployment(id)
+      return nil if deployments.nil?
+      deployments.find { |d| d.id == id }
+    end
+
+    def deployments
+      ecs_service&.deployments
+    end
+
     def container_definition
       base = service.heritage.base_task_definition(service_name)
       base[:environment] += service.port_mappings.map do |pm|

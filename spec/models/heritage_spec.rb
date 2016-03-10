@@ -6,7 +6,8 @@ describe Heritage do
   describe "#save_and_deploy!" do
     it "enqueues deploy job" do
       expect(DeployRunnerJob).to receive(:perform_later).with(heritage, without_before_deploy: false)
-      heritage.save_and_deploy!
+      release = heritage.save_and_deploy!(description: "deploy")
+      expect(release.description).to eq "deploy"
     end
   end
 

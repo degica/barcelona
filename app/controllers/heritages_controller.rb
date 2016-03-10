@@ -13,13 +13,14 @@ class HeritagesController < ApplicationController
 
   def create
     @heritage = BuildHeritage.new(permitted_params, district: @district).execute
-    @heritage.save_and_deploy!(without_before_deploy: true)
+    @heritage.save_and_deploy!(without_before_deploy: true, description: "Created")
     render json: @heritage
   end
 
   def update
     @heritage = BuildHeritage.new(permitted_params).execute
-    @heritage.save_and_deploy!(without_before_deploy: false)
+    @heritage.save_and_deploy!(without_before_deploy: false,
+                               description: "Updated to #{@heritage.image_path}")
     render json: @heritage
   end
 
@@ -45,7 +46,8 @@ class HeritagesController < ApplicationController
       env.value = v
       env.save!
     end
-    @heritage.save_and_deploy!(without_before_deploy: true)
+    @heritage.save_and_deploy!(without_before_deploy: true,
+                               description: "Set environments #{env_vars.keys.join(', ')}")
 
     render json: @heritage
   end
@@ -55,7 +57,8 @@ class HeritagesController < ApplicationController
     env_keys.each do |k|
       @heritage.env_vars.find_by(key: k).destroy!
     end
-    @heritage.save_and_deploy!(without_before_deploy: true)
+    @heritage.save_and_deploy!(without_before_deploy: true,
+                               description: "Unset environments #{env_keys.join(', ')}")
 
     render json: @heritage
   end

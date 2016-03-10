@@ -27,7 +27,9 @@ describe Backend::Ecs::Adapter do
               cluster: service.district.name,
               service: service.service_name,
               task_definition: service.service_name
-            )
+            ).
+            and_return(double(service: double(task_definition: 'arn/td-id',
+                                              deployments: [double(id: 'aaaaaaa')])))
           expect(elb_mock).to receive(:describe_load_balancers).
             with(load_balancer_names: [service.service_name]) do
             double(load_balancer_descriptions: [double(dns_name: 'service.local')])
@@ -78,7 +80,9 @@ describe Backend::Ecs::Adapter do
               service_name: service.service_name,
               task_definition: service.service_name,
               desired_count: 1
-            )
+            ).
+            and_return(double(service: double(task_definition: 'arn/td-id',
+                                              deployments: [double(id: 'aaaaaaa')])))
           expect{adapter.apply}.to_not raise_error
         end
       end
@@ -163,7 +167,9 @@ describe Backend::Ecs::Adapter do
               ],
               role: service.district.ecs_service_role,
               desired_count: 1
-            )
+            ).
+            and_return(double(service: double(task_definition: 'arn/td-id',
+                                              deployments: [double(id: 'aaaaaaa')])))
           expect(elb_mock).to receive(:create_load_balancer).
             with(
               load_balancer_name: service.service_name,

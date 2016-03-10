@@ -14,6 +14,10 @@ Rails.application.routes.draw do
         post "/services/:service_id/scale", to: "services#scale"
         post "/trigger/:token", to: "heritages#trigger"
         resources :oneoffs, only: [:show, :create]
+
+        get "/releases", to: "releases#index"
+        get "/releases/:version", to: "releases#show"
+        post "/releases/:version/rollback", to: "releases#rollback"
       end
     end
 
