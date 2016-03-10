@@ -18,7 +18,8 @@ class DeployRunnerJob < ActiveJob::Base
     heritage.services.each do |service|
       Rails.logger.info "Updating service #{service.service_name} ..."
       begin
-        service.apply
+        result = service.apply
+        MonitorDeploymentJob.perform_later(service, deployment_id: result[:deployment_id])
       rescue => e
         Rails.logger.error "#{e.class}: #{e.message}"
         Rails.logger.error caller.join("\n")
@@ -27,10 +28,6 @@ class DeployRunnerJob < ActiveJob::Base
           message: "Deploy failed: Something went wrong with deploying #{service.service_name}"
         )
       end
-    end
-
-    heritage.services.each do |service|
-      MonitorDeploymentJob.perform_later(service)
     end
   end
 end
