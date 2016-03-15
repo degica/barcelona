@@ -1,10 +1,6 @@
 class District < ActiveRecord::Base
   include EncryptAttribute
 
-  attr_writer :vpc_id, :public_elb_security_group, :private_elb_security_group,
-              :instance_security_group, :private_hosted_zone_id,
-              :ecs_instance_profile, :ecs_service_role
-
   before_validation :set_default_attributes
   before_create :assign_default_users
   after_create :create_s3_bucket
