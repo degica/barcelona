@@ -11,6 +11,7 @@ environments:
         cpu: 128
         memory: 256
         command: puma -C config/puma.rb
+        force_ssl: true
         hosts:
           - hostname: barcelona.degica.com
             ssl_cert_path: s3://degica2-barcelona/certs/degica.com.crt
