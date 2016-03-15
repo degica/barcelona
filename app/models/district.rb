@@ -75,6 +75,14 @@ class District < ActiveRecord::Base
     @stack_resources ||= stack_executor.resource_ids
   end
 
+  def bastion_ip
+    bastion_server_id = stack_resources["BastionServer"]
+    return nil if bastion_server_id.blank?
+
+    resp = aws.ec2.describe_instances(instance_ids: [bastion_server_id])
+    resp.reservations[0].instances[0].public_ip_address if resp.reservations.present?
+  end
+
   def subnets(network = "Private")
     @subnets ||= aws.ec2.describe_subnets(
       filters: [
