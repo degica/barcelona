@@ -47,9 +47,9 @@ describe District do
 
   describe "#subnets" do
     before do
-      allow(district).to receive_message_chain(:aws, :ec2) { ec2_mock }
-      allow(district).to receive_message_chain(:aws, :ecs) { ecs_mock }
-      allow(district).to receive_message_chain(:aws, :s3)  { s3_mock }
+      allow(district.aws).to receive(:ec2) { ec2_mock }
+      allow(district.aws).to receive(:ecs) { ecs_mock }
+      allow(district.aws).to receive(:s3)  { s3_mock }
     end
 
     it "returns private subnets" do

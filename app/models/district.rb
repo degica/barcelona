@@ -1,10 +1,6 @@
 class District < ActiveRecord::Base
   include EncryptAttribute
 
-  attr_writer :vpc_id, :public_elb_security_group, :private_elb_security_group,
-              :instance_security_group, :private_hosted_zone_id,
-              :ecs_instance_profile, :ecs_service_role
-
   before_validation :set_default_attributes
   before_create :assign_default_users
   after_create :create_s3_bucket
@@ -77,6 +73,14 @@ class District < ActiveRecord::Base
 
   def stack_resources
     @stack_resources ||= stack_executor.resource_ids
+  end
+
+  def bastion_ip
+    bastion_server_id = stack_resources["BastionServer"]
+    return nil if bastion_server_id.blank?
+
+    resp = aws.ec2.describe_instances(instance_ids: [bastion_server_id])
+    resp.reservations[0].instances[0].public_ip_address if resp.reservations.present?
   end
 
   def subnets(network = "Private")
