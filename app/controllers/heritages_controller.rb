@@ -31,6 +31,10 @@ class HeritagesController < ApplicationController
 
   def trigger
     @heritage = Heritage.find_by!(name: params[:heritage_id])
+    if params[:image_name].present? && @heritage.image_name != params[:image_name]
+      raise ExceptionHandler::Forbidden
+    end
+
     params[:id] = params.delete :heritage_id
     if Rack::Utils.secure_compare(params[:token], @heritage.token)
       update
