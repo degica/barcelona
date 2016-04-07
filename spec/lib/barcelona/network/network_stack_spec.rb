@@ -791,6 +791,7 @@ describe Barcelona::Network::NetworkStack do
       )
       generated = JSON.load(stack.target!)
       expect(generated["Resources"]["ContainerInstanceLaunchConfiguration"]).to be_present
+      expect(generated["Resources"]["ContainerInstanceLaunchConfiguration"]["Properties"]["EbsOptimized"]).to eq false
       expect(generated["Resources"]["ContainerInstanceAutoScalingGroup"]).to be_present
     end
   end
