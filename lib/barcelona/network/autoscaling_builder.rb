@@ -1,6 +1,10 @@
 module Barcelona
   module Network
     class AutoscalingBuilder < CloudFormation::Builder
+      def ebs_optimized_by_default?
+        !!(instance_type =~ /\A(c4|m4|d2)\..*\z/)
+      end
+
       def build_resources
         add_resource("AWS::AutoScaling::LaunchConfiguration",
                      "ContainerInstanceLaunchConfiguration") do |j|
@@ -10,6 +14,7 @@ module Barcelona
           j.InstanceType instance_type
           j.SecurityGroups [ref("InstanceSecurityGroup")]
           j.UserData instance_user_data
+          j.EbsOptimized ebs_optimized_by_default?
           j.BlockDeviceMappings [
             {
               "DeviceName" => "/dev/xvda",
