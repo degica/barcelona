@@ -2,11 +2,11 @@ source 'https://rubygems.org'
 
 ruby "2.3.0"
 
-gem 'rails', '4.2.5.2'
+gem 'rails', '4.2.6'
 gem 'pg'
 gem 'aws-sdk'
 gem 'puma'
-gem 'active_model_serializers', "0.10.0.rc3"
+gem 'active_model_serializers', "0.10.0.rc5"
 gem 'gibberish'
 gem 'octokit'
 gem 'delayed_job_active_record'
