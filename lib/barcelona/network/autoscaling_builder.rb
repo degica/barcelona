@@ -6,7 +6,7 @@ module Barcelona
                      "ContainerInstanceLaunchConfiguration") do |j|
 
           j.IamInstanceProfile ref("ECSInstanceProfile")
-          j.ImageId "ami-b3afa2dd" # amzn-ami-2015.09.g-amazon-ecs-optimized
+          j.ImageId "ami-7e4a5b10" # amzn-ami-2016.03.a-amazon-ecs-optimized
           j.InstanceType instance_type
           j.SecurityGroups [ref("InstanceSecurityGroup")]
           j.UserData instance_user_data
@@ -31,13 +31,15 @@ module Barcelona
         user_data = options[:container_instance].user_data
         user_data.run_commands += [
           "start ecs",
-          "sleep 10",
+          "sleep 10", # Wait for ecs agent to be running
           "ecs_cluster=$(curl http://localhost:51678/v1/metadata | jq -r .Cluster)",
+          # Wait for all tasks in the cluster to be running
           "while : ; do",
           "  pending_tasks_count=$(aws ecs describe-clusters --region=$AWS_REGION --clusters=$ecs_cluster | jq -r .clusters[0].pendingTasksCount)",
           "  [[ $pending_tasks_count -eq 0 ]] && break",
           "  sleep 3",
           "done",
+          "sleep 30", # Wait for services to be attached to ELB
           "/opt/aws/bin/cfn-signal -e $? --region $AWS_REGION --stack #{stack.name} --resource ContainerInstanceAutoScalingGroup || true"
         ]
         user_data.build
