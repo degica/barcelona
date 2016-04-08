@@ -50,8 +50,8 @@ class ContainerInstance
 
   def user_data
     user_data = UserData.new
-    user_data.boot_commands += [
-      "echo exclude=ecs-init >> /etc/yum.conf",
+    user_data.run_commands += [
+      "set -e",
       "MEMSIZE=`cat /proc/meminfo | grep MemTotal | awk '{print $2}'`",
       "if [ $MEMSIZE -lt 2097152 ]; then",
       "  SIZE=$((MEMSIZE * 2))k",
@@ -62,10 +62,7 @@ class ContainerInstance
       "else",
       "  SIZE=4194304k",
       "fi",
-      "fallocate -l $SIZE /swap.img && mkswap /swap.img && chmod 600 /swap.img && swapon /swap.img"
-    ]
-    user_data.run_commands += [
-      "set -e",
+      "fallocate -l $SIZE /swap.img && mkswap /swap.img && chmod 600 /swap.img && swapon /swap.img",
       "AWS_REGION=ap-northeast-1",
       "aws s3 cp s3://#{district.s3_bucket_name}/#{district.name}/ecs.config /etc/ecs/ecs.config",
       "sed -i 's/^#\\s%wheel\\s*ALL=(ALL)\\s*NOPASSWD:\\sALL$/%wheel\\tALL=(ALL)\\tNOPASSWD:\\tALL/g' /etc/sudoers",
