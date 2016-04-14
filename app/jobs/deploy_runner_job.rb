@@ -1,8 +1,8 @@
 class DeployRunnerJob < ActiveJob::Base
   queue_as :default
 
-  def perform(heritage, without_before_deploy:)
-    heritage.events.create(level: :good, message: "Deploying #{heritage.name}(#{heritage.image_path}) to #{heritage.district.name} district...")
+  def perform(heritage, without_before_deploy:, description: "")
+    heritage.events.create(level: :good, message: "Deploying to #{heritage.district.name} district: #{description}")
     before_deploy = heritage.before_deploy
     if before_deploy.present? && !without_before_deploy
       oneoff = heritage.oneoffs.create!(command: before_deploy)
@@ -25,7 +25,7 @@ class DeployRunnerJob < ActiveJob::Base
         Rails.logger.error caller.join("\n")
         heritage.events.create(
           level: :error,
-          message: "Deploy failed: Something went wrong with deploying #{service.service_name}"
+          message: "Deploy failed: Something went wrong with deploying #{service.name} service"
         )
       end
     end

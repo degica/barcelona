@@ -35,7 +35,7 @@ describe "GET /heritages/:heritage/releases/:version", type: :request do
 
     release = JSON.load(response.body)["release"]
     expect(release["version"]).to eq 1
-    expect(release["description"]).to eq "Created"
+    expect(release["description"]).to eq "Create"
     expect(release["data"]).to include("image_name" => "nginx",
                                        "image_tag" => "latest")
   end
