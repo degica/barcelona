@@ -13,14 +13,14 @@ class HeritagesController < ApplicationController
 
   def create
     @heritage = BuildHeritage.new(permitted_params, district: @district).execute
-    @heritage.save_and_deploy!(without_before_deploy: true, description: "Created")
+    @heritage.save_and_deploy!(without_before_deploy: true, description: "Create")
     render json: @heritage
   end
 
   def update
     @heritage = BuildHeritage.new(permitted_params).execute
     @heritage.save_and_deploy!(without_before_deploy: false,
-                               description: "Updated to #{@heritage.image_path}")
+                               description: "Update to #{@heritage.image_path}")
     render json: @heritage
   end
 

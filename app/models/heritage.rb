@@ -40,7 +40,7 @@ class Heritage < ActiveRecord::Base
   def save_and_deploy!(without_before_deploy: false, description: "")
     save!
     release = releases.create!(description: description)
-    update_services(without_before_deploy)
+    update_services(release, without_before_deploy)
     release
   end
 
@@ -63,8 +63,12 @@ class Heritage < ActiveRecord::Base
 
   private
 
-  def update_services(without_before_deploy)
+  def update_services(release, without_before_deploy)
     return if image_path.nil?
-    DeployRunnerJob.perform_later self, without_before_deploy: without_before_deploy
+    DeployRunnerJob.perform_later(
+      self,
+      without_before_deploy: without_before_deploy,
+      description: release.description
+    )
   end
 end

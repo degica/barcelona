@@ -3,10 +3,10 @@ class MonitorDeploymentJob < ActiveJob::Base
 
   def perform(service, count: 0, deployment_id: nil)
     if service.deployment_finished?(deployment_id)
-      service.heritage.events.create!(level: :good, message: "#{service.service_name}(#{service.heritage.image_path}) deployed")
+      service.heritage.events.create!(level: :good, message: "#{service.name} service deployed")
     elsif count > 200
       # deploys not finished after 1000 seconds are marked as timeout
-      service.heritage.events.create!(level: :error, message: "Deploying #{service.service_name}(#{service.heritage.image_path}) has not finished for a while.")
+      service.heritage.events.create!(level: :error, message: "Deploying #{service.name} service has not finished for a while.")
     else
       MonitorDeploymentJob.set(wait: 5.seconds).perform_later(service,
                                                               count: count + 1,
