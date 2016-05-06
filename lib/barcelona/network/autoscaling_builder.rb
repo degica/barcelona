@@ -10,7 +10,7 @@ module Barcelona
                      "ContainerInstanceLaunchConfiguration") do |j|
 
           j.IamInstanceProfile ref("ECSInstanceProfile")
-          j.ImageId "ami-7e4a5b10" # amzn-ami-2016.03.a-amazon-ecs-optimized
+          j.ImageId "ami-a98d97c7" # amzn-ami-2016.03.b-amazon-ecs-optimized
           j.InstanceType instance_type
           j.SecurityGroups [ref("InstanceSecurityGroup")]
           j.UserData instance_user_data
