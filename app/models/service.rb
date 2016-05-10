@@ -1,5 +1,5 @@
 class Service < ActiveRecord::Base
-  DEFAULT_REVERSE_PROXY = 'k2nr/reverse-proxy:latest'
+  DEFAULT_REVERSE_PROXY = 'quay.io/degica/barcelona-reverse-proxy:latest'
 
   belongs_to :heritage, inverse_of: :services
   has_many :port_mappings, inverse_of: :service, dependent: :destroy
