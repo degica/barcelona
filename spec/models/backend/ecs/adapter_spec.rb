@@ -129,7 +129,7 @@ describe Backend::Ecs::Adapter do
                   cpu: 128,
                   memory: 128,
                   essential: true,
-                  image: "k2nr/reverse-proxy:latest",
+                  image: Service::DEFAULT_REVERSE_PROXY,
                   links: ["#{service.service_name}:backend"],
                   environment: [
                     {name: "AWS_REGION", value: "ap-northeast-1"},
