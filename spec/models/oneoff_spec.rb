@@ -33,8 +33,8 @@ describe Oneoff do
           container_definitions: [
             {
               name: heritage.name + "-oneoff",
-              cpu: 256,
-              memory: 256,
+              cpu: 128,
+              memory: 512,
               essential: true,
               image: "#{heritage.image_path}",
               environment: []
@@ -73,8 +73,8 @@ describe Oneoff do
             container_definitions: [
               {
                 name: heritage.name + "-oneoff",
-                cpu: 256,
-                memory: 256,
+                cpu: 128,
+                memory: 512,
                 essential: true,
                 image: "#{heritage.image_name}:v100",
                 environment: []

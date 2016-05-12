@@ -94,8 +94,8 @@ class Oneoff < ActiveRecord::Base
 
   def task_definition
     heritage.base_task_definition(container_name).merge(
-      cpu: 256,
-      memory: 256,
+      cpu: 128,
+      memory: 512,
       image: image_path
     )
   end
