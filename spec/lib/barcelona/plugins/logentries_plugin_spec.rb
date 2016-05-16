@@ -14,27 +14,6 @@ module Barcelona
         ]
       end
 
-      it "gets hooked with created trigger" do
-        heritage = Heritage.last
-        expect(heritage).to be_present
-        expect(heritage.name).to eq "#{district.name}-logger"
-        expect(heritage.image_name).to eq "k2nr/rsyslog-logentries"
-        expect(heritage.env_vars[0].key).to eq "LE_TOKEN"
-        expect(heritage.env_vars[0].value).to eq "logentries_token"
-
-        service = heritage.services.first
-        expect(service.name).to eq "main"
-        port_mapping = service.port_mappings.first
-        expect(port_mapping.lb_port).to eq described_class::LOGGER_PORT
-        expect(port_mapping.container_port).to eq 514
-      end
-
-      it "gets hooked with destroyed trigger" do
-        expect(district).to receive(:update_ecs_config)
-        district.plugins.first.destroy!
-        expect(Heritage.count).to be_zero
-      end
-
       it "gets hooked with heritage_task_definition trigger" do
         heritage = district.heritages.create(name: 'heritage',
                                              image_name: "docker_image",
@@ -46,17 +25,25 @@ module Barcelona
         expect(definition[:log_configuration]).to eq(log_driver: "syslog",
                                                      options: {
                                                        "syslog-address" => "tcp://127.0.0.1:514",
-                                                       "syslog-tag" => "heritage"
+                                                       "tag" => "heritage"
                                                      })
       end
 
       it "gets hooked with container_instance_user_data trigger" do
         ci = ContainerInstance.new(district)
         user_data = YAML.load(Base64.decode64(ci.user_data.build))
-        expect(user_data["write_files"].last["path"]).to eq "/etc/rsyslog.d/barcelona-logger.conf"
-        expect(user_data["write_files"].last["owner"]).to eq "root:root"
-        expect(user_data["write_files"].last["permissions"]).to eq "644"
-        expect(user_data["write_files"].last["content"]).to be_a String
+
+        cert_file = user_data["write_files"].find{ |f| f["path"] == "/etc/ssl/certs/logentries.all.crt" }
+        expect(cert_file["path"]).to eq "/etc/ssl/certs/logentries.all.crt"
+        expect(cert_file["owner"]).to eq "root:root"
+        expect(cert_file["permissions"]).to eq "644"
+        expect(cert_file["content"]).to be_a String
+
+        conf_file = user_data["write_files"].find{ |f| f["path"] ==  "/etc/rsyslog.d/barcelona-logger.conf" }
+        expect(conf_file["path"]).to eq "/etc/rsyslog.d/barcelona-logger.conf"
+        expect(conf_file["owner"]).to eq "root:root"
+        expect(conf_file["permissions"]).to eq "644"
+        expect(conf_file["content"]).to be_a String
       end
     end
   end
