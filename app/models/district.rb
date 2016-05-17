@@ -207,17 +207,7 @@ class District < ActiveRecord::Base
   end
 
   def network_stack
-    Barcelona::Network::NetworkStack.new(
-      stack_name,
-      cidr_block: cidr_block,
-      bastion_key_pair: bastion_key_pair,
-      nat_type: nat_type,
-      autoscaling: {
-        container_instance: ContainerInstance.new(self),
-        instance_type: cluster_instance_type,
-        desired_capacity: cluster_size
-      }
-    )
+    Barcelona::Network::NetworkStack.new(self)
   end
 
   def stack_executor

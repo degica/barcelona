@@ -228,24 +228,9 @@ module Barcelona
         end
 
         if options[:bastion_key_pair]
-          add_resource("AWS::EC2::Instance", "BastionServer",
-                       depends_on: ["VPCGatewayAttachment"]) do |j|
-            j.InstanceType "t2.micro"
-            j.SourceDestCheck false
-            j.ImageId "ami-383c1956"
-            j.KeyName options[:bastion_key_pair]
-            j.NetworkInterfaces [
-              {
-                "AssociatePublicIpAddress" => true,
-                "DeviceIndex" => 0,
-                "SubnetId" => ref("SubnetDmz1"),
-                "GroupSet" => [ref("SecurityGroupBastion")]
-              }
-            ]
-            j.Tags [
-              tag("Name", join("-", cf_stack_name, "bastion"))
-            ]
-          end
+          add_resource(BastionServer, "BastionServer",
+                       bastion_key_pair: options[:bastion_key_pair],
+                       depends_on: ["VPCGatewayAttachment"])
         end
 
         add_resource("AWS::IAM::Role", "ECSServiceRole") do |j|

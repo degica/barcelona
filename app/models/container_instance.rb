@@ -1,47 +1,4 @@
 class ContainerInstance
-  class UserData
-    attr_accessor :files, :boot_commands, :run_commands, :packages, :users
-
-    def initialize
-      @files = []
-      @boot_commands = []
-      @run_commands = []
-      @users = []
-      @packages = ["aws-cli", "jq", "aws-cfn-bootstrap"]
-    end
-
-    def build
-      user_data = {
-        "repo_update" => true,
-        "repo_upgrade" => "all",
-        "packages" => packages.uniq,
-        "write_files" => files,
-        "bootcmd" => boot_commands,
-        "runcmd" => run_commands,
-        "users" => users
-      }.reject{ |_, v| v.blank? }
-      raw_user_data = "#cloud-config\n" << YAML.dump(user_data)
-      Base64.encode64(raw_user_data)
-    end
-
-    def add_file(path, owner, permissions, content)
-      @files << {
-        "path" => path,
-        "owner" => owner,
-        "permissions" => permissions,
-        "content" => content
-      }
-    end
-
-    def add_user(name, authorized_keys: [], groups: [])
-      @users << {
-        "name" => name,
-        "ssh-authorized-keys" => authorized_keys,
-        "groups" => groups.join(',')
-      }
-    end
-  end
-
   attr_accessor :district
 
   def initialize(district)
@@ -49,7 +6,8 @@ class ContainerInstance
   end
 
   def user_data
-    user_data = UserData.new
+    user_data = InstanceUserData.new
+    user_data.packages += ["aws-cli", "jq", "aws-cfn-bootstrap"]
     user_data.run_commands += [
       "set -e",
       "MEMSIZE=`cat /proc/meminfo | grep MemTotal | awk '{print $2}'`",
