@@ -22,11 +22,5 @@ module Barcelona::Network
         builder.add_builder VPCBuilder.new(self, options)
       end
     end
-
-    def build_outputs(json)
-      json.VpcId do |j|
-        j.Value ref("VPC")
-      end
-    end
   end
 end
