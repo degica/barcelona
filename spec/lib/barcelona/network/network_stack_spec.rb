@@ -799,25 +799,25 @@ describe Barcelona::Network::NetworkStack do
         "DependsOn" => ["VPCGatewayAttachment"],
         "Type" => "AWS::EC2::Instance",
         "Properties" => {
-          "InstanceType"=>"t2.micro",
-          "SourceDestCheck"=>false,
-          "ImageId"=>"ami-383c1956",
-          "KeyName"=>"bastion",
+          "InstanceType" => "t2.micro",
+          "SourceDestCheck" => false,
+          "ImageId" => "ami-29160d47",
+          "KeyName" => "bastion",
           "NetworkInterfaces" => [
             {
               "AssociatePublicIpAddress" => true,
-              "DeviceIndex"=>0,
+              "DeviceIndex" => 0,
               "SubnetId" => {
-                "Ref"=>"SubnetDmz1"
+                "Ref" => "SubnetDmz1"
               },
               "GroupSet" => [
-                {"Ref"=>"SecurityGroupBastion"}
+                {"Ref" => "SecurityGroupBastion"}
               ]
             }
           ],
           "Tags" => [
             {
-              "Key"=>"Name",
+              "Key" => "Name",
               "Value" => {"Fn::Join"=>["-", [{"Ref"=>"AWS::StackName"}, "bastion"]]}
             }
           ]
