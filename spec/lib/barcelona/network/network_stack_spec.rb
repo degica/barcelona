@@ -4,11 +4,8 @@ describe Barcelona::Network::NetworkStack do
   let(:district) { create :district }
 
   it "generates network stack CF template" do
-    stack = described_class.new(
-      "test-stack",
-      cidr_block: '10.0.0.0/16',
-      bastion_key_pair: 'bastion'
-    )
+    district.nat_type = nil
+    stack = described_class.new(district)
     generated = JSON.load(stack.target!)
     expect(generated["Description"]).to eq "AWS CloudFormation for Barcelona network stack"
     expect(generated["AWSTemplateFormatVersion"]).to eq "2010-09-09"
@@ -17,7 +14,7 @@ describe Barcelona::Network::NetworkStack do
         "Type" => "AWS::EC2::VPC",
         "Properties" =>
         {
-          "CidrBlock" => "10.0.0.0/16",
+          "CidrBlock" => district.cidr_block,
           "EnableDnsSupport" => true,
           "EnableDnsHostnames" => true,
           "Tags" =>
@@ -68,7 +65,7 @@ describe Barcelona::Network::NetworkStack do
             {"IpProtocol" => "-1",
              "FromPort" => "-1",
              "ToPort" => "-1",
-             "CidrIp" => "10.0.0.0/16"}]}},
+             "CidrIp" => district.cidr_block}]}},
       "PrivateELBSecurityGroup" => {
         "Type" => "AWS::EC2::SecurityGroup",
         "Properties" => {"GroupDescription" => "SG for Private ELB",
@@ -77,12 +74,56 @@ describe Barcelona::Network::NetworkStack do
                            {"IpProtocol" => "tcp",
                             "FromPort" => 1,
                             "ToPort" => 65535,
-                            "CidrIp" => "10.0.0.0/16"}]}},
+                            "CidrIp" => district.cidr_block}]}},
       "ContainerInstanceAccessibleSecurityGroup" => {
         "Type" => "AWS::EC2::SecurityGroup",
         "Properties" => {
           "GroupDescription" => "accessible to container instances",
           "VpcId" => {"Ref" => "VPC"}}},
+      "ContainerInstanceAutoScalingGroup" => {
+        "Type"=>"AWS::AutoScaling::AutoScalingGroup",
+        "Properties" => {
+          "DesiredCapacity" => 1,
+          "Cooldown" => 0,
+          "HealthCheckGracePeriod" => 0,
+          "MaxSize" => 2,
+          "MinSize" => 1,
+          "HealthCheckType" => "EC2",
+          "LaunchConfigurationName" => {"Ref" => "ContainerInstanceLaunchConfiguration"},
+          "VPCZoneIdentifier"=>[
+            {"Ref" => "SubnetTrusted1"},
+            {"Ref"=>"SubnetTrusted2"}
+          ],
+          "Tags" => [
+            {"Key"=>"Name", "Value"=>"barcelona-container-instance", "PropagateAtLaunch"=>true}
+          ]
+        },
+        "UpdatePolicy" => {
+          "AutoScalingRollingUpdate" => {
+            "MaxBatchSize" => 1,
+            "MinInstancesInService" => 1,
+            "WaitOnResourceSignals" => true,
+            "PauseTime" => "PT20M"
+          }
+        }
+      },
+      "ContainerInstanceLaunchConfiguration" => {
+        "Type" => "AWS::AutoScaling::LaunchConfiguration",
+        "Properties" => {
+          "IamInstanceProfile" => {"Ref"=>"ECSInstanceProfile"},
+          "ImageId" => "ami-a98d97c7",
+          "InstanceType" => "t2.micro",
+          "SecurityGroups" => [{"Ref"=>"InstanceSecurityGroup"}],
+          "UserData" => instance_of(String),
+          "EbsOptimized" => false,
+          "BlockDeviceMappings" => [
+            {
+              "DeviceName"=>"/dev/xvda",
+              "Ebs" => {"DeleteOnTermination"=>true, "VolumeSize"=>80, "VolumeType"=>"gp2"}
+            }
+          ]
+        }
+      },
       "InstanceSecurityGroup" => {
         "Type" => "AWS::EC2::SecurityGroup",
         "Properties" => {
@@ -96,7 +137,7 @@ describe Barcelona::Network::NetworkStack do
             {"IpProtocol" => "icmp",
              "FromPort" => -1,
              "ToPort" => -1,
-             "CidrIp" => "10.0.0.0/16"},
+             "CidrIp" => district.cidr_block},
             {"IpProtocol" => -1,
              "FromPort" => -1,
              "ToPort" => -1,
@@ -131,28 +172,12 @@ describe Barcelona::Network::NetworkStack do
             {"IpProtocol" => "udp",
              "FromPort" => 123,
              "ToPort" => 123,
-             "CidrIp" => "10.0.0.0/16"}],
+             "CidrIp" => district.cidr_block}],
           "SecurityGroupEgress" => [
             {"IpProtocol" => -1,
              "FromPort" => -1,
              "ToPort" => -1,
              "CidrIp" => "0.0.0.0/0"}]}},
-      "BastionServer" => {
-        "Type" => "AWS::EC2::Instance",
-        "DependsOn" => ["VPCGatewayAttachment"],
-        "Properties" => {
-          "InstanceType" => "t2.micro",
-          "SourceDestCheck" => false,
-          "ImageId" => "ami-383c1956",
-          "KeyName" => "bastion",
-          "NetworkInterfaces" => [
-            {"AssociatePublicIpAddress" => true,
-             "DeviceIndex" => 0,
-             "SubnetId" => {"Ref" => "SubnetDmz1"},
-             "GroupSet" => [{"Ref" => "SecurityGroupBastion"}]}],
-          "Tags" => [
-            {"Key" => "Name",
-             "Value" => {"Fn::Join" => ["-", [{"Ref" => "AWS::StackName"}, "bastion"]]}}]}},
       "ECSInstanceProfile" => {
         "Type"=>"AWS::IAM::InstanceProfile",
         "Properties" => {
@@ -350,7 +375,7 @@ describe Barcelona::Network::NetworkStack do
         "Type" => "AWS::EC2::Subnet",
         "Properties" => {
           "VpcId" => {"Ref" => "VPC"},
-          "CidrBlock" => "10.0.129.0/24",
+          "CidrBlock" => (IPAddr.new(district.cidr_block) | (129 << 8)).to_s + "/24",
           "AvailabilityZone" =>
           {"Fn::Select" => [0, {"Fn::GetAZs" => {"Ref" => "AWS::Region"}}]},
           "Tags" => [
@@ -474,7 +499,7 @@ describe Barcelona::Network::NetworkStack do
         "Type" => "AWS::EC2::Subnet",
         "Properties" => {
           "VpcId" => {"Ref" => "VPC"},
-          "CidrBlock" => "10.0.130.0/24",
+          "CidrBlock" => (IPAddr.new(district.cidr_block) | (130 << 8)).to_s + "/24",
           "AvailabilityZone" => {"Fn::Select" => [1, {"Fn::GetAZs" => {"Ref" => "AWS::Region"}}]},
           "Tags" => [
             {"Key" => "Name", "Value" => {"Fn::Join" => ["-", [{"Ref" => "AWS::StackName"}, "Dmz2"]]}},
@@ -590,7 +615,7 @@ describe Barcelona::Network::NetworkStack do
         "Type" => "AWS::EC2::Subnet",
         "Properties" => {
           "VpcId" => {"Ref" => "VPC"},
-          "CidrBlock" => "10.0.1.0/24",
+          "CidrBlock" => (IPAddr.new(district.cidr_block) | (1 << 8)).to_s + "/24",
           "AvailabilityZone" => {"Fn::Select" => [0, {"Fn::GetAZs" => {"Ref" => "AWS::Region"}}]},
           "Tags" => [
             {"Key" => "Name", "Value" => {"Fn::Join" => ["-", [{"Ref" => "AWS::StackName"}, "Trusted1"]]}},
@@ -706,7 +731,7 @@ describe Barcelona::Network::NetworkStack do
         "Type" => "AWS::EC2::Subnet",
         "Properties" => {
           "VpcId" => {"Ref" => "VPC"},
-          "CidrBlock" => "10.0.2.0/24",
+          "CidrBlock" => (IPAddr.new(district.cidr_block) | (2 << 8)).to_s + "/24",
           "AvailabilityZone" => {
             "Fn::Select" => [1, {"Fn::GetAZs" => {"Ref" => "AWS::Region"}}]},
           "Tags" => [
@@ -723,17 +748,13 @@ describe Barcelona::Network::NetworkStack do
         "Properties" => {
           "SubnetId" => {"Ref" => "SubnetTrusted2"},
           "NetworkAclId" => {"Ref" => "NetworkAclTrusted2"}}}}
-    expect(generated["Resources"]).to eq expected
+    expect(generated["Resources"]).to match expected
   end
 
   context "when nat_type is instance" do
     it "includes NAT resources" do
-      stack = described_class.new(
-        "test-stack",
-        cidr_block: '10.0.0.0/16',
-        bastion_key_pair: 'bastion',
-        nat_type: "instance"
-      )
+      district.nat_type = "instance"
+      stack = described_class.new(district)
       generated = JSON.load(stack.target!)
       expect(generated["Resources"]["NATInstance1"]).to be_present
       expect(generated["Resources"]["SecurityGroupNAT"]).to be_present
@@ -743,12 +764,8 @@ describe Barcelona::Network::NetworkStack do
 
   context "when nat_type is managed_gateway" do
     it "includes NAT resources" do
-      stack = described_class.new(
-        "test-stack",
-        cidr_block: '10.0.0.0/16',
-        bastion_key_pair: 'bastion',
-        nat_type: "managed_gateway"
-      )
+      district.nat_type = "managed_gateway"
+      stack = described_class.new(district)
       generated = JSON.load(stack.target!)
       expect(generated["Resources"]["EIPForNATManagedGateway1"]).to be_present
       expect(generated["Resources"]["EIPForNATManagedGateway1"]["DeletionPolicy"]).to eq "Retain"
@@ -759,12 +776,8 @@ describe Barcelona::Network::NetworkStack do
 
   context "when nat_type is managed_gateway_multi_az" do
     it "includes NAT resources" do
-      stack = described_class.new(
-        "test-stack",
-        cidr_block: '10.0.0.0/16',
-        bastion_key_pair: 'bastion',
-        nat_type: "managed_gateway_multi_az"
-      )
+      district.nat_type =  "managed_gateway_multi_az"
+      stack = described_class.new(district)
       generated = JSON.load(stack.target!)
       expect(generated["Resources"]["EIPForNATManagedGateway1"]).to be_present
       expect(generated["Resources"]["EIPForNATManagedGateway1"]["DeletionPolicy"]).to eq "Retain"
@@ -777,22 +790,40 @@ describe Barcelona::Network::NetworkStack do
     end
   end
 
-  context "when autoscaling is set" do
-    it "includes NAT resources" do
-      stack = described_class.new(
-        "test-stack",
-        cidr_block: '10.0.0.0/16',
-        bastion_key_pair: 'bastion',
-        autoscaling: {
-          container_instance: ContainerInstance.new(district),
-          desired_capacity: 1,
-          instance_type: 't2.micro'
-        }
-      )
+  context "when a district has bastion_key_pair" do
+    it "includes bastion server resource" do
+      district.bastion_key_pair = "bastion"
+      stack = described_class.new(district)
       generated = JSON.load(stack.target!)
-      expect(generated["Resources"]["ContainerInstanceLaunchConfiguration"]).to be_present
-      expect(generated["Resources"]["ContainerInstanceLaunchConfiguration"]["Properties"]["EbsOptimized"]).to eq false
-      expect(generated["Resources"]["ContainerInstanceAutoScalingGroup"]).to be_present
+      expected = {
+        "DependsOn" => ["VPCGatewayAttachment"],
+        "Type" => "AWS::EC2::Instance",
+        "Properties" => {
+          "InstanceType"=>"t2.micro",
+          "SourceDestCheck"=>false,
+          "ImageId"=>"ami-383c1956",
+          "KeyName"=>"bastion",
+          "NetworkInterfaces" => [
+            {
+              "AssociatePublicIpAddress" => true,
+              "DeviceIndex"=>0,
+              "SubnetId" => {
+                "Ref"=>"SubnetDmz1"
+              },
+              "GroupSet" => [
+                {"Ref"=>"SecurityGroupBastion"}
+              ]
+            }
+          ],
+          "Tags" => [
+            {
+              "Key"=>"Name",
+              "Value" => {"Fn::Join"=>["-", [{"Ref"=>"AWS::StackName"}, "bastion"]]}
+            }
+          ]
+        }
+      }
+      expect(generated["Resources"]["BastionServer"]).to match expected
     end
   end
 end
