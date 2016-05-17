@@ -1,10 +1,20 @@
 module Barcelona::Network
   class NetworkStack < CloudFormation::Stack
-    attr_accessor :name, :options
+    attr_accessor :district
 
-    def initialize(name, options = {})
-      @name = name
-      @options = options
+    def initialize(district)
+      @district = district
+      options = {
+        cidr_block: district.cidr_block,
+        bastion_key_pair: district.bastion_key_pair,
+        nat_type: district.nat_type,
+        autoscaling: {
+          container_instance: ContainerInstance.new(district),
+          instance_type: district.cluster_instance_type,
+          desired_capacity: district.cluster_size
+        }
+      }
+      super(district.stack_name, options)
     end
 
     def build
