@@ -1,4 +1,12 @@
 module Barcelona::Network
+  class PluginBuilder < CloudFormation::Builder
+    delegate :district, to: :stack
+
+    def build_resources
+      district.hook_plugins(:network_stack_template, stack, top_level.attributes!)
+    end
+  end
+
   class NetworkStack < CloudFormation::Stack
     attr_accessor :district
 
@@ -20,6 +28,7 @@ module Barcelona::Network
     def build
       super do |builder|
         builder.add_builder VPCBuilder.new(self, options)
+        builder.add_builder PluginBuilder.new(self, options)
       end
     end
   end
