@@ -5,8 +5,8 @@ class District < ActiveRecord::Base
   before_create :assign_default_users
   after_create :create_s3_bucket
   after_create :create_ecs_cluster
+  after_create :create_or_update_network_stack
   after_save :update_ecs_config
-  after_save :create_or_update_network_stack
   after_destroy :delete_ecs_cluster
 
   has_many :heritages, inverse_of: :district, dependent: :destroy
