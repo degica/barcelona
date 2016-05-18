@@ -21,7 +21,7 @@ module Barcelona
                        depends_on: ["VPCGatewayAttachment"]) do |j|
             j.InstanceType options[:instance_type] || 't2.nano'
             j.SourceDestCheck false
-            j.ImageId "ami-03cf3903"
+            j.ImageId "ami-5d170c33"
             j.NetworkInterfaces [
               {
                 "AssociatePublicIpAddress" => true,

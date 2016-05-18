@@ -9,7 +9,7 @@ module Barcelona
         super do |j|
           j.InstanceType "t2.micro"
           j.SourceDestCheck false
-          j.ImageId "ami-383c1956"
+          j.ImageId "ami-29160d47"
           j.KeyName options[:bastion_key_pair]
           j.UserData options[:user_data] if options[:user_data]
           j.NetworkInterfaces [
