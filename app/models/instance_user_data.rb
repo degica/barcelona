@@ -12,11 +12,11 @@ class InstanceUserData
   def self.load(base64)
     yml = YAML.load(Base64.decode64(base64))
     instance = self.new
-    instance.files = yml["write_files"]
-    instance.boot_commands = yml["bootcmd"]
-    instance.run_commands = yml["runcmd"]
-    instance.packages = yml["packages"]
-    instance.users = yml["users"]
+    instance.files = yml["write_files"] || []
+    instance.boot_commands = yml["bootcmd"] || []
+    instance.run_commands = yml["runcmd"] || []
+    instance.packages = yml["packages"] || []
+    instance.users = yml["users"] || []
     instance
   end
 
