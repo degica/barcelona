@@ -4,7 +4,7 @@ module Barcelona
   module Plugins
     describe LogentriesPlugin do
       let!(:district) do
-        create :district, plugins_attributes: [
+        create :district, bastion_key_pair: "bastion", plugins_attributes: [
           {
             name: 'logentries',
             plugin_attributes: {
@@ -33,17 +33,19 @@ module Barcelona
         ci = ContainerInstance.new(district)
         user_data = YAML.load(Base64.decode64(ci.user_data.build))
 
-        cert_file = user_data["write_files"].find{ |f| f["path"] == "/etc/ssl/certs/logentries.all.crt" }
-        expect(cert_file["path"]).to eq "/etc/ssl/certs/logentries.all.crt"
-        expect(cert_file["owner"]).to eq "root:root"
-        expect(cert_file["permissions"]).to eq "644"
-        expect(cert_file["content"]).to be_a String
-
         conf_file = user_data["write_files"].find{ |f| f["path"] ==  "/etc/rsyslog.d/barcelona-logger.conf" }
         expect(conf_file["path"]).to eq "/etc/rsyslog.d/barcelona-logger.conf"
         expect(conf_file["owner"]).to eq "root:root"
         expect(conf_file["permissions"]).to eq "644"
         expect(conf_file["content"]).to be_a String
+        expect(user_data["runcmd"]).to include(*described_class::RUN_COMMANDS)
+      end
+
+      it "gets hooked with network_stack_template trigger" do
+        template = JSON.load(::Barcelona::Network::NetworkStack.new(district).target!)
+        user_data = InstanceUserData.load(template["Resources"]["BastionServer"]["Properties"]["UserData"])
+        expect(user_data.packages).to include(*described_class::SYSTEM_PACKAGES)
+        expect(user_data.run_commands).to include(*described_class::RUN_COMMANDS)
       end
     end
   end
