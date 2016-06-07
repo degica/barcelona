@@ -161,7 +161,8 @@ class District < ActiveRecord::Base
     config = {
       "ECS_CLUSTER" => name,
       "ECS_AVAILABLE_LOGGING_DRIVERS" => '["json-file", "syslog", "fluentd"]',
-      "ECS_RESERVED_MEMORY" => 128
+      "ECS_RESERVED_MEMORY" => 128,
+      "ECS_CONTAINER_STOP_TIMEOUT" => "5m"
     }
     if dockercfg.present?
       config["ECS_ENGINE_AUTH_TYPE"] = "dockercfg"

@@ -22,6 +22,8 @@ class DistrictsController < ApplicationController
   end
 
   def apply_stack
+    # Make sure the related resources are in-sync
+    @district.save!
     @district.create_or_update_network_stack
     render status: 202, nothing: true
   end
