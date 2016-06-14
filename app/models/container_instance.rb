@@ -21,7 +21,7 @@ class ContainerInstance
       "  SIZE=4194304k",
       "fi",
       "fallocate -l $SIZE /swap.img && mkswap /swap.img && chmod 600 /swap.img && swapon /swap.img",
-      "AWS_REGION=ap-northeast-1",
+      "AWS_REGION=#{district.region}",
       "aws s3 cp s3://#{district.s3_bucket_name}/#{district.name}/ecs.config /etc/ecs/ecs.config",
       "chmod 600 /etc/ecs/ecs.config",
       "sed -i 's/^#\\s%wheel\\s*ALL=(ALL)\\s*NOPASSWD:\\sALL$/%wheel\\tALL=(ALL)\\tNOPASSWD:\\tALL/g' /etc/sudoers",
@@ -38,7 +38,7 @@ class ContainerInstance
 set -e
 
 stop() {
-  AWS_REGION=ap-northeast-1
+  AWS_REGION=#{district.region}
   ec2_instance_id=`curl http://169.254.169.254/latest/meta-data/instance-id`
   ecs_cluster=`curl http://localhost:51678/v1/metadata | jq -r .Cluster`
   container_instance_arn=`curl http://localhost:51678/v1/metadata | jq -r .ContainerInstanceArn | cut -d / -f2`

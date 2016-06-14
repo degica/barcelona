@@ -82,7 +82,7 @@ module Backend::Ecs
     def reverse_proxy_definition
       base = service.heritage.base_task_definition("#{service.service_name}-revpro")
       base[:environment] += [
-        {name: "AWS_REGION", value: 'ap-northeast-1'},
+        {name: "AWS_REGION", value: district.region},
         {name: "UPSTREAM_NAME", value: "backend"},
         {name: "UPSTREAM_PORT", value: service.web_container_port.to_s},
         {name: "FORCE_SSL", value: (!!service.force_ssl).to_s},

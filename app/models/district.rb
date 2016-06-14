@@ -26,6 +26,12 @@ class District < ActiveRecord::Base
   validates :aws_access_key_id, presence: true, if: -> { !Rails.env.test? }
   validates :aws_secret_access_key, presence: true, if: -> { !Rails.env.test? }
 
+  ECS_REGIONS = Aws.
+                partition("aws").
+                regions.select { |r| r.services.include?("ECS") }.
+                map(&:name)
+  validates :region, inclusion: {in: ECS_REGIONS}
+
   validate :validate_cidr_block
 
   serialize :dockercfg, JSON
@@ -177,6 +183,7 @@ class District < ActiveRecord::Base
   end
 
   def set_default_attributes
+    self.region ||= "us-east-1"
     self.s3_bucket_name ||= "barcelona-#{name}-#{Time.now.to_i}"
     self.cidr_block     ||= "10.#{Random.rand(256)}.0.0/16"
     self.stack_name     ||= "barcelona-#{name}"

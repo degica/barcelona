@@ -96,7 +96,7 @@ module Barcelona
         end
 
         add_resource("AWS::EC2::DHCPOptions", "VPCDHCPOptions") do |j|
-          j.DomainName join(" ", "ap-northeast-1.compute.internal", "bcn")
+          j.DomainName join(" ", "#{options[:region]}.compute.internal", "bcn")
           j.DomainNameServers ["AmazonProvidedDNS"]
         end
 

@@ -132,7 +132,7 @@ describe Backend::Ecs::Adapter do
                   image: Service::DEFAULT_REVERSE_PROXY,
                   links: ["#{service.service_name}:backend"],
                   environment: [
-                    {name: "AWS_REGION", value: "ap-northeast-1"},
+                    {name: "AWS_REGION", value: "us-east-1"},
                     {name: "UPSTREAM_NAME", value: "backend"},
                     {name: "UPSTREAM_PORT", value: "3000"},
                     {name: "FORCE_SSL", value: "false"}
