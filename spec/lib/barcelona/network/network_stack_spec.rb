@@ -36,7 +36,7 @@ describe Barcelona::Network::NetworkStack do
         "Type" => "AWS::EC2::DHCPOptions",
         "Properties" => {
           "DomainName" => {
-            "Fn::Join" => [" ", ["ap-northeast-1.compute.internal", "bcn"]]},
+            "Fn::Join" => [" ", ["us-east-1.compute.internal", "bcn"]]},
           "DomainNameServers" => ["AmazonProvidedDNS"]}},
       "VPCDHCPOptionsAssociation" => {
         "Type" => "AWS::EC2::VPCDHCPOptionsAssociation",

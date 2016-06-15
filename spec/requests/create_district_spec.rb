@@ -6,6 +6,7 @@ describe "POST /districts", type: :request do
   let(:params) do
     {
       name: "district",
+      region: "ap-northeast-1",
       aws_access_key_id: "awsaccessskeyid",
       aws_secret_access_key: "secret key",
       bastion_key_pair: 'bastion-key-pair'
@@ -28,6 +29,7 @@ describe "POST /districts", type: :request do
 
       body = JSON.load(response.body)
       expect(body["district"]["name"]).to eq "district"
+      expect(body["district"]["region"]).to eq "ap-northeast-1"
       expect(body["district"]["cidr_block"]).to match %r{10\.[0-9]+\.0.0\/16}
       expect(body["district"]["stack_name"]).to eq "barcelona-district"
       expect(body["district"]["s3_bucket_name"]).to match %r{barcelona-district-[0-9]+}

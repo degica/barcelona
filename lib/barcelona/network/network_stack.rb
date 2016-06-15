@@ -13,6 +13,7 @@ module Barcelona::Network
     def initialize(district)
       @district = district
       options = {
+        region: district.region,
         cidr_block: district.cidr_block,
         bastion_key_pair: district.bastion_key_pair,
         nat_type: district.nat_type,

@@ -42,6 +42,7 @@ class DistrictsController < ApplicationController
   def create_params
     params.permit(
       :name,
+      :region,
       :bastion_key_pair,
       :nat_type,
       :cluster_backend,
