@@ -42,7 +42,7 @@ class District < ActiveRecord::Base
 
   def aws
     # these fallback "empty" value is a trick to speed up specs
-    @aws ||= AwsAccessor.new(aws_access_key_id || "empty", aws_secret_access_key || "empty")
+    @aws ||= AwsAccessor.new(aws_access_key_id || "empty", aws_secret_access_key || "empty", region)
   end
 
   def to_param
