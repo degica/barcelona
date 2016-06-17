@@ -16,6 +16,8 @@ module Barcelona
         "echo '[DEFAULT]' > /etc/fail2ban/jail.local",
         "echo 'bantime = 1800' >> /etc/fail2ban/jail.local",
         "service fail2ban restart",
+        # SSH session timeout
+        "echo 'TMOUT=900 && readonly TMOUT && export TMOUT' > /etc/profile.d/tmout.sh"
       ]
 
       def on_container_instance_user_data(_instance, user_data)
