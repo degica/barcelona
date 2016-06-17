@@ -1,7 +1,7 @@
 module Barcelona
   module Plugins
     class PcidssPlugin < Base
-      SYSTEM_PACKAGES = ["clamav", "clamav-update", "tmpwatch"]
+      SYSTEM_PACKAGES = ["clamav", "clamav-update", "tmpwatch", "fail2ban"]
       # Exclude different file systems such as /proc and /dev (-xdev)
       # Files that have changed within a day (-mtime -1)
       SCAN_COMMAND = "listfile=`mktemp` && find / -xdev -mtime -1 -type f -fprint $listfile && clamscan -i -f $listfile | logger -t clamscan"
@@ -11,7 +11,13 @@ module Barcelona
         "sed -i 's/^FRESHCLAM_DELAY=disabled-warn.*$//g' /etc/sysconfig/freshclam",
         # Daily full file system scan
         "echo '0 0 * * * root #{SCAN_COMMAND}' > /etc/cron.d/clamscan",
-        "service crond restart"
+        "service crond restart",
+        # fail2ban configurations
+        "echo '[DEFAULT]' > /etc/fail2ban/jail.local",
+        "echo 'bantime = 1800' >> /etc/fail2ban/jail.local",
+        "service fail2ban restart",
+        # SSH session timeout
+        "echo 'TMOUT=900 && readonly TMOUT && export TMOUT' > /etc/profile.d/tmout.sh"
       ]
 
       def on_container_instance_user_data(_instance, user_data)
