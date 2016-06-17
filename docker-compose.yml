@@ -9,6 +9,8 @@ services:
     ports:
      - "3333:3333"
     command: rails s -p 3333 -b 0.0.0.0
+    stdin_open: true
+    tty: true
     links:
      - db
     volumes:
@@ -24,8 +26,6 @@ services:
     <<: *app_base
     ports: []
     command: spring server
-    stdin_open: true
-    tty: true
     pid: host
     environment:
       DATABASE_URL: postgres://postgres:@db:5432
