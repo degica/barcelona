@@ -2,8 +2,8 @@ require 'rails_helper'
 
 describe Oneoff do
   let(:ecs_mock) { double }
-  let(:heritage) { create :heritage }
-  let(:oneoff) { create :oneoff, heritage: heritage, command: "rake db:migrate" }
+  let(:app) { create :app }
+  let(:oneoff) { create :oneoff, app: app, command: "rake db:migrate" }
 
   describe "#running?" do
     before do
@@ -29,26 +29,26 @@ describe Oneoff do
     it "creates ECS task" do
       expect(ecs_mock).to receive(:register_task_definition).
         with(
-          family: "#{heritage.name}-oneoff",
+          family: "#{app.name}-oneoff",
           container_definitions: [
             {
-              name: heritage.name + "-oneoff",
+              name: app.name + "-oneoff",
               cpu: 128,
               memory: 512,
               essential: true,
-              image: "#{heritage.image_path}",
+              image: "#{app.image_path}",
               environment: []
             }
           ]
         )
       expect(ecs_mock).to receive(:run_task).
         with(
-          cluster: heritage.district.name,
-          task_definition: "#{heritage.name}-oneoff",
+          cluster: app.district.name,
+          task_definition: "#{app.name}-oneoff",
           overrides: {
             container_overrides: [
               {
-                name: heritage.name + "-oneoff",
+                name: app.name + "-oneoff",
                 command: ["sh", "-c", "exec rake db:migrate"],
                 environment: []
               }
@@ -61,7 +61,7 @@ describe Oneoff do
     context "when attributes are overwrite" do
       let(:oneoff) {
         create :oneoff,
-               heritage: heritage,
+               app: app,
                command: "rake db:migrate",
                image_tag: "v100",
                env_vars: {"OVERRITE_ENV" => "VALUE"}
@@ -69,26 +69,26 @@ describe Oneoff do
       it "creates ECS task" do
         expect(ecs_mock).to receive(:register_task_definition).
           with(
-            family: "#{heritage.name}-oneoff",
+            family: "#{app.name}-oneoff",
             container_definitions: [
               {
-                name: heritage.name + "-oneoff",
+                name: app.name + "-oneoff",
                 cpu: 128,
                 memory: 512,
                 essential: true,
-                image: "#{heritage.image_name}:v100",
+                image: "#{app.image_name}:v100",
                 environment: []
               }
             ]
           )
         expect(ecs_mock).to receive(:run_task).
           with(
-            cluster: heritage.district.name,
-            task_definition: "#{heritage.name}-oneoff",
+            cluster: app.district.name,
+            task_definition: "#{app.name}-oneoff",
             overrides: {
               container_overrides: [
                 {
-                  name: heritage.name + "-oneoff",
+                  name: app.name + "-oneoff",
                   command: ["sh", "-c", "exec rake db:migrate"],
                   environment: [
                     {name: "OVERRITE_ENV", value: "VALUE"}

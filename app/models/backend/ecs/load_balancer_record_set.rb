@@ -1,7 +1,7 @@
 module Backend::Ecs
   class LoadBalancerRecordSet
     attr_accessor :service
-    delegate :name, :heritage, :service_name, :district, to: :service
+    delegate :name, :app, :service_name, :district, to: :service
     delegate :aws, to: :district
 
     def initialize(service)
@@ -54,7 +54,7 @@ module Backend::Ecs
     end
 
     def service_record_set_name
-      @service_record_set_name ||= [name, heritage.name, hosted_zone.name].join(".")
+      @service_record_set_name ||= [name, app.name, hosted_zone.name].join(".")
     end
   end
 end

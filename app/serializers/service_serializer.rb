@@ -3,7 +3,7 @@ class ServiceSerializer < ActiveModel::Serializer
              :port_mappings, :running_count, :pending_count, :desired_count,
              :reverse_proxy_image, :hosts, :service_type, :force_ssl, :health_check
 
-  belongs_to :heritage
+  belongs_to :app
 
   def port_mappings
     object.port_mappings.map do |pm|

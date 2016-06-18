@@ -1,5 +1,5 @@
 class ReleasesController < ApplicationController
-  before_action :load_heritage
+  before_action :load_app
   before_action :load_release, only: [:show, :rollback]
 
   def show
@@ -7,7 +7,7 @@ class ReleasesController < ApplicationController
   end
 
   def index
-    render json: @heritage.releases.first(10)
+    render json: @app.releases.first(10)
   end
 
   def rollback
@@ -17,11 +17,11 @@ class ReleasesController < ApplicationController
 
   private
 
-  def load_heritage
-    @heritage = Heritage.find_by!(name: params[:heritage_id])
+  def load_app
+    @app = App.find_by!(name: params[:app_id])
   end
 
   def load_release
-    @release = @heritage.releases.find_by!(version: params[:version])
+    @release = @app.releases.find_by!(version: params[:version])
   end
 end

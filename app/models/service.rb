@@ -1,7 +1,7 @@
 class Service < ActiveRecord::Base
   DEFAULT_REVERSE_PROXY = 'quay.io/degica/barcelona-reverse-proxy:latest'
 
-  belongs_to :heritage, inverse_of: :services
+  belongs_to :app, inverse_of: :services
   has_many :port_mappings, inverse_of: :service, dependent: :destroy
 
   serialize :hosts
@@ -9,7 +9,7 @@ class Service < ActiveRecord::Base
 
   validates :name,
             presence: true,
-            uniqueness: {scope: :heritage_id},
+            uniqueness: {scope: :app_id},
             format: { with: /\A[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]\z/ }
   validates :cpu, numericality: {greater_than: 0}
   validates :memory, numericality: {greater_than: 0}
@@ -31,7 +31,7 @@ class Service < ActiveRecord::Base
   after_create :create_port_mappings
   after_destroy :delete_service
 
-  delegate :district, to: :heritage
+  delegate :district, to: :app
   delegate :status, :desired_count, :running_count, :pending_count, to: :backend
 
   def apply
@@ -43,7 +43,7 @@ class Service < ActiveRecord::Base
   end
 
   def service_name
-    "#{heritage.name}-#{name}"
+    "#{app.name}-#{name}"
   end
 
   def endpoint

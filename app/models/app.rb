@@ -1,10 +1,10 @@
-class Heritage < ActiveRecord::Base
-  has_many :services, inverse_of: :heritage, dependent: :destroy
+class App < ActiveRecord::Base
+  has_many :services, inverse_of: :app, dependent: :destroy
   has_many :env_vars, dependent: :destroy
   has_many :oneoffs, dependent: :destroy
   has_many :events, dependent: :destroy
-  has_many :releases, -> { order 'version DESC' }, dependent: :destroy, inverse_of: :heritage
-  belongs_to :district, inverse_of: :heritages
+  has_many :releases, -> { order 'version DESC' }, dependent: :destroy, inverse_of: :app
+  belongs_to :district, inverse_of: :apps
 
   validates :name,
             presence: true,
@@ -13,8 +13,8 @@ class Heritage < ActiveRecord::Base
             format: { with: /\A[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]\z/ }
   validates :district, presence: true
 
-  before_validation do |heritage|
-    heritage.regenerate_token if heritage.token.blank?
+  before_validation do |app|
+    app.regenerate_token if app.token.blank?
   end
 
   accepts_nested_attributes_for :services, allow_destroy: true
@@ -58,7 +58,7 @@ class Heritage < ActiveRecord::Base
     )
     base[:environment] += env_vars.map { |e| {name: e.key, value: e.value} }
 
-    district.hook_plugins(:heritage_task_definition, self, base)
+    district.hook_plugins(:app_task_definition, self, base)
   end
 
   private

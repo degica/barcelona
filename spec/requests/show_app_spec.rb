@@ -1,12 +1,11 @@
 require 'rails_helper'
 
-describe "POST /apps/:app/env_vars", type: :request do
+describe "GET /apps/:app", type: :request do
   let(:user) { create :user }
   let(:auth) { {"X-Barcelona-Token" => user.token} }
   let(:district) { create :district }
 
-  before {Aws.config[:stub_responses] = true}
-  before do
+  it "updates a app" do
     params = {
       name: "nginx",
       image_name: "nginx",
@@ -28,18 +27,9 @@ describe "POST /apps/:app/env_vars", type: :request do
       ]
     }
     post "/v1/districts/#{district.name}/apps", params, auth
-  end
+    expect(response).to be_success
 
-  it "updates app's environment variables" do
-    params = {
-      env_vars: {
-        "RAILS_ENV" => "production",
-        "SECRET_KEY_BASE" => "abcdef"
-      }
-    }
-
-    expect(DeployRunnerJob).to receive(:perform_later)
-    post "/v1/apps/nginx/env_vars", params, auth
+    get "/v1/apps/nginx", nil, auth
     expect(response).to be_success
 
     app = JSON.load(response.body)["app"]
@@ -54,7 +44,5 @@ describe "POST /apps/:app/env_vars", type: :request do
     expect(app["services"][0]["command"]).to eq nil
     expect(app["services"][0]["port_mappings"][0]["lb_port"]).to eq 80
     expect(app["services"][0]["port_mappings"][0]["container_port"]).to eq 80
-
-    expect(app["env_vars"]).to eq("RAILS_ENV" => "production", "SECRET_KEY_BASE" => "abcdef")
   end
 end

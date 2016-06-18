@@ -1,9 +1,9 @@
 class EnvVar < ActiveRecord::Base
   include EncryptAttribute
 
-  belongs_to :heritage
+  belongs_to :app
 
-  validates :key, uniqueness: {scope: :heritage_id}
+  validates :key, uniqueness: {scope: :app_id}
   validates :key, :value, presence: true
 
   encrypted_attribute :value, secret_key: ENV['ENCRYPTION_KEY']

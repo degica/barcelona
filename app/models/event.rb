@@ -1,8 +1,8 @@
 class Event < ActiveRecord::Base
-  belongs_to :heritage
+  belongs_to :app
 
   validates :uuid, uniqueness: true, presence: true
-  validates :heritage, presence: true
+  validates :app, presence: true
   validates :level, inclusion: { in: %w(good warn error)}
 
   after_initialize :set_uuid
@@ -20,8 +20,8 @@ class Event < ActiveRecord::Base
 
   def send_notifications
     Rails.logger.info(user_message)
-    return if heritage.slack_url.blank?
-    notifier = Slack::Notifier.new(heritage.slack_url, username: "Barcelona")
+    return if app.slack_url.blank?
+    notifier = Slack::Notifier.new(app.slack_url, username: "Barcelona")
     notifier.ping("", attachments: [{color: slack_color, text: user_message}])
   end
 
@@ -32,6 +32,6 @@ class Event < ActiveRecord::Base
   end
 
   def user_message
-    "[#{heritage.name}] #{message}"
+    "[#{app.name}] #{message}"
   end
 end

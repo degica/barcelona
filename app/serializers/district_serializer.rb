@@ -6,6 +6,6 @@ class DistrictSerializer < ActiveModel::Serializer
              :cluster_backend, :cidr_block, :stack_name, :bastion_key_pair, :bastion_ip,
              :aws_access_key_id
 
-  has_many :heritages
+  has_many :apps
   has_many :plugins
 end

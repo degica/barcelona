@@ -9,7 +9,7 @@ class District < ActiveRecord::Base
   after_save :update_ecs_config
   after_destroy :delete_ecs_cluster
 
-  has_many :heritages, inverse_of: :district, dependent: :destroy
+  has_many :apps, inverse_of: :district, dependent: :destroy
   has_many :users_districts, dependent: :destroy
   has_many :users, through: :users_districts
   has_many :plugins, dependent: :delete_all, inverse_of: :district

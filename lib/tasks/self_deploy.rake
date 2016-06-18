@@ -14,22 +14,12 @@ namespace :bcn do
     Rake::Task["db:setup"].invoke
   end
 
-  desc "Deploy Barcelona to the specified ECS cluster(local)"
-  task :self_deploy_local => ["bcn:prepare_self_deploy", :environment] do
+  desc "Bootstrap Barcelona to the specified ECS cluster(local)"
+  task :bootstrap_local => ["bcn:prepare_self_deploy", :environment] do
     access_key_id       = user_input("AWS Access Key ID", default_value: ENV["AWS_ACCESS_KEY_ID"])
     secret_key          = user_input("AWS Secret Access Key", default_value: ENV["AWS_SECRET_ACCESS_KEY"])
     district_name       = user_input("District(ECS cluster) name", default_value: "default")
-    vpc_id              = user_input("VPC ID", default_value: ENV["VPC_ID"])
-    public_elb_sg       = user_input("Public ELB Security Group", default_value: ENV["PUBLIC_ELB_SECURITY_GROUP"])
-    private_elb_sg      = user_input("Private ELB Security Group", default_value: ENV["PRIVATE_ELB_SECURITY_GROUP"])
-    instance_sg         = user_input("Container Instance Security Group", default_value: ENV["INSTANCE_SECURITY_GROUP"])
-    ecs_service_role    = user_input("ECS Service Role", default_value: "ecsServiceRole")
-    ecs_instance_role   = user_input("ECS Instance Role", default_value: "ecsInstanceRole")
-    private_hosted_zone_id = user_input("Route53 Private Hosted Zone ID", default_value: ENV["PRIVATE_HOSTED_ZONE_ID"])
-    s3_bucket_name      = user_input("S3 Bucket Name", default_value: ENV["S3_BUCKET_NAME"])
     database_url        = user_input("Database URL", default_value: ENV["BARCELONA_DATABASE_URL"] || "postgres://user:password@your.domain:5432/dbname")
-    docker_image_name   = user_input("Barcelona Docker Image Name", default_value: "degica/barcelona")
-    dockercfg           = user_input("Dockercfg JSON", default_value: ENV["DOCKERCFG"])
     dockercfg = JSON.load(dockercfg) if dockercfg.present?
 
     ENV["AWS_REGION"] = 'ap-northeast-1'
@@ -60,13 +50,13 @@ namespace :bcn do
       STDIN.gets
     end
 
-    heritage = district.heritages.create!(
+    app = district.apps.create!(
       name: "barcelona",
       image_name: docker_image_name,
       image_tag: "latest"
     )
 
-    oneoff = heritage.oneoffs.create(
+    oneoff = app.oneoffs.create(
       env_vars: {
         "AWS_REGION"                 => ENV["AWS_REGION"],
         "AWS_ACCESS_KEY_ID"          => ENV["AWS_ACCESS_KEY_ID"],
@@ -113,7 +103,7 @@ namespace :bcn do
 
     ENV["ENCRYPTION_KEY"] = SecureRandom.hex(64)
 
-    district.heritages.create!(
+    district.apps.create!(
       name: "barcelona",
       image_name: ENV["DOCKER_IMAGE_NAME"],
       image_tag: "latest",

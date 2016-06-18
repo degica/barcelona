@@ -15,7 +15,7 @@ module Barcelona
         user_data
       end
 
-      def on_heritage_task_definition(_heritage, task_definition)
+      def on_app_task_definition(_app, task_definition)
         task_definition.merge(
           log_configuration: {
             log_driver: "syslog",

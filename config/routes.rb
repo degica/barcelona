@@ -7,12 +7,12 @@ Rails.application.routes.draw do
 
       resources :plugins, except: [:new, :edit]
 
-      resources :heritages, shallow: true, except: [:new, :edit] do
-        post   :env_vars, on: :member, to: "heritages#set_env_vars"
-        delete :env_vars, on: :member, to: "heritages#delete_env_vars"
+      resources :apps, shallow: true, except: [:new, :edit] do
+        post   :env_vars, on: :member, to: "apps#set_env_vars"
+        delete :env_vars, on: :member, to: "apps#delete_env_vars"
 
         post "/services/:service_id/scale", to: "services#scale"
-        post "/trigger/:token", to: "heritages#trigger"
+        post "/trigger/:token", to: "apps#trigger"
         resources :oneoffs, only: [:show, :create]
 
         get "/releases", to: "releases#index"

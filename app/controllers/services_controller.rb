@@ -1,8 +1,8 @@
 class ServicesController < ApplicationController
   def scale
     scale = params.require(:scale)
-    heritage = Heritage.select(:id).find_by(name: params[:heritage_id])
-    service = Service.find_by(heritage: heritage, name: params[:service_id])
+    app = App.select(:id).find_by(name: params[:app_id])
+    service = Service.find_by(app: app, name: params[:service_id])
     service.scale(scale)
 
     render json: service
