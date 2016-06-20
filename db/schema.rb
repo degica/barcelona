@@ -11,10 +11,25 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160614143648) do
+ActiveRecord::Schema.define(version: 20160618163044) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "apps", force: :cascade do |t|
+    t.string   "name",          null: false
+    t.string   "image_name"
+    t.string   "image_tag"
+    t.integer  "district_id"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
+    t.text     "before_deploy"
+    t.text     "slack_url"
+    t.string   "token"
+  end
+
+  add_index "apps", ["district_id"], name: "index_apps_on_district_id", using: :btree
+  add_index "apps", ["name"], name: "index_apps_on_name", unique: true, using: :btree
 
   create_table "delayed_jobs", force: :cascade do |t|
     t.integer  "priority",   default: 0, null: false
@@ -51,50 +66,35 @@ ActiveRecord::Schema.define(version: 20160614143648) do
   end
 
   create_table "env_vars", force: :cascade do |t|
-    t.integer "heritage_id"
+    t.integer "app_id"
     t.string  "key"
     t.text    "encrypted_value"
   end
 
-  add_index "env_vars", ["heritage_id", "key"], name: "index_env_vars_on_heritage_id_and_key", unique: true, using: :btree
-  add_index "env_vars", ["heritage_id"], name: "index_env_vars_on_heritage_id", using: :btree
+  add_index "env_vars", ["app_id", "key"], name: "index_env_vars_on_app_id_and_key", unique: true, using: :btree
+  add_index "env_vars", ["app_id"], name: "index_env_vars_on_app_id", using: :btree
 
   create_table "events", force: :cascade do |t|
     t.string   "uuid"
-    t.integer  "heritage_id"
+    t.integer  "app_id"
     t.text     "message"
     t.string   "level"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
-  add_index "events", ["heritage_id"], name: "index_events_on_heritage_id", using: :btree
+  add_index "events", ["app_id"], name: "index_events_on_app_id", using: :btree
   add_index "events", ["uuid"], name: "index_events_on_uuid", unique: true, using: :btree
-
-  create_table "heritages", force: :cascade do |t|
-    t.string   "name",          null: false
-    t.string   "image_name"
-    t.string   "image_tag"
-    t.integer  "district_id"
-    t.datetime "created_at",    null: false
-    t.datetime "updated_at",    null: false
-    t.text     "before_deploy"
-    t.text     "slack_url"
-    t.string   "token"
-  end
-
-  add_index "heritages", ["district_id"], name: "index_heritages_on_district_id", using: :btree
-  add_index "heritages", ["name"], name: "index_heritages_on_name", unique: true, using: :btree
 
   create_table "oneoffs", force: :cascade do |t|
     t.string   "task_arn"
-    t.integer  "heritage_id"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
+    t.integer  "app_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
     t.text     "command"
   end
 
-  add_index "oneoffs", ["heritage_id"], name: "index_oneoffs_on_heritage_id", using: :btree
+  add_index "oneoffs", ["app_id"], name: "index_oneoffs_on_app_id", using: :btree
 
   create_table "plugins", force: :cascade do |t|
     t.text     "plugin_attributes"
@@ -120,15 +120,15 @@ ActiveRecord::Schema.define(version: 20160614143648) do
   add_index "port_mappings", ["service_id"], name: "index_port_mappings_on_service_id", using: :btree
 
   create_table "releases", force: :cascade do |t|
-    t.integer  "heritage_id"
+    t.integer  "app_id"
     t.text     "description"
-    t.text     "heritage_params"
+    t.text     "app_params"
     t.integer  "version"
-    t.datetime "created_at",      null: false
-    t.datetime "updated_at",      null: false
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
   end
 
-  add_index "releases", ["heritage_id"], name: "index_releases_on_heritage_id", using: :btree
+  add_index "releases", ["app_id"], name: "index_releases_on_app_id", using: :btree
 
   create_table "services", force: :cascade do |t|
     t.string   "name",                                    null: false
@@ -136,7 +136,7 @@ ActiveRecord::Schema.define(version: 20160614143648) do
     t.integer  "memory"
     t.text     "command"
     t.boolean  "public"
-    t.integer  "heritage_id"
+    t.integer  "app_id"
     t.datetime "created_at",                              null: false
     t.datetime "updated_at",                              null: false
     t.string   "reverse_proxy_image"
@@ -146,7 +146,7 @@ ActiveRecord::Schema.define(version: 20160614143648) do
     t.text     "health_check"
   end
 
-  add_index "services", ["heritage_id"], name: "index_services_on_heritage_id", using: :btree
+  add_index "services", ["app_id"], name: "index_services_on_app_id", using: :btree
 
   create_table "users", force: :cascade do |t|
     t.string   "name"
@@ -170,14 +170,14 @@ ActiveRecord::Schema.define(version: 20160614143648) do
   add_index "users_districts", ["district_id"], name: "index_users_districts_on_district_id", using: :btree
   add_index "users_districts", ["user_id"], name: "index_users_districts_on_user_id", using: :btree
 
-  add_foreign_key "env_vars", "heritages"
-  add_foreign_key "events", "heritages"
-  add_foreign_key "heritages", "districts"
-  add_foreign_key "oneoffs", "heritages"
+  add_foreign_key "apps", "districts"
+  add_foreign_key "env_vars", "apps"
+  add_foreign_key "events", "apps"
+  add_foreign_key "oneoffs", "apps"
   add_foreign_key "plugins", "districts"
   add_foreign_key "port_mappings", "services"
-  add_foreign_key "releases", "heritages"
-  add_foreign_key "services", "heritages"
+  add_foreign_key "releases", "apps"
+  add_foreign_key "services", "apps"
   add_foreign_key "users_districts", "districts"
   add_foreign_key "users_districts", "users"
 end

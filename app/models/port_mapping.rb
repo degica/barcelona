@@ -85,8 +85,8 @@ class PortMapping < ActiveRecord::Base
 
   def used_host_ports
     @used_host_ports = PortMapping.
-                       joins(service: { heritage: :district }).
-                       where("heritages.district_id" => service.heritage.district.id).
+                       joins(service: { app: :district }).
+                       where("apps.district_id" => service.app.district.id).
                        pluck(:host_port).
                        compact
   end

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "DELETE /heritages/:heritage/env_vars", type: :request do
+describe "DELETE /apps/:app/env_vars", type: :request do
   let(:user) { create :user }
   let(:auth) { {"X-Barcelona-Token" => user.token} }
   let(:district) { create :district }
@@ -30,32 +30,32 @@ describe "DELETE /heritages/:heritage/env_vars", type: :request do
         }
       ]
     }
-    post "/v1/districts/#{district.name}/heritages", params, auth
+    post "/v1/districts/#{district.name}/apps", params, auth
     expect(response).to be_success
   end
 
-  it "deletes heritage's environment variables" do
+  it "deletes app's environment variables" do
     params = {
       env_keys: ["RAILS_ENV"]
     }
 
     expect(DeployRunnerJob).to receive(:perform_later)
-    delete "/v1/heritages/nginx/env_vars", params, auth
+    delete "/v1/apps/nginx/env_vars", params, auth
     expect(response).to be_success
 
-    heritage = JSON.load(response.body)["heritage"]
-    expect(heritage["name"]).to eq "nginx"
-    expect(heritage["image_name"]).to eq "nginx"
-    expect(heritage["image_tag"]).to eq "latest"
-    expect(heritage["before_deploy"]).to eq "echo hello"
-    expect(heritage["services"][0]["name"]).to eq "web"
-    expect(heritage["services"][0]["public"]).to eq true
-    expect(heritage["services"][0]["cpu"]).to eq 128
-    expect(heritage["services"][0]["memory"]).to eq 256
-    expect(heritage["services"][0]["command"]).to eq nil
-    expect(heritage["services"][0]["port_mappings"][0]["lb_port"]).to eq 80
-    expect(heritage["services"][0]["port_mappings"][0]["container_port"]).to eq 80
+    app = JSON.load(response.body)["app"]
+    expect(app["name"]).to eq "nginx"
+    expect(app["image_name"]).to eq "nginx"
+    expect(app["image_tag"]).to eq "latest"
+    expect(app["before_deploy"]).to eq "echo hello"
+    expect(app["services"][0]["name"]).to eq "web"
+    expect(app["services"][0]["public"]).to eq true
+    expect(app["services"][0]["cpu"]).to eq 128
+    expect(app["services"][0]["memory"]).to eq 256
+    expect(app["services"][0]["command"]).to eq nil
+    expect(app["services"][0]["port_mappings"][0]["lb_port"]).to eq 80
+    expect(app["services"][0]["port_mappings"][0]["container_port"]).to eq 80
 
-    expect(heritage["env_vars"]).to be_blank
+    expect(app["env_vars"]).to be_blank
   end
 end

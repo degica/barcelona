@@ -1,13 +1,13 @@
 require 'rails_helper'
 
 describe Backend::Ecs::Adapter do
-  let(:heritage) { create :heritage }
+  let(:app) { create :app }
   let(:adapter) { described_class.new(service) }
 
   describe "#apply" do
     let(:ecs_mock) { double }
     let(:elb_mock) { double }
-    let(:service) { create :web_service, heritage: heritage }
+    let(:service) { create :web_service, app: app }
     context "when updating service" do
       before do
         allow(adapter.ecs_service).to receive(:applied?) { true }
@@ -57,7 +57,7 @@ describe Backend::Ecs::Adapter do
       end
 
       context "when port_mappings is blank" do
-        let(:service) { create :service, heritage: heritage }
+        let(:service) { create :service, app: app }
         it "create ECS resources" do
           expect(ecs_mock).to receive(:register_task_definition).
             with(
@@ -90,7 +90,7 @@ describe Backend::Ecs::Adapter do
       context "when port_mappings is present" do
         let(:elb_mock) { double }
         let(:route53_mock) { double }
-        let(:service) { create :web_service, heritage: heritage, command: 'rails s' }
+        let(:service) { create :web_service, app: app, command: 'rails s' }
         let(:port_http) { service.port_mappings.http }
         let(:port_https) { service.port_mappings.https }
 
@@ -112,7 +112,7 @@ describe Backend::Ecs::Adapter do
                   memory: 128,
                   essential: true,
                   command: ["sh", "-c", "exec rails s"],
-                  image: service.heritage.image_path,
+                  image: service.app.image_path,
                   environment: [
                     {name: "HOST_PORT_HTTP_3000", value: port_http.host_port.to_s},
                     {name: "HOST_PORT_HTTPS_3000", value: port_https.host_port.to_s},
@@ -235,7 +235,7 @@ describe Backend::Ecs::Adapter do
                   {
                     action: "CREATE",
                     resource_record_set: {
-                      name: "#{service.name}.#{service.heritage.name}.bcn.",
+                      name: "#{service.name}.#{service.app.name}.bcn.",
                       type: "CNAME",
                       ttl: 300,
                       resource_records: [
@@ -257,7 +257,7 @@ describe Backend::Ecs::Adapter do
   describe "#delete" do
     let(:ecs_mock) { double }
     let(:route53_mock) { double }
-    let(:service) { create :web_service, heritage: heritage }
+    let(:service) { create :web_service, app: app }
 
     before do
       allow(adapter.ecs_service).to receive(:applied?) { true }
@@ -288,9 +288,9 @@ describe Backend::Ecs::Adapter do
       expect(route53_mock).to receive(:list_resource_record_sets).
         with(
           hosted_zone_id: service.district.private_hosted_zone_id,
-          start_record_name: "#{service.name}.#{heritage.name}.bcn."
+          start_record_name: "#{service.name}.#{app.name}.bcn."
         ) do
-        double(resource_record_sets: [double(name: "#{service.name}.#{heritage.name}.bcn.")])
+        double(resource_record_sets: [double(name: "#{service.name}.#{app.name}.bcn.")])
       end
       expect(route53_mock).to receive(:change_resource_record_sets).
         with(
@@ -300,7 +300,7 @@ describe Backend::Ecs::Adapter do
               {
                 action: "DELETE",
                 resource_record_set: {
-                  name: "#{service.name}.#{service.heritage.name}.bcn.",
+                  name: "#{service.name}.#{service.app.name}.bcn.",
                   type: "CNAME",
                   ttl: 300,
                   resource_records: [

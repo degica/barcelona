@@ -1,21 +1,21 @@
 class DeployRunnerJob < ActiveJob::Base
   queue_as :default
 
-  def perform(heritage, without_before_deploy:, description: "")
-    heritage.events.create(level: :good, message: "Deploying to #{heritage.district.name} district: #{description}")
-    before_deploy = heritage.before_deploy
+  def perform(app, without_before_deploy:, description: "")
+    app.events.create(level: :good, message: "Deploying to #{app.district.name} district: #{description}")
+    before_deploy = app.before_deploy
     if before_deploy.present? && !without_before_deploy
-      oneoff = heritage.oneoffs.create!(command: before_deploy)
+      oneoff = app.oneoffs.create!(command: before_deploy)
       oneoff.run!(sync: true)
       if oneoff.exit_code != 0
-        heritage.events.create(level: :error, message: "The command `#{before_deploy}` failed. Stopped deploying.")
+        app.events.create(level: :error, message: "The command `#{before_deploy}` failed. Stopped deploying.")
         return
       else
-        heritage.events.create(level: :good, message:  "before_deploy script `#{before_deploy}` successfully finished")
+        app.events.create(level: :good, message:  "before_deploy script `#{before_deploy}` successfully finished")
       end
     end
 
-    heritage.services.each do |service|
+    app.services.each do |service|
       Rails.logger.info "Updating service #{service.service_name} ..."
       begin
         result = service.apply
@@ -23,7 +23,7 @@ class DeployRunnerJob < ActiveJob::Base
       rescue => e
         Rails.logger.error "#{e.class}: #{e.message}"
         Rails.logger.error caller.join("\n")
-        heritage.events.create(
+        app.events.create(
           level: :error,
           message: "Deploy failed: Something went wrong with deploying #{service.name} service"
         )

@@ -14,18 +14,18 @@ module Barcelona
         ]
       end
 
-      it "gets hooked with heritage_task_definition trigger" do
-        heritage = district.heritages.create(name: 'heritage',
+      it "gets hooked with app_task_definition trigger" do
+        app = district.apps.create(name: 'app',
                                              image_name: "docker_image",
                                              env_vars_attributes: [
                                                {key: "ENVIRONMENT", value: "VALUE"}
                                              ])
-        definition = heritage.base_task_definition("heritage")
-        expect(definition[:name]).to eq "heritage"
+        definition = app.base_task_definition("app")
+        expect(definition[:name]).to eq "app"
         expect(definition[:log_configuration]).to eq(log_driver: "syslog",
                                                      options: {
                                                        "syslog-address" => "tcp://127.0.0.1:514",
-                                                       "tag" => "heritage"
+                                                       "tag" => "app"
                                                      })
       end
 

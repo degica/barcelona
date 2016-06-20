@@ -1,24 +1,24 @@
 class Release < ActiveRecord::Base
-  belongs_to :heritage, required: true, inverse_of: :releases
+  belongs_to :app, required: true, inverse_of: :releases
 
-  serialize :heritage_params, JSON
+  serialize :app_params, JSON
 
   before_create do |release|
-    release.heritage_params = export_heritage
-    release.version = heritage.releases.count + 1
+    release.app_params = export_app
+    release.version = app.releases.count + 1
   end
 
   def rollback
-    heritage.attributes = heritage_params
-    heritage.save_and_deploy!(
+    app.attributes = app_params
+    app.save_and_deploy!(
       without_before_deploy: true,
       description: "Rolled back to version #{version}"
     )
   end
 
-  def export_heritage
-    exported = heritage.attributes.slice("image_name", "image_tag")
-    exported["services_attributes"] = heritage.services.map do |service|
+  def export_app
+    exported = app.attributes.slice("image_name", "image_tag")
+    exported["services_attributes"] = app.services.map do |service|
       service.attributes.slice(
         "id",
         "cpu",

@@ -24,9 +24,9 @@ Barcelona will not offer new concepts. It's a simple wrapper service on top of A
 
 District manages the above AWS resources and EC2 instances running as an ECS cotainer instance.
 
-### Heritage
+### App
 
-`Heritage` represents a micro-service. Assume that you have a heritage called `komoju-core-app`(which is identical to the current hats repository). `komoju-core-app` heritage would have several "services" such as
+`App` represents a micro-service. Assume that you have a app called `komoju-core-app`(which is identical to the current hats repository). `komoju-core-app` app would have several "services" such as
 
 - web
   - run by rails application and it listens on http/https
@@ -34,11 +34,11 @@ District manages the above AWS resources and EC2 instances running as an ECS cot
   - delayed_job
 - cron
 
-So the `komoju-core-app` heritage has 3 services: `web`, `worker`, `cron`. Each service can independently scale out/in for example web with scale 4, worker with scale 2, cron with scale 1.
+So the `komoju-core-app` app has 3 services: `web`, `worker`, `cron`. Each service can independently scale out/in for example web with scale 4, worker with scale 2, cron with scale 1.
 
-Once you create a heritage, Barcelona makes a `create-service` request to AWS ECS and ECS pulls and runs the specified docker image on the ECS container instances.
+Once you create a app, Barcelona makes a `create-service` request to AWS ECS and ECS pulls and runs the specified docker image on the ECS container instances.
 
-Additionally, We also may want another heritage `komoju-core-front` which runs nginx as a reverse-proxy for `komoju-core-app`.
+Additionally, We also may want another app `komoju-core-front` which runs nginx as a reverse-proxy for `komoju-core-app`.
 
 ## Usage
 
@@ -60,13 +60,13 @@ Barcelona provides a Restful API
   - PATCH /districts/:district_name
   - DELETE /districts/:district_name
 - Application management
-  - POST /districts/:district_name/heritages
-  - DELETE /heritages/:heritage_name
+  - POST /districts/:district_name/apps
+  - DELETE /apps/:app_name
   - Environment variables management
-    - POST /heritages/:heritage_name/env_vars
-    - DELETE /heritages/:heritage_name/env_vars
+    - POST /apps/:app_name/env_vars
+    - DELETE /apps/:app_name/env_vars
   - Scale out/in
-    - POST /heritages/:heritage_name/services/:service_name/scale
+    - POST /apps/:app_name/services/:service_name/scale
 
 ## IAM users and roles
 

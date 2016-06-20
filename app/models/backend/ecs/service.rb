@@ -57,7 +57,7 @@ module Backend::Ecs
     end
 
     def container_definition
-      base = service.heritage.base_task_definition(service_name)
+      base = service.app.base_task_definition(service_name)
       base[:environment] += service.port_mappings.map do |pm|
         {
           name: "HOST_PORT_#{pm.protocol.upcase}_#{pm.container_port}",
@@ -80,7 +80,7 @@ module Backend::Ecs
     end
 
     def reverse_proxy_definition
-      base = service.heritage.base_task_definition("#{service.service_name}-revpro")
+      base = service.app.base_task_definition("#{service.service_name}-revpro")
       base[:environment] += [
         {name: "AWS_REGION", value: district.region},
         {name: "UPSTREAM_NAME", value: "backend"},

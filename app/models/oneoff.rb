@@ -1,11 +1,11 @@
 class Oneoff < ActiveRecord::Base
-  belongs_to :heritage
-  validates :heritage, presence: true
+  belongs_to :app
+  validates :app, presence: true
   validates :command, presence: true
 
   attr_accessor :env_vars, :image_tag
 
-  delegate :district, to: :heritage
+  delegate :district, to: :app
   delegate :aws, to: :district
 
   after_initialize do |oneoff|
@@ -77,23 +77,23 @@ class Oneoff < ActiveRecord::Base
   end
 
   def task_family
-    "#{heritage.name}-oneoff"
+    "#{app.name}-oneoff"
   end
 
   def container_name
-    "#{heritage.name}-oneoff"
+    "#{app.name}-oneoff"
   end
 
   def image_path
     if image_tag.present?
-      "#{heritage.image_name}:#{image_tag}"
+      "#{app.image_name}:#{image_tag}"
     else
-      heritage.image_path
+      app.image_path
     end
   end
 
   def task_definition
-    heritage.base_task_definition(container_name).merge(
+    app.base_task_definition(container_name).merge(
       cpu: 128,
       memory: 512,
       image: image_path

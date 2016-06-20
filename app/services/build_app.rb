@@ -1,10 +1,10 @@
-class BuildHeritage
-  attr_accessor :params, :district, :heritage
+class BuildApp
+  attr_accessor :params, :district, :app
 
   def initialize(params, district: nil)
     @district = district
-    heritage_name = params.delete(:id) || params[:name]
-    @heritage = Heritage.find_or_initialize_by(name: heritage_name)
+    app_name = params.delete(:id) || params[:name]
+    @app = App.find_or_initialize_by(name: app_name)
     @params = convert_params_for_model ActionController::Parameters.new(params)
   end
 
@@ -12,7 +12,7 @@ class BuildHeritage
     new_params = original.dup
     if new_params[:env_vars].present?
       new_params[:env_vars_attributes] = new_params.delete(:env_vars).map do |k, v|
-        existing = heritage.env_vars.find_by(key: k)
+        existing = app.env_vars.find_by(key: k)
         e = {key: k, value: v}
         existing.present? ? e.merge(id: existing.id) : e
       end
@@ -25,10 +25,10 @@ class BuildHeritage
       end
     end
 
-    unless heritage.new_record?
+    unless app.new_record?
       new_params.delete :name
 
-      map = Hash[@heritage.services.pluck(:name, :id)]
+      map = Hash[@app.services.pluck(:name, :id)]
       if new_params[:services_attributes].present?
         # Add or modify services
         new_params[:services_attributes].each do |service|
@@ -52,8 +52,8 @@ class BuildHeritage
   end
 
   def execute
-    heritage.district = district if district.present?
-    heritage.attributes = params.permit!
-    heritage
+    app.district = district if district.present?
+    app.attributes = params.permit!
+    app
   end
 end

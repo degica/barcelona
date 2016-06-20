@@ -6,7 +6,7 @@ FactoryGirl.define do
     cpu 128
     memory 128
     public true
-    association :heritage, factory: :heritage
+    association :app, factory: :app
   end
 
   factory :web_service, class: 'Service' do
@@ -17,6 +17,6 @@ FactoryGirl.define do
     cpu 128
     memory 128
     public true
-    association :heritage, factory: :heritage
+    association :app, factory: :app
   end
 end

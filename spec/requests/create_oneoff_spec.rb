@@ -1,9 +1,9 @@
 require 'rails_helper'
 
-describe "POST /heritages/:heritage/oneoffs", type: :request do
+describe "POST /apps/:app/oneoffs", type: :request do
   let(:user) { create :user }
   let(:auth) { {"X-Barcelona-Token" => user.token} }
-  let(:heritage) { create :heritage }
+  let(:appl) { create :app }
 
   before {Aws.config[:stub_responses] = true}
 
@@ -16,7 +16,7 @@ describe "POST /heritages/:heritage/oneoffs", type: :request do
       command: "rake db:migrate",
       image_tag: "v100"
     }
-    post "/v1/heritages/#{heritage.name}/oneoffs", params, auth
+    post "/v1/apps/#{appl.name}/oneoffs", params, auth
     expect(response).to be_success
     oneoff = JSON.load(response.body)["oneoff"]
     expect(oneoff["task_arn"]).to eq "arn"

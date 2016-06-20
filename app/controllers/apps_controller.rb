@@ -1,42 +1,42 @@
-class HeritagesController < ApplicationController
+class AppsController < ApplicationController
   before_action :load_district, only:   [:index, :create]
-  before_action :load_heritage, except: [:index, :create, :trigger]
+  before_action :load_app, except: [:index, :create, :trigger]
   skip_before_action :authenticate, only: [:trigger]
 
   def index
-    render json: @district.heritages
+    render json: @district.apps
   end
 
   def show
-    render json: @heritage
+    render json: @app
   end
 
   def create
-    @heritage = BuildHeritage.new(permitted_params, district: @district).execute
-    @heritage.save_and_deploy!(without_before_deploy: true, description: "Create")
-    render json: @heritage
+    @app = BuildApp.new(permitted_params, district: @district).execute
+    @app.save_and_deploy!(without_before_deploy: true, description: "Create")
+    render json: @app
   end
 
   def update
-    @heritage = BuildHeritage.new(permitted_params).execute
-    @heritage.save_and_deploy!(without_before_deploy: false,
-                               description: "Update to #{@heritage.image_path}")
-    render json: @heritage
+    @app = BuildApp.new(permitted_params).execute
+    @app.save_and_deploy!(without_before_deploy: false,
+                               description: "Update to #{@app.image_path}")
+    render json: @app
   end
 
   def destroy
-    @heritage.destroy!
+    @app.destroy!
     render status: 204, nothing: true
   end
 
   def trigger
-    @heritage = Heritage.find_by!(name: params[:heritage_id])
-    if params[:image_name].present? && @heritage.image_name != params[:image_name]
+    @app = App.find_by!(name: params[:app_id])
+    if params[:image_name].present? && @app.image_name != params[:image_name]
       raise ExceptionHandler::Forbidden
     end
 
-    params[:id] = params.delete :heritage_id
-    if Rack::Utils.secure_compare(params[:token], @heritage.token)
+    params[:id] = params.delete :app_id
+    if Rack::Utils.secure_compare(params[:token], @app.token)
       update
     else
       raise ExceptionHandler::NotFound
@@ -46,25 +46,25 @@ class HeritagesController < ApplicationController
   def set_env_vars
     env_vars = params[:env_vars]
     env_vars.each do |k, v|
-      env = @heritage.env_vars.find_or_create_by(key: k)
+      env = @app.env_vars.find_or_create_by(key: k)
       env.value = v
       env.save!
     end
-    @heritage.save_and_deploy!(without_before_deploy: true,
-                               description: "Set environments #{env_vars.keys.join(', ')}")
+    @app.save_and_deploy!(without_before_deploy: true,
+                          description: "Set environments #{env_vars.keys.join(', ')}")
 
-    render json: @heritage
+    render json: @app
   end
 
   def delete_env_vars
     env_keys = params[:env_keys]
     env_keys.each do |k|
-      @heritage.env_vars.find_by(key: k).destroy!
+      @app.env_vars.find_by(key: k).destroy!
     end
-    @heritage.save_and_deploy!(without_before_deploy: true,
+    @app.save_and_deploy!(without_before_deploy: true,
                                description: "Unset environments #{env_keys.join(', ')}")
 
-    render json: @heritage
+    render json: @app
   end
 
   def permitted_params
@@ -109,8 +109,8 @@ class HeritagesController < ApplicationController
     end
   end
 
-  def load_heritage
-    @heritage = Heritage.find_by!(name: params[:id])
+  def load_app
+    @app = App.find_by!(name: params[:id])
   end
 
   def load_district

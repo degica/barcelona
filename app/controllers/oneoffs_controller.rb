@@ -1,5 +1,5 @@
 class OneoffsController < ApplicationController
-  before_action :load_heritage, only: [:create]
+  before_action :load_app, only: [:create]
   before_action :load_oneoff, except: [:index, :create]
 
   def show
@@ -7,7 +7,7 @@ class OneoffsController < ApplicationController
   end
 
   def create
-    @oneoff = @heritage.oneoffs.create!(create_params)
+    @oneoff = @app.oneoffs.create!(create_params)
     sync = params[:sync] || false
     @oneoff.run!(sync: sync)
     render json: @oneoff
@@ -24,8 +24,8 @@ class OneoffsController < ApplicationController
     end
   end
 
-  def load_heritage
-    @heritage = Heritage.find_by!(name: params[:heritage_id])
+  def load_app
+    @app = App.find_by!(name: params[:app_id])
   end
 
   def load_oneoff

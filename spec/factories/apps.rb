@@ -1,7 +1,7 @@
 FactoryGirl.define do
-  factory :heritage do
+  factory :app do
     sequence :name do |n|
-      "heritage#{n}"
+      "app#{n}"
     end
     image_name "nginx"
     image_tag "1.9.5"
