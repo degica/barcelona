@@ -1,15 +1,4 @@
-FROM ruby:2.3
-
-RUN apt-get update && apt-get install -y postgresql-client nodejs --no-install-recommends && rm -rf /var/lib/apt/lists/*
-
-ENV APP_HOME /app
-
-RUN mkdir $APP_HOME
-WORKDIR $APP_HOME
-
-ADD Gemfile $APP_HOME/
-ADD Gemfile.lock $APP_HOME/
-RUN bundle install -j 4
+FROM degica/rails-base:debian
 
 ADD . $APP_HOME
 RUN rake assets:precompile

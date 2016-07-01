@@ -6,6 +6,7 @@ services:
       dockerfile: Dockerfile.development
       args:
         - APP_HOME=${PWD}
+        - SKIP_BUNDLE=yes
     ports:
      - "3333:3333"
     command: rails s -p 3333 -b 0.0.0.0
@@ -14,8 +15,9 @@ services:
     links:
      - db
     volumes:
+      - bundle:/usr/local/bundle
       - .:${PWD}
-    environment:
+    environment: &env_base
       RAILS_ENV: development
       DATABASE_URL: postgres://postgres:@db:5432
   worker:
@@ -28,12 +30,14 @@ services:
     command: spring server
     pid: host
     environment:
-      DATABASE_URL: postgres://postgres:@db:5432
+      <<: *env_base
       SPRING_SOCKET: /tmp/spring/spring.sock
     volumes:
+      - bundle:/usr/local/bundle
       - .:${PWD}
       - spring:/tmp/spring
   db:
     image: postgres:9.5
 volumes:
+  bundle:
   spring:
