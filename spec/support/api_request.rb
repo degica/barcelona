@@ -1,13 +1,12 @@
 module Support
   module ApiRequest
-    def api_request(method, path, params)
-      user = create :user
+    def api_request(method, path, params={})
       headers = {
         "X-Barcelona-Token" => user.token,
         "Content-Type" => "application/json",
         "Accept" => "application/json"
       }
-      send(method, path, params.to_json, headers)
+      send(method, path, params: params.to_json, headers: headers)
     end
   end
 end
