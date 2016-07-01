@@ -6,9 +6,7 @@ class UsersController < ApplicationController
     github_token = request.headers['HTTP_X_GITHUB_TOKEN']
     user = User.login!(github_token)
 
-    respond_to do |format|
-      format.json { render json: {"login" => user.name, "token" => user.token}}
-    end
+    render json: {"login" => user.name, "token" => user.token}
   end
 
   def index

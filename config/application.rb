@@ -50,5 +50,7 @@ module Barcelona
         params: params
       }.compact
     end
+
+    config.api_only = true
   end
 end
