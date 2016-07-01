@@ -26,7 +26,7 @@ class HeritagesController < ApplicationController
 
   def destroy
     @heritage.destroy!
-    render status: 204, nothing: true
+    head 204
   end
 
   def trigger
