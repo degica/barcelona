@@ -18,7 +18,6 @@ describe Release do
                          "services_attributes" => [
                            service.
                            attributes.
-                           with_indifferent_access.
                            slice("id",
                                  "cpu",
                                  "memory",
@@ -27,7 +26,7 @@ describe Release do
                                  "hosts",
                                  "service_type",
                                  "force_ssl",
-                                 "health_check")]})
+                                 "health_check")]}.deep_stringify_keys)
     }
   end
 
