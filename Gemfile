@@ -22,15 +22,13 @@ group :development, :test do
 end
 
 group :development do
-  gem 'web-console', '~> 2.0'
-
-  # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
   gem 'spring'
   gem 'spring-commands-rspec'
 end
 
 group :test do
-  gem 'rspec-rails'
+  gem 'rspec', '3.5.0.beta4'
+  gem 'rspec-rails', '3.5.0.beta4'
   gem 'rspec-its'
   gem 'factory_girl_rails'
   gem 'database_rewinder'
