@@ -6,6 +6,8 @@ class Service < ActiveRecord::Base
 
   serialize :hosts
   serialize :health_check
+  serialize :new_hosts, JSON
+  serialize :new_health_check, JSON
 
   validates :name,
             presence: true,

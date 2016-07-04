@@ -2,6 +2,7 @@ class Plugin < ActiveRecord::Base
   belongs_to :district, inverse_of: :plugins
 
   serialize :plugin_attributes
+  serialize :new_plugin_attributes, JSON
 
   before_validation :default_attributes
   validates :name, uniqueness: {scope: :district_id}, presence: true
