@@ -3,6 +3,7 @@ require 'rails_helper'
 describe "updating a heritage" do
   let(:district) { create :district }
   let(:user) { create :user }
+  let(:auth) { {"X-Barcelona-Token" => user.token} }
 
   before do
     params = {
@@ -29,7 +30,7 @@ describe "updating a heritage" do
         }
       ]
     }
-    api_request :post, "/v1/districts/#{district.name}/heritages", params
+    post "/v1/districts/#{district.name}/heritages", params, auth
   end
 
   describe "PATCH /heritages/:heritage", type: :request do
@@ -50,7 +51,7 @@ describe "updating a heritage" do
       }
 
       expect(DeployRunnerJob).to receive(:perform_later)
-      api_request :patch, "/v1/heritages/nginx", params
+      patch "/v1/heritages/nginx", params, auth
       expect(response).to be_success
 
       heritage = JSON.load(response.body)["heritage"]
@@ -92,7 +93,7 @@ describe "updating a heritage" do
       token = JSON.load(response.body)["heritage"]["token"]
 
       expect(DeployRunnerJob).to receive(:perform_later)
-      post "/v1/heritages/nginx/trigger/#{token}", params: params
+      post "/v1/heritages/nginx/trigger/#{token}", params
       expect(response).to be_success
       heritage = JSON.load(response.body)["heritage"]
 
@@ -130,7 +131,7 @@ describe "updating a heritage" do
         ]
       }
 
-      api_request :post, "/v1/heritages/nginx/trigger/wrong-token", params
+      post "/v1/heritages/nginx/trigger/wrong-token", params
       expect(response.status).to eq 404
     end
   end
@@ -157,7 +158,7 @@ describe "updating a heritage" do
       }
 
       expect(DeployRunnerJob).to receive(:perform_later)
-      api_request :patch, "/v1/heritages/nginx", params
+      patch "/v1/heritages/nginx", params, auth
       expect(response).to be_success
 
       heritage = JSON.load(response.body)["heritage"]
@@ -196,7 +197,7 @@ describe "updating a heritage" do
       }
 
       expect(DeployRunnerJob).to receive(:perform_later)
-      api_request :patch, "/v1/heritages/nginx", params
+      patch "/v1/heritages/nginx", params, auth
       expect(response).to be_success
 
       heritage = JSON.load(response.body)["heritage"]

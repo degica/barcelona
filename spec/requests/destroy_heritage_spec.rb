@@ -2,7 +2,10 @@ require 'rails_helper'
 
 describe "DELETE /heritages/:heritage", type: :request do
   let(:user) { create :user }
+  let(:auth) { {"X-Barcelona-Token" => user.token} }
   let(:district) { create :district }
+
+  before {Aws.config[:stub_responses] = true}
 
   it "updates a heritage" do
     params = {
@@ -25,10 +28,10 @@ describe "DELETE /heritages/:heritage", type: :request do
         }
       ]
     }
-    api_request :post, "/v1/districts/#{district.name}/heritages", params
+    post "/v1/districts/#{district.name}/heritages", params, auth
     expect(response).to be_success
 
-    api_request :delete, "/v1/heritages/nginx"
+    delete "/v1/heritages/nginx", nil, auth
     expect(response.status).to eq 204
   end
 end

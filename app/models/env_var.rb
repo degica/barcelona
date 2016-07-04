@@ -1,11 +1,5 @@
 class EnvVar < ActiveRecord::Base
-  module ValueToString
-    def value
-      super.to_s
-    end
-  end
   include EncryptAttribute
-  prepend ValueToString
 
   belongs_to :heritage
 
@@ -13,4 +7,9 @@ class EnvVar < ActiveRecord::Base
   validates :key, :value, presence: true
 
   encrypted_attribute :value, secret_key: ENV['ENCRYPTION_KEY']
+
+  def value_with_to_s
+    value_without_to_s.to_s
+  end
+  alias_method_chain :value, :to_s
 end
