@@ -59,15 +59,15 @@ describe "updating a heritage" do
       expect(heritage["image_name"]).to eq "nginx"
       expect(heritage["image_tag"]).to eq "v3"
       expect(heritage["before_deploy"]).to eq nil
-      expect(heritage["services"][0]["name"]).to eq "web"
-      expect(heritage["services"][0]["public"]).to eq true
-      expect(heritage["services"][0]["cpu"]).to eq 128
-      expect(heritage["services"][0]["memory"]).to eq 256
-      expect(heritage["services"][0]["command"]).to eq "true"
-      expect(heritage["services"][0]["port_mappings"][0]["lb_port"]).to eq 80
-      expect(heritage["services"][0]["port_mappings"][0]["container_port"]).to eq 80
-      expect(heritage["services"][1]["name"]).to eq "worker"
-      expect(heritage["services"][1]["command"]).to eq "rake jobs:work"
+      web_service = heritage["services"].find { |s| s["name"] == "web" }
+      expect(web_service["public"]).to eq true
+      expect(web_service["cpu"]).to eq 128
+      expect(web_service["memory"]).to eq 256
+      expect(web_service["command"]).to eq "true"
+      expect(web_service["port_mappings"][0]["lb_port"]).to eq 80
+      expect(web_service["port_mappings"][0]["container_port"]).to eq 80
+      worker_service = heritage["services"].find { |s| s["name"] == "worker" }
+      expect(worker_service["command"]).to eq "rake jobs:work"
     end
   end
 
