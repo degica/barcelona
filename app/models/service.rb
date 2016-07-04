@@ -4,10 +4,8 @@ class Service < ActiveRecord::Base
   belongs_to :heritage, inverse_of: :services
   has_many :port_mappings, inverse_of: :service, dependent: :destroy
 
-  serialize :hosts
-  serialize :health_check
-  serialize :new_hosts, JSON
-  serialize :new_health_check, JSON
+  serialize :hosts, JSON
+  serialize :health_check, JSON
 
   validates :name,
             presence: true,
