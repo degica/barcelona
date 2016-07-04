@@ -25,12 +25,12 @@ class DistrictsController < ApplicationController
     # Make sure the related resources are in-sync
     @district.save!
     @district.create_or_update_network_stack
-    head 202
+    render status: 202, nothing: true
   end
 
   def destroy
     @district.destroy!
-    head 204
+    render status: 204, nothing: true
   end
 
   def update_params

@@ -29,7 +29,7 @@ class Release < ActiveRecord::Base
         "service_type",
         "force_ssl",
         "health_check"
-      ).deep_stringify_keys
+      )
     end
     exported
   end

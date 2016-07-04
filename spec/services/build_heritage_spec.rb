@@ -5,7 +5,7 @@ describe BuildHeritage do
     allow_any_instance_of(Aws::ECS::Client).to receive(:create_cluster)
   end
   let(:params) do
-    ActionController::Parameters.new({
+    {
       name: "heritage",
       image_name: "docker_image",
       image_tag: "latest",
@@ -31,7 +31,7 @@ describe BuildHeritage do
           command: "rake jobs:work"
         }
       ]
-    }).permit!
+    }
   end
   let(:district) { create :district }
   let(:heritage) { BuildHeritage.new(params, district: district).execute }

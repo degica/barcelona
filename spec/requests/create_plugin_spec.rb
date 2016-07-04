@@ -2,6 +2,7 @@ require 'rails_helper'
 
 describe "POST /districts/:district/plugins", type: :request do
   let(:user) { create :user }
+  let(:auth) { {"X-Barcelona-Token" => user.token} }
   let(:district) { create :district }
 
   it "creates a plugin" do
@@ -9,7 +10,7 @@ describe "POST /districts/:district/plugins", type: :request do
       name: "logentries",
       attributes: {token: "abcde"}
     }
-    api_request :post, "/v1/districts/#{district.name}/plugins", params
+    post "/v1/districts/#{district.name}/plugins", params, auth
     expect(response.status).to eq 200
     plugin = JSON.load(response.body)["plugin"]
     expect(plugin["name"]).to eq "logentries"

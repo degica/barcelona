@@ -2,6 +2,7 @@ require 'rails_helper'
 
 describe "DELETE /heritages/:heritage/env_vars", type: :request do
   let(:user) { create :user }
+  let(:auth) { {"X-Barcelona-Token" => user.token} }
   let(:district) { create :district }
 
   before {Aws.config[:stub_responses] = true}
@@ -29,7 +30,7 @@ describe "DELETE /heritages/:heritage/env_vars", type: :request do
         }
       ]
     }
-    api_request :post, "/v1/districts/#{district.name}/heritages", params
+    post "/v1/districts/#{district.name}/heritages", params, auth
     expect(response).to be_success
   end
 
@@ -39,7 +40,7 @@ describe "DELETE /heritages/:heritage/env_vars", type: :request do
     }
 
     expect(DeployRunnerJob).to receive(:perform_later)
-    api_request :delete, "/v1/heritages/nginx/env_vars", params
+    delete "/v1/heritages/nginx/env_vars", params, auth
     expect(response).to be_success
 
     heritage = JSON.load(response.body)["heritage"]
