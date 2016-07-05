@@ -97,10 +97,11 @@ ActiveRecord::Schema.define(version: 20160704095918) do
   add_index "oneoffs", ["heritage_id"], name: "index_oneoffs_on_heritage_id", using: :btree
 
   create_table "plugins", force: :cascade do |t|
+    t.text     "old_plugin_attributes"
     t.integer  "district_id"
     t.string   "name"
-    t.datetime "created_at",        null: false
-    t.datetime "updated_at",        null: false
+    t.datetime "created_at",            null: false
+    t.datetime "updated_at",            null: false
     t.text     "plugin_attributes"
   end
 
@@ -140,8 +141,10 @@ ActiveRecord::Schema.define(version: 20160704095918) do
     t.datetime "created_at",                              null: false
     t.datetime "updated_at",                              null: false
     t.string   "reverse_proxy_image"
+    t.text     "old_hosts"
     t.string   "service_type",        default: "default"
     t.boolean  "force_ssl"
+    t.text     "old_health_check"
     t.text     "hosts"
     t.text     "health_check"
   end
