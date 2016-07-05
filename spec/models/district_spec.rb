@@ -6,7 +6,6 @@ describe District do
   let(:ecs_mock) { double }
   let(:s3_mock)  { double }
 
-
   describe "#validations" do
     let(:district) { build :district }
     before do
