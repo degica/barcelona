@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160704092318) do
+ActiveRecord::Schema.define(version: 20160704095918) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -97,12 +97,12 @@ ActiveRecord::Schema.define(version: 20160704092318) do
   add_index "oneoffs", ["heritage_id"], name: "index_oneoffs_on_heritage_id", using: :btree
 
   create_table "plugins", force: :cascade do |t|
-    t.text     "plugin_attributes"
+    t.text     "old_plugin_attributes"
     t.integer  "district_id"
     t.string   "name"
     t.datetime "created_at",            null: false
     t.datetime "updated_at",            null: false
-    t.text     "new_plugin_attributes"
+    t.text     "plugin_attributes"
   end
 
   add_index "plugins", ["district_id"], name: "index_plugins_on_district_id", using: :btree
@@ -141,12 +141,12 @@ ActiveRecord::Schema.define(version: 20160704092318) do
     t.datetime "created_at",                              null: false
     t.datetime "updated_at",                              null: false
     t.string   "reverse_proxy_image"
-    t.text     "hosts"
+    t.text     "old_hosts"
     t.string   "service_type",        default: "default"
     t.boolean  "force_ssl"
+    t.text     "old_health_check"
+    t.text     "hosts"
     t.text     "health_check"
-    t.text     "new_hosts"
-    t.text     "new_health_check"
   end
 
   add_index "services", ["heritage_id"], name: "index_services_on_heritage_id", using: :btree
