@@ -86,7 +86,13 @@ class Service < ActiveRecord::Base
   end
 
   def backend
-    @backend ||= Backend::Ecs::Adapter.new(self)
+    @backend ||= case heritage.version
+                 when 1 then
+                   Backend::Ecs::V1::Adapter.new(self)
+                 when 2 then
+                   #Backend::Ecs::V2::Adapter.new(self)
+                   raise NotImplementedError
+                 end
   end
 
   def validate_health_check
