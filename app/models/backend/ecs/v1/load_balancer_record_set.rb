@@ -1,4 +1,4 @@
-module Backend::Ecs
+module Backend::Ecs::V1
   class LoadBalancerRecordSet
     attr_accessor :service
     delegate :name, :heritage, :service_name, :district, to: :service

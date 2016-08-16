@@ -1,4 +1,4 @@
-module Backend::Ecs
+module Backend::Ecs::V1
   class Adapter
     Result = Struct.new(:task_definition, :deployment_id)
 
@@ -62,15 +62,15 @@ module Backend::Ecs
     end
 
     def ecs_service
-      @ecs_service ||= Backend::Ecs::Service.new(service)
+      @ecs_service ||= Backend::Ecs::V1::Service.new(service)
     end
 
     def elb
-      @elb ||= Backend::Ecs::Elb.new(service)
+      @elb ||= Backend::Ecs::V1::Elb.new(service)
     end
 
     def record_set
-      @record_set ||= Backend::Ecs::LoadBalancerRecordSet.new(service)
+      @record_set ||= Backend::Ecs::V1::LoadBalancerRecordSet.new(service)
     end
   end
 end

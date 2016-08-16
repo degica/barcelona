@@ -1,6 +1,6 @@
 require "rails_helper"
 
-describe Backend::Ecs::Elb do
+describe Backend::Ecs::V1::Elb do
   let(:service) { create :web_service }
 
   describe "#health_check_target" do

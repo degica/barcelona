@@ -20,6 +20,10 @@ class Heritage < ActiveRecord::Base
   accepts_nested_attributes_for :services, allow_destroy: true
   accepts_nested_attributes_for :env_vars
 
+  after_initialize do |heritage|
+    heritage.version ||= 1
+  end
+
   def to_param
     name
   end

@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe Backend::Ecs::Adapter do
+describe Backend::Ecs::V1::Adapter do
   let(:heritage) { create :heritage }
   let(:adapter) { described_class.new(service) }
 

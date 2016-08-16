@@ -1,4 +1,4 @@
-module Backend::Ecs
+module Backend::Ecs::V1
   class Service
     attr_accessor :service
     delegate :service_name, :cpu, :memory, :command, :port_mappings, :district, to: :service

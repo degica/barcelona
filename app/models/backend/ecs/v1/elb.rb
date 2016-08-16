@@ -1,4 +1,4 @@
-module Backend::Ecs
+module Backend::Ecs::V1
   class Elb
     attr_accessor :service
 
