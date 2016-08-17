@@ -30,8 +30,6 @@ class InstanceUserData
 
   def build
     user_data = {
-      "repo_update" => true,
-      "repo_upgrade" => "all",
       "packages" => packages.uniq,
       "write_files" => files,
       "bootcmd" => boot_commands,
