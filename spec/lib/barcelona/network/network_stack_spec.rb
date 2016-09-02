@@ -119,6 +119,10 @@ describe Barcelona::Network::NetworkStack do
           "BlockDeviceMappings" => [
             {
               "DeviceName"=>"/dev/xvda",
+              "Ebs" => {"DeleteOnTermination"=>true, "VolumeSize"=>20, "VolumeType"=>"gp2"}
+            },
+            {
+              "DeviceName"=>"/dev/xvdcz",
               "Ebs" => {"DeleteOnTermination"=>true, "VolumeSize"=>80, "VolumeType"=>"gp2"}
             }
           ]

@@ -16,8 +16,18 @@ module Barcelona
           j.UserData instance_user_data
           j.EbsOptimized ebs_optimized_by_default?
           j.BlockDeviceMappings [
+            # Root volume
             {
               "DeviceName" => "/dev/xvda",
+              "Ebs" => {
+                "DeleteOnTermination" => true,
+                "VolumeSize" => 20,
+                "VolumeType" => "gp2"
+              }
+            },
+            # devicemapper volume used by docker
+            {
+              "DeviceName" => "/dev/xvdcz",
               "Ebs" => {
                 "DeleteOnTermination" => true,
                 "VolumeSize" => 80,
