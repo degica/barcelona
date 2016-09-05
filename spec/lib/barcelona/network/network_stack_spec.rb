@@ -111,7 +111,7 @@ describe Barcelona::Network::NetworkStack do
         "Type" => "AWS::AutoScaling::LaunchConfiguration",
         "Properties" => {
           "IamInstanceProfile" => {"Ref"=>"ECSInstanceProfile"},
-          "ImageId" => "ami-058a4964",
+          "ImageId" => "ami-2b6ba64a",
           "InstanceType" => "t2.micro",
           "SecurityGroups" => [{"Ref"=>"InstanceSecurityGroup"}],
           "UserData" => instance_of(String),
@@ -119,6 +119,10 @@ describe Barcelona::Network::NetworkStack do
           "BlockDeviceMappings" => [
             {
               "DeviceName"=>"/dev/xvda",
+              "Ebs" => {"DeleteOnTermination"=>true, "VolumeSize"=>20, "VolumeType"=>"gp2"}
+            },
+            {
+              "DeviceName"=>"/dev/xvdcz",
               "Ebs" => {"DeleteOnTermination"=>true, "VolumeSize"=>80, "VolumeType"=>"gp2"}
             }
           ]

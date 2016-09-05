@@ -10,14 +10,24 @@ module Barcelona
                      "ContainerInstanceLaunchConfiguration") do |j|
 
           j.IamInstanceProfile ref("ECSInstanceProfile")
-          j.ImageId "ami-058a4964" # amzn-ami-2016.03.g-amazon-ecs-optimized
+          j.ImageId "ami-2b6ba64a" # amzn-ami-2016.03.h-amazon-ecs-optimized
           j.InstanceType instance_type
           j.SecurityGroups [ref("InstanceSecurityGroup")]
           j.UserData instance_user_data
           j.EbsOptimized ebs_optimized_by_default?
           j.BlockDeviceMappings [
+            # Root volume
             {
               "DeviceName" => "/dev/xvda",
+              "Ebs" => {
+                "DeleteOnTermination" => true,
+                "VolumeSize" => 20,
+                "VolumeType" => "gp2"
+              }
+            },
+            # devicemapper volume used by docker
+            {
+              "DeviceName" => "/dev/xvdcz",
               "Ebs" => {
                 "DeleteOnTermination" => true,
                 "VolumeSize" => 80,
