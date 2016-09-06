@@ -189,7 +189,8 @@ describe BuildHeritage do
       before do
         new_params = params.dup
         new_params[:services] << {
-          name: "another-service"
+          name: "another-service",
+          command: "command"
         }
         @updated_heritage = BuildHeritage.new(new_params, district: nil).execute
         @updated_heritage.save!
@@ -218,6 +219,7 @@ describe BuildHeritage do
 
         service3 = @updated_heritage.services.third
         expect(service3.name).to eq "another-service"
+        expect(service3.command).to eq "command"
       end
     end
   end

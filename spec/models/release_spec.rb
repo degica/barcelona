@@ -39,7 +39,7 @@ describe Release do
         services_attributes: [
           {
             id: service.id,
-            command: "rails s"
+            command: "rails s -p 3000"
           }
         ]
       }
@@ -48,12 +48,12 @@ describe Release do
 
     it "rollbacks to the previous version" do
       expect(heritage.image_tag).to eq "v111"
-      expect(heritage.services.first.command).to eq "rails s"
+      expect(heritage.services.first.command).to eq "rails s -p 3000"
 
       release.rollback
 
       expect(heritage.image_tag).to eq "1.9.5"
-      expect(heritage.services.first.command).to eq nil
+      expect(heritage.services.first.command).to eq "rails s"
     end
 
     it "creates a rolling back release" do

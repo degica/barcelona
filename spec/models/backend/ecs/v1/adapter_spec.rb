@@ -69,6 +69,7 @@ describe Backend::Ecs::V1::Adapter do
                   memory: 128,
                   essential: true,
                   image: 'nginx:1.9.5',
+                  command: LaunchCommand.new(service.command).to_command,
                   environment: [],
                   port_mappings: []
                 }

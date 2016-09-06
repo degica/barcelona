@@ -17,6 +17,7 @@ describe "GET /heritages/:heritage/releases", type: :request do
           public: true,
           cpu: 128,
           memory: 256,
+          command: "nginx",
           port_mappings: [
             {
               lb_port: 80,

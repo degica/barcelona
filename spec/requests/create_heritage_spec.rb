@@ -19,6 +19,7 @@ describe "POST /districts/:district/heritages", type: :request do
           force_ssl: true,
           cpu: 128,
           memory: 256,
+          command: "nginx",
           reverse_proxy_image: 'org/custom_revpro:v1.2',
           port_mappings: [
             {container_port: 3333, protocol: "udp", lb_port: 3333 }
@@ -49,6 +50,7 @@ describe "POST /districts/:district/heritages", type: :request do
     expect(heritage["services"][0]["public"]).to eq true
     expect(heritage["services"][0]["cpu"]).to eq 128
     expect(heritage["services"][0]["memory"]).to eq 256
+    expect(heritage["services"][0]["command"]).to eq "nginx"
     expect(heritage["services"][0]["force_ssl"]).to eq true
     expect(heritage["services"][0]["reverse_proxy_image"]).to eq "org/custom_revpro:v1.2"
     expect(heritage["services"][0]["port_mappings"][0]["lb_port"]).to eq 3333
