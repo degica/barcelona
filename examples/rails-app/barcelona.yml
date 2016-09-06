@@ -9,4 +9,4 @@ environments:
         public: true
         cpu: 128
         memory: 256
-        command: rails s -p $PORT
+        command: rails s -p $PORT -b 0.0.0.0
