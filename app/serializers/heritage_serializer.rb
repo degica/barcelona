@@ -5,10 +5,8 @@ class HeritageSerializer < ActiveModel::Serializer
   belongs_to :district
 
   def env_vars
-    # Heritage#env_vars don't include env vars which are added by plugins
-    # as plugins add env vars to task_definition directly and those are not
-    # stored in DB'
-    task_definition = object.base_task_definition('_')
-    Hash[task_definition[:environment].map { |env| [env[:name], env[:value]] }]
+    Hash[object.env_vars.map do |e|
+      [e.key, e.value.presence || "<secret>"]
+    end]
   end
 end

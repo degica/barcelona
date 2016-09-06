@@ -48,6 +48,7 @@ class HeritagesController < ApplicationController
     env_vars.each do |k, v|
       env = @heritage.env_vars.find_or_create_by(key: k)
       env.value = v
+      env.secret = !!params[:secret]
       env.save!
     end
     @heritage.save_and_deploy!(without_before_deploy: true,
