@@ -63,7 +63,6 @@ describe Oneoff do
         create :oneoff,
                heritage: heritage,
                command: "rake db:migrate",
-               image_tag: "v100",
                env_vars: {"OVERRITE_ENV" => "VALUE"}
       }
       it "creates ECS task" do
@@ -76,7 +75,7 @@ describe Oneoff do
                 cpu: 128,
                 memory: 512,
                 essential: true,
-                image: "#{heritage.image_name}:v100",
+                image: heritage.image_path,
                 environment: []
               }
             ]

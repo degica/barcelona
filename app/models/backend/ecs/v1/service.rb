@@ -56,83 +56,13 @@ module Backend::Ecs::V1
       ecs_service&.deployments
     end
 
-    def container_definition
-      base = service.heritage.base_task_definition(service_name)
-      base[:environment] += service.port_mappings.map do |pm|
-        {
-          name: "HOST_PORT_#{pm.protocol.upcase}_#{pm.container_port}",
-          value: pm.host_port.to_s
-        }
-      end
-      if service.web?
-        base[:environment] << {
-          name: "PORT",
-          value: service.web_container_port.to_s
-        }
-      end
-
-      base.merge(
-        cpu: cpu,
-        memory: memory,
-        command: LaunchCommand.new(command).to_command,
-        port_mappings: port_mappings.to_task_definition
-      ).compact
-    end
-
-    def reverse_proxy_definition
-      base = service.heritage.base_task_definition("#{service.service_name}-revpro")
-      base[:environment] += [
-        {name: "AWS_REGION", value: district.region},
-        {name: "UPSTREAM_NAME", value: "backend"},
-        {name: "UPSTREAM_PORT", value: service.web_container_port.to_s},
-        {name: "FORCE_SSL", value: (!!service.force_ssl).to_s},
-        service.hosts.map do |h|
-          host_key = h['hostname'].tr('.', '_').gsub('-', '__').upcase
-          [
-            {name: "CERT_#{host_key}", value: h['ssl_cert_path']},
-            {name: "KEY_#{host_key}", value: h['ssl_key_path']}
-          ]
-        end
-      ].flatten
-
-      http_hosts = service.hosts.map{ |h| h['hostname'] }.join(',')
-      base[:environment] << {name: "HTTP_HOSTS", value: http_hosts} if http_hosts.present?
-
-      http = service.port_mappings.http
-      https = service.port_mappings.https
-      base.merge(
-        cpu: 128,
-        memory: 128,
-        image: service.reverse_proxy_image,
-        links: ["#{service.service_name}:backend"],
-        port_mappings: [
-          {
-            container_port: 80,
-            host_port: http.host_port,
-            protocol: "tcp"
-          },
-          {
-            container_port: 443,
-            host_port: https.host_port,
-            protocol: "tcp"
-          }
-        ]
-      )
-    end
-
-    def container_definitions
-      definitions = [container_definition]
-      definitions << reverse_proxy_definition if service.web?
-      definitions
-    end
-
     def applied?
       !(ecs_service.nil? || ecs_service.status != "ACTIVE")
     end
 
     def register_task
-      aws.ecs.register_task_definition(family: service.service_name,
-                                       container_definitions: container_definitions)
+      task_definition = HeritageTaskDefinition.service_definition(service).to_task_definition
+      aws.ecs.register_task_definition(task_definition)
     end
 
     def update
