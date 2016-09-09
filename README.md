@@ -2,160 +2,83 @@
 
 Barcelona is the next generation of our infrastructure.
 
-## Status
+# Setup Guide
+## Install Barcelona Client
 
-Prior to alpha status.
+1. Setup NPM
+2. `npm install -g barcelona`
 
-## Philosophy
+## Deploy Barcelona
 
-Barcelona tries to be tied with AWS managed services(ECS, ELB, VPC) so that we have less amount of ops tasks.
-Barcelona will not offer new concepts. It's a simple wrapper service on top of AWS EC2 Container Service(ECS). All data or configurations in Barcelona are directly linked to AWS resource.
+TODO
 
-### District
+## Login to Barcelona
+### Create GitHub access token
 
-`District` is basically same as AWS ECS's cluster. It also has several associations to provide proper AWS configuration:
+1. Go to https://github.com/settings/tokens
+1. create a new token with `read:org` permission
 
-- `vpc_id`
-- `public_elb_security_group`
-- `private_elb_security_group`
-- `ecs_service_role`
-- `ecs_instance_role`
-- `instance_security_group`
+### Run login command
 
-District manages the above AWS resources and EC2 instances running as an ECS cotainer instance.
-
-### Heritage
-
-`Heritage` represents a micro-service. Assume that you have a heritage called `komoju-core-app`(which is identical to the current hats repository). `komoju-core-app` heritage would have several "services" such as
-
-- web
-  - run by rails application and it listens on http/https
-- worker
-  - delayed_job
-- cron
-
-So the `komoju-core-app` heritage has 3 services: `web`, `worker`, `cron`. Each service can independently scale out/in for example web with scale 4, worker with scale 2, cron with scale 1.
-
-Once you create a heritage, Barcelona makes a `create-service` request to AWS ECS and ECS pulls and runs the specified docker image on the ECS container instances.
-
-Additionally, We also may want another heritage `komoju-core-front` which runs nginx as a reverse-proxy for `komoju-core-app`.
-
-## Usage
-
-### Authentication
-
-Currently only users in the `developers` team of `degica` organization can login.
-
-1. [Create Github access token](https://github.com/settings/tokens) with permission `read:org`
-2. login by `curl -XPOST -H "X-GitHub-Token: [your GitHub access token]" http://localhost:3000/login`
-  - the response includes barcelona access token: `{"login":"k2nr","token":"24106f22c0b6c0e0a032cb001229c2e9d8009cd7"}`
-3. You can call Barcelona API with the token: `curl -H "X-Barcelona-Token: 24106f22c0b6c0e0a032cb001229c2e9d8009cd7" http://localhost:3000/districts`
-
-### API
-
-Barcelona provides a Restful API
-
-- Cluster management
-  - POST /districts
-  - PATCH /districts/:district_name
-  - DELETE /districts/:district_name
-- Application management
-  - POST /districts/:district_name/heritages
-  - DELETE /heritages/:heritage_name
-  - Environment variables management
-    - POST /heritages/:heritage_name/env_vars
-    - DELETE /heritages/:heritage_name/env_vars
-  - Scale out/in
-    - POST /heritages/:heritage_name/services/:service_name/scale
-
-## IAM users and roles
-
-### IAM user for Barcelona API
-
-```json
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "Stmt1445588337000",
-            "Effect": "Allow",
-            "Action": [
-                "ec2:RunInstances",
-                "ec2:StopInstances",
-                "ec2:StartInstances",
-                "ec2:DescribeInstances",
-                "ec2:DescribeSubnets",
-                "ecs:*",
-                "elasticloadbalancing:ConfigureHealthCheck",
-                "elasticloadbalancing:CreateLoadBalancer",
-                "elasticloadbalancing:CreateLoadBalancerListeners",
-                "elasticloadbalancing:DeleteLoadBalancer",
-                "elasticloadbalancing:DescribeLoadBalancers",
-                "elasticloadbalancing:ModifyLoadBalancerAttributes",
-                "route53:ChangeResourceRecordSets",
-                "route53:GetHostedZone",
-                "s3:PutObject",
-                "iam:PassRole"
-            ],
-            "Resource": [
-                "*"
-            ]
-        }
-    ]
-}
+```
+$ bcn login http://localhost:3333 [Your GitHub token]
 ```
 
-### ECS instance role
+# Create a District
 
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "ecs:CreateCluster",
-        "ecs:DeregisterContainerInstance",
-        "ecs:DiscoverPollEndpoint",
-        "ecs:Poll",
-        "ecs:RegisterContainerInstance",
-        "ecs:StartTelemetrySession",
-        "ecs:Submit*",
-        "s3:Get*",
-        "s3:List*"
-      ],
-      "Resource": [
-        "*"
-      ]
-    }
-  ]
-}
+District is a set of fundamental AWS resources required to run your applications.
+The AWS resoureces include VPC, Subnet, NAT Gateway, AutoScaling Group, S3 bucket, Route53 Hosted zone, bastion servers, etc.
+
+To create a district, run this command. 
+
+```
+$ bcn request post /districts '{"name": "your-district", "aws_access_key_id": "<AWS_ACCESS_KEY_ID>", "aws_secret_access_key": "<AWS_SECRET_ACCESS_KEY>", "region": "ap-northeast-1"}'
 ```
 
-### ECS service role
+Then Barcelona sets up a district in a specified AWS region using the given access key.
+The access key must have "Administrator" permission.
+(TODO: the permission can be shrink. I need to list up required actions for district management)
 
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": [
-        "ec2:AuthorizeSecurityGroupIngress",
-        "ec2:Describe*",
-        "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
-        "elasticloadbalancing:Describe*",
-        "elasticloadbalancing:RegisterInstancesWithLoadBalancer"
-      ],
-      "Resource": "*"
-    }
-  ]
-}
+## Create a Heritage
+
+Heritage is an application that runs on a district. It consists of Some ECS resources and ELB.
+
+### Create `barcelona.yml`
+
+Create a file and name it `barcelona.yml`. Our rails application example is [here](https://github.com/degica/barcelona/blob/master/examples/rails-app/barcelona.yml)
+
+Run the below command
+
+```
+$ bcn create -e production --district <your district name>
 ```
 
-## TODO
+# Development
 
-- Logentries integration
-- scheduled tasks(cron integration)
-- interactive command execution
-- Slack integration
+## Prerequisites
+
+To start development you need to install docker.
+
+For mac, use [Docker for Mac](https://docs.docker.com/engine/installation/mac/#/docker-for-mac)
+For linux users, install `docker` and `docker-compose` in your machine.
+
+## Running Barcelona Server
+
+Clone this repository
+
+```
+$ git clone https://github.com/degica/barcelona
+```
+
+Run the server
+
+```
+$ make setup
+$ make up
+```
+
+Now your Barcelona server is running. Try logging in.
+
+```
+$ bcn login http://localhost:3333 <YOUR GITHUB TOKEN>
+```
