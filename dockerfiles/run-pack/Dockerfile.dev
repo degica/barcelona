@@ -1,0 +1,7 @@
+FROM alpine:3.4
+
+ENV GOPATH /.go
+ENV GOBIN $GOPATH/bin
+RUN apk add --update go
+VOLUME $GOPATH/src/app
+WORKDIR $GOPATH/src/app
