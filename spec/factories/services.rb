@@ -6,6 +6,7 @@ FactoryGirl.define do
     cpu 128
     memory 128
     public true
+    command "rails s"
     association :heritage, factory: :heritage
   end
 
@@ -17,6 +18,7 @@ FactoryGirl.define do
     cpu 128
     memory 128
     public true
+    command "rails s"
     association :heritage, factory: :heritage
   end
 end

@@ -13,17 +13,15 @@ class Oneoff < ActiveRecord::Base
   end
 
   def run(sync: false)
-    aws.ecs.register_task_definition(
-      family: task_family,
-      container_definitions: [task_definition]
-    )
+    definition = HeritageTaskDefinition.oneoff_definition(self)
+    aws.ecs.register_task_definition(definition.to_task_definition)
     resp = aws.ecs.run_task(
       cluster: district.name,
-      task_definition: task_family,
+      task_definition: definition.family_name,
       overrides: {
         container_overrides: [
           {
-            name: container_name,
+            name: definition.family_name,
             command: LaunchCommand.new(command).to_command,
             environment: env_vars.map { |k, v| {name: k, value: v} }
           }
@@ -74,29 +72,5 @@ class Oneoff < ActiveRecord::Base
       cluster: district.name,
       tasks: [task_arn]
     ).tasks[0]
-  end
-
-  def task_family
-    "#{heritage.name}-oneoff"
-  end
-
-  def container_name
-    "#{heritage.name}-oneoff"
-  end
-
-  def image_path
-    if image_tag.present?
-      "#{heritage.image_name}:#{image_tag}"
-    else
-      heritage.image_path
-    end
-  end
-
-  def task_definition
-    heritage.base_task_definition(container_name).merge(
-      cpu: 128,
-      memory: 512,
-      image: image_path
-    )
   end
 end

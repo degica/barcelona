@@ -22,7 +22,7 @@ class DeployRunnerJob < ActiveJob::Base
         MonitorDeploymentJob.perform_later(service, deployment_id: result[:deployment_id])
       rescue => e
         Rails.logger.error "#{e.class}: #{e.message}"
-        Rails.logger.error caller.join("\n")
+        Rails.logger.error e.backtrace.join("\n")
         heritage.events.create(
           level: :error,
           message: "Deploy failed: Something went wrong with deploying #{service.name} service"

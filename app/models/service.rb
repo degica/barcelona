@@ -15,6 +15,7 @@ class Service < ActiveRecord::Base
   validates :memory, numericality: {greater_than: 0}
   validates :service_type, inclusion: { in: %w(default web) }
   validates :name, :service_type, :public, immutable: true
+  validates :command, presence: true
   validate :validate_health_check
 
   accepts_nested_attributes_for :port_mappings

@@ -18,6 +18,7 @@ describe "POST /heritages/:heritage/env_vars", type: :request do
           public: true,
           cpu: 128,
           memory: 256,
+          command: "nginx",
           port_mappings: [
             {
               lb_port: 80,
@@ -51,7 +52,7 @@ describe "POST /heritages/:heritage/env_vars", type: :request do
     expect(heritage["services"][0]["public"]).to eq true
     expect(heritage["services"][0]["cpu"]).to eq 128
     expect(heritage["services"][0]["memory"]).to eq 256
-    expect(heritage["services"][0]["command"]).to eq nil
+    expect(heritage["services"][0]["command"]).to eq "nginx"
     expect(heritage["services"][0]["port_mappings"][0]["lb_port"]).to eq 80
     expect(heritage["services"][0]["port_mappings"][0]["container_port"]).to eq 80
 

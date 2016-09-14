@@ -18,10 +18,7 @@ describe Backend::Ecs::V1::Adapter do
       context "when port_mappings is blank" do
         it "create ECS resources" do
           expect(ecs_mock).to receive(:register_task_definition).
-            with(
-              family: service.service_name,
-              container_definitions: adapter.ecs_service.container_definitions
-            )
+            with(HeritageTaskDefinition.service_definition(service).to_task_definition)
           expect(ecs_mock).to receive(:update_service).
             with(
               cluster: service.district.name,
@@ -69,8 +66,8 @@ describe Backend::Ecs::V1::Adapter do
                   memory: 128,
                   essential: true,
                   image: 'nginx:1.9.5',
-                  environment: [],
-                  port_mappings: []
+                  command: LaunchCommand.new(service.command).to_command,
+                  environment: []
                 }
               ]
             )
