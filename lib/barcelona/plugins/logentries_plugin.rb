@@ -1,12 +1,9 @@
 module Barcelona
   module Plugins
     class LogentriesPlugin < Base
-      CERT_URL = "https://d1cnss1t6ao97n.cloudfront.net/mstatic/a6af84b/includes/certificates/logentries.all.crt"
-      CERT_PATH = "/etc/ssl/certs/logentries.all.crt"
       LOCAL_LOGGER_PORT = 514 # TCP port for local rsyslog
       SYSTEM_PACKAGES = ["rsyslog-gnutls"]
       RUN_COMMANDS = [
-        "curl --retry 3 #{CERT_URL} > #{CERT_PATH}",
         "service rsyslog restart"
       ]
 
@@ -44,7 +41,7 @@ module Barcelona
 $ModLoad imtcp
 $InputTCPServerRun #{LOCAL_LOGGER_PORT}
 
-$DefaultNetstreamDriverCAFile #{CERT_PATH}
+$DefaultNetstreamDriverCAFile /etc/ssl/certs/ca-bundle.crt
 $ActionSendStreamDriver gtls
 $ActionSendStreamDriverMode 1
 $ActionSendStreamDriverAuthMode x509/name
