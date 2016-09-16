@@ -1,14 +1,9 @@
 class Oneoff < ActiveRecord::Base
   belongs_to :heritage
   validates :heritage, presence: true
-  attr_accessor :env_vars, :image_tag
 
   delegate :district, to: :heritage
   delegate :aws, to: :district
-
-  after_initialize do |oneoff|
-    oneoff.env_vars ||= []
-  end
 
   def run(sync: false, interactive: false)
     raise ArgumentError if sync && interactive
@@ -23,6 +18,10 @@ class Oneoff < ActiveRecord::Base
           {
             name: definition.family_name,
             command: interactive ? watch_session_command : run_command,
+            # Ideally Barcelona should not override LANG but because all official docker images
+            # doesn't set LANG as UTF8 we can't use multi byte characters in
+            # the interactive session without this override
+            environment: interactive ? [{name: "LANG", value: "C.UTF-8"}] : []
           }
         ]
       }

@@ -48,7 +48,8 @@ describe Oneoff do
             container_overrides: [
               {
                 name: heritage.name + "-oneoff",
-                command: LaunchCommand.new(heritage, oneoff.command).to_command
+                command: LaunchCommand.new(heritage, oneoff.command).to_command,
+                environment: []
               }
             ]
           }
@@ -67,7 +68,7 @@ describe Oneoff do
                                     {
                                       name: heritage.name + "-oneoff",
                                       command: ["/barcelona/barcelona-run", "watch-interactive-session"],
-                                      environment: []
+                                      environment: [{name: "LANG", value: "C.UTF-8"}]
                                     }
                                   ]
                                 }
