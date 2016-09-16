@@ -17,8 +17,7 @@ class OneoffsController < ApplicationController
 
   def create_params
     params.permit(
-      :command,
-      :image_tag
+      :command
     )
   end
 
