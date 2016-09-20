@@ -23,7 +23,6 @@ class Oneoff < ActiveRecord::Base
           {
             name: definition.family_name,
             command: LaunchCommand.new(command).to_command,
-            environment: env_vars.map { |k, v| {name: k, value: v} }
           }
         ]
       }
