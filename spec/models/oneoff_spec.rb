@@ -2,6 +2,21 @@ require 'rails_helper'
 
 describe Oneoff do
   let(:ecs_mock) { double }
+  let(:describe_tasks_response_mock) {
+    double(
+      tasks: [
+        double(
+          task_arn: "arns",
+          containers: [
+            double(
+              name: "#{heritage.name}-oneoff",
+              container_arn: "container-arn"
+            )
+          ]
+        )
+      ]
+    )
+  }
   let(:heritage) { create :heritage }
   let(:oneoff) { create :oneoff, heritage: heritage, command: "rake db:migrate" }
 
@@ -24,23 +39,10 @@ describe Oneoff do
   describe "#run" do
     before do
       allow(oneoff).to receive_message_chain(:aws, :ecs) { ecs_mock }
+      expect(ecs_mock).to receive(:register_task_definition)
     end
 
     it "creates ECS task" do
-      expect(ecs_mock).to receive(:register_task_definition).
-        with(
-          family: "#{heritage.name}-oneoff",
-          container_definitions: [
-            {
-              name: heritage.name + "-oneoff",
-              cpu: 128,
-              memory: 512,
-              essential: true,
-              image: "#{heritage.image_path}",
-              environment: []
-            }
-          ]
-        )
       expect(ecs_mock).to receive(:run_task).
         with(
           cluster: heritage.district.name,
@@ -49,55 +51,12 @@ describe Oneoff do
             container_overrides: [
               {
                 name: heritage.name + "-oneoff",
-                command: ["sh", "-c", "exec rake db:migrate"],
-                environment: []
+                command: LaunchCommand.new(heritage, oneoff.command).to_command
               }
             ]
           }
-        ).and_return(double(tasks: [double(task_arn: 'arn')]))
+        ).and_return(describe_tasks_response_mock)
       oneoff.run
-    end
-
-    context "when attributes are overwrite" do
-      let(:oneoff) {
-        create :oneoff,
-               heritage: heritage,
-               command: "rake db:migrate",
-               env_vars: {"OVERRITE_ENV" => "VALUE"}
-      }
-      it "creates ECS task" do
-        expect(ecs_mock).to receive(:register_task_definition).
-          with(
-            family: "#{heritage.name}-oneoff",
-            container_definitions: [
-              {
-                name: heritage.name + "-oneoff",
-                cpu: 128,
-                memory: 512,
-                essential: true,
-                image: heritage.image_path,
-                environment: []
-              }
-            ]
-          )
-        expect(ecs_mock).to receive(:run_task).
-          with(
-            cluster: heritage.district.name,
-            task_definition: "#{heritage.name}-oneoff",
-            overrides: {
-              container_overrides: [
-                {
-                  name: heritage.name + "-oneoff",
-                  command: ["sh", "-c", "exec rake db:migrate"],
-                  environment: [
-                    {name: "OVERRITE_ENV", value: "VALUE"}
-                  ]
-                }
-              ]
-            }
-          ).and_return(double(tasks: [double(task_arn: 'arn')]))
-        oneoff.run
-      end
     end
   end
 end
