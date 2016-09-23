@@ -7,7 +7,7 @@ module Barcelona
 
       def define_resource(json)
         super do |j|
-          j.InstanceType "t2.micro"
+          j.InstanceType "t2.nano"
           j.SourceDestCheck false
           j.ImageId "ami-29160d47"
           j.UserData user_data
