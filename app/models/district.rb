@@ -166,7 +166,7 @@ class District < ActiveRecord::Base
   def ecs_config
     config = {
       "ECS_CLUSTER" => name,
-      "ECS_AVAILABLE_LOGGING_DRIVERS" => '["json-file", "syslog", "fluentd"]',
+      "ECS_AVAILABLE_LOGGING_DRIVERS" => '["awslogs", "json-file", "syslog", "fluentd"]',
       "ECS_RESERVED_MEMORY" => 128,
       "ECS_CONTAINER_STOP_TIMEOUT" => "5m"
     }
