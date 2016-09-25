@@ -111,7 +111,7 @@ describe Barcelona::Network::NetworkStack do
         "Type" => "AWS::AutoScaling::LaunchConfiguration",
         "Properties" => {
           "IamInstanceProfile" => {"Ref"=>"ECSInstanceProfile"},
-          "ImageId" => "ami-2b6ba64a",
+          "ImageId" => kind_of(String),
           "InstanceType" => "t2.micro",
           "SecurityGroups" => [{"Ref"=>"InstanceSecurityGroup"}],
           "UserData" => instance_of(String),
