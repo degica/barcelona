@@ -11,7 +11,6 @@ environments:
         cpu: 128
         memory: 256
         command: puma -C config/puma.rb
-        reverse_proxy_image: quay.io/degica/barcelona-reverse-proxy:dev
         force_ssl: true
         hosts:
           - hostname: barcelona.degica.com
