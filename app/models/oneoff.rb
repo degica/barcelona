@@ -22,8 +22,7 @@ class Oneoff < ActiveRecord::Base
         container_overrides: [
           {
             name: definition.family_name,
-            command: LaunchCommand.new(command).to_command,
-            environment: env_vars.map { |k, v| {name: k, value: v} }
+            command: run_command,
           }
         ]
       }
@@ -36,6 +35,10 @@ class Oneoff < ActiveRecord::Base
         sleep 3
       end
     end
+  end
+
+  def run_command
+    LaunchCommand.new(heritage, command).to_command
   end
 
   def running?

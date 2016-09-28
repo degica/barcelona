@@ -8,6 +8,7 @@ describe Backend::Ecs::V1::Adapter do
     let(:ecs_mock) { double }
     let(:elb_mock) { double }
     let(:service) { create :web_service, heritage: heritage }
+
     context "when updating service" do
       before do
         allow(adapter.ecs_service).to receive(:applied?) { true }
@@ -56,21 +57,9 @@ describe Backend::Ecs::V1::Adapter do
       context "when port_mappings is blank" do
         let(:service) { create :service, heritage: heritage }
         it "create ECS resources" do
-          expect(ecs_mock).to receive(:register_task_definition).
-            with(
-              family: service.service_name,
-              container_definitions: [
-                {
-                  name: service.service_name,
-                  cpu: 128,
-                  memory: 128,
-                  essential: true,
-                  image: 'nginx:1.9.5',
-                  command: LaunchCommand.new(service.command).to_command,
-                  environment: []
-                }
-              ]
-            )
+          expect(ecs_mock).to receive(:register_task_definition) {
+            HeritageTaskDefinition.service_definition(service)
+          }
           expect(ecs_mock).to receive(:create_service).
             with(
               cluster: service.district.name,
@@ -99,57 +88,9 @@ describe Backend::Ecs::V1::Adapter do
         end
 
         it "create ECS resources" do
-          expect(ecs_mock).to receive(:register_task_definition).
-            with(
-              family: service.service_name,
-              container_definitions: [
-                {
-                  name: service.service_name,
-                  cpu: 128,
-                  memory: 128,
-                  essential: true,
-                  command: ["sh", "-c", "exec rails s"],
-                  image: service.heritage.image_path,
-                  environment: [
-                    {name: "HOST_PORT_HTTP_3000", value: port_http.host_port.to_s},
-                    {name: "HOST_PORT_HTTPS_3000", value: port_https.host_port.to_s},
-                    {name: "HOST_PORT_TCP_1111", value: @port_tcp.host_port.to_s},
-                    {name: "PORT", value: "3000"}
-                  ],
-                  port_mappings: [
-                    {container_port: 3000, protocol: "tcp"},
-                    {container_port: 1111, protocol: "tcp", host_port: @port_tcp.host_port}
-                  ]
-                },
-                {
-                  name: "#{service.service_name}-revpro",
-                  cpu: 128,
-                  memory: 128,
-                  essential: true,
-                  image: Service::DEFAULT_REVERSE_PROXY,
-                  links: ["#{service.service_name}:backend"],
-                  environment: [
-                    {name: "AWS_REGION", value: "us-east-1"},
-                    {name: "UPSTREAM_NAME", value: "backend"},
-                    {name: "UPSTREAM_PORT", value: "3000"},
-                    {name: "FORCE_SSL", value: "false"}
-
-                  ],
-                  port_mappings: [
-                    {
-                      container_port: 80,
-                      host_port: port_http.host_port,
-                      protocol: "tcp"
-                    },
-                    {
-                      container_port: 443,
-                      host_port: port_https.host_port,
-                      protocol: "tcp"
-                    }
-                  ]
-                }
-              ]
-            )
+          expect(ecs_mock).to receive(:register_task_definition) {
+            HeritageTaskDefinition.service_definition(service)
+          }
           expect(ecs_mock).to receive(:create_service).
             with(
               cluster: service.district.name,

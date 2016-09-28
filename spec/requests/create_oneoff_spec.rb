@@ -13,8 +13,7 @@ describe "POST /heritages/:heritage/oneoffs", type: :request do
     end
 
     params = {
-      command: "rake db:migrate",
-      image_tag: "v100"
+      command: "rake db:migrate"
     }
     post "/v1/heritages/#{heritage.name}/oneoffs", params, auth
     expect(response).to be_success

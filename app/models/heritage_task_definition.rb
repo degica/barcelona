@@ -23,7 +23,7 @@ class HeritageTaskDefinition
   end
 
   def to_task_definition
-    containers = [container_definition]
+    containers = [container_definition, run_pack_definition]
     containers << reverse_proxy_definition if web_service?
     {family: family_name, container_definitions: containers}
   end
@@ -71,11 +71,27 @@ class HeritageTaskDefinition
 
     base = base.merge(
       cpu: cpu,
-      memory: memory
+      memory: memory,
+      volumes_from: [
+        {
+          source_container: "runpack",
+          read_only: true
+        }
+      ]
     ).compact
-    base[:command] = LaunchCommand.new(command).to_command if command.present?
+    base[:command] = LaunchCommand.new(heritage, command).to_command if command.present?
     base[:port_mappings] = port_mappings.to_task_definition if port_mappings.present?
     base
+  end
+
+  def run_pack_definition
+    base = heritage.base_task_definition("runpack")
+    base.merge(
+      cpu: 1,
+      memory: 16,
+      essential: false,
+      image: "quay.io/degica/barcelona-run-pack"
+    )
   end
 
   def reverse_proxy_definition

@@ -60,7 +60,7 @@ class Heritage < ActiveRecord::Base
       essential: true,
       image: image_path
     )
-    base[:environment] += env_vars.map { |e| {name: e.key, value: e.value} }
+    base[:environment] += env_vars.where(secret: false).map { |e| {name: e.key, value: e.value} }
 
     district.hook_plugins(:heritage_task_definition, self, base)
   end
