@@ -1,0 +1,4 @@
+#!/bin/sh
+
+ruby render_template.rb
+exec nginx -g "daemon off;"
