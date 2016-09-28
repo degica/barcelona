@@ -1,8 +1,6 @@
 class Oneoff < ActiveRecord::Base
   belongs_to :heritage
   validates :heritage, presence: true
-  validates :command, presence: true
-
   attr_accessor :env_vars, :image_tag
 
   delegate :district, to: :heritage
@@ -12,7 +10,9 @@ class Oneoff < ActiveRecord::Base
     oneoff.env_vars ||= []
   end
 
-  def run(sync: false)
+  def run(sync: false, interactive: false)
+    raise ArgumentError if sync && interactive
+
     definition = HeritageTaskDefinition.oneoff_definition(self)
     aws.ecs.register_task_definition(definition.to_task_definition)
     resp = aws.ecs.run_task(
@@ -22,7 +22,7 @@ class Oneoff < ActiveRecord::Base
         container_overrides: [
           {
             name: definition.family_name,
-            command: run_command,
+            command: interactive ? watch_session_command : run_command,
           }
         ]
       }
@@ -41,14 +41,31 @@ class Oneoff < ActiveRecord::Base
     LaunchCommand.new(heritage, command).to_command
   end
 
+  def interactive_run_command
+    real_command = run_command.map { |c| '"' + c + '"' }.join(' ')
+    [
+      "docker exec -it",
+      "$(docker ps -q -f label=com.amazonaws.ecs.task-arn=#{task_arn} -f label=com.amazonaws.ecs.container-name=#{container_name})",
+      real_command
+    ].join(' ')
+  end
+
+  def watch_session_command
+    ["/barcelona/barcelona-run", "watch-interactive-session"]
+  end
+
   def stopped?
     fetch_task
     %w(STOPPED MISSING).include?(status)
   end
 
-  def run!(sync: false)
-    run(sync: sync)
+  def run!(sync: false, interactive: false)
+    run(sync: sync, interactive: interactive)
     save!
+  end
+
+  def container_instance_arn
+    task&.container_instance_arn
   end
 
   def app_container

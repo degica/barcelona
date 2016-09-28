@@ -55,5 +55,25 @@ describe Oneoff do
         ).and_return(describe_tasks_response_mock)
       oneoff.run
     end
+
+    context "when interactive is true" do
+      it "creates ECS task" do
+        expect(ecs_mock).to receive(:run_task).
+                              with(
+                                cluster: heritage.district.name,
+                                task_definition: "#{heritage.name}-oneoff",
+                                overrides: {
+                                  container_overrides: [
+                                    {
+                                      name: heritage.name + "-oneoff",
+                                      command: ["/barcelona/barcelona-run", "watch-interactive-session"],
+                                      environment: []
+                                    }
+                                  ]
+                                }
+                              ).and_return(describe_tasks_response_mock)
+        oneoff.run(interactive: true)
+      end
+    end
   end
 end
