@@ -31,7 +31,7 @@ class Oneoff < ActiveRecord::Base
     self.task_arn = @task.task_arn
     if sync
       300.times do
-        break unless running?
+        break if stopped?
         sleep 3
       end
     end
@@ -41,9 +41,9 @@ class Oneoff < ActiveRecord::Base
     LaunchCommand.new(heritage, command).to_command
   end
 
-  def running?
+  def stopped?
     fetch_task
-    !(%w(STOPPED MISSING).include?(status))
+    %w(STOPPED MISSING).include?(status)
   end
 
   def run!(sync: false)
@@ -51,16 +51,24 @@ class Oneoff < ActiveRecord::Base
     save!
   end
 
+  def app_container
+    task&.containers&.find { |c| c.name == "#{heritage.name}-oneoff" }
+  end
+
+  def container_name
+    app_container&.name
+  end
+
   def status
-    task&.containers&.first&.last_status
+    task&.last_status
   end
 
   def exit_code
-    task&.containers&.first&.exit_code
+    app_container&.exit_code
   end
 
   def reason
-    task&.containers&.first&.reason
+    app_container&.reason
   end
 
   private
