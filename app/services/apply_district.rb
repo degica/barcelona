@@ -9,6 +9,7 @@ class ApplyDistrict
   def create!
     if district.valid?
       create_s3_bucket
+      generate_ssh_ca_key_pair
       create_ecs_cluster
     end
     apply
@@ -23,6 +24,15 @@ class ApplyDistrict
   def destroy!
     district.destroy!
     delete_ecs_cluster
+  end
+
+  def generate_ssh_ca_key_pair
+    key_pair = OpenSSL::PKey::RSA.new 4096
+    aws.s3.put_object(bucket: s3_bucket_name,
+                      key: "#{district.name}/ssh_ca_key",
+                      body: key_pair.to_pem,
+                      server_side_encryption: "aws:kms")
+    district.ssh_ca_public_key = key_pair.public_key.to_pem
   end
 
   private
