@@ -156,6 +156,12 @@ class District < ActiveRecord::Base
     users.map{|u| "#{u.name},#{u.public_key}"}.join("\n")
   end
 
+  def ssh_format_ca_public_key
+    return nil if ssh_ca_public_key.nil?
+    key = OpenSSL::PKey::RSA.new(ssh_ca_public_key)
+    "#{key.ssh_type} #{[key.to_blob].pack('m0')}"
+  end
+
   def set_default_attributes
     self.region ||= "us-east-1"
     self.s3_bucket_name ||= "barcelona-#{name}-#{Time.now.to_i}"

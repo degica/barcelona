@@ -22,12 +22,15 @@ class ContainerInstance
       "AWS_REGION=#{district.region}",
       "aws configure set s3.signature_version s3v4",
       "aws s3 cp s3://#{district.s3_bucket_name}/#{district.name}/ecs.config /etc/ecs/ecs.config",
+      'printf "\nTrustedUserCAKeys /etc/ssh/ssh_ca_key.pub\n" >> /etc/ssh/sshd_config',
+      "service sshd restart",
       "chmod 600 /etc/ecs/ecs.config",
-      "sed -i 's/^#\\s%wheel\\s*ALL=(ALL)\\s*NOPASSWD:\\sALL$/%wheel\\tALL=(ALL)\\tNOPASSWD:\\tALL/g' /etc/sudoers",
       "chkconfig --add barcelona",
       "chkconfig barcelona on",
       "service barcelona start"
     ]
+
+    user_data.add_file("/etc/ssh/ssh_ca_key.pub", "root:root", "644", district.ssh_format_ca_public_key)
 
     user_data.add_file("/etc/init.d/barcelona", "root:root", "755", <<EOS)
 #!/bin/bash
