@@ -3,11 +3,6 @@ class District < ActiveRecord::Base
 
   before_validation :set_default_attributes
   before_create :assign_default_users
-  after_create :create_s3_bucket
-  after_create :create_ecs_cluster
-  after_create :create_or_update_network_stack
-  after_save :update_ecs_config
-  after_destroy :delete_ecs_cluster
 
   has_many :heritages, inverse_of: :district, dependent: :destroy
   has_many :users_districts, dependent: :destroy
@@ -149,33 +144,12 @@ class District < ActiveRecord::Base
     hook_plugins(:district_task_definition, self, base)
   end
 
-  def create_or_update_network_stack
-    stack_executor.create_or_update
-  end
-
   def delete_network_stack
     stack_executor.delete
   end
 
   def stack_status
     stack_executor.stack_status
-  end
-
-  private
-
-  def ecs_config
-    config = {
-      "ECS_CLUSTER" => name,
-      "ECS_AVAILABLE_LOGGING_DRIVERS" => '["awslogs", "json-file", "syslog", "fluentd"]',
-      "ECS_RESERVED_MEMORY" => 128,
-      "ECS_CONTAINER_STOP_TIMEOUT" => "5m"
-    }
-    if dockercfg.present?
-      config["ECS_ENGINE_AUTH_TYPE"] = "dockercfg"
-      config["ECS_ENGINE_AUTH_DATA"] = dockercfg.to_json
-    end
-    config = hook_plugins(:ecs_config, self, config)
-    config.map {|k, v| "#{k}=#{v}"}.join("\n")
   end
 
   def users_body
@@ -193,27 +167,6 @@ class District < ActiveRecord::Base
     self.cluster_instance_type ||= "t2.micro"
   end
 
-  def create_s3_bucket
-    aws.s3.create_bucket(bucket: s3_bucket_name)
-  rescue => e
-    Rails.logger.error e
-  end
-
-  def update_ecs_config
-    aws.s3.put_object(bucket: s3_bucket_name,
-                      key: "#{name}/ecs.config",
-                      body: ecs_config,
-                      server_side_encryption: "AES256")
-  end
-
-  def create_ecs_cluster
-    aws.ecs.create_cluster(cluster_name: name)
-  end
-
-  def delete_ecs_cluster
-    aws.ecs.delete_cluster(cluster: name)
-  end
-
   def network_stack
     Barcelona::Network::NetworkStack.new(self)
   end
@@ -221,6 +174,8 @@ class District < ActiveRecord::Base
   def stack_executor
     CloudFormation::Executor.new(network_stack, aws.cloudformation)
   end
+
+  private
 
   def validate_cidr_block
     if IPAddr.new(cidr_block).to_range.count < 65536
