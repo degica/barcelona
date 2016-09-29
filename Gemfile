@@ -13,6 +13,7 @@ gem 'slack-notifier'
 gem 'pundit'
 gem 'jbuilder'
 gem 'lograge'
+gem 'net-ssh'
 
 group :development, :test do
   gem 'pry-rails'
