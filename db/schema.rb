@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160906052312) do
+ActiveRecord::Schema.define(version: 20160921024639) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -48,6 +48,7 @@ ActiveRecord::Schema.define(version: 20160906052312) do
     t.string   "cluster_instance_type"
     t.string   "aws_access_key_id"
     t.string   "region"
+    t.text     "ssh_ca_public_key"
   end
 
   create_table "env_vars", force: :cascade do |t|
