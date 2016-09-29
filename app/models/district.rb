@@ -3,7 +3,6 @@ class District < ActiveRecord::Base
 
   before_validation :set_default_attributes
   before_create :assign_default_users
-  after_destroy :delete_ecs_cluster
 
   has_many :heritages, inverse_of: :district, dependent: :destroy
   has_many :users_districts, dependent: :destroy
@@ -177,10 +176,6 @@ class District < ActiveRecord::Base
   end
 
   private
-
-  def delete_ecs_cluster
-    aws.ecs.delete_cluster(cluster: name)
-  end
 
   def validate_cidr_block
     if IPAddr.new(cidr_block).to_range.count < 65536

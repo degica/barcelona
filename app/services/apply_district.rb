@@ -10,14 +10,19 @@ class ApplyDistrict
     if district.valid?
       create_s3_bucket
       create_ecs_cluster
-      apply
     end
-    district.save!
+    apply
   end
 
   def apply
+    district.save!
     update_ecs_config
     create_or_update_network_stack
+  end
+
+  def destroy!
+    district.destroy!
+    delete_ecs_cluster
   end
 
   private
@@ -57,5 +62,9 @@ class ApplyDistrict
 
   def create_or_update_network_stack
     district.stack_executor.create_or_update
+  end
+
+  def delete_ecs_cluster
+    aws.ecs.delete_cluster(cluster: district.name)
   end
 end

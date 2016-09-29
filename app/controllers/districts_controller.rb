@@ -30,7 +30,7 @@ class DistrictsController < ApplicationController
   end
 
   def destroy
-    @district.destroy!
+    ApplyDistrict.new(@district).destroy!
     render status: 204, nothing: true
   end
 
