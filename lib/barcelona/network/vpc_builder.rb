@@ -227,11 +227,9 @@ module Barcelona
           ]
         end
 
-        if options[:bastion_key_pair]
-          add_resource(BastionServer, "BastionServer",
-                       bastion_key_pair: options[:bastion_key_pair],
-                       depends_on: ["VPCGatewayAttachment"])
-        end
+        add_resource(BastionServer, "BastionServer",
+                     district: stack.district,
+                     depends_on: ["VPCGatewayAttachment"])
 
         add_resource("AWS::IAM::Role", "ECSServiceRole") do |j|
           j.AssumeRolePolicyDocument do |j|
