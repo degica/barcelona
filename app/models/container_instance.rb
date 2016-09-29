@@ -62,21 +62,6 @@ case "$1" in
 esac
 EOS
 
-    district.users.each do |user|
-      user_data.add_user(user.name, authorized_keys: [user.public_key], groups: user.instance_groups)
-      if district.dockercfg.present?
-        name = user.name
-        dockercfg = {"auths" => district.dockercfg}.to_json
-        dockercfg_path = "/home/#{name}/.docker"
-        user_data.run_commands += [
-          "mkdir #{dockercfg_path}",
-          "echo '#{dockercfg}' > #{dockercfg_path}/config.json",
-          "chmod 600 #{dockercfg_path}/config.json",
-          "chown #{name}:#{name} #{dockercfg_path}/config.json"
-        ]
-      end
-    end
-
     user_data = district.hook_plugins(:container_instance_user_data, self, user_data)
   end
 end

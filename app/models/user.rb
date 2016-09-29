@@ -27,7 +27,6 @@ class User < ActiveRecord::Base
 
   before_validation :assign_districts
   before_save :hash_token
-  after_save :update_instance_user_account
 
   def self.login!(github_token)
     client = Octokit::Client.new(access_token: github_token)
@@ -87,13 +86,5 @@ class User < ActiveRecord::Base
   def assign_districts
     # Currently all users belong to all districts
     self.districts = District.all
-  end
-
-  def update_instance_user_account
-    if public_key.present? && public_key_changed?
-      districts.each do |district|
-        district.update_instance_user_account(self)
-      end
-    end
   end
 end

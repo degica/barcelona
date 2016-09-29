@@ -127,10 +127,6 @@ class District < ActiveRecord::Base
     instances.map { |ec2_id, ins| ins.merge(ec2_instance_id: ec2_id) }
   end
 
-  def update_instance_user_account(user)
-    UpdateUserTask.new(self, user).run
-  end
-
   def hook_plugins(trigger, origin, arg = nil)
     plugins.reverse.reduce(arg) do |a, plugin|
       plugin.hook(trigger, origin, a)
@@ -150,10 +146,6 @@ class District < ActiveRecord::Base
 
   def stack_status
     stack_executor.stack_status
-  end
-
-  def users_body
-    users.map{|u| "#{u.name},#{u.public_key}"}.join("\n")
   end
 
   def ssh_format_ca_public_key
