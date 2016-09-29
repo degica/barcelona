@@ -12,7 +12,8 @@ class DistrictsController < ApplicationController
   end
 
   def create
-    @district = District.create!(create_params)
+    @district = District.new(create_params)
+    ApplyDistrict.new(@district).create!
     render json: @district, status: 201
   end
 
@@ -24,7 +25,7 @@ class DistrictsController < ApplicationController
   def apply_stack
     # Make sure the related resources are in-sync
     @district.save!
-    @district.create_or_update_network_stack
+    ApplyDistrict.new(@district).apply
     render status: 202, nothing: true
   end
 
