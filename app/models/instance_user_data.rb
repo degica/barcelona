@@ -58,6 +58,6 @@ class InstanceUserData
       "name" => name,
       "ssh-authorized-keys" => authorized_keys,
       "groups" => groups.join(',')
-    }
+    }.reject { |_, v| v.blank? }
   end
 end
