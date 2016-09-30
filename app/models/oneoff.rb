@@ -37,14 +37,14 @@ class Oneoff < ActiveRecord::Base
   end
 
   def run_command
-    LaunchCommand.new(heritage, command).to_command
+    LaunchCommand.new(heritage, command, shell_format: false).to_command
   end
 
   def interactive_run_command
-    real_command = run_command.map { |c| '"' + c + '"' }.join(' ')
+    real_command = run_command.join(' ')
     [
       "docker exec -it",
-      "$(docker ps -q -f label=com.amazonaws.ecs.task-arn=#{task_arn} -f label=com.amazonaws.ecs.container-name=#{container_name})",
+      "$(docker ps -q -f label=com.barcelona.oneoff-id=#{self.id})",
       real_command
     ].join(' ')
   end
