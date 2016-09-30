@@ -31,6 +31,12 @@ class ContainerInstance
     ]
 
     user_data.add_file("/etc/ssh/ssh_ca_key.pub", "root:root", "644", district.ssh_format_ca_public_key)
+    user_data.add_file("/etc/ssh/exec-interactive-oneoff.sh", "root:root", "755", <<~EOS)
+      #!/bin/bash
+      read oneoff_id command <<< $SSH_ORIGINAL_COMMAND
+      container_id=$(docker ps -q -f "label=com.barcelona.oneoff-id=$oneoff_id")
+      [[ -n $container_id ]] && docker exec --detach-keys="\\\\" -it $container_id $command
+    EOS
 
     user_data.add_file("/etc/init.d/barcelona", "root:root", "755", <<EOS)
 #!/bin/bash
