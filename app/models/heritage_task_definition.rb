@@ -18,6 +18,9 @@ class HeritageTaskDefinition
   def self.oneoff_definition(oneoff)
     new(heritage: oneoff.heritage,
         family_name: "#{oneoff.heritage.name}-oneoff",
+        app_container_labels: {
+          "com.barcelona.oneoff-id" => oneoff.id.to_s
+        },
         cpu: 128,
         memory: 512)
   end
@@ -30,7 +33,7 @@ class HeritageTaskDefinition
 
   private
 
-  def initialize(heritage:, family_name:, cpu:, memory:, command: nil, port_mappings: nil, is_web_service: false, force_ssl: false, hosts: [], reverse_proxy_image: nil)
+  def initialize(heritage:, family_name:, cpu:, memory:, command: nil, port_mappings: nil, is_web_service: false, force_ssl: false, hosts: [], app_container_labels: {}, reverse_proxy_image: nil)
     @heritage = heritage
     @family_name = family_name
     @cpu = cpu
@@ -41,6 +44,7 @@ class HeritageTaskDefinition
     @force_ssl = force_ssl
     @hosts = hosts
     @reverse_proxy_image = reverse_proxy_image
+    @app_container_labels = app_container_labels
   end
 
   def web_service?
@@ -68,6 +72,8 @@ class HeritageTaskDefinition
         value: web_container_port.to_s
       }
     end
+
+    base[:docker_labels] = @app_container_labels if @app_container_labels.present?
 
     base = base.merge(
       cpu: cpu,
