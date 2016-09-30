@@ -54,8 +54,8 @@ class Oneoff < ActiveRecord::Base
     %w(STOPPED MISSING).include?(status)
   end
 
-  def run!(sync: false, interactive: false)
-    run(sync: sync, interactive: interactive)
+  def run!(*args)
+    run(*args)
     save!
   end
 
