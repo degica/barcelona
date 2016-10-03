@@ -38,24 +38,11 @@ set -e
 
 stop() {
   AWS_REGION=#{district.region}
-  ec2_instance_id=`curl http://169.254.169.254/latest/meta-data/instance-id`
   ecs_cluster=`curl http://localhost:51678/v1/metadata | jq -r .Cluster`
   container_instance_arn=`curl http://localhost:51678/v1/metadata | jq -r .ContainerInstanceArn | cut -d / -f2`
 
   aws ecs deregister-container-instance --region $AWS_REGION --cluster $ecs_cluster --container-instance $container_instance_arn --force
-
-  elb_names=`aws elb describe-load-balancers --region $AWS_REGION | jq -r ".LoadBalancerDescriptions | map(select(contains({Instances: [{InstanceId: \\"$ec2_instance_id\\"}]}))) | map(.LoadBalancerName) | join(\\" \\")"`
-
-  for elb in $elb_names
-  do
-      aws elb deregister-instances-from-load-balancer --region $AWS_REGION --load-balancer-name $elb --instances $ec2_instance_id
-  done
-
-  while [[ -n "$elb_names" ]]
-  do
-      elb_names=`aws elb describe-load-balancers --region $AWS_REGION | jq -r ".LoadBalancerDescriptions | map(select(contains({Instances: [{InstanceId: \\"$ec2_instance_id\\"}]}))) | map(.LoadBalancerName) | join(\\" \\")"`
-      sleep 3
-  done
+  sleep 60
 
   docker stop -t 90 $(docker ps -q)
 }
