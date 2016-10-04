@@ -26,15 +26,6 @@ describe District do
   end
 
   describe "callbacks" do
-    it "assigns default users" do
-      user1 = create :user
-      user2 = create :user
-      district1 = District.create!(name: 'name')
-      district1.reload
-      expect(district1.users).to include(user1)
-      expect(district1.users).to include(user2)
-    end
-
     it "deletes all associated plugins" do
       district.save!
       district.plugins.create(name: 'ntp', plugin_attributes: {ntp_hosts: ["10.0.0.1"]})

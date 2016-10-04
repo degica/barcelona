@@ -2,7 +2,7 @@ require 'rails_helper'
 
 describe ContainerInstance do
   let(:user) { create :user, public_key: 'abc' }
-  let(:district) { create :district, users: [user] }
+  let(:district) { create :district }
   describe "#instance_user_data" do
     it "generates user data" do
       ci = ContainerInstance.new(district)

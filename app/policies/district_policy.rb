@@ -1,33 +1,29 @@
 class DistrictPolicy < ApplicationPolicy
   def create?
-    user.admin?
+    true
   end
 
   def update?
-    user.admin?
+    admin?
   end
 
   def destroy?
-    user.admin?
+    admin?
   end
 
   def index?
-    user.developer?
-  end
-
-  def launch_instances?
-    user.developer?
-  end
-
-  def terminate_instance?
-    user.developer?
+    developer?
   end
 
   def apply_stack?
-    user.admin?
+    admin?
   end
 
   def sign_public_key?
-    user.admin?
+    admin?
+  end
+
+  def district
+    record
   end
 end

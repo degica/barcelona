@@ -5,6 +5,10 @@ describe "GET /districts", type: :request do
   let(:auth) { {"X-Barcelona-Token" => user.token} }
   let!(:district) { create :district }
 
+  before do
+    stub_github_auth(user_name: user.name)
+  end
+
   it "lists districts" do
     get "/v1/districts", nil, auth
     expect(response.status).to eq 200

@@ -6,6 +6,10 @@ describe "POST /heritages/:heritage/releases/:version/rollback", type: :request 
   let(:district) { create :district }
 
   before do
+    stub_github_auth(user_name: user.name)
+  end
+
+  before do
     params = {
       name: "nginx",
       image_name: "nginx",

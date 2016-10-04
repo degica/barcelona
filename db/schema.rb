@@ -49,6 +49,8 @@ ActiveRecord::Schema.define(version: 20161008153656) do
     t.string   "aws_access_key_id"
     t.string   "region"
     t.text     "ssh_ca_public_key"
+    t.string   "admin_team"
+    t.string   "developer_team"
   end
 
   create_table "env_vars", force: :cascade do |t|
@@ -154,24 +156,14 @@ ActiveRecord::Schema.define(version: 20161008153656) do
   create_table "users", force: :cascade do |t|
     t.string   "name"
     t.string   "token_hash"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
     t.text     "public_key"
-    t.text     "roles"
+    t.string   "github_token"
   end
 
   add_index "users", ["name"], name: "index_users_on_name", unique: true, using: :btree
   add_index "users", ["token_hash"], name: "index_users_on_token_hash", unique: true, using: :btree
-
-  create_table "users_districts", force: :cascade do |t|
-    t.integer  "user_id"
-    t.integer  "district_id"
-    t.datetime "created_at",  null: false
-    t.datetime "updated_at",  null: false
-  end
-
-  add_index "users_districts", ["district_id"], name: "index_users_districts_on_district_id", using: :btree
-  add_index "users_districts", ["user_id"], name: "index_users_districts_on_user_id", using: :btree
 
   add_foreign_key "env_vars", "heritages"
   add_foreign_key "events", "heritages"
@@ -181,6 +173,4 @@ ActiveRecord::Schema.define(version: 20161008153656) do
   add_foreign_key "port_mappings", "services"
   add_foreign_key "releases", "heritages"
   add_foreign_key "services", "heritages"
-  add_foreign_key "users_districts", "districts"
-  add_foreign_key "users_districts", "users"
 end

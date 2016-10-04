@@ -4,27 +4,32 @@ class PluginsController < ApplicationController
 
   def create
     name = params.require :name
-    @plugin = @district.plugins.create!(name: name,
+    @plugin = @district.plugins.build(name: name,
                                         plugin_attributes: params[:attributes])
+    authorize @plugin
+    @plugin.save!
     render json: @plugin
   end
 
   def index
-    @plugins = @district.plugins
+    @plugins = policy_scope(@district.plugins)
     render json: @plugins
   end
 
   def show
+    authorize @plugin
     render json: @plugin
   end
 
   def update
+    authorize @plugin
     attributes = params.require :attributes
     @plugin.update!(plugin_attributes: attributes)
     render json: @plugin
   end
 
   def destroy
+    authorize @plugin
     @plugin.destroy!
     render status: 204, nothing: true
   end

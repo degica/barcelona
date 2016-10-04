@@ -3,20 +3,16 @@ require 'rails_helper'
 describe "POST /login", type: :request do
   let(:user) { create :user }
   let(:gh_auth) { {"X-GitHub-Token" => "abcdef", "Accept" => "application/json"} }
-  let(:district) { create :district }
-  let(:gh_stub) {
-    dbl = double Octokit::Client
-    allow(dbl).to receive(:user_teams) { user_teams }
-    allow(dbl).to receive_message_chain(:user, :login) { user.name }
-    dbl
-  }
 
   before do
-    allow(Octokit::Client).to receive(:new).and_return(gh_stub)
+    stub_github_auth(user_name: user.name, org: 'org')
   end
 
-  context "when user team is allowed to login" do
-    let(:user_teams) { [OpenStruct.new(organization: OpenStruct.new(login: "degica"), name: "developers")] }
+  context "When a user belongs to github organization" do
+    before do
+      ENV['GITHUB_ORGANIZATION'] = 'org'
+    end
+
     it "returns login info" do
       post "/v1/login", nil, gh_auth
       expect(response).to be_success
@@ -26,8 +22,13 @@ describe "POST /login", type: :request do
     end
   end
 
-  context "when user team is not allowed to login" do
+  context "When a user doesn't belong to github organization" do
     let(:user_teams) { [OpenStruct.new(organization: OpenStruct.new(login: "degica"), name: "notdevelopers")] }
+
+    before do
+      ENV['GITHUB_ORGANIZATION'] = 'other_org'
+    end
+
     it "returns 401" do
       post "/v1/login", nil, gh_auth
       expect(response.status).to eq 401

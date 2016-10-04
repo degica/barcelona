@@ -7,6 +7,10 @@ describe "GET /districts/:district", type: :request do
   let!(:plugin) { create :plugin, district: district }
 
   before do
+    stub_github_auth(user_name: user.name)
+  end
+
+  before do
     expect_any_instance_of(Aws::CloudFormation::Client).to receive(:describe_stacks) do
       double(stacks: [double(stack_status: "CREATE_COMPLETE")])
     end

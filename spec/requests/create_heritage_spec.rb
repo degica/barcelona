@@ -5,6 +5,10 @@ describe "POST /districts/:district/heritages", type: :request do
   let(:auth) { {"X-Barcelona-Token" => user.token, "Content-Type" => "application/json", "Accept" => "application/json"} }
   let(:district) { create :district }
 
+  before do
+    stub_github_auth(user_name: user.name)
+  end
+
   it "creates a heritage" do
     params = {
       name: "nginx",
