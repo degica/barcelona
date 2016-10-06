@@ -8,8 +8,7 @@ class OneoffsController < ApplicationController
 
   def create
     @oneoff = @heritage.oneoffs.create!(create_params)
-    sync = params[:sync] || false
-    @oneoff.run!(sync: sync)
+    @oneoff.run!(sync: !!params[:sync], interactive: !!params[:interactive])
     render json: @oneoff
   end
 

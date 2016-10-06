@@ -20,20 +20,17 @@ describe Oneoff do
   let(:heritage) { create :heritage }
   let(:oneoff) { create :oneoff, heritage: heritage, command: "rake db:migrate" }
 
-  describe "#running?" do
+  describe "#stopped?" do
     before do
       allow(oneoff).to receive_message_chain(:aws, :ecs, :describe_tasks) {
         double(
           tasks: [
-            double(
-              containers: [
-                double(last_status: "STOPPED")
-              ])
+            double(last_status: "STOPPED")
           ])
       }
     end
 
-    it { expect(oneoff.running?).to eq false }
+    it { expect(oneoff.stopped?).to eq true }
   end
 
   describe "#run" do
@@ -51,12 +48,33 @@ describe Oneoff do
             container_overrides: [
               {
                 name: heritage.name + "-oneoff",
-                command: LaunchCommand.new(heritage, oneoff.command).to_command
+                command: LaunchCommand.new(heritage, oneoff.command, shell_format: false).to_command,
+                environment: []
               }
             ]
           }
         ).and_return(describe_tasks_response_mock)
       oneoff.run
+    end
+
+    context "when interactive is true" do
+      it "creates ECS task" do
+        expect(ecs_mock).to receive(:run_task).
+                              with(
+                                cluster: heritage.district.name,
+                                task_definition: "#{heritage.name}-oneoff",
+                                overrides: {
+                                  container_overrides: [
+                                    {
+                                      name: heritage.name + "-oneoff",
+                                      command: ["/barcelona/barcelona-run", "watch-interactive-session"],
+                                      environment: [{name: "LANG", value: "C.UTF-8"}]
+                                    }
+                                  ]
+                                }
+                              ).and_return(describe_tasks_response_mock)
+        oneoff.run(interactive: true)
+      end
     end
   end
 end

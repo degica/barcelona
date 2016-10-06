@@ -1,18 +1,13 @@
 class Oneoff < ActiveRecord::Base
   belongs_to :heritage
   validates :heritage, presence: true
-  validates :command, presence: true
-
-  attr_accessor :env_vars, :image_tag
 
   delegate :district, to: :heritage
   delegate :aws, to: :district
 
-  after_initialize do |oneoff|
-    oneoff.env_vars ||= []
-  end
+  def run(sync: false, interactive: false)
+    raise ArgumentError if sync && interactive
 
-  def run(sync: false)
     definition = HeritageTaskDefinition.oneoff_definition(self)
     aws.ecs.register_task_definition(definition.to_task_definition)
     resp = aws.ecs.run_task(
@@ -22,7 +17,11 @@ class Oneoff < ActiveRecord::Base
         container_overrides: [
           {
             name: definition.family_name,
-            command: run_command,
+            command: interactive ? watch_session_command : run_command,
+            # Ideally Barcelona should not override LANG but because all official docker images
+            # doesn't set LANG as UTF8 we can't use multi byte characters in
+            # the interactive session without this override
+            environment: interactive ? [{name: "LANG", value: "C.UTF-8"}] : []
           }
         ]
       }
@@ -31,36 +30,61 @@ class Oneoff < ActiveRecord::Base
     self.task_arn = @task.task_arn
     if sync
       300.times do
-        break unless running?
+        break if stopped?
         sleep 3
       end
     end
   end
 
   def run_command
-    LaunchCommand.new(heritage, command).to_command
+    LaunchCommand.new(heritage, command, shell_format: false).to_command
   end
 
-  def running?
+  def interactive_run_command
+    real_command = run_command.join(' ')
+    [
+      "docker exec -it",
+      "$(docker ps -q -f label=com.barcelona.oneoff-id=#{self.id})",
+      real_command
+    ].join(' ')
+  end
+
+  def watch_session_command
+    ["/barcelona/barcelona-run", "watch-interactive-session"]
+  end
+
+  def stopped?
     fetch_task
-    !(%w(STOPPED MISSING).include?(status))
+    %w(STOPPED MISSING).include?(status)
   end
 
-  def run!(sync: false)
-    run(sync: sync)
+  def run!(sync: false, interactive: false)
+    run(sync: sync, interactive: interactive)
     save!
   end
 
+  def container_instance_arn
+    task&.container_instance_arn
+  end
+
+  def app_container
+    task&.containers&.find { |c| c.name == "#{heritage.name}-oneoff" }
+  end
+
+  def container_name
+    app_container&.name
+  end
+
   def status
-    task&.containers&.first&.last_status
+    task&.last_status
   end
 
   def exit_code
-    task&.containers&.first&.exit_code
+    app_container&.exit_code
   end
 
   def reason
-    task&.containers&.first&.reason
+    app_container&.reason
   end
 
   private

@@ -144,6 +144,9 @@ describe HeritageTaskDefinition do
                                   essential: true,
                                   image: heritage.image_path,
                                   environment: [],
+                                  docker_labels: {
+                                    "com.barcelona.oneoff-id" => oneoff.id.to_s
+                                  },
                                   volumes_from: [
                                     {
                                       source_container: "runpack",
