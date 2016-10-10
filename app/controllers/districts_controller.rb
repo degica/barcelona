@@ -34,6 +34,12 @@ class DistrictsController < ApplicationController
     render status: 204, nothing: true
   end
 
+  def sign_public_key
+    certificate = @district.ca_sign_public_key(current_user)
+    json = {district: DistrictSerializer.new(@district), certificate: certificate}
+    render json: json
+  end
+
   def update_params
     permitted = create_params
     permitted.delete :name

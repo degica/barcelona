@@ -154,6 +154,10 @@ class District < ActiveRecord::Base
     "#{key.ssh_type} #{[key.to_blob].pack('m0')}"
   end
 
+  def ca_sign_public_key(user, options = {})
+    SignSSHKey.new(user, get_ca_key).sign(options)
+  end
+
   def set_default_attributes
     self.region ||= "us-east-1"
     self.s3_bucket_name ||= "barcelona-#{name}-#{Time.now.to_i}"
@@ -171,6 +175,11 @@ class District < ActiveRecord::Base
 
   def stack_executor
     CloudFormation::Executor.new(network_stack, aws.cloudformation)
+  end
+
+  def get_ca_key
+    aws.s3.get_object(bucket: s3_bucket_name,
+                      key: "#{name}/ssh_ca_key").body.read
   end
 
   private
