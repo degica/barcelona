@@ -7,9 +7,21 @@ class OneoffsController < ApplicationController
   end
 
   def create
+    interactive = !!params[:interactive]
     @oneoff = @heritage.oneoffs.create!(create_params)
-    @oneoff.run!(sync: !!params[:sync], interactive: !!params[:interactive])
-    render json: @oneoff
+    @oneoff.run!(sync: !!params[:sync], interactive: interactive)
+    json = if interactive
+             certificate = @heritage.district.ca_sign_public_key(
+               current_user,
+               identity: "#{current_user.name}@#{@heritage.name}",
+               force_command: '/etc/ssh/exec-interactive-oneoff.sh'
+             )
+             {oneoff: OneoffSerializer.new(@oneoff), certificate: certificate}
+           else
+             {oneoff: OneoffSerializer.new(@oneoff)}
+           end
+
+    render json: json
   end
 
   private
