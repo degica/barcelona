@@ -37,7 +37,7 @@ class Oneoff < ActiveRecord::Base
   end
 
   def run_command
-    LaunchCommand.new(heritage, command, shell_format: false).to_command
+    LaunchCommand.new(heritage, command.split(" "), shell_format: false).to_command
   end
 
   def interactive_run_command
