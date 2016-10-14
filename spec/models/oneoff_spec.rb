@@ -48,7 +48,7 @@ describe Oneoff do
             container_overrides: [
               {
                 name: heritage.name + "-oneoff",
-                command: LaunchCommand.new(heritage, oneoff.command, shell_format: false).to_command,
+                command: LaunchCommand.new(heritage, ["rake", "db:migrate"], shell_format: false).to_command,
                 environment: []
               }
             ]
