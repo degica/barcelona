@@ -182,6 +182,34 @@ describe Barcelona::Network::NetworkStack do
              "FromPort" => -1,
              "ToPort" => -1,
              "CidrIp" => "0.0.0.0/0"}]}},
+      "BastionServer" => {
+        "DependsOn" => ["VPCGatewayAttachment"],
+        "Type" => "AWS::EC2::Instance",
+        "Properties" => {
+          "InstanceType" => "t2.nano",
+          "SourceDestCheck" => false,
+          "ImageId" => "ami-29160d47",
+          "UserData" => anything,
+          "NetworkInterfaces" => [
+            {
+              "AssociatePublicIpAddress" => true,
+              "DeviceIndex" => 0,
+              "SubnetId" => {
+                "Ref" => "SubnetDmz1"
+              },
+              "GroupSet" => [
+                {"Ref" => "SecurityGroupBastion"}
+              ]
+            }
+          ],
+          "Tags" => [
+            {
+              "Key" => "Name",
+              "Value" => {"Fn::Join"=>["-", [{"Ref"=>"AWS::StackName"}, "bastion"]]}
+            }
+          ]
+        }
+      },
       "ECSInstanceProfile" => {
         "Type"=>"AWS::IAM::InstanceProfile",
         "Properties" => {
@@ -797,43 +825,6 @@ describe Barcelona::Network::NetworkStack do
       expect(generated["Resources"]["EIPForNATManagedGateway2"]["DeletionPolicy"]).to eq "Retain"
       expect(generated["Resources"]["NATManagedGateway2"]).to be_present
       expect(generated["Resources"]["RouteNATForRouteTableTrusted2"]).to be_present
-    end
-  end
-
-  context "when a district has bastion_key_pair" do
-    it "includes bastion server resource" do
-      district.bastion_key_pair = "bastion"
-      stack = described_class.new(district)
-      generated = JSON.load(stack.target!)
-      expected = {
-        "DependsOn" => ["VPCGatewayAttachment"],
-        "Type" => "AWS::EC2::Instance",
-        "Properties" => {
-          "InstanceType" => "t2.micro",
-          "SourceDestCheck" => false,
-          "ImageId" => "ami-29160d47",
-          "KeyName" => "bastion",
-          "NetworkInterfaces" => [
-            {
-              "AssociatePublicIpAddress" => true,
-              "DeviceIndex" => 0,
-              "SubnetId" => {
-                "Ref" => "SubnetDmz1"
-              },
-              "GroupSet" => [
-                {"Ref" => "SecurityGroupBastion"}
-              ]
-            }
-          ],
-          "Tags" => [
-            {
-              "Key" => "Name",
-              "Value" => {"Fn::Join"=>["-", [{"Ref"=>"AWS::StackName"}, "bastion"]]}
-            }
-          ]
-        }
-      }
-      expect(generated["Resources"]["BastionServer"]).to match expected
     end
   end
 end

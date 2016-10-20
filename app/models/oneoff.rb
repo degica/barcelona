@@ -42,11 +42,7 @@ class Oneoff < ActiveRecord::Base
 
   def interactive_run_command
     real_command = run_command.join(' ')
-    [
-      "docker exec -it",
-      "$(docker ps -q -f label=com.barcelona.oneoff-id=#{self.id})",
-      real_command
-    ].join(' ')
+    [self.id, real_command].join(' ')
   end
 
   def watch_session_command
@@ -58,8 +54,8 @@ class Oneoff < ActiveRecord::Base
     %w(STOPPED MISSING).include?(status)
   end
 
-  def run!(sync: false, interactive: false)
-    run(sync: sync, interactive: interactive)
+  def run!(*args)
+    run(*args)
     save!
   end
 

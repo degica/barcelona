@@ -127,10 +127,6 @@ class District < ActiveRecord::Base
     instances.map { |ec2_id, ins| ins.merge(ec2_instance_id: ec2_id) }
   end
 
-  def update_instance_user_account(user)
-    UpdateUserTask.new(self, user).run
-  end
-
   def hook_plugins(trigger, origin, arg = nil)
     plugins.reverse.reduce(arg) do |a, plugin|
       plugin.hook(trigger, origin, a)
@@ -152,8 +148,14 @@ class District < ActiveRecord::Base
     stack_executor.stack_status
   end
 
-  def users_body
-    users.map{|u| "#{u.name},#{u.public_key}"}.join("\n")
+  def ssh_format_ca_public_key
+    return nil if ssh_ca_public_key.nil?
+    key = OpenSSL::PKey::RSA.new(ssh_ca_public_key)
+    "#{key.ssh_type} #{[key.to_blob].pack('m0')}"
+  end
+
+  def ca_sign_public_key(user, options = {})
+    SignSSHKey.new(user, get_ca_key).sign(options)
   end
 
   def set_default_attributes
@@ -173,6 +175,11 @@ class District < ActiveRecord::Base
 
   def stack_executor
     CloudFormation::Executor.new(network_stack, aws.cloudformation)
+  end
+
+  def get_ca_key
+    aws.s3.get_object(bucket: s3_bucket_name,
+                      key: "#{name}/ssh_ca_key").body.read
   end
 
   private

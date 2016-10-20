@@ -1,3 +1,4 @@
 FROM degica/rails-base:debian
 
+RUN apt-get install -y openssh-client --no-install-recommends
 ADD . $APP_HOME

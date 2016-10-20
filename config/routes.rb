@@ -3,6 +3,7 @@ Rails.application.routes.draw do
     resources :districts, except: [:new, :edit] do
       member do
         post :apply_stack
+        post :sign_public_key
       end
 
       resources :plugins, except: [:new, :edit]

@@ -26,4 +26,8 @@ class DistrictPolicy < ApplicationPolicy
   def apply_stack?
     user.admin?
   end
+
+  def sign_public_key?
+    user.admin?
+  end
 end

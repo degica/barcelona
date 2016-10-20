@@ -11,7 +11,6 @@ describe "POST /login", type: :request do
     dbl
   }
 
-  before {Aws.config[:stub_responses] = true}
   before do
     allow(Octokit::Client).to receive(:new).and_return(gh_stub)
   end
@@ -21,9 +20,9 @@ describe "POST /login", type: :request do
     it "returns login info" do
       post "/v1/login", nil, gh_auth
       expect(response).to be_success
-      login = JSON.load(response.body)
-      expect(login["login"]).to eq user.name
-      expect(login["token"]).to be_a String
+      body = JSON.load(response.body)
+      expect(body["user"]["name"]).to eq user.name
+      expect(body["user"]["token"]).to be_present
     end
   end
 
