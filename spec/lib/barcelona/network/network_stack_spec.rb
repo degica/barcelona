@@ -7,7 +7,7 @@ describe Barcelona::Network::NetworkStack do
     district.nat_type = nil
     stack = described_class.new(district)
     generated = JSON.load(stack.target!)
-    expect(generated["Description"]).to eq "AWS CloudFormation for Barcelona network stack"
+    expect(generated["Description"]).to eq "AWS CloudFormation for Barcelona #{stack.name}"
     expect(generated["AWSTemplateFormatVersion"]).to eq "2010-09-09"
     expected = {
       "VPC" => {
