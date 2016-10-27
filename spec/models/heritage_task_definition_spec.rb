@@ -1,6 +1,17 @@
 require "rails_helper"
 
 describe HeritageTaskDefinition do
+  let(:expected_log_configuration) {
+    {
+      log_driver: "awslogs",
+      options: {
+        "awslogs-group" => heritage.log_group_name,
+        "awslogs-region" => district.region,
+        "awslogs-stream-prefix" => heritage.name
+      }
+    }
+  }
+
   describe ".service_definition" do
     subject { described_class.service_definition(service).to_task_definition }
     let(:service) { create :service }
@@ -24,7 +35,8 @@ describe HeritageTaskDefinition do
                                       source_container: "runpack",
                                       read_only: true
                                     }
-                                  ]
+                                  ],
+                                  log_configuration: expected_log_configuration
                                 },
                                 {
                                   name: "runpack",
@@ -33,6 +45,7 @@ describe HeritageTaskDefinition do
                                   essential: false,
                                   image: "quay.io/degica/barcelona-run-pack",
                                   environment: [],
+                                  log_configuration: expected_log_configuration
                                 }
                               ]
                            })
@@ -73,7 +86,8 @@ describe HeritageTaskDefinition do
                                     ],
                                     port_mappings: [
                                       {container_port: 3000, protocol: "tcp"}
-                                    ]
+                                    ],
+                                    log_configuration: expected_log_configuration
                                   },
                                   {
                                     name: "runpack",
@@ -82,6 +96,7 @@ describe HeritageTaskDefinition do
                                     essential: false,
                                     image: "quay.io/degica/barcelona-run-pack",
                                     environment: [],
+                                    log_configuration: expected_log_configuration
                                   },
                                   {
                                     name: "#{service.service_name}-revpro",
@@ -119,7 +134,8 @@ describe HeritageTaskDefinition do
                                         host_port: service.https_port_mapping.host_port,
                                         protocol: "tcp"
                                       }
-                                    ]
+                                    ],
+                                    log_configuration: expected_log_configuration
                                   }
                                 ]
                               })
@@ -153,6 +169,7 @@ describe HeritageTaskDefinition do
                                       read_only: true
                                     }
                                   ],
+                                  log_configuration: expected_log_configuration
                                 },
                                 {
                                   name: "runpack",
@@ -161,6 +178,7 @@ describe HeritageTaskDefinition do
                                   essential: false,
                                   image: "quay.io/degica/barcelona-run-pack",
                                   environment: [],
+                                  log_configuration: expected_log_configuration
                                 }
                               ]
                            })
