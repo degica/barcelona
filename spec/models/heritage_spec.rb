@@ -34,3 +34,24 @@ describe Heritage do
     end
   end
 end
+
+describe Heritage::Stack do
+  let(:heritage) { build :heritage }
+  let(:stack) { described_class.new(heritage) }
+
+  describe "#target!" do
+    it "generates a correct stack template" do
+      generated = JSON.load stack.target!
+      expected = {
+        "LogGroup" => {
+          "Type" => "AWS::Logs::LogGroup",
+          "Properties" => {
+            "LogGroupName" => "Barcelona/#{heritage.district.name}/#{heritage.name}",
+            "RetentionInDays" => 30
+          }
+        }
+      }
+      expect(generated["Resources"]).to eq expected
+    end
+  end
+end
