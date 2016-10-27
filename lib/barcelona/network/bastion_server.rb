@@ -1,6 +1,20 @@
 module Barcelona
   module Network
     class BastionServer < CloudFormation::Resource
+      # https://aws.amazon.com/amazon-linux-ami/
+      # Amazon Linux AMI 2016.09.0
+      AMI_IDS = {
+        "us-east-1" => "ami-c481fad3",
+        "us-east-2" => "ami-71ca9114",
+        "us-west-1" => "ami-de347abe",
+        "us-west-2" => "ami-b04e92d0",
+        "eu-west-1" => "ami-d41d58a7",
+        "eu-central-1" => "ami-0044b96f",
+        "ap-northeast-1" => "ami-1a15c77b",
+        "ap-southeast-1" => "ami-7243e611",
+        "ap-southeast-2" => "ami-55d4e436"
+      }
+
       def self.type
         "AWS::EC2::Instance"
       end
@@ -9,7 +23,7 @@ module Barcelona
         super do |j|
           j.InstanceType "t2.nano"
           j.SourceDestCheck false
-          j.ImageId "ami-29160d47"
+          j.ImageId AMI_IDS[district.region]
           j.UserData user_data
           j.NetworkInterfaces [
             {

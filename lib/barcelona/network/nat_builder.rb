@@ -1,6 +1,19 @@
 module Barcelona
   module Network
     class NatBuilder < CloudFormation::Builder
+      # amzn-ami-vpc-nat-hvm-2016.09.0.20160923-x86_64-ebs
+      VPC_NAT_AMI_IDS = {
+        "us-east-1" => "ami-d2ee95c5",
+        "us-east-2" => "ami-9fc299fa",
+        "us-west-1" => "ami-90357bf0",
+        "us-west-2" => "ami-c4469aa4",
+        "eu-west-1" => "ami-d41d58a7",
+        "eu-central-1" => "ami-b646bbd9",
+        "ap-northeast-1" => "ami-831fcde2",
+        "ap-southeast-1" => "ami-9c40e5ff",
+        "ap-southeast-2" => "ami-addbebce"
+      }
+
       def build_resources
         case options[:type]
         when :instance then
@@ -21,7 +34,7 @@ module Barcelona
                        depends_on: ["VPCGatewayAttachment"]) do |j|
             j.InstanceType options[:instance_type] || 't2.nano'
             j.SourceDestCheck false
-            j.ImageId "ami-5d170c33"
+            j.ImageId VPC_NAT_AMI_IDS[stack.district.region]
             j.NetworkInterfaces [
               {
                 "AssociatePublicIpAddress" => true,
