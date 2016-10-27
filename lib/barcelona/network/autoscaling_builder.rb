@@ -1,6 +1,20 @@
 module Barcelona
   module Network
     class AutoscalingBuilder < CloudFormation::Builder
+      # http://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html
+      # amzn-ami-2016.09.a-amazon-ecs-optimized
+      ECS_OPTIMIZED_AMI_IDS = {
+        "us-east-1" => "ami-1924770e",
+        "us-east-2" => "ami-bd3e64d8",
+        "us-west-1" => "ami-7f004b1f",
+        "us-west-2" => "ami-56ed4936",
+        "eu-west-1" => "ami-c8337dbb",
+        "eu-central-1" => "ami-dd12ebb2",
+        "ap-northeast-1" => "ami-c8b016a9",
+        "ap-southeast-1" => "ami-6d22840e",
+        "ap-southeast-2" => "ami-73407d10"
+      }
+
       def ebs_optimized_by_default?
         !!(instance_type =~ /\A(c4|m4|d2)\..*\z/)
       end
@@ -10,7 +24,7 @@ module Barcelona
                      "ContainerInstanceLaunchConfiguration") do |j|
 
           j.IamInstanceProfile ref("ECSInstanceProfile")
-          j.ImageId "ami-010ed160" # amzn-ami-2016.03.j-amazon-ecs-optimized
+          j.ImageId ECS_OPTIMIZED_AMI_IDS[stack.district.region]
           j.InstanceType instance_type
           j.SecurityGroups [ref("InstanceSecurityGroup")]
           j.UserData instance_user_data

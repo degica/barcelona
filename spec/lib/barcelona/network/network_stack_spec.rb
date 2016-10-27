@@ -188,7 +188,7 @@ describe Barcelona::Network::NetworkStack do
         "Properties" => {
           "InstanceType" => "t2.nano",
           "SourceDestCheck" => false,
-          "ImageId" => "ami-29160d47",
+          "ImageId" => kind_of(String),
           "UserData" => anything,
           "NetworkInterfaces" => [
             {
