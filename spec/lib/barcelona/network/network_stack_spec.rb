@@ -254,8 +254,6 @@ describe Barcelona::Network::NetworkStack do
                       "ecr:BatchGetImage",
                       "logs:CreateLogStream",
                       "logs:PutLogEvents",
-                      "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
-                      "elasticloadbalancing:DescribeLoadBalancers",
                       "s3:Get*",
                       "s3:List*"
                     ],
