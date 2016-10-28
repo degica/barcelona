@@ -55,7 +55,9 @@ class ApplyDistrict
       "ECS_CLUSTER" => district.name,
       "ECS_AVAILABLE_LOGGING_DRIVERS" => '["awslogs", "json-file", "syslog", "fluentd"]',
       "ECS_RESERVED_MEMORY" => 128,
-      "ECS_CONTAINER_STOP_TIMEOUT" => "5m"
+      "ECS_CONTAINER_STOP_TIMEOUT" => "5m",
+      "ECS_ENABLE_TASK_IAM_ROLE" => "true",
+      "ECS_ENABLE_TASK_IAM_ROLE_NETWORK_HOST" => "true"
     }
 
     if district.dockercfg.present?
