@@ -9,6 +9,7 @@ addons:
 env:
   global:
     - DATABASE_URL=postgres://postgres:@localhost:5432/travis_ci_test
+    - ENCRYPTION_KEY=abcdefghijklmn
 before_script:
 - npm install -g barcelona
 - gem install bcnd --no-ri --no-rdoc
