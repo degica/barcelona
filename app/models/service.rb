@@ -2,6 +2,7 @@ class Service < ActiveRecord::Base
   DEFAULT_REVERSE_PROXY = 'quay.io/degica/barcelona-reverse-proxy:latest'
 
   belongs_to :heritage, inverse_of: :services
+  has_many :listeners, inverse_of: :service, dependent: :destroy
   has_many :port_mappings, inverse_of: :service, dependent: :destroy
 
   serialize :hosts, JSON
@@ -19,6 +20,7 @@ class Service < ActiveRecord::Base
   validate :validate_health_check
 
   accepts_nested_attributes_for :port_mappings
+  accepts_nested_attributes_for :listeners, allow_destroy: true
 
   after_initialize do |service|
     service.cpu ||= 512

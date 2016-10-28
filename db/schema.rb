@@ -101,6 +101,21 @@ ActiveRecord::Schema.define(version: 20161008153656) do
   add_index "heritages", ["district_id"], name: "index_heritages_on_district_id", using: :btree
   add_index "heritages", ["name"], name: "index_heritages_on_name", unique: true, using: :btree
 
+  create_table "listeners", force: :cascade do |t|
+    t.integer  "endpoint_id"
+    t.integer  "service_id"
+    t.integer  "health_check_interval"
+    t.string   "health_check_path"
+    t.text     "rule_conditions"
+    t.integer  "rule_priority"
+    t.datetime "created_at",            null: false
+    t.datetime "updated_at",            null: false
+  end
+
+  add_index "listeners", ["endpoint_id", "service_id"], name: "index_listeners_on_endpoint_id_and_service_id", unique: true, using: :btree
+  add_index "listeners", ["endpoint_id"], name: "index_listeners_on_endpoint_id", using: :btree
+  add_index "listeners", ["service_id"], name: "index_listeners_on_service_id", using: :btree
+
   create_table "oneoffs", force: :cascade do |t|
     t.string   "task_arn"
     t.integer  "heritage_id"
@@ -189,6 +204,8 @@ ActiveRecord::Schema.define(version: 20161008153656) do
   add_foreign_key "env_vars", "heritages"
   add_foreign_key "events", "heritages"
   add_foreign_key "heritages", "districts"
+  add_foreign_key "listeners", "endpoints"
+  add_foreign_key "listeners", "services"
   add_foreign_key "oneoffs", "heritages"
   add_foreign_key "plugins", "districts"
   add_foreign_key "port_mappings", "services"
