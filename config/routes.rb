@@ -20,6 +20,8 @@ Rails.application.routes.draw do
         get "/releases/:version", to: "releases#show"
         post "/releases/:version/rollback", to: "releases#rollback"
       end
+
+      resources :endpoints, except: [:new, :edit]
     end
 
     resources :users, only: [:index, :show, :update]

@@ -51,6 +51,18 @@ ActiveRecord::Schema.define(version: 20161008153656) do
     t.text     "ssh_ca_public_key"
   end
 
+  create_table "endpoints", force: :cascade do |t|
+    t.integer  "district_id"
+    t.string   "name"
+    t.boolean  "public"
+    t.string   "certificate_id"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
+  end
+
+  add_index "endpoints", ["district_id", "name"], name: "index_endpoints_on_district_id_and_name", unique: true, using: :btree
+  add_index "endpoints", ["district_id"], name: "index_endpoints_on_district_id", using: :btree
+
   create_table "env_vars", force: :cascade do |t|
     t.integer "heritage_id"
     t.string  "key"
@@ -173,6 +185,7 @@ ActiveRecord::Schema.define(version: 20161008153656) do
   add_index "users_districts", ["district_id"], name: "index_users_districts_on_district_id", using: :btree
   add_index "users_districts", ["user_id"], name: "index_users_districts_on_user_id", using: :btree
 
+  add_foreign_key "endpoints", "districts"
   add_foreign_key "env_vars", "heritages"
   add_foreign_key "events", "heritages"
   add_foreign_key "heritages", "districts"
