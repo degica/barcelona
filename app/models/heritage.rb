@@ -3,7 +3,7 @@ class Heritage < ActiveRecord::Base
     def build_resources
       add_resource("AWS::Logs::LogGroup", "LogGroup") do |j|
         j.LogGroupName heritage.log_group_name
-        j.RetentionInDays 30
+        j.RetentionInDays 365
       end
 
     end

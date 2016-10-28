@@ -47,7 +47,7 @@ describe Heritage::Stack do
           "Type" => "AWS::Logs::LogGroup",
           "Properties" => {
             "LogGroupName" => "Barcelona/#{heritage.district.name}/#{heritage.name}",
-            "RetentionInDays" => 30
+            "RetentionInDays" => 365
           }
         }
       }
