@@ -1,7 +1,3 @@
-machine:
-	docker-machine create --driver virtualbox --virtualbox-memory "2048" default
-	docker-machine start
-	echo "To use docker, run this command: eval "$(docker-machine env)""
 init:
 	git submodule update --init
 build: init

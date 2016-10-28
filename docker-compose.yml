@@ -1,6 +1,8 @@
 version: '2'
 services:
   web: &app_base
+    depends_on:
+      - db
     build:
       context: .
       dockerfile: Dockerfile.development
@@ -20,6 +22,7 @@ services:
     environment: &env_base
       RAILS_ENV: development
       DATABASE_URL: postgres://postgres:@db:5432
+      ENCRYPTION_KEY: abcdefghijklmn
   worker:
     <<: *app_base
     ports: []
@@ -38,6 +41,11 @@ services:
       - spring:/tmp/spring
   db:
     image: postgres:9.5
+    environment:
+      PGDATA: /data
+    volumes:
+      - pgdata:/data
 volumes:
+  pgdata:
   bundle:
   spring:

@@ -49,24 +49,17 @@ GEM
       jmespath (~> 1.0)
     aws-sdk-resources (2.6.14)
       aws-sdk-core (= 2.6.14)
-    binding_of_caller (0.7.2)
-      debug_inspector (>= 0.0.1)
     builder (3.2.2)
     byebug (9.0.6)
     coderay (1.1.1)
     concurrent-ruby (1.0.2)
     database_rewinder (0.6.5)
-    debug_inspector (0.0.2)
     delayed_job (4.1.2)
       activesupport (>= 3.0, < 5.1)
     delayed_job_active_record (4.1.1)
       activerecord (>= 3.0, < 5.1)
       delayed_job (>= 3.0, < 5)
     diff-lcs (1.2.5)
-    dotenv (2.1.1)
-    dotenv-rails (2.1.1)
-      dotenv (= 2.1.1)
-      railties (>= 4.0, < 5.1)
     erubis (2.7.0)
     factory_girl (4.7.0)
       activesupport (>= 3.0.0)
@@ -197,11 +190,6 @@ GEM
     thread_safe (0.3.5)
     tzinfo (1.2.2)
       thread_safe (~> 0.1)
-    web-console (2.3.0)
-      activemodel (>= 4.0)
-      binding_of_caller (>= 0.7.2)
-      railties (>= 4.0)
-      sprockets-rails (>= 2.0, < 4.0)
 
 PLATFORMS
   ruby
@@ -211,7 +199,6 @@ DEPENDENCIES
   aws-sdk
   database_rewinder
   delayed_job_active_record
-  dotenv-rails
   factory_girl_rails
   gibberish
   jbuilder
@@ -231,7 +218,6 @@ DEPENDENCIES
   spring
   spring-commands-rspec
   sqlite3
-  web-console (~> 2.0)
 
 BUNDLED WITH
-   1.12.5
+   1.13.2
