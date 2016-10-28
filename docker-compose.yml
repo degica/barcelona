@@ -22,6 +22,7 @@ services:
     environment: &env_base
       RAILS_ENV: development
       DATABASE_URL: postgres://postgres:@db:5432
+      ENCRYPTION_KEY: abcdefghijklmn
   worker:
     <<: *app_base
     ports: []
