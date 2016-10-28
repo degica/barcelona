@@ -2,11 +2,12 @@ environments:
   production:
     name: rails-app
     image_name: k2nr/rails-docker-sample
+    aws_actions:
+      - s3:Put*
     services:
       - name: web
         service_type: web
-        public: true
-        cpu: 128
+        cpu: 10
         memory: 256
         command: rails s -p $PORT -b 0.0.0.0
         listeners:
@@ -16,3 +17,6 @@ environments:
             rule_conditions:
               - type: path-pattern
                 value: '*'
+        auto_scaling:
+          max_count: 3
+          min_count: 1
