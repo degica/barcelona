@@ -5,7 +5,9 @@ describe "POST /heritages/:heritage/env_vars", type: :request do
   let(:auth) { {"X-Barcelona-Token" => user.token} }
   let(:district) { create :district }
 
-  before {Aws.config[:stub_responses] = true}
+  before do
+    stub_github_auth(user_name: user.name)
+  end
   before do
     params = {
       name: "nginx",

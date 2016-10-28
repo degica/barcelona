@@ -43,7 +43,7 @@ module Barcelona
 
     ### Log configurations
 
-    config.filter_parameters += [:token, :aws_secret_access_key, :env_vars, :public_key, :roles]
+    config.filter_parameters += [:token, :aws_secret_access_key, :env_vars]
 
     config.lograge.enabled = true
     config.lograge.custom_options = -> event do

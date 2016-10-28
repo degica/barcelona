@@ -3,12 +3,16 @@ class OneoffsController < ApplicationController
   before_action :load_oneoff, except: [:index, :create]
 
   def show
+    authorize @oneoff
     render json: @oneoff
   end
 
   def create
+    @oneoff = @heritage.oneoffs.new(create_params)
+    authorize @oneoff
+    @oneoff.save!
+
     interactive = !!params[:interactive]
-    @oneoff = @heritage.oneoffs.create!(create_params)
     @oneoff.run!(sync: !!params[:sync], interactive: interactive)
     json = if interactive
              certificate = @heritage.district.ca_sign_public_key(

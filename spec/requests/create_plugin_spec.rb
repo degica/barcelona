@@ -5,6 +5,10 @@ describe "POST /districts/:district/plugins", type: :request do
   let(:auth) { {"X-Barcelona-Token" => user.token} }
   let(:district) { create :district }
 
+  before do
+    stub_github_auth(user_name: user.name)
+  end
+
   it "creates a plugin" do
     params = {
       name: "logentries",

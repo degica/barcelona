@@ -22,7 +22,7 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :users, only: [:index, :show, :update]
+    resources :users, only: [:index, :show]
 
     post "/login", to: "users#login"
     patch "/user", to: "users#update"

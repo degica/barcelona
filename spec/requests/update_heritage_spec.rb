@@ -6,6 +6,10 @@ describe "updating a heritage" do
   let(:auth) { {"X-Barcelona-Token" => user.token} }
 
   before do
+    stub_github_auth(user_name: user.name)
+  end
+
+  before do
     params = {
       name: "nginx",
       image_name: "nginx",

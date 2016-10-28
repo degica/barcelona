@@ -1,5 +1,6 @@
 class Release < ActiveRecord::Base
   belongs_to :heritage, required: true, inverse_of: :releases
+  delegate :district, to: :heritage
 
   serialize :heritage_params, JSON
 

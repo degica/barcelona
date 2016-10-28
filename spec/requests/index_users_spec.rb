@@ -3,7 +3,11 @@ require 'rails_helper'
 describe "GET /users", type: :request do
   let(:auth) { {"X-Barcelona-Token" => user.token} }
   let(:district) { create :district }
-  let(:user) { create :user, roles: ["developer"], districts: [district] }
+  let(:user) { create :user }
+
+  before do
+    stub_github_auth(user_name: user.name)
+  end
 
   it "shows user information" do
     get "/v1/users", nil, auth

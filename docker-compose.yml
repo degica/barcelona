@@ -20,6 +20,7 @@ services:
     environment: &env_base
       RAILS_ENV: development
       DATABASE_URL: postgres://postgres:@db:5432
+      GITHUB_ORGANIZATION: degica
   worker:
     <<: *app_base
     ports: []

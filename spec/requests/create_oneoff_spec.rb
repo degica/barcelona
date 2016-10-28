@@ -24,6 +24,10 @@ describe "POST /heritages/:heritage/oneoffs", type: :request do
     )
   }
 
+  before do
+    stub_github_auth(user_name: user.name)
+  end
+
   it "creates a oneoff task" do
     expect_any_instance_of(Aws::ECS::Client).to receive(:run_task) do
       run_task_response_mock

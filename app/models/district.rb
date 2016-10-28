@@ -2,11 +2,8 @@ class District < ActiveRecord::Base
   include EncryptAttribute
 
   before_validation :set_default_attributes
-  before_create :assign_default_users
 
   has_many :heritages, inverse_of: :district, dependent: :destroy
-  has_many :users_districts, dependent: :destroy
-  has_many :users, through: :users_districts
   has_many :plugins, dependent: :delete_all, inverse_of: :district
 
   validates :name, presence: true, uniqueness: true, immutable: true
@@ -190,9 +187,5 @@ class District < ActiveRecord::Base
     end
   rescue IPAddr::InvalidAddressError
     errors.add(:cidr_block, "is not a valid IPv4 format")
-  end
-
-  def assign_default_users
-    self.users = User.all
   end
 end

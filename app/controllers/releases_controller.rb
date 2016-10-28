@@ -3,14 +3,17 @@ class ReleasesController < ApplicationController
   before_action :load_release, only: [:show, :rollback]
 
   def show
+    authorize @release
     render json: @release
   end
 
   def index
-    render json: @heritage.releases.first(10)
+    releases = policy_scope(@heritage.releases)
+    render json: releases.first(10)
   end
 
   def rollback
+    authorize @release
     new_release = @release.rollback
     render json: new_release
   end

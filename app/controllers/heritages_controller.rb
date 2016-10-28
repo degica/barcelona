@@ -4,33 +4,39 @@ class HeritagesController < ApplicationController
   skip_before_action :authenticate, only: [:trigger]
 
   def index
-    render json: @district.heritages
+    render json: policy_scope(@district.heritages)
   end
 
   def show
+    authorize @heritage
     render json: @heritage
   end
 
   def create
     @heritage = BuildHeritage.new(permitted_params, district: @district).execute
+    authorize @heritage
+
     @heritage.save_and_deploy!(without_before_deploy: true, description: "Create")
     render json: @heritage
   end
 
   def update
     @heritage = BuildHeritage.new(permitted_params).execute
+    authorize @heritage
     @heritage.save_and_deploy!(without_before_deploy: false,
                                description: "Update to #{@heritage.image_path}")
     render json: @heritage
   end
 
   def destroy
+    authorize @heritage
     @heritage.destroy!
     render status: 204, nothing: true
   end
 
   def trigger
     @heritage = Heritage.find_by!(name: params[:heritage_id])
+    authorize @heritage
     if params[:image_name].present? && @heritage.image_name != params[:image_name]
       raise ExceptionHandler::Forbidden
     end

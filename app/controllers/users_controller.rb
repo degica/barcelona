@@ -4,17 +4,18 @@ class UsersController < ApplicationController
 
   def login
     github_token = request.headers['HTTP_X_GITHUB_TOKEN']
-    user = User.login!(github_token)
+    user = AuthDriver::Github.new(github_token).login!
 
     render json: user
   end
 
   def index
-    users = User.all
-    render json: users
+    users = policy_scope(User)
+    render json: users.all
   end
 
   def show
+    authorize @user
     render json: @user
   end
 
@@ -31,7 +32,6 @@ class UsersController < ApplicationController
             else
               current_user
             end
-    authorize @user
   end
 
   def update_params
