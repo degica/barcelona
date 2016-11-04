@@ -52,7 +52,7 @@ class Heritage < ActiveRecord::Base
     self.token = SecureRandom.uuid
   end
 
-  def base_task_definition(task_name)
+  def base_task_definition(task_name, with_environment: true)
     base = district.base_task_definition.merge(
       name: task_name,
       cpu: 256,
@@ -60,7 +60,9 @@ class Heritage < ActiveRecord::Base
       essential: true,
       image: image_path
     )
-    base[:environment] += env_vars.where(secret: false).map { |e| {name: e.key, value: e.value} }
+    if with_environment
+      base[:environment] += env_vars.where(secret: false).map { |e| {name: e.key, value: e.value} }
+    end
 
     district.hook_plugins(:heritage_task_definition, self, base)
   end

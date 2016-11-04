@@ -91,7 +91,7 @@ class HeritageTaskDefinition
   end
 
   def run_pack_definition
-    base = heritage.base_task_definition("runpack")
+    base = heritage.base_task_definition("runpack", with_environment: false)
     base.merge(
       cpu: 1,
       memory: 16,
@@ -101,7 +101,7 @@ class HeritageTaskDefinition
   end
 
   def reverse_proxy_definition
-    base = heritage.base_task_definition("#{family_name}-revpro")
+    base = heritage.base_task_definition("#{family_name}-revpro", with_environment: false)
     base[:environment] += [
       {name: "AWS_REGION", value: district.region},
       {name: "UPSTREAM_NAME", value: "backend"},
