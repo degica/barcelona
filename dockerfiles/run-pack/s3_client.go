@@ -47,10 +47,10 @@ func newSession(region string) (*session.Session, error) {
 			return nil, err
 		}
 
-		if os.Setenv("AWS_ACCESS_KEY_ID", keyId) != nil {
+		if err = os.Setenv("AWS_ACCESS_KEY_ID", keyId); err != nil {
 			return nil, err
 		}
-		if os.Setenv("AWS_SECRET_ACCESS_KEY", secretKey) != nil {
+		if err = os.Setenv("AWS_SECRET_ACCESS_KEY", secretKey); err != nil {
 			return nil, err
 		}
 		return sess, err
