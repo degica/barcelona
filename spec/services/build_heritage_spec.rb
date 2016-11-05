@@ -178,7 +178,7 @@ describe BuildHeritage do
         @updated_heritage.save!
       end
 
-      it "deletes a service that is not specified in params" do
+      it "adds a service" do
         expect(@updated_heritage.services.count).to eq 3
 
         service1 = @updated_heritage.services.first
