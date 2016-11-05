@@ -34,42 +34,34 @@ class BuildHeritage
     unless heritage.new_record?
       new_params.delete :name
 
-      map = Hash[@heritage.services.pluck(:name, :id)]
-      if new_params[:services_attributes].present?
-        # Add or modify services
+      if new_params[:services_attributes]
+        new_params[:services_attributes] = sync_resources(new_params[:services_attributes], @heritage.services, :name)
         new_params[:services_attributes].each do |service|
-          service.delete :port_mappings_attributes # Currently updating port mapping is not supported
-          name = service[:name] or raise "name is required"
-          if map[name].present?
-            service[:id] = map[name]
-            listeners_map = Hash[Service.find(service[:id]).listeners.pluck("endpoint_id", "id")]
-            service[:listeners_attributes] ||= []
-            service[:listeners_attributes].each do |listener|
-              listener[:id] = listeners_map[listener[:endpoint_id]] if listener[:endpoint_id].present?
-            end
+          next if service[:_destroy].present? || service[:id].blank?
+          service.delete :port_mappings_attributes
 
-            listeners_to_delete = listeners_map.keys - service[:listeners_attributes].map { |l| l[:endpoint_id] }
-            listeners_to_delete.each do |endpoint_id|
-              service[:listeners_attributes] << {
-                id: listeners_map[endpoint_id],
-                _destroy: '1'
-              }
-            end
-          end
-        end
-
-        # Delete services
-        to_delete = map.keys - new_params[:services_attributes].map{ |s| s[:name] }
-        to_delete.each do |name|
-          new_params[:services_attributes] << {
-            id: map[name],
-            _destroy: '1'
-          }
+          service[:listeners_attributes] = sync_resources(service[:listeners_attributes],
+                                                          Service.find(service[:id]).listeners,
+                                                          :endpoint_id)
         end
       end
     end
 
     new_params
+  end
+
+  def sync_resources(attributes, resources, key_key)
+    resource_map = resources.pluck(key_key, :id).to_h
+    attributes ||= []
+    attributes.each do |attr|
+      attr[:id] = resource_map[attr[key_key]] if resource_map[attr[key_key]].present?
+    end
+
+    resources_to_delete = resource_map.keys - attributes.map { |attr| attr[key_key] }
+    resources_to_delete.each do |k|
+      attributes << {id: resource_map[k], _destroy: '1'}
+    end
+    attributes
   end
 
   def execute
