@@ -9,9 +9,6 @@ describe BuildHeritage do
       name: "heritage",
       image_name: "docker_image",
       image_tag: "latest",
-      env_vars: {
-        "RAILS_ENV" => "production"
-      },
       services: [
         {
           name: "web",
@@ -70,11 +67,6 @@ describe BuildHeritage do
       expect(service2.command).to eq "rake jobs:work"
       expect(service2.port_mappings.count).to eq 0
     end
-
-    it "has env vars" do
-      expect(heritage.env_vars[0].key).to eq "RAILS_ENV"
-      expect(heritage.env_vars[0].value).to eq "production"
-    end
   end
 
   describe "update object" do
@@ -114,11 +106,6 @@ describe BuildHeritage do
         expect(service2.command).to eq "rake jobs:offwork"
         expect(service2.port_mappings.count).to eq 0
       end
-
-      it "has env vars" do
-        expect(heritage.env_vars[0].key).to eq "RAILS_ENV"
-        expect(heritage.env_vars[0].value).to eq "production"
-      end
     end
 
     context "without name but id" do
@@ -153,11 +140,6 @@ describe BuildHeritage do
         expect(service2.memory).to eq 512
         expect(service2.command).to eq "rake jobs:offwork"
         expect(service2.port_mappings.count).to eq 0
-      end
-
-      it "has env vars" do
-        expect(heritage.env_vars[0].key).to eq "RAILS_ENV"
-        expect(heritage.env_vars[0].value).to eq "production"
       end
     end
 

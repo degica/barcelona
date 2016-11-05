@@ -12,9 +12,6 @@ describe "DELETE /heritages/:heritage/env_vars", type: :request do
       image_name: "nginx",
       image_tag: "latest",
       before_deploy: "echo hello",
-      env_vars: {
-        "RAILS_ENV" => "production"
-      },
       services: [
         {
           name: "web",
@@ -32,6 +29,8 @@ describe "DELETE /heritages/:heritage/env_vars", type: :request do
       ]
     }
     post "/v1/districts/#{district.name}/heritages", params, auth
+    expect(response).to be_success
+    post "/v1/heritages/nginx/env_vars?debug=true", {env_vars: {"RAILS_ENV" => "production"}}, auth
     expect(response).to be_success
   end
 
