@@ -6,10 +6,92 @@ class Heritage < ActiveRecord::Base
         j.RetentionInDays 365
       end
 
+      if heritage.scheduled_tasks.present?
+        heritage.scheduled_tasks.each_with_index do |s, i|
+          event_name =  "ScheduledEvent#{i}"
+          command = s["command"]
+          command = command.split(" ") if s["command"].is_a?(String)
+          run_command = LaunchCommand.new(heritage, command,
+                                          shell_format: false).to_command
+          add_resource("AWS::Events::Rule", event_name) do |j|
+            j.Description "Scheduled Task Rule"
+            j.State "ENABLED"
+            j.ScheduleExpression s["schedule"]
+            j.Targets [
+              {
+                "Arn" => get_attr("ScheduleHandler", "Arn"),
+                "Id" => "barcelona-#{heritage.name}-schedule-event-#{i}",
+                "Input" => {
+                  cluster: heritage.district.name,
+                  task_family: "#{heritage.name}-schedule",
+                  command: run_command
+                }.to_json
+              }
+            ]
+          end
+
+          add_resource("AWS::Lambda::Permission", "PermissionFor#{event_name}") do |j|
+            j.FunctionName ref("ScheduleHandler")
+            j.Action "lambda:InvokeFunction"
+            j.Principal "events.amazonaws.com"
+            j.SourceArn get_attr(event_name, "Arn")
+          end
+        end
+
+        add_resource("AWS::Lambda::Function", "ScheduleHandler") do |j|
+          j.Handler "index.handler"
+          j.Role get_attr("ScheduleHandlerRole", "Arn")
+          j.Runtime "nodejs4.3"
+          j.Timeout 60
+          j.Code do |j|
+            j.ZipFile schedule_handler_code
+          end
+        end
+
+        add_resource("AWS::IAM::Role", "ScheduleHandlerRole") do |j|
+          j.AssumeRolePolicyDocument do |j|
+            j.Version "2012-10-17"
+            j.Statement [
+              {
+                "Effect" => "Allow",
+                "Principal" => {
+                  "Service" => ["lambda.amazonaws.com"]
+                },
+                "Action" => ["sts:AssumeRole"]
+              }
+            ]
+          end
+          j.Path "/"
+          j.Policies [
+            {
+              "PolicyName" => "barcelona-schedule-handler-role-#{heritage.name}",
+              "PolicyDocument" => {
+                "Version" => "2012-10-17",
+                "Statement" => [
+                  {
+                    "Effect" => "Allow",
+                    "Action" => [
+                      "ecs:RunTask",
+                      "logs:CreateLogGroup",
+                      "logs:CreateLogStream",
+                      "logs:PutLogEvents",
+                    ],
+                    "Resource" => ["*"]
+                  }
+                ]
+              }
+            }
+          ]
+        end
+      end
     end
 
     def heritage
       options[:heritage]
+    end
+
+    def schedule_handler_code
+      File.read(Rails.root.join("schedule_handler.js"))
     end
   end
 
@@ -40,6 +122,8 @@ class Heritage < ActiveRecord::Base
             format: { with: /\A[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]\z/ }
   validates :district, presence: true
 
+  serialize :scheduled_tasks, JSON
+
   before_validation do |heritage|
     heritage.regenerate_token if heritage.token.blank?
   end
@@ -49,6 +133,7 @@ class Heritage < ActiveRecord::Base
 
   after_initialize do |heritage|
     heritage.version ||= 2
+    heritage.scheduled_tasks ||= []
   end
   after_save :apply_stack
   after_destroy :delete_stack
@@ -126,6 +211,8 @@ class Heritage < ActiveRecord::Base
   end
 
   def apply_stack
+    definition = HeritageTaskDefinition.schedule_definition(self)
+    district.aws.ecs.register_task_definition(definition.to_task_definition)
     cf_executor.create_or_update
   end
 
