@@ -95,5 +95,18 @@ describe Heritage::Stack do
       }
       expect(generated["Resources"]).to eq expected
     end
+
+    context "when a heritage has scheduled tasks" do
+      let(:heritage) { build :heritage,
+                             scheduled_tasks: [{schedule: 'rate(1 minute)',
+                                                command: 'echo hello'}] }
+      it "generates a correct stack template" do
+        generated = JSON.load stack.target!
+        expect(generated["Resources"]["ScheduledEvent0"]).to be_present
+        expect(generated["Resources"]["PermissionForScheduledEvent0"]).to be_present
+        expect(generated["Resources"]["ScheduleHandler"]).to be_present
+        expect(generated["Resources"]["ScheduleHandlerRole"]).to be_present
+      end
+    end
   end
 end

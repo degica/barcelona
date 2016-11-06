@@ -27,6 +27,13 @@ class HeritageTaskDefinition
         memory: 512)
   end
 
+  def self.schedule_definition(heritage)
+    new(heritage: heritage,
+        family_name: "#{heritage.name}-schedule",
+        cpu: 128,
+        memory: 512)
+  end
+
   def to_task_definition
     containers = [container_definition, run_pack_definition]
     if web_service?

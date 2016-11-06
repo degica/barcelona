@@ -4,6 +4,11 @@ environments:
     image_name: k2nr/rails-docker-sample
     aws_actions:
       - s3:Put*
+    scheduled_tasks:
+      - schedule: rate(1 minute)
+        command: ["sh", "-c", "echo hello $SECRET_KEY_BASE"]
+      - schedule: rate(10 minutes)
+        command: echo hello hello
     services:
       - name: web
         service_type: web
