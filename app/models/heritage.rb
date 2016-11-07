@@ -6,6 +6,40 @@ class Heritage < ActiveRecord::Base
         j.RetentionInDays 365
       end
 
+      add_resource("AWS::IAM::Role", "TaskRole") do |j|
+        j.AssumeRolePolicyDocument do |j|
+          j.Version "2012-10-17"
+          j.Statement [
+            {
+              "Effect" => "Allow",
+              "Principal" => {
+                "Service" => ["ecs-tasks.amazonaws.com"]
+              },
+              "Action" => ["sts:AssumeRole"]
+            }
+          ]
+        end
+        j.Path "/"
+        j.Policies [
+          {
+            "PolicyName" => "barcelona-ecs-task-role-#{heritage.name}",
+            "PolicyDocument" => {
+              "Version" => "2012-10-17",
+              "Statement" => [
+                {
+                  "Effect" => "Allow",
+                  "Action" => ["s3:Get*",
+                               "s3:List*",
+                               "logs:CreateLogStream",
+                               "logs:PutLogEvents",
+                              ].concat(heritage.aws_actions),
+                  "Resource" => ["*"]
+                }
+              ]
+            }
+          }
+        ]
+      end
     end
 
     def heritage
@@ -40,6 +74,8 @@ class Heritage < ActiveRecord::Base
             format: { with: /\A[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]\z/ }
   validates :district, presence: true
 
+  serialize :aws_actions, JSON
+
   before_validation do |heritage|
     heritage.regenerate_token if heritage.token.blank?
   end
@@ -49,6 +85,7 @@ class Heritage < ActiveRecord::Base
 
   after_initialize do |heritage|
     heritage.version ||= 2
+    heritage.aws_actions ||= []
   end
   after_save :apply_stack
   after_destroy :delete_stack
@@ -107,6 +144,11 @@ class Heritage < ActiveRecord::Base
   def log_group_name
     "Barcelona/#{district.name}/#{name}"
   end
+
+  def task_role_id
+    cf_executor&.resource_ids["TaskRole"]
+  end
+
   private
 
   def update_services(release, without_before_deploy)

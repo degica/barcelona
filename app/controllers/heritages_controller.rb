@@ -77,6 +77,7 @@ class HeritagesController < ApplicationController
       :image_tag,
       :slack_url,
       :before_deploy,
+      aws_actions: [],
       services: [
         :name,
         :cpu,

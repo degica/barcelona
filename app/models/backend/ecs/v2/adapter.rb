@@ -9,6 +9,7 @@ module Backend::Ecs::V2
 
     def apply
       std = HeritageTaskDefinition.service_definition(service).to_task_definition
+      std = std.merge(task_role_arn: service.heritage.task_role_id)
       resp = aws.ecs.register_task_definition(std).task_definition
       td = "#{resp.family}:#{resp.revision}"
       # CloudFormation updates service's desired_count to the declarated value

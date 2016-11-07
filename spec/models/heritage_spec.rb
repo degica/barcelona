@@ -49,6 +49,48 @@ describe Heritage::Stack do
             "LogGroupName" => "Barcelona/#{heritage.district.name}/#{heritage.name}",
             "RetentionInDays" => 365
           }
+        },
+        "TaskRole" => {
+          "Type" => "AWS::IAM::Role",
+          "Properties" => {
+            "AssumeRolePolicyDocument" => {
+              "Version" => "2012-10-17",
+              "Statement" => [
+                {
+                  "Effect"=>"Allow",
+                  "Principal" => {
+                    "Service" => [
+                      "ecs-tasks.amazonaws.com"
+                    ]
+                  },
+                  "Action" => [
+                    "sts:AssumeRole"
+                  ]
+                }
+              ]
+            },
+            "Path" => "/",
+            "Policies" => [
+              {
+                "PolicyName" => "barcelona-ecs-task-role-#{heritage.name}",
+                "PolicyDocument" => {
+                  "Version" => "2012-10-17",
+                  "Statement" => [
+                    {
+                      "Effect" => "Allow",
+                      "Action" => [
+                        "s3:Get*",
+                        "s3:List*",
+                        "logs:CreateLogStream",
+                        "logs:PutLogEvents"
+                      ],
+                      "Resource"=>["*"]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
         }
       }
       expect(generated["Resources"]).to eq expected

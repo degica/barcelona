@@ -96,6 +96,7 @@ ActiveRecord::Schema.define(version: 20161008153656) do
     t.text     "slack_url"
     t.string   "token"
     t.integer  "version"
+    t.text     "aws_actions"
   end
 
   add_index "heritages", ["district_id"], name: "index_heritages_on_district_id", using: :btree
