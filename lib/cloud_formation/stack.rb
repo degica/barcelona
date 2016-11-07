@@ -10,7 +10,7 @@ module CloudFormation
 
     def build
       Jbuilder.new do |j|
-        j.Description "AWS CloudFormation for Barcelona network stack"
+        j.Description description
         j.AWSTemplateFormatVersion "2010-09-09"
         j.Resources do |j|
           builder = Builder.new(self)
@@ -29,6 +29,12 @@ module CloudFormation
 
     def target!
       build.target!
+    end
+
+    private
+
+    def description
+      "AWS CloudFormation for Barcelona #{name}"
     end
   end
 end

@@ -182,6 +182,10 @@ class District < ActiveRecord::Base
                       key: "#{name}/ssh_ca_key").body.read
   end
 
+  def instance_log_group_name
+    "Barcelona/#{name}/instances"
+  end
+
   private
 
   def validate_cidr_block

@@ -7,7 +7,7 @@ class ContainerInstance
 
   def user_data
     user_data = InstanceUserData.new
-    user_data.packages += ["aws-cli", "jq", "aws-cfn-bootstrap"]
+    user_data.packages += ["aws-cli", "jq", "aws-cfn-bootstrap", "awslogs"]
     user_data.run_commands += [
       "set -e",
       "MEMSIZE=`cat /proc/meminfo | grep MemTotal | awk '{print $2}'`",
@@ -27,7 +27,11 @@ class ContainerInstance
       "chmod 600 /etc/ecs/ecs.config",
       "chkconfig --add barcelona",
       "chkconfig barcelona on",
-      "service barcelona start"
+      "service barcelona start",
+      "ec2_id=$(curl http://169.254.169.254/latest/meta-data/instance-id)",
+      'sed -i -e "s/{ec2_id}/$ec2_id/g" /etc/awslogs/awslogs.conf',
+      'sed -i -e "s/us-east-1/'+district.region+'/g" /etc/awslogs/awscli.conf',
+      "service awslogs start"
     ]
 
     user_data.add_file("/etc/ssh/ssh_ca_key.pub", "root:root", "644", district.ssh_format_ca_public_key)
@@ -67,6 +71,54 @@ case "$1" in
   *) exit 2;;
 esac
 EOS
+
+    # CloudWatch Logs configurations
+    # See http://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_cloudwatch_logs.html
+    user_data.add_file("/etc/awslogs/awslogs.conf", "root:root", "644", <<~EOS)
+      [general]
+      state_file = /var/lib/awslogs/agent-state
+
+      [/var/log/dmesg]
+      file = /var/log/dmesg
+      log_group_name = #{district.instance_log_group_name}
+      log_stream_name = {ec2_id}/var/log/dmesg
+
+      [/var/log/messages]
+      file = /var/log/messages
+      log_group_name = #{district.instance_log_group_name}
+      log_stream_name = {ec2_id}/var/log/messages
+      datetime_format = %b %d %H:%M:%S
+
+      [/var/log/secure]
+      file = /var/log/secure
+      log_group_name = #{district.instance_log_group_name}
+      log_stream_name = {ec2_id}/var/log/secure
+      datetime_format = %b %d %H:%M:%S
+
+      [/var/log/docker]
+      file = /var/log/docker
+      log_group_name = #{district.instance_log_group_name}
+      log_stream_name = {ec2_id}/var/log/docker
+      datetime_format = %Y-%m-%dT%H:%M:%S.%f
+
+      [/var/log/ecs/ecs-init.log]
+      file = /var/log/ecs/ecs-init.log.*
+      log_group_name = #{district.instance_log_group_name}
+      log_stream_name = {ec2_id}/var/log/ecs/ecs-init.log
+      datetime_format = %Y-%m-%dT%H:%M:%SZ
+
+      [/var/log/ecs/ecs-agent.log]
+      file = /var/log/ecs/ecs-agent.log.*
+      log_group_name = #{district.instance_log_group_name}
+      log_stream_name = {ec2_id}/var/log/ecs/ecs-agent.log
+      datetime_format = %Y-%m-%dT%H:%M:%SZ
+
+      [/var/log/ecs/audit.log]
+      file = /var/log/ecs/audit.log.*
+      log_group_name = #{district.instance_log_group_name}
+      log_stream_name = {ec2_id}/var/log/ecs/audit.log
+      datetime_format = %Y-%m-%dT%H:%M:%SZ
+    EOS
 
     user_data = district.hook_plugins(:container_instance_user_data, self, user_data)
   end

@@ -303,7 +303,9 @@ module Barcelona
                       "ecr:BatchCheckLayerAvailability",
                       "ecr:GetDownloadUrlForLayer",
                       "ecr:BatchGetImage",
+                      "logs:CreateLogGroup",
                       "logs:CreateLogStream",
+                      "logs:DescribeLogStreams",
                       "logs:PutLogEvents",
                       "s3:Get*",
                       "s3:List*"
