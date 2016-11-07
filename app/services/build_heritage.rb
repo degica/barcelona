@@ -10,13 +10,6 @@ class BuildHeritage
 
   def convert_params_for_model(original)
     new_params = original.dup
-    if new_params[:env_vars].present?
-      new_params[:env_vars_attributes] = new_params.delete(:env_vars).map do |k, v|
-        existing = heritage.env_vars.find_by(key: k)
-        e = {key: k, value: v}
-        existing.present? ? e.merge(id: existing.id) : e
-      end
-    end
 
     if new_params[:services].present?
       new_params[:services_attributes] = new_params.delete(:services)
