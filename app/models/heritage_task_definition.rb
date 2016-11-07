@@ -1,5 +1,5 @@
 class HeritageTaskDefinition
-  attr_accessor :heritage, :cpu, :memory, :family_name, :command, :port_mappings, :container_defintions, :force_ssl, :hosts, :reverse_proxy_image
+  attr_accessor :heritage, :cpu, :memory, :family_name, :command, :port_mappings, :container_defintions, :force_ssl, :hosts, :reverse_proxy_image, :mode
   delegate :district, to: :heritage
 
   def self.service_definition(service)
@@ -12,7 +12,9 @@ class HeritageTaskDefinition
         is_web_service: service.web?,
         force_ssl: service.force_ssl,
         hosts: service.hosts,
-        reverse_proxy_image: service.reverse_proxy_image)
+        reverse_proxy_image: service.reverse_proxy_image,
+        mode: (service.listeners.present?) ? :alb : :tcp
+       )
   end
 
   def self.oneoff_definition(oneoff)
@@ -27,13 +29,20 @@ class HeritageTaskDefinition
 
   def to_task_definition
     containers = [container_definition, run_pack_definition]
-    containers << reverse_proxy_definition if web_service?
+    if web_service?
+      containers << case mode
+                    when :tcp
+                      reverse_proxy_definition_tcp
+                    when :alb
+                      reverse_proxy_definition_alb
+                    end
+    end
     {family: family_name, container_definitions: containers}
   end
 
   private
 
-  def initialize(heritage:, family_name:, cpu:, memory:, command: nil, port_mappings: nil, is_web_service: false, force_ssl: false, hosts: [], app_container_labels: {}, reverse_proxy_image: nil)
+  def initialize(heritage:, family_name:, cpu:, memory:, command: nil, port_mappings: nil, is_web_service: false, force_ssl: false, hosts: [], app_container_labels: {}, reverse_proxy_image: nil, mode: nil)
     @heritage = heritage
     @family_name = family_name
     @cpu = cpu
@@ -45,6 +54,7 @@ class HeritageTaskDefinition
     @hosts = hosts
     @reverse_proxy_image = reverse_proxy_image
     @app_container_labels = app_container_labels
+    @mode = mode
   end
 
   def web_service?
@@ -100,7 +110,7 @@ class HeritageTaskDefinition
     )
   end
 
-  def reverse_proxy_definition
+  def reverse_proxy_definition_tcp
     base = heritage.base_task_definition("#{family_name}-revpro", with_environment: false)
     base[:environment] += [
       {name: "AWS_REGION", value: district.region},
@@ -135,6 +145,30 @@ class HeritageTaskDefinition
         {
           container_port: 443,
           host_port: https.host_port,
+          protocol: "tcp"
+        }
+      ]
+    )
+  end
+
+  def reverse_proxy_definition_alb
+    base = heritage.base_task_definition("#{family_name}-revpro", with_environment: false)
+    base[:environment] += [
+      {name: "AWS_REGION", value: district.region},
+      {name: "UPSTREAM_NAME", value: "backend"},
+      {name: "UPSTREAM_PORT", value: web_container_port.to_s},
+      {name: "DISABLE_PROXY_PROTOCOL", value: "true"},
+      {name: "FORCE_SSL", value: "false"}
+    ].flatten
+
+    base.merge(
+      cpu: 128,
+      memory: 128,
+      image: reverse_proxy_image,
+      links: ["#{family_name}:backend"],
+      port_mappings: [
+        {
+          container_port: 80,
           protocol: "tcp"
         }
       ]

@@ -64,11 +64,21 @@ module Backend::Ecs::V2
                 "ContainerName" => container_name
               }
             ]
+          elsif use_alb?
+            j.LoadBalancers [
+              {
+                "TargetGroupArn" => ref("LBTargetGroup1"),
+                "ContainerPort" => 80,
+                "ContainerName" => "#{service.service_name}-revpro"
+              }
+            ]
           end
         end
 
         if use_tcp_load_balancer?
           build_classic_elb
+        elsif use_alb?
+          build_alb_listener
         end
       end
 
@@ -131,6 +141,38 @@ module Backend::Ecs::V2
         end
       end
 
+      def build_alb_listener
+        add_resource("AWS::ElasticLoadBalancingV2::ListenerRule", "LBListenerRuleHTTP") do |j|
+          j.Actions [{"TargetGroupArn" => ref("LBTargetGroup1"), "Type" => "forward"}]
+          j.Conditions(listener.rule_conditions.map { |c| {"Field" => c["type"], "Values" => [c["value"]]} })
+          j.ListenerArn listener.endpoint.http_listener_id
+          j.Priority listener.rule_priority
+        end
+
+        if listener.endpoint.https_listener_id.present?
+          add_resource("AWS::ElasticLoadBalancingV2::ListenerRule", "LBListenerRuleHTTPS") do |j|
+            j.Actions [{"TargetGroupArn" => ref("LBTargetGroup1"), "Type" => "forward"}]
+            j.Conditions(listener.rule_conditions.map { |c| {"Field" => c["type"], "Values" => [c["value"]]} })
+            j.ListenerArn listener.endpoint.https_listener_id
+            j.Priority listener.rule_priority
+          end
+        end
+
+        add_resource("AWS::ElasticLoadBalancingV2::TargetGroup", "LBTargetGroup1") do |j|
+          j.VpcId district.vpc_id
+          j.HealthCheckIntervalSeconds listener.health_check_interval
+          j.HealthCheckPath listener.health_check_path
+          j.Matcher do |j|
+            j.HttpCode "200-299"
+          end
+          j.Port 80
+          j.Protocol "HTTP"
+          j.TargetGroupAttributes [
+            {"Key" => "deregistration_delay.timeout_seconds", "Value" => "60"}
+          ]
+        end
+      end
+
       def service
         options[:service]
       end
@@ -147,7 +189,11 @@ module Backend::Ecs::V2
       def use_tcp_load_balancer?
         # Using port_mappings or hosts requires ELB run in TCP mode which is supported
         # only by Classic ELB. Only in the case above we use Classic ELB
-        service.port_mappings.present? || service.hosts.present?
+        !use_alb? && (service.port_mappings.present? || service.hosts.present?)
+      end
+
+      def use_alb?
+        listener.present?
       end
     end
 

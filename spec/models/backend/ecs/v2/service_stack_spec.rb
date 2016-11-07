@@ -22,6 +22,30 @@ describe Backend::Ecs::V2::ServiceStack do
       expect(generated["Resources"]["ECSService"]).to be_present
       expect(generated["Resources"]["ClassicLoadBalancer"]).to be_present
       expect(generated["Resources"]["RecordSet"]).to be_present
+      expect(generated["Resources"]["LBTargetGroup1"]).to_not be_present
+      expect(generated["Resources"]["LBListenerRuleHTTP"]).to_not be_present
+      expect(generated["Resources"]["LBListenerRuleHTTPS"]).to_not be_present
+    end
+  end
+
+  context "when a service is ALB mode" do
+    context "when the service has autoscaling and listeners" do
+      let(:endpoint) { create :endpoint }
+
+      before do
+        service.listeners << endpoint.listeners.new
+        allow_any_instance_of(Endpoint).to receive(:https_listener_id) { "https-listener-id" }
+      end
+
+      it "generates resources" do
+        generated = JSON.load stack.target!
+        expect(generated["Resources"]["ECSServiceRole"]).to be_present
+        expect(generated["Resources"]["ECSService"]).to be_present
+        expect(generated["Resources"]["LBTargetGroup1"]).to be_present
+        expect(generated["Resources"]["LBListenerRuleHTTP"]).to be_present
+        expect(generated["Resources"]["LBListenerRuleHTTPS"]).to be_present
+        expect(generated["Resources"]["ClassicLoadBalancer"]).to_not be_present
+      end
     end
   end
 end

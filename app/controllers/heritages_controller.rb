@@ -98,6 +98,16 @@ class HeritagesController < ApplicationController
             :hostname,
             :ssl_cert_path,
             :ssl_key_path
+          ],
+          endpoints: [
+            :name,
+            :health_check_interval,
+            :health_check_path,
+            :rule_priority,
+            rule_conditions: [
+              :type,
+              :value
+            ]
           ]
         }
       ]
