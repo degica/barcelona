@@ -115,6 +115,7 @@ class HeritagesController < ApplicationController
       if params[:services].present?
         params[:services].each_with_index do |s, i|
           whitelisted[:services][i][:health_check] = s[:health_check].permit(:protocol, :port) if s.key?(:health_check)
+          whitelisted[:services][i][:auto_scaling] = s[:auto_scaling].permit(:max_count, :min_count) if s.key?(:auto_scaling)
         end
       end
     end
