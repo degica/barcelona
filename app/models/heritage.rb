@@ -48,7 +48,7 @@ class Heritage < ActiveRecord::Base
   accepts_nested_attributes_for :env_vars
 
   after_initialize do |heritage|
-    heritage.version ||= 1
+    heritage.version ||= 2
   end
   after_save :apply_stack
   after_destroy :delete_stack

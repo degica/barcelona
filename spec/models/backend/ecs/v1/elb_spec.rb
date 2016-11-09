@@ -1,7 +1,8 @@
 require "rails_helper"
 
 describe Backend::Ecs::V1::Elb do
-  let(:service) { create :web_service }
+  let(:heritage) { create :heritage, version: 1 }
+  let(:service) { create :web_service, heritage: heritage }
 
   describe "#health_check_target" do
     subject { described_class.new(service).health_check_target }

@@ -1,5 +1,6 @@
 class HeritageSerializer < ActiveModel::Serializer
-  attributes :name, :image_name, :image_tag, :env_vars, :before_deploy, :slack_url, :token
+  attributes :name, :image_name, :image_tag, :env_vars, :before_deploy,
+             :slack_url, :token, :version
 
   has_many :services
   belongs_to :district

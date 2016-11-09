@@ -56,6 +56,12 @@ module CloudFormation
       end
     end
 
+    def in_progress?
+      status = stack_status
+      return false if status.nil?
+      !!(status =~ /_IN_PROGRESS/)
+    end
+
     # Returns CF ID => Real ID hash
     def resource_ids
       return @resource_ids if @resource_ids

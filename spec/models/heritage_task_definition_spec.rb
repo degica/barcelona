@@ -14,9 +14,9 @@ describe HeritageTaskDefinition do
 
   describe ".service_definition" do
     subject { described_class.service_definition(service).to_task_definition }
-    let(:service) { create :service }
-    let(:heritage) { service.heritage }
-    let(:district) { service.district }
+    let(:district) { create :district }
+    let(:heritage) { create :heritage, version: 1, district: district }
+    let(:service)  { create :service, heritage: heritage }
 
     it "returns a task definition for the service" do
       expect(subject).to eq({
@@ -52,7 +52,7 @@ describe HeritageTaskDefinition do
     end
 
     context "when a service is web service" do
-      let(:service) { create :web_service }
+      let(:service) { create :web_service, heritage: heritage }
       it "returns a task definition for the service" do
         expect(subject).to eq({
                                 family: service.service_name,

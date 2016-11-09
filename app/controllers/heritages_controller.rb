@@ -71,6 +71,7 @@ class HeritagesController < ApplicationController
   def permitted_params
     params.permit([
       :id,
+      :version,
       :name,
       :image_name,
       :image_tag,
