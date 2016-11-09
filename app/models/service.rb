@@ -92,6 +92,8 @@ class Service < ActiveRecord::Base
                    Backend::Ecs::V1::Adapter.new(self)
                  when 2 then
                    Backend::Ecs::V2::Adapter.new(self)
+                 else
+                   raise NotImplementedError
                  end
   end
 
