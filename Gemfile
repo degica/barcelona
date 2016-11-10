@@ -8,7 +8,6 @@ gem 'active_model_serializers'
 gem 'gibberish'
 gem 'octokit'
 gem 'delayed_job_active_record'
-gem 'rails_12factor', group: :production
 gem 'slack-notifier'
 gem 'pundit'
 gem 'jbuilder'
