@@ -18,7 +18,6 @@ describe Release do
                          "services_attributes" => [
                            service.
                            attributes.
-                           with_indifferent_access.
                            slice("id",
                                  "cpu",
                                  "memory",

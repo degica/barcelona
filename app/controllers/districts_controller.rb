@@ -26,12 +26,12 @@ class DistrictsController < ApplicationController
     # Make sure the related resources are in-sync
     @district.save!
     ApplyDistrict.new(@district).apply
-    render status: 202, nothing: true
+    head 202
   end
 
   def destroy
     ApplyDistrict.new(@district).destroy!
-    render status: 204, nothing: true
+    head 204
   end
 
   def sign_public_key

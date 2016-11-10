@@ -3,7 +3,7 @@ module Barcelona
     class NewrelicPlugin < Base
       def on_container_instance_user_data(_instance, user_data)
         user_data.add_file("/etc/newrelic-infra.yml", "root:root", "644", <<~EOS)
-          license_key: #{attributes[:license_key]}
+          license_key: #{attributes["license_key"]}
           custom_attributes:
             role: barcelona-ci
             district: #{district.name}
