@@ -18,7 +18,7 @@ describe "POST /login", type: :request do
   context "when user team is allowed to login" do
     let(:user_teams) { [OpenStruct.new(organization: OpenStruct.new(login: "degica"), name: "developers")] }
     it "returns login info" do
-      post "/v1/login", nil, gh_auth
+      api_request :post, "/v1/login", {}, gh_auth
       expect(response).to be_success
       body = JSON.load(response.body)
       expect(body["user"]["name"]).to eq user.name
@@ -29,7 +29,7 @@ describe "POST /login", type: :request do
   context "when user team is not allowed to login" do
     let(:user_teams) { [OpenStruct.new(organization: OpenStruct.new(login: "degica"), name: "notdevelopers")] }
     it "returns 401" do
-      post "/v1/login", nil, gh_auth
+      api_request :post, "/v1/login", {}, gh_auth
       expect(response.status).to eq 401
     end
   end

@@ -2,7 +2,6 @@ require 'rails_helper'
 
 describe "GET /heritages/:heritage", type: :request do
   let(:user) { create :user }
-  let(:auth) { {"X-Barcelona-Token" => user.token} }
   let(:district) { create :district }
 
   it "updates a heritage" do
@@ -27,10 +26,10 @@ describe "GET /heritages/:heritage", type: :request do
         }
       ]
     }
-    post "/v1/districts/#{district.name}/heritages", params, auth
+    api_request :post, "/v1/districts/#{district.name}/heritages", params
     expect(response).to be_success
 
-    get "/v1/heritages/nginx", nil, auth
+    api_request :get, "/v1/heritages/nginx"
     expect(response).to be_success
 
     heritage = JSON.load(response.body)["heritage"]

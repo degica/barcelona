@@ -2,7 +2,6 @@ require "rails_helper"
 
 describe "POST /heritages/:heritage/releases/:version/rollback", type: :request do
   let(:user) { create :user }
-  let(:auth) { {"X-Barcelona-Token" => user.token} }
   let(:district) { create :district }
 
   before do
@@ -27,12 +26,12 @@ describe "POST /heritages/:heritage/releases/:version/rollback", type: :request 
         }
       ]
     }
-    post "/v1/districts/#{district.name}/heritages", params, auth
-    patch "/v1/heritages/nginx", {"image_tag" => "v111"}, auth
+    api_request :post, "/v1/districts/#{district.name}/heritages", params
+    api_request :patch, "/v1/heritages/nginx", {"image_tag" => "v111"}
   end
 
   it "rolls back to the specified version" do
-    post "/v1/heritages/nginx/releases/1/rollback", nil, auth
+    api_request :post, "/v1/heritages/nginx/releases/1/rollback"
     expect(response).to be_success
 
     release = JSON.load(response.body)["release"]
