@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '4.2.7.1'
+gem 'rails', '~> 5.0'
 gem 'pg'
 gem 'aws-sdk'
 gem 'puma'
