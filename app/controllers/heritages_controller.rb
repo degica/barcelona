@@ -99,8 +99,8 @@ class HeritagesController < ApplicationController
             :ssl_cert_path,
             :ssl_key_path
           ],
-          endpoints: [
-            :name,
+          listeners: [
+            :endpoint,
             :health_check_interval,
             :health_check_path,
             :rule_priority,

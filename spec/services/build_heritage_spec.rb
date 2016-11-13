@@ -19,9 +19,9 @@ describe BuildHeritage do
               container_port: 3000
             }
           ],
-          endpoints: [
+          listeners: [
             {
-              name: endpoint.name,
+              endpoint: endpoint.name,
               health_check_interval: 5,
               health_check_path: "/health_check",
               rule_priority: 99,
@@ -232,7 +232,7 @@ describe BuildHeritage do
       let(:endpoint2) { district.endpoints.create!(name: "load-balancer2") }
       before do
         new_params = params.dup
-        new_params[:services][0][:endpoints][0] = {name: endpoint2.name}
+        new_params[:services][0][:listeners][0] = {endpoint: endpoint2.name}
         @updated_heritage = BuildHeritage.new(new_params).execute
         @updated_heritage.save!
       end
@@ -250,7 +250,7 @@ describe BuildHeritage do
     context "deleting endpoints" do
       before do
         new_params = params.dup
-        new_params[:services][0].delete(:endpoints)
+        new_params[:services][0].delete(:listeners)
         @updated_heritage = BuildHeritage.new(new_params).execute
         @updated_heritage.save!
       end

@@ -16,15 +16,15 @@ class BuildHeritage
       new_params[:services_attributes].each do |service|
         service[:port_mappings_attributes] = service.delete(:port_mappings) if service[:port_mappings].present?
 
-        if service[:endpoints].present?
-          endpoint_map = Hash[Endpoint.where(name: service[:endpoints].map { |e| e[:name] }).pluck(:name, :id)]
-          service[:listeners_attributes] = service.delete(:endpoints).map do |endpoint|
+        if service[:listeners].present?
+          listener_map = Hash[Endpoint.where(name: service[:listeners].map { |e| e[:endpoint] }).pluck(:name, :id)]
+          service[:listeners_attributes] = service.delete(:listeners).map do |listener|
             {
-              endpoint_id: endpoint_map[endpoint[:name]],
-              health_check_interval: endpoint[:health_check_interval],
-              health_check_path: endpoint[:health_check_path],
-              rule_priority: endpoint[:rule_priority],
-              rule_conditions: endpoint[:rule_conditions]
+              endpoint_id: listener_map[listener[:endpoint]],
+              health_check_interval: listener[:health_check_interval],
+              health_check_path: listener[:health_check_path],
+              rule_priority: listener[:rule_priority],
+              rule_conditions: listener[:rule_conditions]
             }
           end
         end
