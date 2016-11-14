@@ -26,7 +26,7 @@ class HeritagesController < ApplicationController
 
   def destroy
     @heritage.destroy!
-    render status: 204, nothing: true
+    head 204
   end
 
   def trigger
@@ -104,7 +104,7 @@ class HeritagesController < ApplicationController
     ]).tap do |whitelisted|
       if params[:services].present?
         params[:services].each_with_index do |s, i|
-          whitelisted[:services][i][:health_check] = s[:health_check] if s.key?(:health_check)
+          whitelisted[:services][i][:health_check] = s[:health_check].permit(:protocol, :port) if s.key?(:health_check)
         end
       end
     end

@@ -29,7 +29,7 @@ module Barcelona
       end
 
       def api_key
-        attributes[:api_key]
+        attributes["api_key"]
       end
     end
   end

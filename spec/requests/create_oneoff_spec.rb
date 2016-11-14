@@ -2,7 +2,6 @@ require 'rails_helper'
 
 describe "POST /heritages/:heritage/oneoffs", type: :request do
   let(:user) { create :user }
-  let(:auth) { {"X-Barcelona-Token" => user.token} }
   let(:heritage) { create :heritage }
   let(:run_task_response_mock) {
     double(
@@ -32,7 +31,7 @@ describe "POST /heritages/:heritage/oneoffs", type: :request do
     params = {
       command: "rake db:migrate"
     }
-    post "/v1/heritages/#{heritage.name}/oneoffs", params, auth
+    api_request :post, "/v1/heritages/#{heritage.name}/oneoffs", params
     expect(response).to be_success
     oneoff = JSON.load(response.body)["oneoff"]
     expect(oneoff["task_arn"]).to eq "arn"
@@ -63,7 +62,7 @@ describe "POST /heritages/:heritage/oneoffs", type: :request do
         command: "rake db:migrate"
       }
 
-      post "/v1/heritages/#{heritage.name}/oneoffs", params, auth
+      api_request :post, "/v1/heritages/#{heritage.name}/oneoffs", params
       expect(response).to be_success
       resp = JSON.load(response.body)
       expect(resp["oneoff"]["task_arn"]).to eq "arn"

@@ -1,5 +1,11 @@
 class EnvVar < ActiveRecord::Base
+  module ValueToString
+    def value
+      super.to_s
+    end
+  end
   include EncryptAttribute
+  prepend ValueToString
 
   delegate :district, to: :heritage
 
@@ -13,11 +19,6 @@ class EnvVar < ActiveRecord::Base
   before_save   :sync_s3,        if: :secret?
   before_save   :wipe_value,     if: :secret?
   after_destroy :delete_from_s3, if: :secret?
-
-  def value_with_to_s
-    value_without_to_s.to_s
-  end
-  alias_method_chain :value, :to_s
 
   def s3_path
     "heritages/#{heritage.name}/env/#{key}"

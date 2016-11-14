@@ -4,8 +4,8 @@ class Service < ActiveRecord::Base
   belongs_to :heritage, inverse_of: :services
   has_many :port_mappings, inverse_of: :service, dependent: :destroy
 
-  serialize :hosts, JsonWithIndifferentAccess
-  serialize :health_check, JsonWithIndifferentAccess
+  serialize :hosts, JSON
+  serialize :health_check, JSON
 
   validates :name,
             presence: true,
@@ -99,7 +99,7 @@ class Service < ActiveRecord::Base
 
   def validate_health_check
     self.health_check = {} if health_check.nil?
-    health_check[:protocol] ||= "tcp"
-    errors.add(:protocol, "is not supported") if health_check[:protocol] != "tcp"
+    health_check["protocol"] ||= "tcp"
+    errors.add(:protocol, "is not supported") if health_check["protocol"] != "tcp"
   end
 end

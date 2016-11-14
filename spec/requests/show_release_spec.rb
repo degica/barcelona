@@ -2,7 +2,6 @@ require 'rails_helper'
 
 describe "GET /heritages/:heritage/releases/:version", type: :request do
   let(:user) { create :user }
-  let(:auth) { {"X-Barcelona-Token" => user.token} }
   let(:district) { create :district }
 
   before do
@@ -27,11 +26,11 @@ describe "GET /heritages/:heritage/releases/:version", type: :request do
         }
       ]
     }
-    post "/v1/districts/#{district.name}/heritages", params, auth
+    api_request :post, "/v1/districts/#{district.name}/heritages", params
   end
 
   it "shows a release" do
-    get "/v1/heritages/nginx/releases/1", nil, auth
+    api_request :get, "/v1/heritages/nginx/releases/1"
     expect(response).to be_success
 
     release = JSON.load(response.body)["release"]

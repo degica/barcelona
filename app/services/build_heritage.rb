@@ -5,7 +5,7 @@ class BuildHeritage
     @district = district
     heritage_name = params.delete(:id) || params[:name]
     @heritage = Heritage.find_or_initialize_by(name: heritage_name)
-    @params = convert_params_for_model ActionController::Parameters.new(params)
+    @params = convert_params_for_model params.to_h
   end
 
   def convert_params_for_model(original)
@@ -26,7 +26,7 @@ class BuildHeritage
         # Add or modify services
         new_params[:services_attributes].each do |service|
           service.delete :port_mappings_attributes # Currently updating port mapping is not supported
-          name = service.require :name
+          name = service[:name] or raise "name is required"
           service[:id] = map[name] if map[name].present?
         end
 
@@ -46,7 +46,7 @@ class BuildHeritage
 
   def execute
     heritage.district = district if district.present?
-    heritage.attributes = params.permit!
+    heritage.attributes = params
     heritage
   end
 end

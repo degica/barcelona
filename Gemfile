@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '4.2.7.1'
+gem 'rails', '~> 5.0'
 gem 'pg'
 gem 'aws-sdk'
 gem 'puma'
@@ -8,7 +8,6 @@ gem 'active_model_serializers'
 gem 'gibberish'
 gem 'octokit'
 gem 'delayed_job_active_record'
-gem 'rails_12factor', group: :production
 gem 'slack-notifier'
 gem 'pundit'
 gem 'jbuilder'

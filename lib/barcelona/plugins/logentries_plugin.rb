@@ -59,7 +59,7 @@ EOS
       end
 
       def token
-        model.plugin_attributes[:token]
+        model.plugin_attributes["token"]
       end
     end
   end

@@ -1,7 +1,6 @@
 require 'rails_helper'
 
 describe "POST /districts/:district/sign_public_key", type: :request do
-  let(:auth) { {"X-Barcelona-Token" => user.token} }
   let(:district) { create :district }
   let(:ca_key_pair) { OpenSSL::PKey::RSA.new(1024) }
   let(:public_key) do
@@ -16,7 +15,7 @@ describe "POST /districts/:district/sign_public_key", type: :request do
   context "when a user is a developer" do
     let(:user) { create :user, roles: ["developer"], public_key: public_key }
     it "returns 403" do
-      post "/v1/districts/#{district.name}/sign_public_key", {}, auth
+      api_request :post, "/v1/districts/#{district.name}/sign_public_key"
       expect(response.status).to eq 403
     end
   end
@@ -24,7 +23,7 @@ describe "POST /districts/:district/sign_public_key", type: :request do
   context "when a user is an admin" do
     let(:user) { create :user, roles: ["admin"], public_key: public_key }
     it "udpates a district" do
-      post "/v1/districts/#{district.name}/sign_public_key", {}, auth
+      api_request :post, "/v1/districts/#{district.name}/sign_public_key"
       expect(response.status).to eq 200
       resp = JSON.parse(response.body)
       expect(resp["district"]).to be_present

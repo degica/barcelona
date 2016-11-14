@@ -50,18 +50,18 @@ module Backend::Ecs::V1
 
     def health_check_target
       health_check = service.health_check
-      protocol = health_check[:protocol] || "tcp"
+      protocol = health_check["protocol"] || "tcp"
       case protocol
       when "tcp" then
-        port = health_check[:port] || service.port_mappings.first.host_port
+        port = health_check["port"] || service.port_mappings.first.host_port
         "TCP:#{port}"
       when "http" then
-        http_path = health_check[:http_path]
-        port = health_check[:port] || service.http_port_mapping.host_port
+        http_path = health_check["http_path"]
+        port = health_check["port"] || service.http_port_mapping.host_port
         "#{protocol.upcase}:#{port}#{http_path}"
       when "https" then
-        http_path = health_check[:http_path]
-        port = health_check[:port] || service.https_port_mapping.host_port
+        http_path = health_check["http_path"]
+        port = health_check["port"] || service.https_port_mapping.host_port
         "#{protocol.upcase}:#{port}#{http_path}"
       end
     end
