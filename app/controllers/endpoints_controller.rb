@@ -3,6 +3,8 @@ class EndpointsController < ApplicationController
   before_action :load_endpoint, except: [:index, :create]
 
   def index
+    endpoints = @district.endpoints
+    render json: endpoints
   end
 
   def create
