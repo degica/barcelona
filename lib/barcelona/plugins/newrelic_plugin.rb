@@ -9,8 +9,16 @@ module Barcelona
             district: #{district.name}
         EOS
 
+        user_data.add_file("/etc/yum.repos.d/newrelic-infra.repo", "root:root", "644", <<~EOS)
+          [newrelic-infra]
+          name=New Relic Infrastructure
+          baseurl=http://download.newrelic.com/infrastructure_agent/linux/yum/el/6/x86_64
+          enable=1
+          gpgcheck=0
+        EOS
+
         user_data.run_commands += [
-          "curl -s https://75aae388e7629eec895d26b0943bbfd06288356953c5777d:@packagecloud.io/install/repositories/newrelic/infra-beta/script.rpm.sh | bash",
+          "yum -q makecache -y --disablerepo='*' --enablerepo='newrelic-infra'",
           "yum install newrelic-infra -y"
         ]
 

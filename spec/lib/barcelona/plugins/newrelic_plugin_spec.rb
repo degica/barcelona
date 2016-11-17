@@ -18,7 +18,7 @@ module Barcelona
       it "gets hooked with container_instance_user_data trigger" do
         ci = ContainerInstance.new(district)
         user_data = YAML.load(Base64.decode64(ci.user_data.build))
-        expect(user_data["runcmd"]).to include "curl -s https://75aae388e7629eec895d26b0943bbfd06288356953c5777d:@packagecloud.io/install/repositories/newrelic/infra-beta/script.rpm.sh | bash"
+        expect(user_data["runcmd"]).to include "yum -q makecache -y --disablerepo='*' --enablerepo='newrelic-infra'"
         expect(user_data["runcmd"]).to include "yum install newrelic-infra -y"
       end
     end
