@@ -247,7 +247,7 @@ describe BuildHeritage do
       end
     end
 
-    context "deleting endpoints" do
+    context "deleting listeners" do
       before do
         new_params = params.dup
         new_params[:services][0].delete(:listeners)

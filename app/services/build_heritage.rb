@@ -1,16 +1,15 @@
 class BuildHeritage
   attr_accessor :params, :district, :heritage
 
-  def initialize(params, district: nil)
+  def initialize(_params, district: nil)
+    params = _params.to_h.deep_dup
     @district = district
     heritage_name = params.delete(:id) || params[:name]
     @heritage = Heritage.find_or_initialize_by(name: heritage_name)
-    @params = convert_params_for_model params.to_h
+    @params = convert_params_for_model params
   end
 
-  def convert_params_for_model(original)
-    new_params = original.dup
-
+  def convert_params_for_model(new_params)
     if new_params[:services].present?
       new_params[:services_attributes] = new_params.delete(:services)
       new_params[:services_attributes].each do |service|
