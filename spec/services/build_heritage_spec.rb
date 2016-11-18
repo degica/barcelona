@@ -1,9 +1,6 @@
 require 'rails_helper'
 
 describe BuildHeritage do
-  before do
-    allow_any_instance_of(Aws::ECS::Client).to receive(:create_cluster)
-  end
   let(:params) do
     {
       name: "heritage",
@@ -21,6 +18,20 @@ describe BuildHeritage do
               lb_port: 80,
               container_port: 3000
             }
+          ],
+          listeners: [
+            {
+              endpoint: endpoint.name,
+              health_check_interval: 5,
+              health_check_path: "/health_check",
+              rule_priority: 99,
+              rule_conditions: [
+                {
+                  type: 'path_pattern',
+                  value: '/app*'
+                }
+              ]
+            }
           ]
         },
         {
@@ -32,6 +43,7 @@ describe BuildHeritage do
   end
   let(:district) { create :district }
   let(:heritage) { BuildHeritage.new(params, district: district).execute }
+  let(:endpoint) { district.endpoints.create!(name: "load-balancer")}
 
   describe "new object" do
     subject { heritage }
@@ -59,6 +71,13 @@ describe BuildHeritage do
       expect(service1.port_mappings.count).to eq 1
       expect(service1.port_mappings.first.lb_port).to eq 80
       expect(service1.port_mappings.first.container_port).to eq 3000
+      expect(service1.listeners.count).to eq 1
+      expect(service1.listeners.first.health_check_interval).to eq 5
+      expect(service1.listeners.first.health_check_path).to eq "/health_check"
+      expect(service1.listeners.first.rule_priority).to eq 99
+      expect(service1.listeners.first.rule_conditions).to eq [{"type" => 'path_pattern',
+                                                               "value" => '/app*'}]
+      expect(service1.listeners.first.endpoint).to eq endpoint
 
       service2 = heritage.services.second
       expect(service2.name).to eq "worker"
@@ -98,6 +117,10 @@ describe BuildHeritage do
         expect(service1.port_mappings.count).to eq 1
         expect(service1.port_mappings.first.lb_port).to eq 80
         expect(service1.port_mappings.first.container_port).to eq 3000
+        expect(service1.listeners.count).to eq 1
+        expect(service1.listeners.first.health_check_interval).to eq 5
+        expect(service1.listeners.first.health_check_path).to eq "/health_check"
+        expect(service1.listeners.first.endpoint.name).to eq endpoint.name
 
         service2 = @updated_heritage.services.second
         expect(service2.name).to eq "worker"
@@ -202,6 +225,40 @@ describe BuildHeritage do
         service3 = @updated_heritage.services.third
         expect(service3.name).to eq "another-service"
         expect(service3.command).to eq "command"
+      end
+    end
+
+    context "changing endpoints" do
+      let(:endpoint2) { district.endpoints.create!(name: "load-balancer2") }
+      before do
+        new_params = params.dup
+        new_params[:services][0][:listeners][0] = {endpoint: endpoint2.name}
+        @updated_heritage = BuildHeritage.new(new_params).execute
+        @updated_heritage.save!
+      end
+
+      it "updates listners" do
+        service1 = @updated_heritage.services.first
+        expect(service1).to be_present
+        expect(service1.listeners.count).to eq 1
+        expect(service1.listeners.first.health_check_interval).to eq 30
+        expect(service1.listeners.first.health_check_path).to eq "/"
+        expect(service1.listeners.first.endpoint.name).to eq endpoint2.name
+      end
+    end
+
+    context "deleting listeners" do
+      before do
+        new_params = params.dup
+        new_params[:services][0].delete(:listeners)
+        @updated_heritage = BuildHeritage.new(new_params).execute
+        @updated_heritage.save!
+      end
+
+      it "deletes listners" do
+        service1 = @updated_heritage.services.first
+        expect(service1).to be_present
+        expect(service1.listeners.count).to eq 0
       end
     end
   end

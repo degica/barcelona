@@ -2,6 +2,7 @@ class Service < ActiveRecord::Base
   DEFAULT_REVERSE_PROXY = 'quay.io/degica/barcelona-reverse-proxy:latest'
 
   belongs_to :heritage, inverse_of: :services
+  has_many :listeners, inverse_of: :service, dependent: :destroy
   has_many :port_mappings, inverse_of: :service, dependent: :destroy
 
   serialize :hosts, JSON
@@ -17,8 +18,10 @@ class Service < ActiveRecord::Base
   validates :name, :service_type, :public, immutable: true
   validates :command, presence: true
   validate :validate_health_check
+  validate :validate_listener_count
 
   accepts_nested_attributes_for :port_mappings
+  accepts_nested_attributes_for :listeners, allow_destroy: true
 
   after_initialize do |service|
     service.cpu ||= 512
@@ -78,6 +81,13 @@ class Service < ActiveRecord::Base
   end
 
   private
+
+  def validate_listener_count
+    # Currently ECS doesn't allow multiple target groups
+    if listeners.count > 1
+      errors.add(:listeners, "must be less than or equal to 1")
+    end
+  end
 
   def create_port_mappings
     return unless web?

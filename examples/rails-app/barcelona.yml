@@ -2,7 +2,6 @@ environments:
   production:
     name: rails-app
     image_name: k2nr/rails-docker-sample
-    before_deploy: rake db:migrate
     services:
       - name: web
         service_type: web
@@ -10,3 +9,10 @@ environments:
         cpu: 128
         memory: 256
         command: rails s -p $PORT -b 0.0.0.0
+        listeners:
+          - endpoint: test-endpoint
+            health_check_interval: 10
+            health_check_path: /
+            rule_conditions:
+              - type: path-pattern
+                value: '*'
