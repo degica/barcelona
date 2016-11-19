@@ -49,9 +49,64 @@ describe Heritage::Stack do
             "LogGroupName" => "Barcelona/#{heritage.district.name}/#{heritage.name}",
             "RetentionInDays" => 365
           }
+        },
+        "TaskRole" => {
+          "Type" => "AWS::IAM::Role",
+          "Properties" => {
+            "AssumeRolePolicyDocument" => {
+              "Version" => "2012-10-17",
+              "Statement" => [
+                {
+                  "Effect"=>"Allow",
+                  "Principal" => {
+                    "Service" => [
+                      "ecs-tasks.amazonaws.com"
+                    ]
+                  },
+                  "Action" => [
+                    "sts:AssumeRole"
+                  ]
+                }
+              ]
+            },
+            "Path" => "/",
+            "Policies" => [
+              {
+                "PolicyName" => "barcelona-ecs-task-role-#{heritage.name}",
+                "PolicyDocument" => {
+                  "Version" => "2012-10-17",
+                  "Statement" => [
+                    {
+                      "Effect" => "Allow",
+                      "Action" => [
+                        "s3:Get*",
+                        "s3:List*",
+                        "logs:CreateLogStream",
+                        "logs:PutLogEvents"
+                      ],
+                      "Resource"=>["*"]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
         }
       }
       expect(generated["Resources"]).to eq expected
+    end
+
+    context "when a heritage has scheduled tasks" do
+      let(:heritage) { build :heritage,
+                             scheduled_tasks: [{schedule: 'rate(1 minute)',
+                                                command: 'echo hello'}] }
+      it "generates a correct stack template" do
+        generated = JSON.load stack.target!
+        expect(generated["Resources"]["ScheduledEvent0"]).to be_present
+        expect(generated["Resources"]["PermissionForScheduledEvent0"]).to be_present
+        expect(generated["Resources"]["ScheduleHandler"]).to be_present
+        expect(generated["Resources"]["ScheduleHandlerRole"]).to be_present
+      end
     end
   end
 end

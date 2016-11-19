@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161008153656) do
+ActiveRecord::Schema.define(version: 20161106141820) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -86,16 +86,18 @@ ActiveRecord::Schema.define(version: 20161008153656) do
   add_index "events", ["uuid"], name: "index_events_on_uuid", unique: true, using: :btree
 
   create_table "heritages", force: :cascade do |t|
-    t.string   "name",          null: false
+    t.string   "name",            null: false
     t.string   "image_name"
     t.string   "image_tag"
     t.integer  "district_id"
-    t.datetime "created_at",    null: false
-    t.datetime "updated_at",    null: false
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
     t.text     "before_deploy"
     t.text     "slack_url"
     t.string   "token"
     t.integer  "version"
+    t.text     "aws_actions"
+    t.text     "scheduled_tasks"
   end
 
   add_index "heritages", ["district_id"], name: "index_heritages_on_district_id", using: :btree
@@ -174,6 +176,7 @@ ActiveRecord::Schema.define(version: 20161008153656) do
     t.boolean  "force_ssl"
     t.text     "hosts"
     t.text     "health_check"
+    t.text     "auto_scaling"
   end
 
   add_index "services", ["heritage_id"], name: "index_services_on_heritage_id", using: :btree
