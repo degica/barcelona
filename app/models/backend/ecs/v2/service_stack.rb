@@ -2,6 +2,49 @@ module Backend::Ecs::V2
   class ServiceStack < CloudFormation::Stack
     class Builder < CloudFormation::Builder
       def build_resources
+        add_resource("AWS::ECS::Service", "ECSService") do |j|
+          j.Cluster district.name
+          j.TaskDefinition options[:task_definition]
+          j.DesiredCount options[:desired_count]
+          if use_tcp_load_balancer?
+            port_mapping = service.port_mappings.lb_registerable.first
+            container_name = service.service_name
+            container_port = port_mapping.container_port
+            if port_mapping.http? || port_mapping.https?
+              container_name = "#{service.service_name}-revpro"
+              container_port = port_mapping.lb_port
+            end
+
+            j.Role ref("ECSServiceRole")
+            j.LoadBalancers [
+              {
+                "LoadBalancerName" => ref("ClassicLoadBalancer"),
+                "ContainerPort" => container_port,
+                "ContainerName" => container_name
+              }
+            ]
+          elsif use_alb?
+            j.Role ref("ECSServiceRole")
+            j.LoadBalancers [
+              {
+                "TargetGroupArn" => ref("LBTargetGroup1"),
+                "ContainerPort" => 80,
+                "ContainerName" => "#{service.service_name}-revpro"
+              }
+            ]
+          end
+        end
+
+        if use_tcp_load_balancer?
+          build_service_role
+          build_classic_elb
+        elsif use_alb?
+          build_service_role
+          build_alb_listener
+        end
+      end
+
+      def build_service_role
         add_resource("AWS::IAM::Role", "ECSServiceRole") do |j|
           j.AssumeRolePolicyDocument do |j|
             j.Version "2008-10-17"
@@ -41,44 +84,6 @@ module Backend::Ecs::V2
               }
             }
           ]
-        end
-
-        add_resource("AWS::ECS::Service", "ECSService") do |j|
-          j.Cluster district.name
-          j.Role ref("ECSServiceRole")
-          j.TaskDefinition options[:task_definition]
-          j.DesiredCount options[:desired_count]
-          if use_tcp_load_balancer?
-            port_mapping = service.port_mappings.lb_registerable.first
-            container_name = service.service_name
-            container_port = port_mapping.container_port
-            if port_mapping.http? || port_mapping.https?
-              container_name = "#{service.service_name}-revpro"
-              container_port = port_mapping.lb_port
-            end
-
-            j.LoadBalancers [
-              {
-                "LoadBalancerName" => ref("ClassicLoadBalancer"),
-                "ContainerPort" => container_port,
-                "ContainerName" => container_name
-              }
-            ]
-          elsif use_alb?
-            j.LoadBalancers [
-              {
-                "TargetGroupArn" => ref("LBTargetGroup1"),
-                "ContainerPort" => 80,
-                "ContainerName" => "#{service.service_name}-revpro"
-              }
-            ]
-          end
-        end
-
-        if use_tcp_load_balancer?
-          build_classic_elb
-        elsif use_alb?
-          build_alb_listener
         end
       end
 
