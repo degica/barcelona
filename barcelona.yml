@@ -1,5 +1,6 @@
 environments:
   production:
+    version: 2
     name: barcelona
     image_name: quay.io/degica/barcelona
     before_deploy: rake db:migrate
@@ -7,15 +8,13 @@ environments:
     services:
       - name: web
         service_type: web
-        public: true
         cpu: 128
         memory: 256
         command: puma -C config/puma.rb
         force_ssl: true
-        hosts:
-          - hostname: barcelona.degica.com
-            ssl_cert_path: s3://degica2-barcelona/certs/degica.com.crt
-            ssl_key_path:  s3://degica2-barcelona/certs/degica.com.key
+        listners:
+          - endpoint: barcelona
+            health_check_path: /health_check
       - name: worker
         command: rake jobs:work
         cpu: 128
