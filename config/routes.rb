@@ -30,4 +30,6 @@ Rails.application.routes.draw do
     patch "/user", to: "users#update"
     get "/user", to: "users#show"
   end
+
+  get "/health_check", to: "health_check#index"
 end
