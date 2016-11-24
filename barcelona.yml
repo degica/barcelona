@@ -12,7 +12,7 @@ environments:
         memory: 256
         command: puma -C config/puma.rb
         force_ssl: true
-        listners:
+        listeners:
           - endpoint: barcelona
             health_check_path: /health_check
       - name: worker
