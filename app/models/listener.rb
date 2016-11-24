@@ -8,7 +8,7 @@ class Listener < ActiveRecord::Base
   after_initialize do |lis|
     lis.health_check_interval ||= 30
     lis.health_check_path ||= '/'
-    lis.rule_conditions ||= [{type: "path-pattern", value: "/"}]
+    lis.rule_conditions ||= [{type: "path-pattern", value: "*"}]
     lis.rule_priority ||= 100
   end
 end
