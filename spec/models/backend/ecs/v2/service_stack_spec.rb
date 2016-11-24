@@ -7,7 +7,7 @@ describe Backend::Ecs::V2::ServiceStack do
 
   it "generates resources" do
     generated = JSON.load stack.target!
-    expect(generated["Resources"]["ECSServiceRole"]).to be_present
+    expect(generated["Resources"]["ECSServiceRole"]).to_not be_present
     expect(generated["Resources"]["ECSService"]).to be_present
   end
 
@@ -25,6 +25,7 @@ describe Backend::Ecs::V2::ServiceStack do
       expect(generated["Resources"]["LBTargetGroup1"]).to_not be_present
       expect(generated["Resources"]["LBListenerRuleHTTP"]).to_not be_present
       expect(generated["Resources"]["LBListenerRuleHTTPS"]).to_not be_present
+      expect(generated["Resources"]["ECSServiceRole"]).to be_present
     end
   end
 
@@ -45,6 +46,7 @@ describe Backend::Ecs::V2::ServiceStack do
         expect(generated["Resources"]["LBListenerRuleHTTP"]).to be_present
         expect(generated["Resources"]["LBListenerRuleHTTPS"]).to be_present
         expect(generated["Resources"]["ClassicLoadBalancer"]).to_not be_present
+        expect(generated["Resources"]["ECSServiceRole"]).to be_present
       end
     end
   end
