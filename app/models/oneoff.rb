@@ -29,7 +29,7 @@ class Oneoff < ActiveRecord::Base
     @task = resp.tasks[0]
     self.task_arn = @task.task_arn
     if sync
-      300.times do
+      3000.times do
         break if stopped?
         sleep 3
       end
