@@ -42,16 +42,8 @@ describe Heritage::Stack do
   describe "#target!" do
     it "generates a correct stack template" do
       generated = JSON.load stack.target!
-      expected = {
-        "LogGroup" => {
-          "Type" => "AWS::Logs::LogGroup",
-          "Properties" => {
-            "LogGroupName" => "Barcelona/#{heritage.district.name}/#{heritage.name}",
-            "RetentionInDays" => 365
-          }
-        }
-      }
-      expect(generated["Resources"]).to eq expected
+      expect(generated["Resources"]["LogGroup"]).to be_present
+      expect(generated["Resources"]["TaskRole"]).to be_present
     end
 
     context "when a heritage has scheduled tasks" do
@@ -60,6 +52,7 @@ describe Heritage::Stack do
                                                 command: 'echo hello'}] }
       it "generates a correct stack template" do
         generated = JSON.load stack.target!
+        expect(generated["Resources"]["ScheduleTaskDefinition"]).to be_present
         expect(generated["Resources"]["ScheduledEvent0"]).to be_present
         expect(generated["Resources"]["PermissionForScheduledEvent0"]).to be_present
         expect(generated["Resources"]["ScheduleHandler"]).to be_present

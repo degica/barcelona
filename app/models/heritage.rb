@@ -7,6 +7,15 @@ class Heritage < ActiveRecord::Base
       end
 
       if heritage.scheduled_tasks.present?
+        definition = HeritageTaskDefinition.schedule_definition(heritage).
+                       to_task_definition(without_task_role: true).
+                       deep_transform_keys { |k| k =~ /^[\w]+$/ ? k.to_s.camelize : k }
+        add_resource("AWS::ECS::TaskDefinition", "ScheduleTaskDefinition") do |j|
+          j.ContainerDefinitions definition["ContainerDefinitions"]
+          j.Family definition["Family"]
+          j.TaskRoleArn ref("TaskRole")
+        end
+
         heritage.scheduled_tasks.each_with_index do |s, i|
           event_name =  "ScheduledEvent#{i}"
           command = s["command"]
@@ -83,6 +92,46 @@ class Heritage < ActiveRecord::Base
             }
           ]
         end
+      end
+
+      add_resource("AWS::IAM::Role", "TaskRole") do |j|
+        j.AssumeRolePolicyDocument do |j|
+          j.Version "2012-10-17"
+          j.Statement [
+            {
+              "Effect" => "Allow",
+              "Principal" => {
+                "Service" => ["ecs-tasks.amazonaws.com"]
+              },
+              "Action" => ["sts:AssumeRole"]
+            }
+          ]
+        end
+        j.Path "/"
+        j.Policies [
+          {
+            "PolicyName" => "barcelona-ecs-task-role-#{heritage.name}",
+            "PolicyDocument" => {
+              "Version" => "2012-10-17",
+              "Statement" => [
+                {
+                  "Effect" => "Allow",
+                  "Action" => ["logs:CreateLogStream",
+                               "logs:PutLogEvents"],
+                  "Resource" => ["*"]
+                },
+                {
+                  "Effect" => "Allow",
+                  "Action" => ["s3:GetObject"],
+                  "Resource" => [
+                    "arn:aws:s3:::#{heritage.district.s3_bucket_name}/heritages/#{heritage.name}/*",
+                    "arn:aws:s3:::#{heritage.district.s3_bucket_name}/certs/*",
+                  ]
+                }
+              ]
+            }
+          }
+        ]
       end
     end
 
@@ -192,6 +241,11 @@ class Heritage < ActiveRecord::Base
   def log_group_name
     "Barcelona/#{district.name}/#{name}"
   end
+
+  def task_role_id
+    cf_executor&.resource_ids["TaskRole"]
+  end
+
   private
 
   def update_services(release, without_before_deploy)
@@ -211,8 +265,6 @@ class Heritage < ActiveRecord::Base
   end
 
   def apply_stack
-    definition = HeritageTaskDefinition.schedule_definition(self)
-    district.aws.ecs.register_task_definition(definition.to_task_definition)
     cf_executor.create_or_update
   end
 
