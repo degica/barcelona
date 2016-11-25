@@ -110,9 +110,12 @@ class HeritagesController < ApplicationController
             ]
           ]
         }
+      ],
+      scheduled_tasks: [
+        :schedule,
+        :command
       ]
     ]).tap do |whitelisted|
-      whitelisted[:scheduled_tasks] = params[:scheduled_tasks] if params[:scheduled_tasks].present?
       if params[:services].present?
         params[:services].each_with_index do |s, i|
           whitelisted[:services][i][:health_check] = s[:health_check].permit(:protocol, :port) if s.key?(:health_check)
