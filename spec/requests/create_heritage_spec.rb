@@ -10,6 +10,12 @@ describe "POST /districts/:district/heritages", type: :request do
       image_name: "nginx",
       image_tag: "latest",
       before_deploy: "echo hello",
+      scheduled_tasks: [
+        {
+          schedule: "rate(1 minute)",
+          command: "echo hello"
+        }
+      ],
       services: [
         {
           name: "web",
@@ -51,6 +57,8 @@ describe "POST /districts/:district/heritages", type: :request do
       expect(heritage["image_name"]).to eq "nginx"
       expect(heritage["image_tag"]).to eq "latest"
       expect(heritage["before_deploy"]).to eq "echo hello"
+      expect(heritage["scheduled_tasks"][0]["schedule"]).to eq "rate(1 minute)"
+      expect(heritage["scheduled_tasks"][0]["command"]).to eq "echo hello"
       expect(heritage["services"][0]["name"]).to eq "web"
       expect(heritage["services"][0]["public"]).to eq true
       expect(heritage["services"][0]["cpu"]).to eq 128
