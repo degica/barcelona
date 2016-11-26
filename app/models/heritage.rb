@@ -10,7 +10,7 @@ class Heritage < ActiveRecord::Base
         definition = HeritageTaskDefinition.schedule_definition(heritage).
                        to_task_definition(without_task_role: true).
                        deep_transform_keys { |k| k =~ /^[\w]+$/ ? k.to_s.camelize : k }
-        add_resource("AWS::ECS::TaskDefinition", "ScheduleTaskDefinition") do |j|
+        add_resource("AWS::ECS::TaskDefinition", "ScheduleTaskDefinition", retain: true) do |j|
           j.ContainerDefinitions definition["ContainerDefinitions"]
           j.Family definition["Family"]
           j.TaskRoleArn ref("TaskRole")
