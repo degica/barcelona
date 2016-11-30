@@ -25,7 +25,7 @@ describe HeritageTaskDefinition do
     it "returns a task definition for the service" do
       expect(subject).to eq({
                               family: service.service_name,
-                              task_role_arn: "task-role",
+#                              task_role_arn: "task-role",
                               container_definitions: [
                                 {
                                   name: service.service_name,
@@ -61,7 +61,7 @@ describe HeritageTaskDefinition do
       it "returns a task definition for the service" do
         expect(subject).to eq({
                                 family: service.service_name,
-                                task_role_arn: "task-role",
+#                                task_role_arn: "task-role",
                                 container_definitions: [
                                   {
                                     environment: [
@@ -162,7 +162,7 @@ describe HeritageTaskDefinition do
     it "returns a task definition for the oneoff" do
       expect(subject).to eq({
                               family: "#{heritage.name}-oneoff",
-                              task_role_arn: "task-role",
+#                              task_role_arn: "task-role",
                               container_definitions: [
                                 {
                                   name:  "#{heritage.name}-oneoff",
