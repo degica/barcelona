@@ -103,7 +103,7 @@ describe Barcelona::Network::NetworkStack do
             "MaxBatchSize" => 1,
             "MinInstancesInService" => 1,
             "WaitOnResourceSignals" => true,
-            "PauseTime" => "PT20M"
+            "PauseTime" => "PT60M"
           }
         }
       },
