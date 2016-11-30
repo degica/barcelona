@@ -34,7 +34,7 @@ class HeritageTaskDefinition
         memory: 512)
   end
 
-  def to_task_definition
+  def to_task_definition(without_task_role: true)
     containers = [container_definition, run_pack_definition]
     if web_service?
       containers << case mode
@@ -44,7 +44,9 @@ class HeritageTaskDefinition
                       reverse_proxy_definition_alb
                     end
     end
-    {family: family_name, container_definitions: containers}
+    ret = {family: family_name, container_definitions: containers}
+    ret = ret.merge(task_role_arn: heritage.task_role_id) unless without_task_role
+    ret
   end
 
   private

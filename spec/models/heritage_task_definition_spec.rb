@@ -18,9 +18,14 @@ describe HeritageTaskDefinition do
     let(:heritage) { create :heritage, version: 1, district: district }
     let(:service)  { create :service, heritage: heritage }
 
+    before do
+      allow(heritage).to receive(:task_role_id) { "task-role" }
+    end
+
     it "returns a task definition for the service" do
       expect(subject).to eq({
                               family: service.service_name,
+#                              task_role_arn: "task-role",
                               container_definitions: [
                                 {
                                   name: service.service_name,
@@ -56,6 +61,7 @@ describe HeritageTaskDefinition do
       it "returns a task definition for the service" do
         expect(subject).to eq({
                                 family: service.service_name,
+#                                task_role_arn: "task-role",
                                 container_definitions: [
                                   {
                                     environment: [
@@ -149,9 +155,14 @@ describe HeritageTaskDefinition do
     let(:heritage) { oneoff.heritage }
     let(:district) { oneoff.district }
 
+    before do
+      allow(heritage).to receive(:task_role_id) { "task-role" }
+    end
+
     it "returns a task definition for the oneoff" do
       expect(subject).to eq({
                               family: "#{heritage.name}-oneoff",
+#                              task_role_arn: "task-role",
                               container_definitions: [
                                 {
                                   name:  "#{heritage.name}-oneoff",
