@@ -30,7 +30,7 @@ module Barcelona
             j.MaxBatchSize 1
             j.MinInstancesInService desired_capacity
             j.WaitOnResourceSignals true
-            j.PauseTime "PT20M"
+            j.PauseTime "PT60M"
           end
         end
       end
