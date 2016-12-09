@@ -12,7 +12,8 @@ module Barcelona
         "eu-central-1" => "ami-0044b96f",
         "ap-northeast-1" => "ami-1a15c77b",
         "ap-southeast-1" => "ami-7243e611",
-        "ap-southeast-2" => "ami-55d4e436"
+        "ap-southeast-2" => "ami-55d4e436",
+        "ca-central-1" => "ami-b48b39d0"
       }
 
       def self.type
