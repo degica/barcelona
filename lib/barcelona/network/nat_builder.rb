@@ -11,7 +11,8 @@ module Barcelona
         "eu-central-1" => "ami-b646bbd9",
         "ap-northeast-1" => "ami-831fcde2",
         "ap-southeast-1" => "ami-9c40e5ff",
-        "ap-southeast-2" => "ami-addbebce"
+        "ap-southeast-2" => "ami-addbebce",
+        "ca-central-1" => "ami-a88735cc"
       }
 
       def build_resources
