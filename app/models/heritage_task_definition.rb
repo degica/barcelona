@@ -34,7 +34,7 @@ class HeritageTaskDefinition
         memory: 512)
   end
 
-  def to_task_definition(without_task_role: true)
+  def to_task_definition(without_task_role: false)
     containers = [container_definition, run_pack_definition]
     if web_service?
       containers << case mode
