@@ -19,13 +19,13 @@ describe Barcelona::Network::NetworkStack do
           "EnableDnsHostnames" => true,
           "Tags" =>
           [{"Key" => "Name", "Value" => {"Ref" => "AWS::StackName"}},
-           {"Key" => "Application", "Value" => {"Ref" => "AWS::StackName"}}]}},
+           {"Key" => "barcelona", "Value" => district.name}]}},
       "InternetGateway" => {
         "Type" => "AWS::EC2::InternetGateway",
         "Properties" => {
           "Tags" =>
           [{"Key" => "Name", "Value" => {"Ref" => "AWS::StackName"}},
-           {"Key" => "Application", "Value" => {"Ref" => "AWS::StackName"}},
+           {"Key" => "barcelona", "Value" => district.name},
            {"Key" => "Network", "Value" => "Public"}]}},
       "VPCGatewayAttachment" => {
         "Type" => "AWS::EC2::VPCGatewayAttachment",
@@ -95,7 +95,9 @@ describe Barcelona::Network::NetworkStack do
             {"Ref"=>"SubnetTrusted2"}
           ],
           "Tags" => [
-            {"Key"=>"Name", "Value"=>"barcelona-container-instance", "PropagateAtLaunch"=>true}
+            {"Key"=>"Name", "Value"=>"barcelona-container-instance", "PropagateAtLaunch"=>true},
+            {"Key"=>"barcelona", "Value"=>district.name, "PropagateAtLaunch"=>true},
+            {"Key"=>"barcelona-role", "Value"=>"ci", "PropagateAtLaunch"=>true}
           ]
         },
         "UpdatePolicy" => {
@@ -206,6 +208,14 @@ describe Barcelona::Network::NetworkStack do
             {
               "Key" => "Name",
               "Value" => {"Fn::Join"=>["-", [{"Ref"=>"AWS::StackName"}, "bastion"]]}
+            },
+            {
+              "Key" => "barcelona",
+              "Value" => district.name
+            },
+            {
+              "Key" => "barcelona-role",
+              "Value" => "bastion"
             }
           ]
         }
@@ -312,7 +322,7 @@ describe Barcelona::Network::NetworkStack do
           "VpcId" => {"Ref" => "VPC"},
           "Tags" => [
             {"Key" => "Name", "Value" => {"Fn::Join" => ["-", [{"Ref" => "AWS::StackName"}, "public"]]}},
-            {"Key" => "Application", "Value" => {"Ref" => "AWS::StackName"}},
+            {"Key" => "barcelona", "Value" => district.name},
             {"Key" => "Network", "Value" => "Public"}]}},
       "RouteDmz1" => {
         "Type" => "AWS::EC2::Route",
@@ -327,7 +337,7 @@ describe Barcelona::Network::NetworkStack do
           "VpcId" => {"Ref" => "VPC"},
           "Tags" => [
             {"Key" => "Name", "Value" => {"Fn::Join" => ["-", [{"Ref" => "AWS::StackName"}, "public"]]}},
-            {"Key" => "Application", "Value" => {"Ref" => "AWS::StackName"}},
+            {"Key" => "barcelona", "Value" => district.name},
             {"Key" => "Network", "Value" => "Public"}]}},
       "InboundNetworkAclEntryDmz10" => {
         "Type" => "AWS::EC2::NetworkAclEntry",
@@ -419,7 +429,7 @@ describe Barcelona::Network::NetworkStack do
           "Tags" => [
             {"Key" => "Name",
              "Value" => {"Fn::Join" => ["-", [{"Ref" => "AWS::StackName"}, "Dmz1"]]}},
-            {"Key" => "Application", "Value" => {"Ref" => "AWS::StackName"}},
+            {"Key" => "barcelona", "Value" => district.name},
             {"Key" => "Network", "Value" => "Public"}]}},
       "SubnetRouteTableAssociationDmz1" => {
         "Type" => "AWS::EC2::SubnetRouteTableAssociation",
@@ -436,7 +446,7 @@ describe Barcelona::Network::NetworkStack do
           "VpcId" => {"Ref" => "VPC"},
           "Tags" => [
             {"Key" => "Name", "Value" => {"Fn::Join" => ["-", [{"Ref" => "AWS::StackName"}, "public"]]}},
-            {"Key" => "Application", "Value" => {"Ref" => "AWS::StackName"}},
+            {"Key" => "barcelona", "Value" => district.name},
             {"Key" => "Network", "Value" => "Public"}]}},
       "RouteDmz2" => {
         "Type" => "AWS::EC2::Route",
@@ -451,7 +461,7 @@ describe Barcelona::Network::NetworkStack do
           "VpcId" => {"Ref" => "VPC"},
           "Tags" => [
             {"Key" => "Name", "Value" => {"Fn::Join" => ["-", [{"Ref" => "AWS::StackName"}, "public"]]}},
-            {"Key" => "Application", "Value" => {"Ref" => "AWS::StackName"}},
+            {"Key" => "barcelona", "Value" => district.name},
             {"Key" => "Network", "Value" => "Public"}]}},
       "InboundNetworkAclEntryDmz20" => {
         "Type" => "AWS::EC2::NetworkAclEntry",
@@ -541,7 +551,7 @@ describe Barcelona::Network::NetworkStack do
           "AvailabilityZone" => {"Fn::Select" => [1, {"Fn::GetAZs" => {"Ref" => "AWS::Region"}}]},
           "Tags" => [
             {"Key" => "Name", "Value" => {"Fn::Join" => ["-", [{"Ref" => "AWS::StackName"}, "Dmz2"]]}},
-            {"Key" => "Application", "Value" => {"Ref" => "AWS::StackName"}},
+            {"Key" => "barcelona", "Value" => district.name},
             {"Key" => "Network", "Value" => "Public"}]}},
       "SubnetRouteTableAssociationDmz2" => {
         "Type" => "AWS::EC2::SubnetRouteTableAssociation",
@@ -559,7 +569,7 @@ describe Barcelona::Network::NetworkStack do
           "VpcId" => {"Ref" => "VPC"},
           "Tags" => [
             {"Key" => "Name", "Value" => {"Fn::Join" => ["-", [{"Ref" => "AWS::StackName"}, "private"]]}},
-            {"Key" => "Application", "Value" => {"Ref" => "AWS::StackName"}},
+            {"Key" => "barcelona", "Value" => district.name},
             {"Key" => "Network", "Value" => "Private"}]}},
       "NetworkAclTrusted1" => {
         "Type" => "AWS::EC2::NetworkAcl",
@@ -567,7 +577,7 @@ describe Barcelona::Network::NetworkStack do
           "VpcId" => {"Ref" => "VPC"},
           "Tags" => [
             {"Key" => "Name", "Value" => {"Fn::Join" => ["-", [{"Ref" => "AWS::StackName"}, "private"]]}},
-            {"Key" => "Application", "Value" => {"Ref" => "AWS::StackName"}},
+            {"Key" => "barcelona", "Value" => district.name},
             {"Key" => "Network", "Value" => "Private"}]}},
       "InboundNetworkAclEntryTrusted10" => {
         "Type" => "AWS::EC2::NetworkAclEntry",
@@ -657,7 +667,7 @@ describe Barcelona::Network::NetworkStack do
           "AvailabilityZone" => {"Fn::Select" => [0, {"Fn::GetAZs" => {"Ref" => "AWS::Region"}}]},
           "Tags" => [
             {"Key" => "Name", "Value" => {"Fn::Join" => ["-", [{"Ref" => "AWS::StackName"}, "Trusted1"]]}},
-            {"Key" => "Application", "Value" => {"Ref" => "AWS::StackName"}},
+            {"Key" => "barcelona", "Value" => district.name},
             {"Key" => "Network", "Value" => "Private"}]}},
       "SubnetRouteTableAssociationTrusted1" => {
         "Type" => "AWS::EC2::SubnetRouteTableAssociation",
@@ -675,7 +685,7 @@ describe Barcelona::Network::NetworkStack do
           "VpcId" => {"Ref" => "VPC"},
           "Tags" => [
             {"Key" => "Name", "Value" => {"Fn::Join" => ["-", [{"Ref" => "AWS::StackName"}, "private"]]}},
-            {"Key" => "Application", "Value" => {"Ref" => "AWS::StackName"}},
+            {"Key" => "barcelona", "Value" => district.name},
             {"Key" => "Network", "Value" => "Private"}]}},
       "NetworkAclTrusted2" => {
         "Type" => "AWS::EC2::NetworkAcl",
@@ -683,7 +693,7 @@ describe Barcelona::Network::NetworkStack do
           "VpcId" => {"Ref" => "VPC"},
           "Tags" => [
             {"Key" => "Name", "Value" => {"Fn::Join" => ["-", [{"Ref" => "AWS::StackName"}, "private"]]}},
-            {"Key" => "Application", "Value" => {"Ref" => "AWS::StackName"}},
+            {"Key" => "barcelona", "Value" => district.name},
             {"Key" => "Network", "Value" => "Private"}]}},
       "InboundNetworkAclEntryTrusted20" => {
         "Type" => "AWS::EC2::NetworkAclEntry",
@@ -774,7 +784,7 @@ describe Barcelona::Network::NetworkStack do
             "Fn::Select" => [1, {"Fn::GetAZs" => {"Ref" => "AWS::Region"}}]},
           "Tags" => [
             {"Key" => "Name", "Value" => {"Fn::Join" => ["-", [{"Ref" => "AWS::StackName"}, "Trusted2"]]}},
-            {"Key" => "Application", "Value" => {"Ref" => "AWS::StackName"}},
+            {"Key" => "barcelona", "Value" => district.name},
             {"Key" => "Network", "Value" => "Private"}]}},
       "SubnetRouteTableAssociationTrusted2" => {
         "Type" => "AWS::EC2::SubnetRouteTableAssociation",

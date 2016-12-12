@@ -14,7 +14,7 @@ module Barcelona
           j.VpcId ref("VPC")
           j.Tags [
             tag("Name", join("-", cf_stack_name, network_type)),
-            tag("Application", cf_stack_name),
+            tag("barcelona", stack.district.name),
             tag("Network", network_type.camelize)
           ]
         end
@@ -32,7 +32,7 @@ module Barcelona
           j.VpcId ref("VPC")
           j.Tags [
             tag("Name", join("-", cf_stack_name, network_type)),
-            tag("Application", cf_stack_name),
+            tag("barcelona", stack.district.name),
             tag("Network", network_type.camelize)
           ]
         end
@@ -88,7 +88,7 @@ module Barcelona
           j.AvailabilityZone select(az_index, azs)
           j.Tags [
             tag("Name", join("-", cf_stack_name, name.camelize)),
-            tag("Application", cf_stack_name),
+            tag("barcelona", stack.district.name),
             tag("Network", network_type.camelize)
           ]
         end

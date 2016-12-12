@@ -104,6 +104,10 @@ module Backend::Ecs::V2
             j.UnhealthyThreshold 2
             j.HealthyThreshold 2
           end
+          j.Tags [
+            tag("barcelona", district.name),
+            tag("barcelona-heritage", service.heritage.name)
+          ]
           j.Listeners(service.port_mappings.lb_registerable.map { |pm|
             {
               "Protocol" => "TCP",
@@ -174,6 +178,9 @@ module Backend::Ecs::V2
           j.Protocol "HTTP"
           j.TargetGroupAttributes [
             {"Key" => "deregistration_delay.timeout_seconds", "Value" => "60"}
+          ]
+          j.Tags [
+            tag("barcelona", district.name)
           ]
         end
       end

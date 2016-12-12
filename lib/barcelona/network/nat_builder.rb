@@ -45,7 +45,8 @@ module Barcelona
               }
             ]
             j.Tags [
-              tag("Application", cf_stack_name),
+              tag("barcelona", stack.district.name),
+              tag("barcelona-role", "nat"),
               tag("Name", join('-', cf_stack_name, nat_name))
             ]
           end

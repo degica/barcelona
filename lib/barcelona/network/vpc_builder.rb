@@ -78,14 +78,14 @@ module Barcelona
           j.EnableDnsHostnames true
           j.Tags [
             tag("Name", cf_stack_name),
-            tag("Application", cf_stack_name)
+            tag("barcelona", stack.district.name)
           ]
         end
 
         add_resource("AWS::EC2::InternetGateway", "InternetGateway") do |j|
           j.Tags [
             tag("Name", cf_stack_name),
-            tag("Application", cf_stack_name),
+            tag("barcelona", stack.district.name),
             tag("Network", "Public")
           ]
         end

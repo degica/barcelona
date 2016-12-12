@@ -35,7 +35,9 @@ module Barcelona
             }
           ]
           j.Tags [
-            tag("Name", join("-", cf_stack_name, "bastion"))
+            tag("Name", join("-", cf_stack_name, "bastion")),
+            tag("barcelona", district.name),
+            tag("barcelona-role", "bastion"),
           ]
         end
       end
