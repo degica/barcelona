@@ -65,7 +65,10 @@ describe Barcelona::Network::NetworkStack do
             {"IpProtocol" => "-1",
              "FromPort" => "-1",
              "ToPort" => "-1",
-             "CidrIp" => district.cidr_block}]}},
+             "CidrIp" => district.cidr_block}],
+          "Tags" => [{"Key" => "barcelona", "Value" => district.name}],
+        }
+      },
       "PrivateELBSecurityGroup" => {
         "Type" => "AWS::EC2::SecurityGroup",
         "Properties" => {"GroupDescription" => "SG for Private ELB",
@@ -74,12 +77,18 @@ describe Barcelona::Network::NetworkStack do
                            {"IpProtocol" => "tcp",
                             "FromPort" => 1,
                             "ToPort" => 65535,
-                            "CidrIp" => district.cidr_block}]}},
+                            "CidrIp" => district.cidr_block}],
+                          "Tags" => [{"Key" => "barcelona", "Value" => district.name}],
+                        }
+      },
       "ContainerInstanceAccessibleSecurityGroup" => {
         "Type" => "AWS::EC2::SecurityGroup",
         "Properties" => {
           "GroupDescription" => "accessible to container instances",
-          "VpcId" => {"Ref" => "VPC"}}},
+          "VpcId" => {"Ref" => "VPC"},
+          "Tags" => [{"Key" => "barcelona", "Value" => district.name}]
+        }
+      },
       "ContainerInstanceAutoScalingGroup" => {
         "Type"=>"AWS::AutoScaling::AutoScalingGroup",
         "Properties" => {
@@ -156,7 +165,10 @@ describe Barcelona::Network::NetworkStack do
              "FromPort" => -1,
              "ToPort" => -1,
              "SourceSecurityGroupId" =>
-             {"Ref" => "ContainerInstanceAccessibleSecurityGroup"}}]}},
+             {"Ref" => "ContainerInstanceAccessibleSecurityGroup"}}],
+          "Tags" => [{"Key" => "barcelona", "Value" => district.name}]
+        }
+      },
       "InstanceSecurityGroupSelfIngress" => {
         "Type" => "AWS::EC2::SecurityGroupIngress",
         "Properties" => {
@@ -183,7 +195,10 @@ describe Barcelona::Network::NetworkStack do
             {"IpProtocol" => -1,
              "FromPort" => -1,
              "ToPort" => -1,
-             "CidrIp" => "0.0.0.0/0"}]}},
+             "CidrIp" => "0.0.0.0/0"}],
+          "Tags" => [{"Key" => "barcelona", "Value" => district.name}]
+        }
+      },
       "BastionServer" => {
         "DependsOn" => ["VPCGatewayAttachment"],
         "Type" => "AWS::EC2::Instance",

@@ -29,6 +29,9 @@ module Barcelona
                 "CidrIp" => options[:vpc_cidr_block]
               }
             ]
+            j.Tags [
+              tag("barcelona", stack.district.name)
+            ]
           end
 
           add_resource("AWS::EC2::Instance", nat_name,

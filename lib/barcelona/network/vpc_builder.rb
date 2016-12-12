@@ -135,6 +135,9 @@ module Barcelona
               "CidrIp" => options[:cidr_block]
             }
           ]
+          j.Tags [
+            tag("barcelona", stack.district.name)
+          ]
         end
 
         add_resource("AWS::EC2::SecurityGroup", "PrivateELBSecurityGroup") do |j|
@@ -148,11 +151,17 @@ module Barcelona
               "CidrIp" => options[:cidr_block]
             }
           ]
+          j.Tags [
+            tag("barcelona", stack.district.name)
+          ]
         end
 
         add_resource("AWS::EC2::SecurityGroup", "ContainerInstanceAccessibleSecurityGroup") do |j|
           j.GroupDescription "accessible to container instances"
           j.VpcId ref("VPC")
+          j.Tags [
+            tag("barcelona", stack.district.name)
+          ]
         end
 
         add_resource("AWS::EC2::SecurityGroup", "InstanceSecurityGroup") do |j|
@@ -190,6 +199,9 @@ module Barcelona
               "SourceSecurityGroupId" => ref("ContainerInstanceAccessibleSecurityGroup")
             }
           ]
+          j.Tags [
+            tag("barcelona", stack.district.name)
+          ]
         end
 
         add_resource("AWS::EC2::SecurityGroupIngress", "InstanceSecurityGroupSelfIngress") do |j|
@@ -224,6 +236,9 @@ module Barcelona
               "ToPort" => -1,
               "CidrIp" => "0.0.0.0/0"
             }
+          ]
+          j.Tags [
+            tag("barcelona", stack.district.name)
           ]
         end
 
