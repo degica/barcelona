@@ -1,8 +1,8 @@
 class AwsAccessor
-  def initialize(access_key_id, secret_access_key, region)
-    @access_key_id = access_key_id
-    @secret_access_key = secret_access_key
-    @region = region
+  attr_accessor :district
+  def initialize(district)
+    @district = district
+    @region = district.region
   end
 
   def ecs
@@ -36,9 +36,21 @@ class AwsAccessor
   end
 
   def credentials
-    Aws::Credentials.new(
-      @access_key_id || ENV['AWS_ACCESS_KEY_ID'],
-      @secret_access_key || ENV['AWS_SECRET_ACCESS_KEY']
+    if district.aws_role.present?
+      access_key_id, secret_access_key = assume_role
+    else
+      access_key_id, secret_access_key = [district.aws_access_key_id, district.aws_secret_access_key]
+    end
+    Aws::Credentials.new(access_key_id, secret_access_key)
+  end
+
+  def assume_role
+    sts = Aws::STS::Client.new()
+    resp = sts.assume_role(
+      duration_seconds: 3600,
+      role_arn: district.aws_role,
+      role_session_name: "barcelona-#{district.name}-session-#{Time.to_i}"
     )
+    [resp.credentials.access_key_id, resp.credentials.secret_access_key]
   end
 end

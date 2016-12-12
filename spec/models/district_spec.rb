@@ -8,15 +8,23 @@ describe District do
 
   describe "#validations" do
     let(:district) { build :district }
+
     before do
       allow(Rails).to receive_message_chain(:env, :test?) {
         false
       }
     end
-    context "when aws keys are nil" do
-      let(:district) { build :district }
+
+    context "when aws keys and role are nil" do
+      let(:district) { build :district, aws_role: nil, aws_access_key_id: nil, aws_secret_access_key: nil }
       it { expect(district).to_not be_valid }
     end
+
+    context "when role is present" do
+      let(:district) { build :district, aws_role: "role", aws_access_key_id: nil, aws_secret_access_key: nil }
+      it { expect(district).to be_valid }
+    end
+
     context "when aws keys are present" do
       let(:district) { build :district,
                              aws_access_key_id: "AWS_ACCESS_KEY_ID",
