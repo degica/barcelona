@@ -54,7 +54,9 @@ module Barcelona
 
         add_resource(AutoScalingGroup,
                      "ContainerInstanceAutoScalingGroup",
-                     desired_capacity: desired_capacity)
+                     desired_capacity: desired_capacity,
+                     district_name: stack.district.name
+                    )
       end
 
       def instance_user_data

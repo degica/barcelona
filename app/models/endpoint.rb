@@ -6,6 +6,9 @@ class Endpoint < ActiveRecord::Base
         j.Scheme lb_scheme
         j.SecurityGroups [lb_security_group]
         j.Subnets lb_subnets
+        j.Tags [
+          tag("barcelona", district.name)
+        ]
       end
 
       add_resource("AWS::ElasticLoadBalancingV2::Listener", "LBListenerHTTP") do |j|
@@ -33,6 +36,9 @@ class Endpoint < ActiveRecord::Base
         j.VpcId district.vpc_id
         j.Port 80
         j.Protocol "HTTP"
+        j.Tags [
+          tag("barcelona", district.name)
+        ]
       end
 
       add_resource("AWS::Route53::RecordSet", "RecordSet") do |j|

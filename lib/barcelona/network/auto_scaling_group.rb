@@ -21,6 +21,16 @@ module Barcelona
               "Key" => "Name",
               "Value" => "barcelona-container-instance",
               "PropagateAtLaunch" => true
+            },
+            {
+              "Key" => "barcelona",
+              "Value" => options[:district_name],
+              "PropagateAtLaunch" => true
+            },
+            {
+              "Key" => "barcelona-role",
+              "Value" => "ci",
+              "PropagateAtLaunch" => true
             }
           ]
         end
