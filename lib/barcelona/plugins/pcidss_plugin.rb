@@ -12,8 +12,9 @@ module Barcelona
             "-p 1514:1514/udp",
             "-p 1515:1515",
             "-v /ossec_mnt:/var/ossec/data",
+            "-e ELASTICSEARCH_URL=ossec-es.#{district.name}.bcn",
             "--name ossec",
-            "quay.io/degica/barcelona-wazuh"
+            "quay.io/degica/barcelona-ossec"
           ].join(" ")
           user_data.run_commands += [
             "set -e",
@@ -25,34 +26,107 @@ module Barcelona
 
         def build_resources
           private_hosted_zone = district.aws.route53.get_hosted_zone(id: district.private_hosted_zone_id).hosted_zone
-          add_resource("AWS::EC2::Instance", "OSSECManager") do |j|
-            j.InstanceType "t2.small"
-            j.ImageId "ami-1a15c77b"
-            j.KeyName "kkajihiro" # ERASEME
-            j.UserData manager_user_data.build
-            j.NetworkInterfaces [
-              {
-                "AssociatePublicIpAddress" => true,
-                "DeviceIndex" => 0,
-                "SubnetId" => district.stack_resources["SubnetDmz1"],
-                "GroupSet" => [ref("OSSECManagerSG")]
-              }
-            ]
+
+          add_resource("AWS::EC2::Volume", "OSSECManagerVolume") do |j|
+            j.AvailabilityZone "ap-northeast-1a"
+            j.Encrypted true
+            j.Size 8
             j.Tags [
-              tag("Name", join("-", cf_stack_name, "ossec-manager")),
+              tag("ossec-manager-volume"),
               tag("barcelona", district.name),
               tag("barcelona-role", "pcidss"),
             ]
           end
 
-          add_resource("AWS::Route53::RecordSet", "OSSECManagerRecordSet") do |j|
-            j.HostedZoneId district.private_hosted_zone_id
-            j.Name ["ossec-manager",
-                    district.name,
-                    private_hosted_zone.name].join(".")
-            j.TTL 60
-            j.Type "A"
-            j.ResourceRecords [get_attr("OSSECManager", "PrivateIp")]
+          add_resource("AWS::AutoScaling::LaunchConfiguration",
+                       "OSSECManagerLaunchConfiguration") do |j|
+            j.IamInstanceProfile ref("OSSECManagerInstanceProfile")
+            j.ImageId "ami-1a15c77b"
+            j.InstanceType "t2.small"
+            j.KeyName "kkajihiro" # ERASEME
+            j.SecurityGroups [ref("OSSECManagerSG")]
+            j.UserData manager_user_data.build
+            j.EbsOptimized false
+            j.BlockDeviceMappings [
+              {
+                "DeviceName" => "/dev/xvda",
+                "Ebs" => {
+                  "DeleteOnTermination" => true,
+                  "VolumeSize" => 8,
+                  "VolumeType" => "gp2"
+                }
+              },
+            ]
+          end
+
+          add_resource("AWS::IAM::Role", "OSSECManagerRole") do |j|
+            j.AssumeRolePolicyDocument do |j|
+              j.Version "2012-10-17"
+              j.Statement [
+                {
+                  "Effect" => "Allow",
+                  "Principal" => {
+                    "Service" => ["ec2.amazonaws.com"]
+                  },
+                  "Action" => ["sts:AssumeRole"]
+                }
+              ]
+            end
+            j.Path "/"
+            j.Policies [
+              {
+                "PolicyName" => "barcelona-ecs-container-instance-role",
+                "PolicyDocument" => {
+                  "Version" => "2012-10-17",
+                  "Statement" => [
+                    {
+                      "Effect" => "Allow",
+                      "Action" => [
+                        "ec2:DescribeVolumes",
+                        "ec2:AttachVolume",
+                        "logs:CreateLogGroup",
+                        "logs:CreateLogStream",
+                        "logs:DescribeLogStreams",
+                        "logs:PutLogEvents",
+                      ],
+                      "Resource" => ["*"]
+                    }
+                  ]
+                }
+              }
+            ]
+          end
+
+          add_resource("AWS::IAM::InstanceProfile", "OSSECManagerInstanceProfile") do |j|
+            j.Path "/"
+            j.Roles [ref("OSSECManagerRole")]
+          end
+
+          add_resource("AWS::AutoScaling::AutoScalingGroup", "OSSECManagerASG") do |j|
+            j.DesiredCapacity 1
+            j.HealthCheckGracePeriod 0
+            j.MaxSize 1
+            j.MinSize 1
+            j.HealthCheckType "EC2"
+            j.LaunchConfigurationName ref("OSSECManagerLaunchConfiguration")
+            j.VPCZoneIdentifier [district.stack_resources["SubnetDmz1"]]
+            j.Tags [
+              {
+                "Key" => "Name",
+                "Value" => join("-", cf_stack_name, "ossec-manager"),
+                "PropagateAtLaunch" => true
+              },
+              {
+                "Key" => "barcelona",
+                "Value" => district.name,
+                "PropagateAtLaunch" => true
+              },
+              {
+                "Key" => "barcelona-role",
+                "Value" => "pcidss",
+                "PropagateAtLaunch" => true
+              }
+            ]
           end
 
           add_resource("AWS::EC2::SecurityGroup", "OSSECManagerSG") do |j|
@@ -116,6 +190,18 @@ module Barcelona
                     }
                   },
                   "Resource" => "*"
+                },
+                {
+                  "Effect" => "Allow",
+                  "Principal" => {
+                    "AWS" => [
+                      "822761295011"
+                    ]
+                  },
+                  "Action" => [
+                    "es:*"
+                  ],
+                  "Resource" => "arn:aws:es:ap-northeast-1:822761295011:domain/test-di-elasti-tq9xmobctins/*"
                 }
               ]
             )
