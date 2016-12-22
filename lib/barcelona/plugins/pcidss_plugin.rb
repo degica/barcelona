@@ -6,7 +6,7 @@ module Barcelona
 
         def manager_user_data
           user_data = InstanceUserData.new
-          user_data.packages += ["docker"]
+          user_data.packages += ["docker", "jq"]
           docker_command = [
             "docker", "run", "-d",
             "-p 1514:1514/udp",
@@ -17,8 +17,15 @@ module Barcelona
             "quay.io/degica/barcelona-ossec"
           ].join(" ")
           user_data.run_commands += [
-            "set -e",
+            "set -ex",
             "service docker start",
+            "volume_id=$(aws ec2 describe-volumes --region ap-northeast-1 --filters Name=tag-key,Values=ossec-manager-volume | jq -r '.Volumes[0].VolumeId')",
+            "instance_id=$(curl http://169.254.169.254/latest/meta-data/instance-id)",
+            "aws ec2 attach-volume --region ap-northeast-1 --volume-id $volume_id --instance-id $instance_id --device /dev/xvdh",
+            "sleep 60",
+            "[[ $(file -s /dev/xvdh) =~ :\\ data$ ]] && mkfs -t ext4 /dev/xvdh",
+            "mkdir /ossec_mnt",
+            "mount /dev/xvdh /ossec_mnt"
 #            docker_command
           ]
           user_data
@@ -43,6 +50,7 @@ module Barcelona
             j.IamInstanceProfile ref("OSSECManagerInstanceProfile")
             j.ImageId "ami-1a15c77b"
             j.InstanceType "t2.small"
+            j.AssociatePublicIpAddress true
             j.KeyName "kkajihiro" # ERASEME
             j.SecurityGroups [ref("OSSECManagerSG")]
             j.UserData manager_user_data.build
@@ -113,7 +121,7 @@ module Barcelona
             j.Tags [
               {
                 "Key" => "Name",
-                "Value" => join("-", cf_stack_name, "ossec-manager"),
+                "Value" => join("-", cf_stack_name, "manager"),
                 "PropagateAtLaunch" => true
               },
               {
