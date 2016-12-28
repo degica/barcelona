@@ -195,4 +195,57 @@ describe HeritageTaskDefinition do
                            })
     end
   end
+
+  describe ".schedule_definition" do
+    subject { described_class.schedule_definition(heritage).to_task_definition(camelize: true) }
+    let(:heritage) { create :heritage }
+    let(:district) { heritage.district }
+    let(:expected_log_configuration) {
+      {
+        "LogDriver" => "awslogs",
+        "Options" => {
+          "awslogs-group" => heritage.log_group_name,
+          "awslogs-region" => district.region,
+          "awslogs-stream-prefix" => heritage.name
+        }
+      }
+    }
+
+    before do
+      allow(heritage).to receive(:task_role_id) { "task-role" }
+    end
+
+    it "returns a task definition for the schedule" do
+      expect(subject).to eq({
+                              "Family" => "#{heritage.name}-schedule",
+                              "TaskRoleArn" => "task-role",
+                              "ContainerDefinitions" => [
+                                {
+                                  "Name" =>  "#{heritage.name}-schedule",
+                                  "Cpu" => 128,
+                                  "Memory" => 512,
+                                  "Essential" => true,
+                                  "Image" => heritage.image_path,
+                                  "Environment" => [],
+                                  "VolumesFrom" => [
+                                    {
+                                      "SourceContainer" => "runpack",
+                                      "ReadOnly" => true
+                                    }
+                                  ],
+                                  "LogConfiguration" => expected_log_configuration
+                                },
+                                {
+                                  "Name" => "runpack",
+                                  "Cpu" => 1,
+                                  "Memory" => 16,
+                                  "Essential" => false,
+                                  "Image" => "quay.io/degica/barcelona-run-pack",
+                                  "Environment" => [],
+                                  "LogConfiguration" => expected_log_configuration
+                                }
+                              ]
+                           })
+    end
+  end
 end
