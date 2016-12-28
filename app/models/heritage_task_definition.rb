@@ -34,7 +34,7 @@ class HeritageTaskDefinition
         memory: 512)
   end
 
-  def to_task_definition(without_task_role: false)
+  def to_task_definition(without_task_role: false, camelize: false)
     containers = [container_definition, run_pack_definition]
     if web_service?
       containers << case mode
@@ -46,10 +46,30 @@ class HeritageTaskDefinition
     end
     ret = {family: family_name, container_definitions: containers}
     ret = ret.merge(task_role_arn: heritage.task_role_id) unless without_task_role
+    if camelize
+      ret = deep_transform_keys_with_parent_keys(ret) do |k, parents|
+        (parents.last(2) != [:log_configuration, :options] &&
+         parents.last != [:docker_labels]
+        ) ? k.to_s.camelize : k
+      end
+    end
     ret
   end
 
   private
+
+  def deep_transform_keys_with_parent_keys(object, parents=[], &block)
+    case object
+    when Hash
+      object.each_with_object({}) do |(key, value), result|
+        result[yield(key, parents)] = deep_transform_keys_with_parent_keys(value, parents + [key], &block)
+      end
+    when Array
+      object.map.with_index {|e, i| deep_transform_keys_with_parent_keys(e, parents + [i], &block) }
+    else
+      object
+    end
+  end
 
   def initialize(heritage:, family_name:, cpu:, memory:, command: nil, port_mappings: nil, is_web_service: false, force_ssl: false, hosts: [], app_container_labels: {}, reverse_proxy_image: nil, mode: nil)
     @heritage = heritage
