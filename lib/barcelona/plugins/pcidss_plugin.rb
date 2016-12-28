@@ -34,7 +34,7 @@ module Barcelona
         def build_resources
           private_hosted_zone = district.aws.route53.get_hosted_zone(id: district.private_hosted_zone_id).hosted_zone
 
-          add_resource("AWS::EC2::Volume", "OSSECManagerVolume") do |j|
+          add_resource("AWS::EC2::Volume", "OSSECManagerVolume", depends_on: "OSSECManagerASG") do |j|
             j.AvailabilityZone "ap-northeast-1a"
             j.Encrypted true
             j.Size 8
