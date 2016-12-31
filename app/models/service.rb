@@ -76,8 +76,8 @@ class Service < ActiveRecord::Base
     port_mappings.find_by(protocol: 'https')
   end
 
-  def deployment_finished?(deployment_id)
-    backend.deployment_finished?(deployment_id)
+  def deployment_status(deployment_id)
+    backend.deployment_status(deployment_id)
   end
 
   private

@@ -40,6 +40,6 @@ class DeployRunnerJob < ActiveJob::Base
 
   def other_deploy_in_progress?(heritage)
     return false if heritage.version == 1
-    heritage.services.map { |s| !s.deployment_finished?(nil) }.any?
+    heritage.services.map { |s| s.deployment_status(nil) == :in_progress }.any?
   end
 end

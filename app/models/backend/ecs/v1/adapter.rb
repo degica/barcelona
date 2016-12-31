@@ -45,20 +45,22 @@ module Backend::Ecs::V1
       end
     end
 
-    def deployment_finished?(deployment_id)
+    def deployment_status(deployment_id)
       deployment = ecs_service.deployment(deployment_id)
       # deployment being nil means the deployment finished and
       # another newer deployment takes in place as PRIMARY
       # http://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_Deployment.html
-      return true if deployment.nil? || deployment.status == "INACTIVE"
+      return :complete if deployment.nil? || deployment.status == "INACTIVE"
 
       # A deployment is considered as finished when
       # 1) There is only one PRIMARY deployment, and
       # 2) The number of running tasks deployed by PRIMARY deployment
       #    reaches to service's desired task count
-      ecs_service.deployments.count == 1 &&
-        deployment.status == "PRIMARY"   &&
-        deployment.desired_count == deployment.running_count
+      if ecs_service.deployments.count == 1 && deployment.status == "PRIMARY" && deployment.desired_count == deployment.running_count
+        :complete
+      else
+        :in_progress
+      end
     end
 
     def ecs_service
