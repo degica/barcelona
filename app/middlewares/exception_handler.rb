@@ -74,6 +74,12 @@ class ExceptionHandler
     end
   end
 
+  class BadRequest < Exception
+    def status_code
+      400
+    end
+  end
+
   def initialize(app)
     @app = app
   end
@@ -91,6 +97,8 @@ class ExceptionHandler
       raise Forbidden.new(e.message)
     rescue ActionController::ParameterMissing => e
       raise UnprocessableEntity.new(e.message)
+    rescue Octokit::ClientError => e
+      raise BadRequest.new(e.message)
     rescue
       raise InternalServerError
     end
