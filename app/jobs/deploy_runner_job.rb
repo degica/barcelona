@@ -36,6 +36,10 @@ class DeployRunnerJob < ActiveJob::Base
         end
       end
     end
+  rescue => e
+    # Retrying failing deployment doesn't make any sense.
+    # Just stop the deployment and let users know it thorough notification
+    heritage.events.create(level: :error, message: "Error occurred: #{e.message}")
   end
 
   def other_deploy_in_progress?(heritage)

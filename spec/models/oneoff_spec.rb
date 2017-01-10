@@ -14,7 +14,8 @@ describe Oneoff do
             )
           ]
         )
-      ]
+      ],
+      failures: []
     )
   }
   let(:heritage) { create :heritage }
@@ -26,7 +27,9 @@ describe Oneoff do
         double(
           tasks: [
             double(last_status: "STOPPED")
-          ])
+          ],
+          failures: []
+        )
       }
     end
 
