@@ -19,7 +19,8 @@ describe "POST /heritages/:heritage/oneoffs", type: :request do
             )
           ]
         )
-      ]
+      ],
+      failures: []
     )
   }
 
