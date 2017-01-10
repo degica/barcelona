@@ -5,6 +5,9 @@ class Oneoff < ActiveRecord::Base
   delegate :district, to: :heritage
   delegate :aws, to: :district
 
+  class ECSResourceError < RuntimeError
+  end
+
   def run(sync: false, interactive: false)
     raise ArgumentError if sync && interactive
 
@@ -26,6 +29,12 @@ class Oneoff < ActiveRecord::Base
         ]
       }
     )
+
+    if resp.failures.present?
+      failure = resp.failures.first
+      handle_failure(failure)
+    end
+
     @task = resp.tasks[0]
     self.task_arn = @task.task_arn
     if sync
@@ -84,6 +93,15 @@ class Oneoff < ActiveRecord::Base
   end
 
   private
+
+  def handle_failure(failure)
+    case failure.reason
+    when "RESOURCE:MEMORY"
+      raise ECSResourceError.new("Memory is not enough to place oneoff")
+    when "RESOURCE:CPU"
+      raise ECSResourceError.new("CPU is not enough to place oneoff")
+    end
+  end
 
   def task
     return @task if @task.present?
