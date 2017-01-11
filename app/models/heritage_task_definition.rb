@@ -187,7 +187,8 @@ class HeritageTaskDefinition
       {name: "UPSTREAM_NAME", value: "backend"},
       {name: "UPSTREAM_PORT", value: web_container_port.to_s},
       {name: "DISABLE_PROXY_PROTOCOL", value: "true"},
-      {name: "FORCE_SSL", value: "false"}
+      {name: "FORCE_SSL", value: (!!force_ssl).to_s},
+      {name: "ALB", value: "true"}
     ].flatten
 
     base.merge(

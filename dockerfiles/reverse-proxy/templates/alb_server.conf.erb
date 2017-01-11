@@ -1,0 +1,36 @@
+# if user-agent is ELB health checker then nginx do not redirect
+# if originator protocol is https then nginx do not redirect
+# otherwise it redirects to https
+# i.e. if (user agent == health check && forwarded proto != https) then redirect
+map "$http_x_forwarded_proto:$http_user_agent" $redirect_to_https {
+  default 1;
+  "~*:ELB-HealthChecker" 0;
+  "~*^https:" 0;
+}
+
+server {
+  server_name <%= decorator.hostname %>;
+  listen 80 default_server;
+
+  <% if decorator.force_ssl %>
+  if ( $redirect_to_https ) {
+    return 301 https://$host$request_uri;
+  }
+  <% end %>
+
+  keepalive_timeout 5;
+
+  location / {
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
+    proxy_set_header Host $http_host;
+    proxy_redirect off;
+
+    proxy_read_timeout 60;
+    proxy_send_timeout 60;
+
+    proxy_pass http://<%= decorator.upstream_name %>;
+  }
+}
