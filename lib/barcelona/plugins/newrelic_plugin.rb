@@ -13,8 +13,9 @@ module Barcelona
           [newrelic-infra]
           name=New Relic Infrastructure
           baseurl=http://download.newrelic.com/infrastructure_agent/linux/yum/el/6/x86_64
-          enable=1
-          gpgcheck=0
+          gpgkey=http://download.newrelic.com/infrastructure_agent/gpg/newrelic-infra.gpg
+          gpgcheck=1
+          repo_gpgcheck=1
         EOS
 
         user_data.run_commands += [
