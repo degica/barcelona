@@ -55,6 +55,14 @@ def download_s3(url, dest)
   )
 end
 
+def server_conf_template_path
+  if ENV['ALB'] == "true"
+    '/templates/alb_server.conf.erb'
+  else
+    '/templates/server.conf.erb'
+  end
+end
+
 render_template('/templates/nginx.conf.erb', '/etc/nginx/nginx.conf',
   upstream_name: ENV['UPSTREAM_NAME'],
   upstream_port: ENV['UPSTREAM_PORT']
@@ -84,15 +92,16 @@ hosts.each do |host|
     upstream_name: ENV['UPSTREAM_NAME'],
     upstream_port: ENV['UPSTREAM_PORT']
   )
-  render_template('/templates/server.conf.erb', "/etc/nginx/conf.d/#{host}.conf", decorator: decorator)
+  render_template(server_conf_template_path, "/etc/nginx/conf.d/#{host}.conf", decorator: decorator)
 end
 
 if hosts.empty?
   decorator = ServerDecorator.new(
     hostname: "_",
     proxy_protocol: !(ENV['DISABLE_PROXY_PROTOCOL'] == 'true'),
+    force_ssl: ENV['FORCE_SSL'] == 'true',
     upstream_name: ENV['UPSTREAM_NAME'],
     upstream_port: ENV['UPSTREAM_PORT']
   )
-  render_template('/templates/server.conf.erb', "/etc/nginx/conf.d/default.conf", decorator: decorator)
+  render_template(server_conf_template_path, "/etc/nginx/conf.d/default.conf", decorator: decorator)
 end
