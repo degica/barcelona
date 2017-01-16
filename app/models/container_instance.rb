@@ -39,7 +39,7 @@ class ContainerInstance
       #!/bin/bash
       read oneoff_id command <<< $SSH_ORIGINAL_COMMAND
       container_id=$(docker ps -q -f "label=com.barcelona.oneoff-id=$oneoff_id")
-      [[ -n $container_id ]] && docker exec --detach-keys="\\\\" -it $container_id $command
+      [[ -n $container_id ]] && docker exec --detach-keys="ctrl-\\\\,\\\\" -it $container_id $command
     EOS
 
     user_data.add_file("/etc/init.d/barcelona", "root:root", "755", <<EOS)
