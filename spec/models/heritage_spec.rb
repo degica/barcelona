@@ -49,11 +49,17 @@ describe Heritage::Stack do
     context "when a heritage has scheduled tasks" do
       let(:heritage) { build :heritage,
                              scheduled_tasks: [{schedule: 'rate(1 minute)',
-                                                command: 'echo hello'}] }
+                                                command: 'rails runner "p :hello"'}] }
       it "generates a correct stack template" do
         generated = JSON.load stack.target!
         expect(generated["Resources"]["ScheduleTaskDefinition"]).to be_present
         expect(generated["Resources"]["ScheduledEvent0"]).to be_present
+        expected_input = {
+          cluster: heritage.district.name,
+          task_family: "#{heritage.name}-schedule",
+          command: LaunchCommand.new(heritage, ["rails", "runner", "p :hello"], shell_format: false).to_command
+        }.to_json
+        expect(generated["Resources"]["ScheduledEvent0"]["Properties"]["Targets"][0]["Input"]).to eq(expected_input)
         expect(generated["Resources"]["PermissionForScheduledEvent0"]).to be_present
         expect(generated["Resources"]["ScheduleHandler"]).to be_present
         expect(generated["Resources"]["ScheduleHandlerRole"]).to be_present

@@ -18,7 +18,7 @@ class Heritage < ActiveRecord::Base
         heritage.scheduled_tasks.each_with_index do |s, i|
           event_name =  "ScheduledEvent#{i}"
           command = s["command"]
-          command = command.split(" ") if s["command"].is_a?(String)
+          command = Shellwords.split(command) if s["command"].is_a?(String)
           run_command = LaunchCommand.new(heritage, command,
                                           shell_format: false).to_command
           add_resource("AWS::Events::Rule", event_name) do |j|
