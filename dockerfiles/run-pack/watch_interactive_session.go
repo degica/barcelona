@@ -27,7 +27,8 @@ func otherSessionRunning(processes []ps.Process) (ps.Process, error) {
 func watchInteractiveSession() {
 	log.Println("Interactive run watcher started")
 
-	timeout := time.After(30 * time.Second)
+	startTimeout := time.After(30 * time.Second)
+	runTimeout := time.After(24 * time.Hour)
 	tick := time.Tick(5 * time.Second)
 	sessionStarted := false
 	for {
@@ -51,11 +52,14 @@ func watchInteractiveSession() {
 				log.Println("Interactive session has started")
 				sessionStarted = true
 			}
-		case <-timeout:
+		case <-startTimeout:
 			if !sessionStarted {
 				log.Println("Interactive session has not started for 30 seconds")
 				os.Exit(2)
 			}
+		case <-runTimeout:
+			log.Println("Interactive session has run for over 24 hours")
+			os.Exit(2)
 		}
 	}
 }
