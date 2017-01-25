@@ -17,6 +17,10 @@ describe "updating a heritage" do
           cpu: 128,
           memory: 256,
           command: "nginx",
+          auto_scaling: {
+            min_count: 3,
+            max_count: 5
+          },
           port_mappings: [
             {
               lb_port: 80,
@@ -64,6 +68,8 @@ describe "updating a heritage" do
       expect(web_service["cpu"]).to eq 128
       expect(web_service["memory"]).to eq 256
       expect(web_service["command"]).to eq "true"
+      expect(web_service["auto_scaling"]["min_count"]).to eq 3
+      expect(web_service["auto_scaling"]["max_count"]).to eq 5
       expect(web_service["port_mappings"][0]["lb_port"]).to eq 80
       expect(web_service["port_mappings"][0]["container_port"]).to eq 80
       worker_service = heritage["services"].find { |s| s["name"] == "worker" }

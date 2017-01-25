@@ -33,6 +33,10 @@ describe "POST /districts/:district/heritages", type: :request do
             protocol: 'tcp',
             port: 1111
           },
+          auto_scaling: {
+            min_count: 3,
+            max_count: 5
+          },
           hosts: [
             {
               hostname: 'awesome-app.degica.com',
@@ -80,6 +84,8 @@ describe "POST /districts/:district/heritages", type: :request do
       expect(heritage["services"][0]["port_mappings"][2]["protocol"]).to eq "https"
       expect(heritage["services"][0]["health_check"]["protocol"]).to eq "tcp"
       expect(heritage["services"][0]["health_check"]["port"]).to eq 1111
+      expect(heritage["services"][0]["auto_scaling"]["min_count"]).to eq 3
+      expect(heritage["services"][0]["auto_scaling"]["max_count"]).to eq 5
       expect(heritage["services"][0]["hosts"][0]["hostname"]).to eq "awesome-app.degica.com"
       expect(heritage["services"][0]["hosts"][0]["ssl_cert_path"]).to eq "s3://degica-bucket/path/to/cert"
       expect(heritage["services"][0]["hosts"][0]["ssl_key_path"]).to eq "s3://degica-bucket/path/to/key"
