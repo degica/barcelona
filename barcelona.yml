@@ -15,10 +15,16 @@ environments:
         listeners:
           - endpoint: barcelona
             health_check_path: /health_check
+        auto_scaling:
+          min_count: 2
+          max_count: 2
       - name: worker
         command: rake jobs:work
         cpu: 128
         memory: 256
+        auto_scaling:
+          min_count: 1
+          max_count: 1
 bcnd:
   mainline_branch: master
   mainline_environment: production
