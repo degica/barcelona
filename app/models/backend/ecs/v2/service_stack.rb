@@ -43,7 +43,7 @@ module Backend::Ecs::V2
           build_alb_listener
         end
 
-        build_auto_scaling if service.auto_scaling.present?
+        build_auto_scaling
       end
 
       def build_service_role
