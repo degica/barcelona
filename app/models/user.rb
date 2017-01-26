@@ -11,11 +11,6 @@ class User < ActiveRecord::Base
     end
   end
 
-  ALLOWED_TEAMS = [
-    {org: 'degica', team: 'developers', role: "developer"},
-    {org: 'degica', team: 'Admin developers', role: "admin"}
-  ]
-
   has_many :users_districts
   has_many :districts, through: :users_districts
 
@@ -27,6 +22,13 @@ class User < ActiveRecord::Base
 
   before_validation :assign_districts
   before_save :hash_token
+
+  def self.allowed_teams
+    [
+      {org: ENV['GITHUB_ORGANIZATION'], team: ENV['GITHUB_DEVELOPER_TEAM'], role: "developer"},
+      {org: ENV['GITHUB_ORGANIZATION'], team: ENV['GITHUB_ADMIN_TEAM'], role: "admin"}
+    ]
+  end
 
   def self.login!(github_token)
     client = Octokit::Client.new(access_token: github_token)
@@ -48,7 +50,7 @@ class User < ActiveRecord::Base
   end
 
   def self.role_for(team:, org:)
-    ALLOWED_TEAMS.find { |t|
+    allowed_teams.find { |t|
       t[:team] == team && t[:org] == org
     }&.dig(:role)
   end
