@@ -12,6 +12,9 @@ describe "POST /login", type: :request do
   }
 
   before do
+    allow(ENV).to receive(:[]).with('GITHUB_ORGANIZATION') { 'degica' }
+    allow(ENV).to receive(:[]).with('GITHUB_DEVELOPER_TEAM') { 'developers' }
+    allow(ENV).to receive(:[]).with('GITHUB_ADMIN_TEAM') { 'Admin developers' }
     allow(Octokit::Client).to receive(:new).and_return(gh_stub)
   end
 
