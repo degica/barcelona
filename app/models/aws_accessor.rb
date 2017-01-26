@@ -36,9 +36,6 @@ class AwsAccessor
   end
 
   def credentials
-    Aws::Credentials.new(
-      @access_key_id || ENV['AWS_ACCESS_KEY_ID'],
-      @secret_access_key || ENV['AWS_SECRET_ACCESS_KEY']
-    )
+    Aws::Credentials.new(@access_key_id, @secret_access_key)
   end
 end
