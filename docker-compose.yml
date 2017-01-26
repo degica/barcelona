@@ -23,6 +23,9 @@ services:
       RAILS_ENV: development
       DATABASE_URL: postgres://postgres:@db:5432
       ENCRYPTION_KEY: abcdefghijklmn
+      GITHUB_ORGANIZATION: 'degica'
+      GITHUB_DEVELOPER_TEAM: 'developers'
+      GITHUB_ADMIN_TEAM: 'Admin developers'
   worker:
     <<: *app_base
     ports: []

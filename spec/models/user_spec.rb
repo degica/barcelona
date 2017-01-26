@@ -6,6 +6,9 @@ describe User do
 
     before do
       allow(Octokit::Client).to receive(:new) { github_client }
+      allow(ENV).to receive(:[]).with('GITHUB_ORGANIZATION') { 'degica' }
+      allow(ENV).to receive(:[]).with('GITHUB_DEVELOPER_TEAM') { 'developers' }
+      allow(ENV).to receive(:[]).with('GITHUB_ADMIN_TEAM') { 'Admin developers' }
     end
     let(:github_client) do
       double(user_teams: github_teams, user: double(login: "k2nr"))
