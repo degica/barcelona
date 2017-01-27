@@ -10,6 +10,8 @@ class ContainerInstance
     user_data.packages += ["aws-cli", "jq", "aws-cfn-bootstrap", "awslogs"]
     user_data.run_commands += [
       "set -e",
+      # Embed SHA2 hash dockercfg so that instance replacement happens when dockercfg is updated
+      "# #{Digest::SHA256.hexdigest(district.dockercfg.to_s)}",
       "MEMSIZE=`cat /proc/meminfo | grep MemTotal | awk '{print $2}'`",
       "if [ $MEMSIZE -lt 2097152 ]; then",
       "  SIZE=$((MEMSIZE * 2))k",
