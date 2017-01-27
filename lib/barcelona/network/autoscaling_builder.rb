@@ -4,16 +4,17 @@ module Barcelona
       # http://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html
       # amzn-ami-2016.09.d-amazon-ecs-optimized
       ECS_OPTIMIZED_AMI_IDS = {
-        "us-east-1" => "ami-a58760b3",
-        "us-east-2" => "ami-a6e4bec3",
-        "us-west-1" => "ami-74cb9b14",
-        "us-west-2" => "ami-5b6dde3b",
-        "eu-west-1" => "ami-e3fbd290",
-        "eu-central-1" => "ami-38dc1157",
-        "ap-northeast-1" => "ami-30bdce57",
-        "ap-southeast-1" => "ami-9f75ddfc",
-        "ap-southeast-2" => "ami-cf393cac",
-        "ca-central-1" => "ami-1b01b37f"
+        "us-east-1" => "ami-d69c74c0",
+        "us-east-2" => "ami-64270201",
+        "us-west-1" => "ami-bc90c2dc",
+        "us-west-2" => "ami-8e7bc4ee",
+        "eu-west-1" => "ami-48f9a52e",
+        "eu-west-2" => "ami-62aea406",
+        "eu-central-1" => "ami-6b428d04",
+        "ap-northeast-1" => "ami-372f5450",
+        "ap-southeast-1" => "ami-69208a0a",
+        "ap-southeast-2" => "ami-307f7853",
+        "ca-central-1" => "ami-b2e65bd6"
       }
 
       def ebs_optimized_by_default?
