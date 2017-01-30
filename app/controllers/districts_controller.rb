@@ -50,9 +50,7 @@ class DistrictsController < ApplicationController
     params.permit(
       :name,
       :region,
-      :bastion_key_pair,
       :nat_type,
-      :cluster_backend,
       :cluster_size,
       :cluster_instance_type,
       :aws_access_key_id,

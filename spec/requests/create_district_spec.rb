@@ -7,7 +7,6 @@ describe "POST /districts", type: :request do
       region: "ap-northeast-1",
       aws_access_key_id: "awsaccessskeyid",
       aws_secret_access_key: "secret key",
-      bastion_key_pair: 'bastion-key-pair'
     }
   end
 
@@ -35,7 +34,6 @@ describe "POST /districts", type: :request do
       expect(body["district"]["cluster_size"]).to eq 1
       expect(body["district"]["cluster_backend"]).to eq "autoscaling"
       expect(body["district"]["cluster_instance_type"]).to eq "t2.micro"
-      expect(body["district"]["bastion_key_pair"]).to eq "bastion-key-pair"
     end
   end
 end
