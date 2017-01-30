@@ -245,6 +245,13 @@ class Heritage < ActiveRecord::Base
     cf_executor&.resource_ids["TaskRole"]
   end
 
+  def cf_executor
+    @cf_executor ||= begin
+                       stack = Stack.new(self)
+                       CloudFormation::Executor.new(stack, district.aws.cloudformation)
+                     end
+  end
+
   private
 
   def update_services(release, without_before_deploy)
@@ -254,13 +261,6 @@ class Heritage < ActiveRecord::Base
       without_before_deploy: without_before_deploy,
       description: release.description
     )
-  end
-
-  def cf_executor
-    @cf_executor ||= begin
-                       stack = Stack.new(self)
-                       CloudFormation::Executor.new(stack, district.aws.cloudformation)
-                     end
   end
 
   def apply_stack
