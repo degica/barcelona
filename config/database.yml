@@ -18,9 +18,9 @@ test:
 production:
   <<: *default
 
-self_hosting:
+bootstrap:
   adapter: sqlite3
   encoding: unicode
   pool: 5
   timeout: 5000
-  database: db/self_hosting.sqlite3
+  database: db/bcn_bootstrap.sqlite3

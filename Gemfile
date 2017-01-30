@@ -13,11 +13,11 @@ gem 'pundit'
 gem 'jbuilder'
 gem 'lograge'
 gem 'net-ssh'
+gem 'thor', require: false
 
 group :development, :test do
   gem 'pry-rails'
   gem 'pry-byebug'
-  gem 'sqlite3'
 end
 
 group :development do
@@ -30,4 +30,8 @@ group :test do
   gem 'rspec-its'
   gem 'factory_girl_rails'
   gem 'database_rewinder'
+end
+
+group :bootstrap do
+  gem 'sqlite3'
 end
