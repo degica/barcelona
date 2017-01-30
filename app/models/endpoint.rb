@@ -91,6 +91,12 @@ class Endpoint < ActiveRecord::Base
         builder.add_builder Builder.new(self, options)
       end
     end
+
+    def build_outputs(j)
+      j.DNSName do |j|
+        j.Value get_attr("LB", "DNSName")
+      end
+    end
   end
 
   belongs_to :district, inverse_of: :endpoints
