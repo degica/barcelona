@@ -12,13 +12,15 @@ class ApplyDistrict
       generate_ssh_ca_key_pair
       create_ecs_cluster
     end
-    apply
+    district.save!
+    update_ecs_config
+    district.stack_executor.create
   end
 
   def apply
     district.save!
     update_ecs_config
-    create_or_update_network_stack
+    district.stack_executor.update
   end
 
   def destroy!
