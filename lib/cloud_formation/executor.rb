@@ -19,8 +19,10 @@ module CloudFormation
       describe&.stack_status
     end
 
-    def create
-      client.create_stack(stack_options)
+    def create(parameters: [])
+      options = stack_options
+      options = options.merge(parameters: parameters) if parameters.present?
+      client.create_stack(options)
     end
 
     def update
