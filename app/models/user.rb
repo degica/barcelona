@@ -46,13 +46,13 @@ class User < ActiveRecord::Base
   end
 
   def self.user_roles(user_teams)
-    user_teams.map{ |t| role_for(team: t.name, org: t.organization.login) }.compact
+    user_teams.map{ |t| roles_for(team: t.name, org: t.organization.login) }.flatten.uniq.compact
   end
 
-  def self.role_for(team:, org:)
-    allowed_teams.find { |t|
-      t[:team] == team && t[:org] == org
-    }&.dig(:role)
+  def self.roles_for(team:, org:)
+    allowed_teams.select { |t|
+      (t[:team] == team || t[:team] == nil) && t[:org] == org
+    }.map { |t| t[:role] }
   end
 
   def new_token!
