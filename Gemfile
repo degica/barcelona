@@ -31,4 +31,5 @@ group :test do
   gem 'rspec-its'
   gem 'factory_girl_rails'
   gem 'database_rewinder'
+  gem 'stub_env'
 end

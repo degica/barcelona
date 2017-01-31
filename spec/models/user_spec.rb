@@ -11,10 +11,9 @@ describe User do
     context "when teams are specified" do
       before do
         allow(Octokit::Client).to receive(:new) { github_client }
-        allow(ENV).to receive(:[]).with('GITHUB_ORGANIZATION') { 'degica' }
-        allow(ENV).to receive(:[]).with('GITHUB_DEVELOPER_TEAM') { 'developers' }
-        allow(ENV).to receive(:[]).with('GITHUB_ADMIN_TEAM') { 'Admin developers' }
-        allow(ENV).to receive(:[]).with('ENCRYPTION_KEY') { 'encryption' }
+        stub_env('GITHUB_ORGANIZATION', 'degica')
+        stub_env('GITHUB_DEVELOPER_TEAM', 'developers')
+        stub_env('GITHUB_ADMIN_TEAM', 'Admin developers')
       end
 
       context "when a user belongs to a github admin team" do
@@ -65,10 +64,9 @@ describe User do
     context "when teams are not specified" do
       before do
         allow(Octokit::Client).to receive(:new) { github_client }
-        allow(ENV).to receive(:[]).with('GITHUB_ORGANIZATION') { 'degica' }
-        allow(ENV).to receive(:[]).with('GITHUB_DEVELOPER_TEAM') { nil }
-        allow(ENV).to receive(:[]).with('GITHUB_ADMIN_TEAM') { nil }
-        allow(ENV).to receive(:[]).with('ENCRYPTION_KEY') { 'encryption' }
+        stub_env('GITHUB_ORGANIZATION', 'degica')
+        stub_env('GITHUB_DEVELOPER_TEAM', nil)
+        stub_env('GITHUB_ADMIN_TEAM', nil)
       end
 
       let(:github_teams) do
