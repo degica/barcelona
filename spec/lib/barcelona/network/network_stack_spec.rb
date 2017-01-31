@@ -810,7 +810,14 @@ describe Barcelona::Network::NetworkStack do
         "Type" => "AWS::EC2::SubnetNetworkAclAssociation",
         "Properties" => {
           "SubnetId" => {"Ref" => "SubnetTrusted2"},
-          "NetworkAclId" => {"Ref" => "NetworkAclTrusted2"}}}}
+          "NetworkAclId" => {"Ref" => "NetworkAclTrusted2"}}},
+      "NotificationTopic" => {
+        "Type" => "AWS::SNS::Topic",
+        "Properties" => {
+          "DisplayName" => "district-#{district.name}-notification"
+        }
+      }
+    }
     expect(generated["Resources"]).to match expected
   end
 
@@ -850,6 +857,23 @@ describe Barcelona::Network::NetworkStack do
       expect(generated["Resources"]["EIPForNATManagedGateway2"]["DeletionPolicy"]).to eq "Retain"
       expect(generated["Resources"]["NATManagedGateway2"]).to be_present
       expect(generated["Resources"]["RouteNATForRouteTableTrusted2"]).to be_present
+    end
+  end
+
+  context "when notifications exist" do
+    it "includes Slack notification resources" do
+      district.notifications = [
+        {
+          "target" => "slack",
+          "endpoint" => "https://slack.com/webhook-endpoint"
+        }
+      ]
+      stack = described_class.new(district)
+      generated = JSON.load(stack.target!)
+      expect(generated["Resources"]["SlackSubscription"]).to be_present
+      expect(generated["Resources"]["NotificationPermission"]).to be_present
+      expect(generated["Resources"]["SlackNotification"]).to be_present
+      expect(generated["Resources"]["NotificationRole"]).to be_present
     end
   end
 end
