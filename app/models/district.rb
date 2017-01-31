@@ -167,7 +167,7 @@ class District < ActiveRecord::Base
     self.nat_type       ||= "instance"
     self.cluster_backend  ||= 'autoscaling'
     self.cluster_size     ||= 1
-    self.cluster_instance_type ||= "t2.micro"
+    self.cluster_instance_type ||= "t2.small"
   end
 
   def network_stack
