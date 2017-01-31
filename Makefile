@@ -1,7 +1,9 @@
+UID=$(shell id -u $(USER))
+
 init:
 	git submodule update --init
 build: init
-	docker-compose build
+	UID=$(UID) docker-compose build
 setup: build
 	docker-compose up -d db
 	sleep 5

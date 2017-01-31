@@ -1,4 +1,4 @@
-version: '2'
+version: '2.1'
 services:
   web: &app_base
     depends_on:
@@ -7,6 +7,7 @@ services:
       context: .
       dockerfile: Dockerfile.development
       args:
+        - UID=${UID-1000}
         - APP_HOME=${PWD}
         - SKIP_BUNDLE=yes
     ports:
@@ -35,13 +36,9 @@ services:
     ports: []
     command: spring server
     pid: host
-    environment:
-      <<: *env_base
-      SPRING_SOCKET: /tmp/spring/spring.sock
     volumes:
       - bundle:/usr/local/bundle
       - .:${PWD}
-      - spring:/tmp/spring
   db:
     image: postgres:9.5
     environment:
@@ -51,4 +48,3 @@ services:
 volumes:
   pgdata:
   bundle:
-  spring:
