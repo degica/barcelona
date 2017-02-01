@@ -99,8 +99,13 @@ namespace :bcn do
     heritage.destroy!
 
     puts
-    puts "Barcelona Bootstrap Completed!"
-    puts "Endpoint: #{dns_name}"
+    puts <<-EOS
+Barcelona Bootstrap Completed!
+Endpoint: #{dns_name}
+Set your DNS record to point to the above endpoint and run the following Barcelona client command
+
+$ bcn login https://<your barcelona domain> <GitHub Token>
+EOS
   end
 
   namespace :bootstrap do
