@@ -14,6 +14,7 @@ gem 'jbuilder'
 gem 'lograge'
 gem 'net-ssh'
 gem 'thor', require: false
+gem 'sqlite3'
 
 group :development, :test do
   gem 'pry-rails'
@@ -30,8 +31,4 @@ group :test do
   gem 'rspec-its'
   gem 'factory_girl_rails'
   gem 'database_rewinder'
-end
-
-group :bootstrap do
-  gem 'sqlite3'
 end
