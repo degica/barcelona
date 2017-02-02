@@ -24,7 +24,7 @@ class HeritageTaskDefinition
           "com.barcelona.oneoff-id" => oneoff.id.to_s
         },
         cpu: 128,
-        memory: 512)
+        memory: oneoff.memory)
   end
 
   def self.schedule_definition(heritage)
