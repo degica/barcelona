@@ -91,6 +91,12 @@ class Endpoint < ActiveRecord::Base
         builder.add_builder Builder.new(self, options)
       end
     end
+
+    def build_outputs(j)
+      j.DNSName do |j|
+        j.Value get_attr("LB", "DNSName")
+      end
+    end
   end
 
   belongs_to :district, inverse_of: :endpoints
@@ -127,14 +133,14 @@ class Endpoint < ActiveRecord::Base
     name
   end
 
-  private
-
   def cf_executor
     @cf_executor ||= begin
                        stack = Stack.new(self)
                        CloudFormation::Executor.new(stack, district.aws.cloudformation)
                      end
   end
+
+  private
 
   def apply_stack
     cf_executor.create_or_update

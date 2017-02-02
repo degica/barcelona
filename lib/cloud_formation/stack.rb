@@ -12,6 +12,11 @@ module CloudFormation
       Jbuilder.new do |j|
         j.Description description
         j.AWSTemplateFormatVersion "2010-09-09"
+
+        j.Parameters do |j|
+          build_parameters(j)
+        end
+
         j.Resources do |j|
           builder = Builder.new(self)
           yield builder if block_given?
@@ -22,6 +27,9 @@ module CloudFormation
           build_outputs(j)
         end
       end
+    end
+
+    def build_parameters(json)
     end
 
     def build_outputs(json)
