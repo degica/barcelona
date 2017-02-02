@@ -28,7 +28,8 @@ class OneoffsController < ApplicationController
 
   def create_params
     params.permit(
-      :command
+      :command,
+      :memory
     )
   end
 

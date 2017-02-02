@@ -1,9 +1,17 @@
 class Oneoff < ActiveRecord::Base
   belongs_to :heritage
+
   validates :heritage, presence: true
+  validates :memory, numericality: {greater_than: 0, less_than_or_equal_to: 4096}, allow_nil: true
 
   delegate :district, to: :heritage
   delegate :aws, to: :district
+
+  attr_accessor :memory
+
+  after_initialize do |oneoff|
+    oneoff.memory ||= 512
+  end
 
   class ECSResourceError < RuntimeError
   end

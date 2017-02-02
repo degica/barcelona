@@ -30,7 +30,8 @@ describe "POST /heritages/:heritage/oneoffs", type: :request do
     end
 
     params = {
-      command: "rake db:migrate"
+      command: "rake db:migrate",
+      memory: 1024
     }
     api_request :post, "/v1/heritages/#{heritage.name}/oneoffs", params
     expect(response).to be_success
@@ -39,6 +40,7 @@ describe "POST /heritages/:heritage/oneoffs", type: :request do
     expect(oneoff["container_instance_arn"]).to eq "container_instance_arn"
     expect(oneoff["exit_code"]).to eq nil
     expect(oneoff["command"]).to eq "rake db:migrate"
+    expect(oneoff["memory"]).to eq 1024
   end
 
   context "when interactive oneoff is requested" do
