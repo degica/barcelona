@@ -63,7 +63,7 @@ namespace :bcn do
     heritage = district.heritages.new(
       name: "barcelona-bootstrap",
       image_name: "quay.io/degica/barcelona",
-      image_tag: "bootstrap"
+      image_tag: "latest"
     )
     heritage.env_vars.build(key: "DATABASE_URL", value: ENV["BOOTSTRAP_DATABASE_URL"], secret: true)
     heritage.env_vars.build(key: "DISABLE_DATABASE_ENVIRONMENT_CHECK", value: "1", secret: false)
@@ -88,6 +88,7 @@ namespace :bcn do
       sleep 5
       print "."
     end
+    puts
 
     if oneoff.exit_code != 0
       raise "Provisioning failed."
@@ -102,8 +103,8 @@ namespace :bcn do
     puts <<-EOS
 Barcelona Bootstrap Completed!
 Endpoint: #{dns_name}
-Set your DNS record to point to the above endpoint and run the following Barcelona client command
 
+Set your DNS record to point to the above endpoint and run the following Barcelona client command
 $ bcn login https://<your barcelona domain> <GitHub Token>
 EOS
   end
@@ -131,7 +132,7 @@ EOS
       heritage = district.heritages.new(
         name: "barcelona",
         image_name: "quay.io/degica/barcelona",
-        image_tag: "bootstrap",
+        image_tag: "latest",
         before_deploy: "rake db:migrate",
         env_vars_attributes: [
           {key: "RAILS_ENV",     value: "production", secret: false},
@@ -145,9 +146,9 @@ EOS
             name: "web",
             cpu: 128,
             memory: 256,
-            public: true,
             service_type: "web",
             command: "puma -C config/puma.rb",
+            force_ssl: true,
             listeners_attributes: [
               {
                 endpoint: endpoint,
