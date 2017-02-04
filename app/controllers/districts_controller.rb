@@ -12,13 +12,23 @@ class DistrictsController < ApplicationController
   end
 
   def create
-    @district = District.new(create_params)
-    ApplyDistrict.new(@district).create!
+    cparams = create_params
+    access_key_id = cparams.delete(:aws_access_key_id)
+    secret_access_key = cparams.delete(:aws_secret_access_key)
+    @district = District.new(cparams)
+
+    ApplyDistrict.new(@district).create!(access_key_id, secret_access_key)
+
     render json: @district, status: 201
   end
 
   def update
-    @district.update!(update_params)
+    uparams = update_params
+    @district.attributes = uparams
+    access_key_id = uparams.delete(:aws_access_key_id)
+    secret_access_key = uparams.delete(:aws_secret_access_key)
+    ApplyDistrict.new(@district).update!(access_key_id, secret_access_key)
+
     render json: @district
   end
 

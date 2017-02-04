@@ -1,8 +1,7 @@
 class AwsAccessor
-  def initialize(access_key_id, secret_access_key, region)
-    @access_key_id = access_key_id
-    @secret_access_key = secret_access_key
-    @region = region
+  attr_accessor :district
+  def initialize(district)
+    @district = district
   end
 
   def ecs
@@ -32,10 +31,19 @@ class AwsAccessor
   private
 
   def client_config
-    {region: @region, credentials: credentials}
+    {region: district.region, credentials: credentials}
   end
 
   def credentials
-    Aws::Credentials.new(@access_key_id, @secret_access_key)
+    if district.aws_role.present?
+      Aws::AssumeRoleCredentials.new(
+        client: Aws::STS::Client.new(region: district.region),
+        role_arn: district.aws_role,
+        role_session_name: "barcelona-#{district.name}-session-#{Time.now.to_i}",
+        duration_seconds: 3600
+      )
+    else
+      Aws::Credentials.new(district.aws_access_key_id, district.aws_secret_access_key)
+    end
   end
 end
