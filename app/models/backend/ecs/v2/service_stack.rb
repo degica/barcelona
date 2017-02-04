@@ -47,7 +47,7 @@ module Backend::Ecs::V2
       def build_service_role
         add_resource("AWS::IAM::Role", "ECSServiceRole") do |j|
           j.AssumeRolePolicyDocument do |j|
-            j.Version "2008-10-17"
+            j.Version "2012-10-17"
             j.Statement [
               {
                 "Effect" => "Allow",
