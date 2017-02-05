@@ -49,8 +49,9 @@ EOS
 
     say <<-EOS, :green
 Provide your AWS access key ID and secret access key.
-This access key will be used to bootstrap your Barcelona environment
-and stored in S3 securely.
+This access key will be used to bootstrap your Barcelona environment.
+The best practice is to create a new access key with admin previleges and
+delete it after the bootstrap is complete.
 EOS
 
     ENV["AWS_ACCESS_KEY_ID"] = ask("AWS Access Key ID:")
