@@ -19,7 +19,7 @@ class PluginsController < ApplicationController
   end
 
   def update
-    attributes = params.require :attributes
+    attributes = params[:attributes]&.to_h || {}
     @plugin.update!(plugin_attributes: attributes)
     render json: @plugin
   end
