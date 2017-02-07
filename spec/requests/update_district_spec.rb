@@ -17,5 +17,27 @@ describe "PATCH /districts/:district", type: :request do
       api_request :patch, "/v1/districts/#{district.name}"
       expect(response.status).to eq 200
     end
+
+    context "when running in ECS environment" do
+      mock_ecs_task_environment(role_arn: 'role-arn')
+
+      it "udpates a district aws role" do
+        params = {
+          aws_access_key_id: 'access_key_id',
+          aws_secret_access_key: 'secret_access_key',
+        }
+
+        expect(district.aws_access_key_id).to be_present
+        expect(district.aws_secret_access_key).to be_present
+
+        api_request :patch, "/v1/districts/#{district.name}", params
+        district.reload
+
+        expect(response.status).to eq 200
+        expect(district.aws_access_key_id).to be_nil
+        expect(district.aws_secret_access_key).to be_nil
+        expect(district.aws_role).to eq "role-arn"
+      end
+    end
   end
 end

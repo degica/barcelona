@@ -35,5 +35,18 @@ describe "POST /districts", type: :request do
       expect(body["district"]["cluster_backend"]).to eq "autoscaling"
       expect(body["district"]["cluster_instance_type"]).to eq "t2.small"
     end
+
+    context "when running in ECS environment" do
+      mock_ecs_task_environment(role_arn: 'role-arn')
+
+      it "creates a district with district role" do
+        api_request :post, "/v1/districts", params
+        expect(response.status).to eq 201
+
+        body = JSON.load(response.body)
+        expect(body["district"]["aws_access_key_id"]).to be_nil
+        expect(body["district"]["aws_role"]).to eq "role-arn"
+      end
+    end
   end
 end
