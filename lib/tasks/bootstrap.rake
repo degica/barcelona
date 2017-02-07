@@ -4,7 +4,6 @@ namespace :bcn do
       sleep 5
       case executor.stack_status
       when "CREATE_COMPLETE"
-
         puts
         break
       when /_IN_PROGRESS/
