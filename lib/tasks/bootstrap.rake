@@ -177,10 +177,7 @@ EOS
     desc "Finalize bootstrap"
     task :finalize => :environment do
       district = District.find_by(name: "default")
-      ApplyDistrict.new(district).
-        set_district_aws_credentials(district.aws_access_key_id,
-                                     district.aws_secret_access_key)
-      district.save!
+      ReplaceCredsWithRole.new(district).run!
     end
   end
 end
