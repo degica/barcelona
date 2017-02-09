@@ -1,7 +1,7 @@
 # if user-agent is ELB health checker then nginx do not redirect
 # if originator protocol is https then nginx do not redirect
 # otherwise it redirects to https
-# i.e. if (user agent == health check && forwarded proto != https) then redirect
+# i.e. if (user agent != health check && forwarded proto != https) then redirect
 map "$http_x_forwarded_proto:$http_user_agent" $redirect_to_https {
   default 1;
   "~*:ELB-HealthChecker" 0;
