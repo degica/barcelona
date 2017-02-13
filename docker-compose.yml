@@ -1,4 +1,4 @@
-version: '2.1'
+version: '3.1'
 services:
   web: &app_base
     depends_on:
@@ -43,6 +43,8 @@ services:
     image: postgres:9.5
     environment:
       PGDATA: /data
+    healthcheck:
+      test: echo "\\l" | psql -U postgres
     volumes:
       - pgdata:/data
 volumes:
