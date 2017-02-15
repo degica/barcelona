@@ -15,6 +15,7 @@ before_script:
 - gem install bcnd --no-ri --no-rdoc
 - psql -c 'create database travis_ci_test;' -U postgres
 script:
+- set -e
 - bundle exec rake db:setup spec
 - bcnd
 notifications:
