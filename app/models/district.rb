@@ -67,6 +67,21 @@ class District < ActiveRecord::Base
     @ecs_instance_profile ||= stack_resources["ECSInstanceProfile"]
   end
 
+  def notification_topic
+    @ecs_instance_profile ||= stack_resources["NotificationTopic"]
+  end
+
+  def publish_sns(text, level: "good", data: {}, subject: nil)
+    topic_arn = notification_topic
+    return if topic_arn.nil?
+    message = {
+      text: text,
+      level: level,
+      data: data
+    }.to_json
+    aws.sns.publish(topic_arn: topic_arn, message: message, subject: subject)
+  end
+
   def stack_resources
     @stack_resources ||= stack_executor.resource_ids
   end

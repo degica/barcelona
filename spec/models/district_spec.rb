@@ -139,4 +139,12 @@ describe District do
       expect(result.first).to have_key :private_ip_address
     end
   end
+
+  describe "#publish_sns" do
+    it "publishes message to the notification topic" do
+      expect(district.aws.sns).to receive(:publish)
+      allow(district).to receive(:notification_topic) { "notification-topic-arn" }
+      district.publish_sns("message")
+    end
+  end
 end
