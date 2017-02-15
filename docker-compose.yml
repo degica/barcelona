@@ -12,7 +12,7 @@ services:
         - SKIP_BUNDLE=yes
     ports:
      - "3333:3333"
-    command: rails s -p 3333 -b 0.0.0.0
+    command: rails s -b 0.0.0.0
     stdin_open: true
     tty: true
     links:
@@ -21,6 +21,7 @@ services:
       - bundle:/usr/local/bundle
       - .:${PWD}
     environment: &env_base
+      PORT: 3333
       RAILS_ENV: development
       DATABASE_URL: postgres://postgres:@db:5432
       ENCRYPTION_KEY: abcdefghijklmn
