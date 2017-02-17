@@ -169,6 +169,12 @@ EOS
       # Sleep 30 seconds to wait for heritage stack to be created
       sleep 30
 
+      district.aws.put_role_policy(
+        role_name: heritage.task_role_id.split('/').last,
+        policy_name: "assume-role",
+        policy_document: {"Version" => "2012-10-17", "Statement" => [{"Effect" => "Allow", "Action" => ["sts:AssumeRole"], "Resource" => ["*"]}]}.to_json
+      )
+
       heritage.save_and_deploy!(without_before_deploy: true, description: "Create")
       finalizer = heritage.oneoffs.create!(command: "rake bcn:bootstrap:finalize")
       finalizer.run!
