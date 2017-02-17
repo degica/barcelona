@@ -14,6 +14,16 @@ class ApplyDistrict
     district.aws_secret_access_key = secret_access_key
     if district.valid?
       set_district_aws_credentials(access_key_id, secret_access_key)
+      # Sleeping in the middle of a request is really, really bad manner but because calling AssumeRole
+      # right after creating a district role doesn't work, we need to wait several seconds.
+      # The CF stack creation can be pushed to DelayedJob but for the following reasons I think sleeping is better
+      # 1) Barcelona is not performance intensive thus it is acceptable that a web process becomes
+      #    non-responsible for seconds
+      # 2) If CF execution is run by DelayedJob, "create district" API have to return "SUCCESS" response
+      #    to the caller but the delayed job may fail for whatever reason. The caller should be told
+      #    such kind of unexpected error immediately
+      sleep 5
+
       create_s3_bucket
       generate_ssh_ca_key_pair
       create_ecs_cluster

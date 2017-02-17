@@ -1,7 +1,7 @@
 namespace :bcn do
   def wait_cf_stack(executor)
     while true
-      sleep 5
+      sleep 10
       case executor.stack_status
       when "CREATE_COMPLETE"
         puts
@@ -84,7 +84,7 @@ namespace :bcn do
     oneoff.run
 
     while !oneoff.stopped?
-      sleep 5
+      sleep 10
       print "."
     end
     puts
