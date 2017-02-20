@@ -196,7 +196,7 @@ class District < ActiveRecord::Base
   end
 
   def presence_of_access_key_or_role
-    unless [aws_role, aws_access_key_id, aws_secret_access_key].any?
+    if aws_role.nil? && (aws_access_key_id.nil? || aws_secret_access_key.nil?)
       errors.add(:aws_role, "aws_role or aws_access_key_id must be present")
     end
   end
