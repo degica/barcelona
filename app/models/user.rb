@@ -1,16 +1,4 @@
 class User < ActiveRecord::Base
-  if Rails.env.development?
-    class Fake
-      def admin?
-        true
-      end
-
-      def developer?
-        true
-      end
-    end
-  end
-
   has_many :users_districts
   has_many :districts, through: :users_districts
 
