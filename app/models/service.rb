@@ -7,6 +7,7 @@ class Service < ActiveRecord::Base
 
   serialize :hosts, JSON
   serialize :health_check, JSON
+  serialize :auto_scaling, JSON
 
   validates :name,
             presence: true,
@@ -30,6 +31,7 @@ class Service < ActiveRecord::Base
     service.service_type ||= 'default'
     service.hosts ||= []
     service.health_check ||= {}
+    service.auto_scaling ||= {"max_count" => 2, "min_count" => 2}
   end
 
   after_create :create_port_mappings

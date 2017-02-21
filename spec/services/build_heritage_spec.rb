@@ -78,6 +78,8 @@ describe BuildHeritage do
       expect(service1.listeners.first.rule_conditions).to eq [{"type" => 'path_pattern',
                                                                "value" => '/app*'}]
       expect(service1.listeners.first.endpoint).to eq endpoint
+      expect(service1.auto_scaling["max_count"]).to eq 2
+      expect(service1.auto_scaling["min_count"]).to eq 2
 
       service2 = heritage.services.second
       expect(service2.name).to eq "worker"

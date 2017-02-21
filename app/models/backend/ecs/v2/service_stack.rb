@@ -42,6 +42,8 @@ module Backend::Ecs::V2
           build_service_role
           build_alb_listener
         end
+
+        build_auto_scaling
       end
 
       def build_service_role
@@ -181,6 +183,101 @@ module Backend::Ecs::V2
           ]
           j.Tags [
             tag("barcelona", district.name)
+          ]
+        end
+      end
+
+      def build_auto_scaling
+        add_resource("AWS::ApplicationAutoScaling::ScalableTarget", "ScalableTarget") do |j|
+          j.MaxCapacity service.auto_scaling["max_count"]
+          j.MinCapacity service.auto_scaling["min_count"]
+          j.ResourceId join("/", "service", district.name, get_attr("ECSService", "Name"))
+          j.RoleARN get_attr("AASRole", "Arn")
+          j.ScalableDimension "ecs:service:DesiredCount"
+          j.ServiceNamespace "ecs"
+        end
+
+        add_resource("AWS::ApplicationAutoScaling::ScalingPolicy", "ScaleUpPolicy") do |j|
+          j.PolicyName "ScaleUpPolicy"
+          j.PolicyType "StepScaling"
+          j.ScalingTargetId ref("ScalableTarget")
+          j.StepScalingPolicyConfiguration do |j|
+            j.AdjustmentType "PercentChangeInCapacity"
+            j.Cooldown 60
+            j.MetricAggregationType "Average"
+            j.MinAdjustmentMagnitude 1
+            j.StepAdjustments [
+              {"MetricIntervalLowerBound" => 0,  "MetricIntervalUpperBound" => 10, "ScalingAdjustment" => 0},
+              {"MetricIntervalLowerBound" => 10, "MetricIntervalUpperBound" => 30, "ScalingAdjustment" => 10},
+              {"MetricIntervalLowerBound" => 30,                                   "ScalingAdjustment" => 50}
+            ]
+          end
+        end
+
+        add_resource("AWS::ApplicationAutoScaling::ScalingPolicy", "ScaleDownPolicy") do |j|
+          j.PolicyName "ScaleDownPolicy"
+          j.PolicyType "StepScaling"
+          j.ScalingTargetId ref("ScalableTarget")
+          j.StepScalingPolicyConfiguration do |j|
+            j.AdjustmentType "PercentChangeInCapacity"
+            j.Cooldown 60
+            j.MetricAggregationType "Average"
+            j.MinAdjustmentMagnitude 1
+            j.StepAdjustments [
+              {                                   "MetricIntervalUpperBound" => -10, "ScalingAdjustment" => -10},
+              {"MetricIntervalLowerBound" => -10, "MetricIntervalUpperBound" => 0, "ScalingAdjustment" => 0}
+            ]
+          end
+        end
+
+        add_resource("AWS::CloudWatch::Alarm", "ServiceCPUAlarm") do |j|
+          j.ComparisonOperator "GreaterThanThreshold"
+          j.AlarmActions [ref("ScaleUpPolicy")]
+          j.OKActions [ref("ScaleDownPolicy")]
+          j.EvaluationPeriods 1
+          j.MetricName "CPUUtilization"
+          j.Namespace "AWS/ECS"
+          j.Period 180
+          j.Statistic "Average"
+          j.Threshold 50
+          j.Dimensions [
+            {"Name" => "ServiceName", "Value" => get_attr("ECSService", "Name")},
+            {"Name" => "ClusterName", "Value" => district.name}
+          ]
+        end
+
+        add_resource("AWS::IAM::Role", "AASRole") do |j|
+          j.AssumeRolePolicyDocument do |j|
+            j.Version "2008-10-17"
+            j.Statement [
+              {
+                "Effect" => "Allow",
+                "Principal" => {
+                  "Service" => ["application-autoscaling.amazonaws.com"]
+                },
+                "Action" => ["sts:AssumeRole"]
+              }
+            ]
+          end
+          j.Path "/"
+          j.Policies [
+            {
+              "PolicyName" => "aas-policy",
+              "PolicyDocument" => {
+                "Version" => "2012-10-17",
+                "Statement" => [
+                  {
+                    "Effect" => "Allow",
+                    "Action" => [
+                      "ecs:DescribeServices",
+                      "ecs:UpdateService",
+                      "cloudwatch:DescribeAlarms"
+                    ],
+                    "Resource" => ["*"]
+                  }
+                ]
+              }
+            }
           ]
         end
       end

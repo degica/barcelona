@@ -50,4 +50,19 @@ describe Backend::Ecs::V2::ServiceStack do
       end
     end
   end
+
+  context "when the service has autoscaling" do
+    before do
+      service.auto_scaling = {"max_count" => 10,  "min_count" => 2}
+    end
+
+    it "generates resources" do
+      generated = JSON.load stack.target!
+      expect(generated["Resources"]["ScalableTarget"]).to be_present
+      expect(generated["Resources"]["ScaleUpPolicy"]).to be_present
+      expect(generated["Resources"]["ScaleDownPolicy"]).to be_present
+      expect(generated["Resources"]["ServiceCPUAlarm"]).to be_present
+      expect(generated["Resources"]["AASRole"]).to be_present
+    end
+  end
 end
