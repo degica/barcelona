@@ -218,6 +218,7 @@ class ApplyDistrict
             duration_seconds: 900,
           )
         rescue Aws::STS::Errors::AccessDenied => e
+          Rails.logger.info "Failed to assume role. Will retry in 1 second"
           sleep 1
         else
           break
