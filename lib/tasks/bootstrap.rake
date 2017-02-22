@@ -61,7 +61,7 @@ namespace :bcn do
     heritage = district.heritages.new(
       name: "barcelona-bootstrap",
       image_name: "quay.io/degica/barcelona",
-      image_tag: "role-based-auth"
+      image_tag: "master"
     )
     heritage.env_vars.build(key: "DATABASE_URL", value: ENV["BOOTSTRAP_DATABASE_URL"], secret: true)
     heritage.env_vars.build(key: "DISABLE_DATABASE_ENVIRONMENT_CHECK", value: "1", secret: false)
@@ -131,7 +131,7 @@ EOS
       heritage = district.heritages.new(
         name: "barcelona",
         image_name: "quay.io/degica/barcelona",
-        image_tag: "role-based-auth",
+        image_tag: "master",
         before_deploy: "rake db:migrate",
         env_vars_attributes: [
           {key: "RAILS_ENV", value: "production", secret: false},
