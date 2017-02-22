@@ -1,7 +1,7 @@
 namespace :bcn do
   def wait_cf_stack(executor)
     while true
-      sleep 5
+      sleep 10
       case executor.stack_status
       when "CREATE_COMPLETE"
         puts
@@ -28,10 +28,8 @@ namespace :bcn do
     # Create District and network stack
     district = District.find_or_initialize_by(name: district_name)
     if district.id.nil?
-      district.aws_access_key_id = access_key_id
-      district.aws_secret_access_key = secret_key
       district.region = region
-      ApplyDistrict.new(district).create!
+      ApplyDistrict.new(district).create!(access_key_id, secret_key)
 
       print "Creating Network Stack"
       wait_cf_stack(district.stack_executor)
@@ -63,7 +61,7 @@ namespace :bcn do
     heritage = district.heritages.new(
       name: "barcelona-bootstrap",
       image_name: "quay.io/degica/barcelona",
-      image_tag: "latest"
+      image_tag: "role-based-auth"
     )
     heritage.env_vars.build(key: "DATABASE_URL", value: ENV["BOOTSTRAP_DATABASE_URL"], secret: true)
     heritage.env_vars.build(key: "DISABLE_DATABASE_ENVIRONMENT_CHECK", value: "1", secret: false)
@@ -71,6 +69,7 @@ namespace :bcn do
     heritage.env_vars.build(key: "AWS_ACCESS_KEY_ID", value: access_key_id, secret: false)
     heritage.env_vars.build(key: "AWS_SECRET_ACCESS_KEY", value: secret_key, secret: true)
     heritage.env_vars.build(key: "RAILS_ENV", value: "production", secret: false)
+    heritage.env_vars.build(key: "RAILS_LOG_TO_STDOUT", value: "true", secret: false)
     heritage.env_vars.build(key: "DISTRICT_NAME", value: district_name, secret: false)
     heritage.env_vars.build(key: "S3_BUCKET_NAME", value: district.s3_bucket_name, secret: false)
     heritage.env_vars.build(key: "CIDR_BLOCK", value: district.cidr_block, secret: false)
@@ -85,7 +84,7 @@ namespace :bcn do
     oneoff.run
 
     while !oneoff.stopped?
-      sleep 5
+      sleep 10
       print "."
     end
     puts
@@ -132,10 +131,11 @@ EOS
       heritage = district.heritages.new(
         name: "barcelona",
         image_name: "quay.io/degica/barcelona",
-        image_tag: "latest",
+        image_tag: "role-based-auth",
         before_deploy: "rake db:migrate",
         env_vars_attributes: [
-          {key: "RAILS_ENV",     value: "production", secret: false},
+          {key: "RAILS_ENV", value: "production", secret: false},
+          {key: "RAILS_LOG_TO_STDOUT", value: "true", secret: false},
           {key: "GITHUB_ORGANIZATION", value: ENV['GITHUB_ORGANIZATION'], secret: false},
           {key: "DATABASE_URL",  value: ENV["DATABASE_URL"], secret: true},
           {key: "SECRET_KEY_BASE", value: SecureRandom.hex(64), secret: true},
@@ -164,8 +164,27 @@ EOS
           }
         ]
       )
+      heritage.save!
+
+      # Sleep 30 seconds to wait for heritage stack to be created
+      sleep 30
+
+      iam = Aws::IAM::Client.new(region: ENV["AWS_REGION"])
+      iam.put_role_policy(
+        role_name: heritage.task_role_id.split('/').last,
+        policy_name: "assume-role",
+        policy_document: {"Version" => "2012-10-17", "Statement" => [{"Effect" => "Allow", "Action" => ["sts:AssumeRole"], "Resource" => ["*"]}]}.to_json
+      )
 
       heritage.save_and_deploy!(without_before_deploy: true, description: "Create")
+      finalizer = heritage.oneoffs.create!(command: "rake bcn:bootstrap:finalize")
+      finalizer.run!
+    end
+
+    desc "Finalize bootstrap"
+    task :finalize => :environment do
+      district = District.find_by(name: "default")
+      ReplaceCredsWithRole.new(district).run!
     end
   end
 end

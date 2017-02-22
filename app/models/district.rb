@@ -16,12 +16,6 @@ class District < ActiveRecord::Base
   validates :cluster_backend, inclusion: {in: %w(autoscaling)}
   validates :cluster_size, numericality: {greater_than_or_equal_to: 0}
 
-  # Allows nil when test environment
-  # This is because encrypting/decrypting value is very slow
-  # So to speed up specs we allow empty access keys
-  validates :aws_access_key_id, presence: true, if: -> { !Rails.env.test? }
-  validates :aws_secret_access_key, presence: true, if: -> { !Rails.env.test? }
-
   ECS_REGIONS = Aws.
                 partition("aws").
                 regions.select { |r| r.services.include?("ECS") }.
@@ -29,6 +23,7 @@ class District < ActiveRecord::Base
   validates :region, inclusion: {in: ECS_REGIONS}
 
   validate :validate_cidr_block
+  validate :presence_of_access_key_or_role, if: -> { !Rails.env.test? }
 
   serialize :dockercfg, JSON
 
@@ -37,8 +32,7 @@ class District < ActiveRecord::Base
   accepts_nested_attributes_for :plugins
 
   def aws
-    # these fallback "empty" value is a trick to speed up specs
-    @aws ||= AwsAccessor.new(aws_access_key_id || "empty", aws_secret_access_key || "empty", region)
+    @aws ||= AwsAccessor.new(self)
   end
 
   def to_param
@@ -199,5 +193,11 @@ class District < ActiveRecord::Base
 
   def assign_default_users
     self.users = User.all
+  end
+
+  def presence_of_access_key_or_role
+    if aws_role.nil? && (aws_access_key_id.nil? || aws_secret_access_key.nil?)
+      errors.add(:aws_role, "aws_role or aws_access_key_id must be present")
+    end
   end
 end
