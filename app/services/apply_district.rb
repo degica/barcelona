@@ -14,18 +14,6 @@ class ApplyDistrict
     district.aws_secret_access_key = secret_access_key
     if district.valid?
       set_district_aws_credentials(access_key_id, secret_access_key)
-      # Sleeping in the middle of a request is really, really bad manner but because calling AssumeRole
-      # right after creating a district role doesn't work, we need to wait several seconds.
-      # Those AWS resource manipulation can be pushed to DelayedJob but for the following reasons
-      # I think sleep is better
-      # 1) Barcelona is not performance intensive thus it is acceptable that one worker process becomes
-      #    non-responsible for seconds
-      # 2) If CF execution is run by DelayedJob, "create district" API have to return "SUCCESS" response
-      #    to the caller but the delayed job may fail for whatever reason. The caller should be told
-      #    such kind of unexpected error immediately.
-      #    Returning error immediately is far more important than making Barcelona high performance.
-      # 3) I want to ensure that given access key can be removed when "create district" API responded.
-      sleep 5
 
       create_s3_bucket
       generate_ssh_ca_key_pair
@@ -209,6 +197,32 @@ class ApplyDistrict
           }
         }.to_json
       )
+
+      # Sleeping in the middle of a request is really, really bad manner but because calling AssumeRole
+      # right after creating a district role doesn't work, we need to wait several seconds.
+      # Those AWS resource manipulation can be pushed to DelayedJob but for the following reasons
+      # I think sleep is better
+      # 1) Barcelona is not performance intensive thus it is acceptable that one worker process becomes
+      #    non-responsible for seconds
+      # 2) If CF execution is run by DelayedJob, "create district" API have to return "SUCCESS" response
+      #    to the caller but the delayed job may fail for whatever reason. The caller should be told
+      #    such kind of unexpected error immediately.
+      #    Returning error immediately is far more important than making Barcelona high performance.
+      # 3) I want to ensure that given access key can be removed when "create district" API responded.
+      sts = Aws::STS::Client.new(region: district.region)
+      10.times do |i|
+        begin
+          sts.assume_role(
+            role_arn: resp.role.arn,
+            role_session_name: "assume-role-check-#{SecureRandom.hex(4)}",
+            duration_seconds: 900,
+          )
+        rescue Aws::STS::Errors::AccessDenied => e
+          sleep 1
+        else
+          break
+        end
+      end
     end
 
     resp.role.arn
