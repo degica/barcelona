@@ -37,8 +37,9 @@ Choose AWS region you want to deploy Barcelona to.
 EOS
 
     ENV["ACM_CERT_ARN"] = options[:acm_cert_arn].presence ||
-                          ask_with_description("ACM Certificate ARN", <<-EOS, required: true)
+                          ask_with_description("ACM Certificate ARN", <<-EOS, required: false)
 Create a new certificate on Amazon Certificate Manager in the region you chose and provide its ARN.
+This is optional but we highly recommend to setup ACM certificate.
 EOS
 
     ENV["GITHUB_ORGANIZATION"] = options[:github_organization].presence ||

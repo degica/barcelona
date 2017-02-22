@@ -73,7 +73,9 @@ namespace :bcn do
     heritage.env_vars.build(key: "DISTRICT_NAME", value: district_name, secret: false)
     heritage.env_vars.build(key: "S3_BUCKET_NAME", value: district.s3_bucket_name, secret: false)
     heritage.env_vars.build(key: "CIDR_BLOCK", value: district.cidr_block, secret: false)
-    heritage.env_vars.build(key: "ACM_CERT_ARN", value: acm_cert_arn, secret: false)
+    if acm_cert_arn
+      heritage.env_vars.build(key: "ACM_CERT_ARN", value: acm_cert_arn, secret: false)
+    end
     heritage.env_vars.build(key: "GITHUB_ORGANIZATION", value: gh_org, secret: false)
     heritage.save!
 
