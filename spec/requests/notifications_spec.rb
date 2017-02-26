@@ -57,6 +57,7 @@ describe "notifications endpoint", type: :request do
         expect(response.status).to eq 200
 
         body = JSON.load(response.body)
+        expect(body["notification"]["id"]).to eq notification.id
         expect(body["notification"]["target"]).to eq "slack"
         expect(body["notification"]["endpoint"]).to eq slack_endpoint
       end
@@ -72,6 +73,7 @@ describe "notifications endpoint", type: :request do
       expect(response.status).to eq 200
 
       body = JSON.load(response.body)
+      expect(body["notification"]["id"]).to eq notification.id
       expect(body["notification"]["target"]).to eq notification.target
       expect(body["notification"]["endpoint"]).to eq notification.endpoint
     end
