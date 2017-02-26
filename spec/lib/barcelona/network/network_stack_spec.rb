@@ -859,21 +859,4 @@ describe Barcelona::Network::NetworkStack do
       expect(generated["Resources"]["RouteNATForRouteTableTrusted2"]).to be_present
     end
   end
-
-  context "when notifications exist" do
-    it "includes Slack notification resources" do
-      district.notifications = [
-        {
-          "target" => "slack",
-          "endpoint" => "https://slack.com/webhook-endpoint"
-        }
-      ]
-      stack = described_class.new(district)
-      generated = JSON.load(stack.target!)
-      expect(generated["Resources"]["SlackSubscription"]).to be_present
-      expect(generated["Resources"]["NotificationPermission"]).to be_present
-      expect(generated["Resources"]["SlackNotification"]).to be_present
-      expect(generated["Resources"]["NotificationRole"]).to be_present
-    end
-  end
 end
