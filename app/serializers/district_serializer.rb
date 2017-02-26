@@ -8,4 +8,5 @@ class DistrictSerializer < ActiveModel::Serializer
 
   has_many :heritages
   has_many :plugins
+  has_many :notifications
 end
