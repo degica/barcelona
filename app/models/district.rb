@@ -70,7 +70,7 @@ class District < ActiveRecord::Base
   end
 
   def notification_topic
-    @ecs_instance_profile ||= stack_resources["NotificationTopic"]
+    @notification_topic ||= stack_resources["NotificationTopic"]
   end
 
   def publish_sns(text, level: "good", data: {}, subject: nil)
