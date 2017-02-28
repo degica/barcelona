@@ -3,7 +3,6 @@ environments:
     version: 2
     name: barcelona
     image_name: quay.io/degica/barcelona
-    before_deploy: rake db:migrate
     slack_url: https://hooks.slack.com/services/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
     services:
       - name: web

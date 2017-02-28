@@ -4,7 +4,7 @@ class DistrictsController < ApplicationController
 
   def index
     @districts = District.all
-    render json: @districts
+    render json: @districts, fields: [:name, :region, :cluster_size, :cluster_instance_type, :stack_name, :aws_access_key_id, :aws_role]
   end
 
   def show
