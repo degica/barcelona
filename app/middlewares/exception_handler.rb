@@ -20,11 +20,11 @@ class ExceptionHandler
     end
 
     def body(debug)
-      data = { error: error.presence || [default_error] }
+      data = { error: error.presence || error_type }
       if debug
         data.merge!(
-          backtrace: original.backtrace,
-          debug_message: "#{original.class}: #{original.message}"
+          debug_message: "#{original.class}: #{original.message}",
+          backtrace: original.backtrace
         )
       end
       data.to_json
@@ -38,12 +38,6 @@ class ExceptionHandler
 
     def error_type
       self.class.to_s.split("::").last.underscore
-    end
-
-    def default_error
-      {
-        type: error_type
-      }
     end
   end
 
@@ -92,7 +86,7 @@ class ExceptionHandler
     rescue ActiveRecord::RecordNotFound
       raise NotFound
     rescue ActiveRecord::RecordInvalid => e
-      raise UnprocessableEntity.new(e.record.errors)
+      raise UnprocessableEntity.new(e.message)
     rescue Pundit::Error => e
       raise Forbidden.new(e.message)
     rescue ActionController::ParameterMissing => e
