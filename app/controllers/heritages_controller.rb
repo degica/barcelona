@@ -75,7 +75,6 @@ class HeritagesController < ApplicationController
       :name,
       :image_name,
       :image_tag,
-      :slack_url,
       :before_deploy,
       services: [
         :name,
