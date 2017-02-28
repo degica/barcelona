@@ -28,6 +28,10 @@ class AwsAccessor
     @cloudformation ||= Aws::CloudFormation::Client.new(client_config)
   end
 
+  def sns
+    @sns ||= Aws::SNS::Client.new(client_config)
+  end
+
   private
 
   def client_config

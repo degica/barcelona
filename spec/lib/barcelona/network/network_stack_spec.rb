@@ -810,7 +810,14 @@ describe Barcelona::Network::NetworkStack do
         "Type" => "AWS::EC2::SubnetNetworkAclAssociation",
         "Properties" => {
           "SubnetId" => {"Ref" => "SubnetTrusted2"},
-          "NetworkAclId" => {"Ref" => "NetworkAclTrusted2"}}}}
+          "NetworkAclId" => {"Ref" => "NetworkAclTrusted2"}}},
+      "NotificationTopic" => {
+        "Type" => "AWS::SNS::Topic",
+        "Properties" => {
+          "DisplayName" => "district-#{district.name}-notification"
+        }
+      }
+    }
     expect(generated["Resources"]).to match expected
   end
 

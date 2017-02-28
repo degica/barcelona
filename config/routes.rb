@@ -22,6 +22,7 @@ Rails.application.routes.draw do
       end
 
       resources :endpoints, except: [:new, :edit]
+      resources :notifications, except: [:new, :edit]
     end
 
     resources :users, only: [:index, :show, :update]

@@ -3,12 +3,14 @@ class District < ActiveRecord::Base
 
   before_validation :set_default_attributes
   before_create :assign_default_users
+  after_destroy :delete_notification_stack
 
   has_many :heritages, inverse_of: :district, dependent: :destroy
   has_many :users_districts, dependent: :destroy
   has_many :users, through: :users_districts
   has_many :plugins, dependent: :delete_all, inverse_of: :district
   has_many :endpoints, inverse_of: :district, dependent: :destroy
+  has_many :notifications, inverse_of: :district, dependent: :destroy
 
   validates :name, presence: true, uniqueness: true, immutable: true
   validates :region, :s3_bucket_name, :stack_name, :cidr_block, presence: true, immutable: true
@@ -65,6 +67,21 @@ class District < ActiveRecord::Base
 
   def ecs_instance_profile
     @ecs_instance_profile ||= stack_resources["ECSInstanceProfile"]
+  end
+
+  def notification_topic
+    @notification_topic ||= stack_resources["NotificationTopic"]
+  end
+
+  def publish_sns(text, level: "good", data: {}, subject: nil)
+    topic_arn = notification_topic
+    return if topic_arn.nil?
+    message = {
+      text: text,
+      level: level,
+      data: data
+    }.to_json
+    aws.sns.publish(topic_arn: topic_arn, message: message, subject: subject)
   end
 
   def stack_resources
@@ -181,6 +198,12 @@ class District < ActiveRecord::Base
     "Barcelona/#{name}/instances"
   end
 
+  def update_notification_stack
+    stack = NotificationStack.new(self)
+    executor = CloudFormation::Executor.new(stack, aws.cloudformation)
+    executor.create_or_update
+  end
+
   private
 
   def validate_cidr_block
@@ -199,5 +222,11 @@ class District < ActiveRecord::Base
     if aws_role.nil? && (aws_access_key_id.nil? || aws_secret_access_key.nil?)
       errors.add(:aws_role, "aws_role or aws_access_key_id must be present")
     end
+  end
+
+  def delete_notification_stack
+    stack = NotificationStack.new(self)
+    executor = CloudFormation::Executor.new(stack, aws.cloudformation)
+    executor.delete
   end
 end

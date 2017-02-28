@@ -337,6 +337,10 @@ module Barcelona
           j.Path "/"
           j.Roles [ref("ECSInstanceRole")]
         end
+
+        add_resource("AWS::SNS::Topic", "NotificationTopic") do |j|
+          j.DisplayName "district-#{stack.district.name}-notification"
+        end
       end
     end
   end

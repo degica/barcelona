@@ -20,6 +20,9 @@ class Event < ActiveRecord::Base
 
   def send_notifications
     Rails.logger.info(user_message)
+    heritage.district.publish_sns(user_message, level: slack_color)
+
+    # TODO Remove these lines after we setup notifcation topic in our districts
     return if heritage.slack_url.blank?
     notifier = Slack::Notifier.new(heritage.slack_url, username: "Barcelona")
     notifier.ping("", attachments: [{color: slack_color, text: user_message}])

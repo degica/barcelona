@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161212130243) do
+ActiveRecord::Schema.define(version: 20170223222338) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -111,6 +111,15 @@ ActiveRecord::Schema.define(version: 20161212130243) do
     t.index ["service_id"], name: "index_listeners_on_service_id", using: :btree
   end
 
+  create_table "notifications", force: :cascade do |t|
+    t.string   "target",      null: false
+    t.string   "endpoint",    null: false
+    t.integer  "district_id"
+    t.datetime "created_at",  null: false
+    t.datetime "updated_at",  null: false
+    t.index ["district_id"], name: "index_notifications_on_district_id", using: :btree
+  end
+
   create_table "oneoffs", force: :cascade do |t|
     t.string   "task_arn"
     t.integer  "heritage_id"
@@ -194,6 +203,7 @@ ActiveRecord::Schema.define(version: 20161212130243) do
   add_foreign_key "heritages", "districts"
   add_foreign_key "listeners", "endpoints"
   add_foreign_key "listeners", "services"
+  add_foreign_key "notifications", "districts"
   add_foreign_key "oneoffs", "heritages"
   add_foreign_key "plugins", "districts"
   add_foreign_key "port_mappings", "services"
