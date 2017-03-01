@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170223222338) do
+ActiveRecord::Schema.define(version: 20170228141152) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -89,7 +89,6 @@ ActiveRecord::Schema.define(version: 20170223222338) do
     t.datetime "created_at",      null: false
     t.datetime "updated_at",      null: false
     t.text     "before_deploy"
-    t.text     "slack_url"
     t.string   "token"
     t.integer  "version"
     t.text     "scheduled_tasks"

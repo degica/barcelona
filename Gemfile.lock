@@ -178,7 +178,6 @@ GEM
     sawyer (0.8.1)
       addressable (>= 2.3.5, < 2.6)
       faraday (~> 0.8, < 1.0)
-    slack-notifier (2.0.0)
     slop (3.6.0)
     spring (2.0.1)
       activesupport (>= 4.2)
@@ -224,7 +223,6 @@ DEPENDENCIES
   rails (~> 5.0)
   rspec-its
   rspec-rails
-  slack-notifier
   spring
   spring-commands-rspec
   sqlite3
