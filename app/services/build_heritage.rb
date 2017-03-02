@@ -15,7 +15,7 @@ class BuildHeritage
       new_params[:services_attributes].each do |service|
         service[:port_mappings_attributes] = service.delete(:port_mappings) if service[:port_mappings].present?
 
-        if service[:listeners].present?
+        unless service[:listeners].nil?
           listener_map = Hash[Endpoint.where(name: service[:listeners].map { |e| e[:endpoint] }).pluck(:name, :id)]
           service[:listeners_attributes] = service.delete(:listeners).map do |listener|
             {

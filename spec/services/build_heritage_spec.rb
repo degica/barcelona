@@ -248,17 +248,34 @@ describe BuildHeritage do
     end
 
     context "deleting listeners" do
-      before do
-        new_params = params.dup
-        new_params[:services][0].delete(:listeners)
-        @updated_heritage = BuildHeritage.new(new_params).execute
-        @updated_heritage.save!
+      context "when listeners is nil" do
+        before do
+          new_params = params.dup
+          new_params[:services][0].delete :listeners
+          @updated_heritage = BuildHeritage.new(new_params).execute
+          @updated_heritage.save!
+        end
+
+        it "deletes listners" do
+          service1 = @updated_heritage.services.first
+          expect(service1).to be_present
+          expect(service1.listeners.count).to eq 0
+        end
       end
 
-      it "deletes listners" do
-        service1 = @updated_heritage.services.first
-        expect(service1).to be_present
-        expect(service1.listeners.count).to eq 0
+      context "when listeners is nil" do
+        before do
+          new_params = params.dup
+          new_params[:services][0][:listeners] = []
+          @updated_heritage = BuildHeritage.new(new_params).execute
+          @updated_heritage.save!
+        end
+
+        it "deletes listners" do
+          service1 = @updated_heritage.services.first
+          expect(service1).to be_present
+          expect(service1.listeners.count).to eq 0
+        end
       end
     end
   end
