@@ -6,7 +6,8 @@ Rails.application.routes.draw do
         post :sign_public_key
       end
 
-      resources :plugins, except: [:new, :edit]
+      resources :plugins, only: [:index, :show, :destroy]
+      put "/plugins/:id", to: "plugins#put"
 
       resources :heritages, shallow: true, except: [:new, :edit] do
         post   :env_vars, on: :member, to: "heritages#set_env_vars"
