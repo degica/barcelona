@@ -2,7 +2,6 @@ require 'rails_helper'
 
 describe "POST /districts/:district/endpoints", type: :request do
   let(:user) { create :user }
-  let(:auth) { {"X-Barcelona-Token" => user.token, "Content-Type" => "application/json", "Accept" => "application/json"} }
   let(:district) { create :district }
 
   it "creates an endpoint" do
