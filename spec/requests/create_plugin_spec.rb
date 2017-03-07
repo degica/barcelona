@@ -1,18 +1,29 @@
 require 'rails_helper'
 
-describe "POST /districts/:district/plugins", type: :request do
+describe "PUT /districts/:district/plugins/:id", type: :request do
   let(:user) { create :user }
   let(:district) { create :district }
+  let(:name) { "logentries" }
 
-  it "creates a plugin" do
-    params = {
-      name: "logentries",
-      attributes: {token: "abcde"}
-    }
-    api_request :post, "/v1/districts/#{district.name}/plugins", params
+  it "puts a plugin" do
+    # create
+    params = {attributes: {token: "abcde"}}
+    api_request :put, "/v1/districts/#{district.name}/plugins/#{name}", params
     expect(response.status).to eq 200
+
     plugin = JSON.load(response.body)["plugin"]
     expect(plugin["name"]).to eq "logentries"
-    expect(plugin["plugin_attributes"]).to eq({"token" => "abcde"})
+    expect(plugin["attributes"]).to eq({"token" => "abcde"})
+
+    # update
+    params = {attributes: {token: "fghijk"}}
+    api_request :put, "/v1/districts/#{district.name}/plugins/#{name}", params
+    expect(response.status).to eq 200
+
+    plugin = JSON.load(response.body)["plugin"]
+    expect(plugin["name"]).to eq "logentries"
+    expect(plugin["attributes"]).to eq({"token" => "fghijk"})
+
+    expect(district.plugins.pluck(:name)).to eq ["logentries"]
   end
 end

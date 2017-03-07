@@ -1,3 +1,4 @@
 class PluginSerializer < ActiveModel::Serializer
-  attributes :name, :plugin_attributes
+  attributes :name
+  attribute :plugin_attributes, key: :attributes
 end

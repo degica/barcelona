@@ -1,11 +1,12 @@
 class PluginsController < ApplicationController
   before_action :load_district
-  before_action :load_plugin, except: [:index, :create]
+  before_action :load_plugin, except: [:index, :put]
 
-  def create
-    name = params.require :name
-    @plugin = @district.plugins.create!(name: name,
-                                        plugin_attributes: params[:attributes])
+  def put
+    @plugin = @district.plugins.find_or_initialize_by(name: params[:id])
+    @plugin.plugin_attributes = params[:attributes]
+    @plugin.save!
+
     render json: @plugin
   end
 
@@ -15,12 +16,6 @@ class PluginsController < ApplicationController
   end
 
   def show
-    render json: @plugin
-  end
-
-  def update
-    attributes = params.require :attributes
-    @plugin.update!(plugin_attributes: attributes)
     render json: @plugin
   end
 
