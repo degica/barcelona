@@ -2,10 +2,12 @@ require 'rails_helper'
 
 describe "POST /districts/:district/endpoints", type: :request do
   let(:user) { create :user }
-  let(:auth) { {"X-Barcelona-Token" => user.token, "Content-Type" => "application/json", "Accept" => "application/json"} }
   let(:district) { create :district }
 
   it "creates an endpoint" do
+    allow_any_instance_of(CloudFormation::Executor).to receive(:outputs) {
+      {"DNSName" => "dns.name"}
+    }
     params = {
       name: "my-endpoint",
       public: true,
@@ -17,5 +19,6 @@ describe "POST /districts/:district/endpoints", type: :request do
     expect(endpoint["name"]).to eq "my-endpoint"
     expect(endpoint["public"]).to eq true
     expect(endpoint["certificate_id"]).to eq 'certificate_id'
+    expect(endpoint["dns_name"]).to eq "dns.name"
   end
 end

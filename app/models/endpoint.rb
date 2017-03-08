@@ -129,6 +129,10 @@ class Endpoint < ActiveRecord::Base
     cf_executor&.resource_ids["LBListenerHTTPS"]
   end
 
+  def dns_name
+    cf_executor.outputs["DNSName"]
+  end
+
   def to_param
     name
   end
