@@ -7,7 +7,7 @@ class Oneoff < ActiveRecord::Base
   delegate :district, to: :heritage
   delegate :aws, to: :district
 
-  attr_accessor :memory
+  attr_accessor :memory, :user
 
   after_initialize do |oneoff|
     oneoff.memory ||= 512

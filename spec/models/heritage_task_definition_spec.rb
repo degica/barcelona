@@ -194,6 +194,13 @@ describe HeritageTaskDefinition do
                               ]
                            })
     end
+
+    context "when user is specified" do
+      it "sets user to task definition" do
+        oneoff.user = "user"
+        expect(subject[:container_definitions][0][:user]).to eq("user")
+      end
+    end
   end
 
   describe ".schedule_definition" do
