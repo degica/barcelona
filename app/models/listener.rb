@@ -6,7 +6,7 @@ class Listener < ActiveRecord::Base
   serialize :rule_conditions, JsonWithIndifferentAccess
 
   after_initialize do |lis|
-    lis.health_check_interval ||= 30
+    lis.health_check_interval ||= 10
     lis.health_check_path ||= '/'
     lis.rule_conditions ||= [{type: "path-pattern", value: "*"}]
     lis.rule_priority ||= 100

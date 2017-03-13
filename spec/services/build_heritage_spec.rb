@@ -241,7 +241,7 @@ describe BuildHeritage do
         service1 = @updated_heritage.services.first
         expect(service1).to be_present
         expect(service1.listeners.count).to eq 1
-        expect(service1.listeners.first.health_check_interval).to eq 30
+        expect(service1.listeners.first.health_check_interval).to eq 10
         expect(service1.listeners.first.health_check_path).to eq "/"
         expect(service1.listeners.first.endpoint.name).to eq endpoint2.name
       end
