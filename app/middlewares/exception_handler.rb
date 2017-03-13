@@ -2,7 +2,7 @@ class ExceptionHandler
   class Exception < StandardError
     attr_accessor :error
 
-    def initialize(error = [])
+    def initialize(error = nil)
       super
       @error = error
     end
