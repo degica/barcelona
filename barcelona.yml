@@ -1,6 +1,5 @@
 environments:
   production:
-    version: 2
     name: barcelona
     image_name: quay.io/degica/barcelona
     services:
