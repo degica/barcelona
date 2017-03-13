@@ -24,7 +24,7 @@ class Service < ActiveRecord::Base
   accepts_nested_attributes_for :listeners, allow_destroy: true
 
   after_initialize do |service|
-    service.cpu ||= 512
+    service.cpu ||= 256
     service.memory ||= 512
     service.reverse_proxy_image ||= DEFAULT_REVERSE_PROXY
     service.service_type ||= 'default'
