@@ -8,8 +8,8 @@ addons:
   postgresql: '9.4'
 env:
   global:
-    - DATABASE_URL=postgres://postgres:@localhost:5432/travis_ci_test
-    - ENCRYPTION_KEY=abcdefghijklmn
+  - DATABASE_URL=postgres://postgres:@localhost:5432/travis_ci_test
+  - ENCRYPTION_KEY=abcdefghijklmn
 before_script:
 - npm install -g barcelona
 - gem install bcnd --no-ri --no-rdoc
@@ -20,4 +20,4 @@ script:
 - bcnd
 notifications:
   slack:
-    secure: rWAGc6ogy9B1E4P/oBYctaAk+EgdgboBU7GOjL3wPtFrgrMXSTzhGUrCpTFw2wgSM5t05rSG0OG/S+TycGM/ZHHo7kQod+uU/53nRbeNDDkths6b8VC2gaAUub8TwH7sJhKMzVUOtpp912usDToldFw1aU/5NIrhdA80XL1nX7+mP3imIdIthuEDZ6vvzol5KoTqvLztePMK8oykRtSy30pDYeiXTsh56a1sR+Q2nau4qphb3+Zzv3QBeEvNIoHGmnPnca16nTO+stvm75mS7ENF9vrn1gUTuAhpu1AO91mEROV43uvct3fEdJ/rAtKWo1dOzhRxqMc+rbZ//TPp5m86evTXgC/cZJS6T704CHqJ5X5FVRqHdoQqvtgs1QKQD6/YwVCkWq6YJoBPW7LEtR8HoryLlDIpnMW2iyaK7HUdTXc1lPCapOeRuLtYdM44TLP0NQAJ1s6JkDiBoqnr70A/y9J5WmGIHRy2iXSnyJgIcGB8Tw2yQ/SXvWNTgeoHkQyD4uXPrpkxNM+OiIybAQERi1JuPE14om3IBJy2xVoub2UHLHpiKSYzvpdI3ij2SetQGLYLovVi4UY4GXVBlV5oPsyouFN/IEN/M9MxDQmPsWDeWYH5+kO9WdK6+zoIIlDNIZ3OuRyQHvkZEDOixq8aHDB6rIncOSvrjwcjJ/I=
+    secure: tLwt7GXy2ppehskMkl0oWKwE/811GDSI9hLMqvRzjMl6E8OwJCnYMnAFydyCY1ZMUIiVmNss8mMWIg2db4TuDnREBosK1ztSRIOPhxwqVJT6er+J0+xX/HXEKTBE+bhQRT6/L4vVGncoGGYQTaPVilO8TGExTQ3jPVDUsbqGtJZ2azwYYPF7/ox72rZQWTaRiy1gpPRaiXpvBRrieqOQ2B+fhZKYlosaH+8XMjWDysVd2TdzYy2VUWNNEqomH+3UByo5tnYjaYh0kxrDbeDWKRhhHqgJRM2qIcULej3OLmj+56DAFLOZ6YAC8MVq+8bBxGzVCQbTzqkoTQEZCLkU+2mBSBXUzPXYEm1uBGutFnMIteazqNJ3XtM6tJwyu0lKMFqGwSVyeNS1yEfrqc8BOmsK3Vi1QNYqQmVoP/A04BnRVhqjnOTeiqpFawiCpP53aRgPULDqjMta4t7dXvnOp1aL16/dbkpWPCpM9/12cRl4m1hgDcFzR2hHrv50kZvHBsdcTf0Sv06+MY+7ukv58rDdSyW0DxeA0dM/GsFiAKsS4nla0E00Ral53iYyLpbheSEDQCNBEhectSbtMQMxdFJodUJorBsHtktoUyQD1pdJ4DqPnCSKhoxTLKrwgUIGQkoHYfddj7i63nCK6k+IHxhY2p5sTPl/8PuSIepG58M=
