@@ -146,7 +146,7 @@ EOS
         services_attributes: [
           {
             name: "web",
-            cpu: 128,
+            cpu: 64,
             memory: 256,
             service_type: "web",
             command: "puma -C config/puma.rb",
@@ -160,7 +160,7 @@ EOS
           },
           {
             name: "worker",
-            cpu: 128,
+            cpu: 64,
             memory: 256,
             command: "rake jobs:work"
           }
