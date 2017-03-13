@@ -13,7 +13,6 @@ Rails.application.routes.draw do
         post   :env_vars, on: :member, to: "heritages#set_env_vars"
         delete :env_vars, on: :member, to: "heritages#delete_env_vars"
 
-        post "/services/:service_id/scale", to: "services#scale"
         post "/trigger/:token", to: "heritages#trigger"
         resources :oneoffs, only: [:show, :create]
 
