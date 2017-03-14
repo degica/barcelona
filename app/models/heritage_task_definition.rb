@@ -1,5 +1,5 @@
 class HeritageTaskDefinition
-  attr_accessor :heritage, :cpu, :memory, :family_name, :command, :port_mappings, :container_defintions, :force_ssl, :hosts, :reverse_proxy_image, :mode
+  attr_accessor :heritage, :user, :cpu, :memory, :family_name, :command, :port_mappings, :container_defintions, :force_ssl, :hosts, :reverse_proxy_image, :mode
   delegate :district, to: :heritage
 
   def self.service_definition(service)
@@ -24,7 +24,9 @@ class HeritageTaskDefinition
           "com.barcelona.oneoff-id" => oneoff.id.to_s
         },
         cpu: 128,
-        memory: oneoff.memory)
+        memory: oneoff.memory,
+        user: oneoff.user
+       )
   end
 
   def self.schedule_definition(heritage)
@@ -71,9 +73,10 @@ class HeritageTaskDefinition
     end
   end
 
-  def initialize(heritage:, family_name:, cpu:, memory:, command: nil, port_mappings: nil, is_web_service: false, force_ssl: false, hosts: [], app_container_labels: {}, reverse_proxy_image: nil, mode: nil)
+  def initialize(heritage:, family_name:, user: nil, cpu:, memory:, command: nil, port_mappings: nil, is_web_service: false, force_ssl: false, hosts: [], app_container_labels: {}, reverse_proxy_image: nil, mode: nil)
     @heritage = heritage
     @family_name = family_name
+    @user = user
     @cpu = cpu
     @memory = memory
     @command = command
@@ -126,6 +129,7 @@ class HeritageTaskDefinition
     ).compact
     base[:command] = LaunchCommand.new(heritage, command).to_command if command.present?
     base[:port_mappings] = port_mappings.to_task_definition if port_mappings.present?
+    base[:user] = user if user.present?
     base
   end
 
