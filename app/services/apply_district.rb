@@ -39,7 +39,6 @@ class ApplyDistrict
 
   def destroy!
     district.destroy!
-    delete_ecs_cluster
   end
 
   def generate_ssh_ca_key_pair
@@ -103,10 +102,6 @@ class ApplyDistrict
 
   def create_or_update_network_stack
     district.stack_executor.create_or_update
-  end
-
-  def delete_ecs_cluster
-    aws.ecs.delete_cluster(cluster: district.name)
   end
 
   def create_district_role(access_key_id, secret_access_key)
