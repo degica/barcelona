@@ -1,35 +1,16 @@
-class Event < ActiveRecord::Base
-  belongs_to :heritage
-
-  validates :uuid, uniqueness: true, presence: true
-  validates :heritage, presence: true
-  validates :level, inclusion: { in: %w(good warn error)}
-
-  after_initialize :set_uuid
-  before_validation :set_level
-  after_create :send_notifications
-
-  def set_uuid
-    self.uuid ||= SecureRandom.uuid
+class Event
+  def initialize(district)
+    @district = district
   end
 
-  def set_level
-    self.level ||= "good"
-    self.level = self.level.to_s
+  def notify(message:, level: :good)
+    Rails.logger.info(message)
+    @district.publish_sns(message, level: slack_color(level))
   end
 
-  def send_notifications
-    Rails.logger.info(user_message)
-    heritage.district.publish_sns(user_message, level: slack_color)
-  end
-
-  def slack_color
+  def slack_color(level)
     { "good"  => "good",
       "warn"  => "warning",
-      "error" => "danger" }[level]
-  end
-
-  def user_message
-    "[#{heritage.name}] #{message}"
+      "error" => "danger" }[level.to_s]
   end
 end

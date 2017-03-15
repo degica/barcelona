@@ -159,7 +159,6 @@ class Heritage < ActiveRecord::Base
   has_many :services, inverse_of: :heritage, dependent: :destroy
   has_many :env_vars, dependent: :destroy
   has_many :oneoffs, dependent: :destroy
-  has_many :events, dependent: :destroy
   has_many :releases, -> { order 'version DESC' }, dependent: :destroy, inverse_of: :heritage
   belongs_to :district, inverse_of: :heritages
 
