@@ -31,8 +31,18 @@ module Backend::Ecs::V2
       nil
     end
 
-    def deployment_finished?(_)
-      !cf_executor.in_progress?
+    def deployment_status(_)
+      status = cf_executor.stack_status
+      case status
+      when "CREATE_COMPLETE", "UPDATE_COMPLETE"
+        :complete
+      when "CREATE_FAILED", /^ROLLBACK_/, /^UPDATE_ROLLBACK_/
+        # regardless of a specific rollback status,
+        # if rollback has happened barcelona handles it as "failed"
+        :failed
+      when "CREATE_IN_PROGRESS", "UPDATE_IN_PROGRESS"
+        :in_progress
+      end
     end
 
     private
