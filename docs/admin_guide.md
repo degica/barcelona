@@ -58,6 +58,16 @@ $ bcn district update \
   [District name]
 ```
 
+### Private docker registries
+
+You can set docker credentials with `bcn district put-dockercfg` command.
+
+```
+$ bcn district put-dockercfg <district name> -f <dockercfg file path>
+```
+
+See [the official document](https://github.com/docker/docker/blob/bbf644ed62cf815cf40ef3de3345fac7ed42588a/docs/sources/use/workingwithrepository.rst#authentication-file) for reference
+
 #### Options
 
 - `--nat-type`: NAT type. The default is `instance`. Available values are as follows
