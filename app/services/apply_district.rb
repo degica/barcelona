@@ -216,6 +216,8 @@ class ApplyDistrict
           Rails.logger.info "Failed to assume role. Will retry in 1 second"
           sleep 1
         else
+          # Calling AssumeRole twice in a very short interval seems to fail sometimes.
+          sleep 1
           break
         end
       end
