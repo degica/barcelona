@@ -14,8 +14,28 @@ describe "PATCH /districts/:district", type: :request do
   context "when a user is an admin" do
     let(:user) { create :user, roles: ["admin"] }
     it "udpates a district" do
-      api_request :patch, "/v1/districts/#{district.name}"
+      dockercfg = {
+        "auths" => {
+          "quay.io" => {
+            "auth" => "abcdefgh"
+          }
+        }
+      }
+
+      params = {
+        cluster_size: 10,
+        cluster_instance_type: "m4.large",
+        dockercfg: dockercfg
+      }
+
+      api_request :patch, "/v1/districts/#{district.name}", params
       expect(response.status).to eq 200
+
+      district.reload
+
+      expect(district.cluster_size).to eq 10
+      expect(district.cluster_instance_type).to eq "m4.large"
+      expect(district.dockercfg).to eq dockercfg
     end
 
     context "when running in ECS environment" do
