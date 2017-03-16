@@ -58,6 +58,16 @@ $ bcn district update \
   [District name]
 ```
 
+#### Options
+
+- `--nat-type`: NAT type. The default is `instance`. Available values are as follows
+  - `instance`: Create a `t2.nano` EC2 instance for NAT instance. This is the cheapest option and suited for development purpose
+  - `managed_gateway`: Create AWS-managed NAT gateway.
+  - `managed_gateway_multi_az`: Create AWS-managed NAT gateways in each public subnet
+- `cluster-instance-type`: EC2 instance type for container instances. Default: `t2.small`
+- `cluster-size`: EC2 instance count of container instance autoscaling group.
+- `--apply`: If specified will apply the change immediately. If not specified changes will be applied when `bcn district apply` command is executed
+
 ### Private docker registries
 
 You can set docker credentials with `bcn district put-dockercfg` command.
@@ -67,10 +77,3 @@ $ bcn district put-dockercfg <district name> -f <dockercfg file path>
 ```
 
 See [the official document](https://github.com/docker/docker/blob/bbf644ed62cf815cf40ef3de3345fac7ed42588a/docs/sources/use/workingwithrepository.rst#authentication-file) for reference
-
-#### Options
-
-- `--nat-type`: NAT type. The default is `instance`. Available values are as follows
-- `cluster-instance-type`: EC2 instance type for container instances. Default: `t2.small`
-- `cluster-size`: EC2 instance count of container instance autoscaling group.
-- `--apply`: If specified will apply the change immediately. If not specified changes will be applied when `bcn district apply` command is executed
