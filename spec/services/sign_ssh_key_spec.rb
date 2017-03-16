@@ -1,7 +1,8 @@
 require 'rails_helper'
 
 describe SignSSHKey, type: :model do
-  subject { described_class.new(user, ca_key) }
+  let(:district) { build :district }
+  subject { described_class.new(user, district, ca_key) }
 
   let(:user) { create :user, public_key: public_key }
   let(:ca_key) { OpenSSL::PKey::RSA.new(1024).to_pem }
@@ -26,6 +27,7 @@ describe SignSSHKey, type: :model do
     end
 
     it "signs user's public key" do
+      expect_any_instance_of(Event).to receive(:notify)
       expect(subject).to receive(:spawn).
                            with(kind_of(String), err: '/dev/null', out: '/dev/null').
                            and_call_original
