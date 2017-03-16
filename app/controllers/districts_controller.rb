@@ -66,7 +66,7 @@ class DistrictsController < ApplicationController
       :aws_access_key_id,
       :aws_secret_access_key
     ).tap do |whitelisted|
-      whitelisted[:dockercfg] = params[:dockercfg] if params[:dockercfg].present?
+      whitelisted[:dockercfg] = params[:dockercfg].permit! if params[:dockercfg].present?
     end
   end
 
