@@ -6,6 +6,8 @@ class UsersController < ApplicationController
     github_token = request.headers['HTTP_X_GITHUB_TOKEN']
     user = User.login!(github_token)
 
+    Event.new.notify(message: "#{user.name} has logged in to Barcelona")
+
     render json: user
   end
 

@@ -2,10 +2,11 @@ require 'tempfile'
 require 'timeout'
 
 class SignSSHKey
-  attr_accessor :user, :ca_key
+  attr_accessor :user, :district, :ca_key
 
-  def initialize(user, ca_key)
+  def initialize(user, district, ca_key)
     @user = user
+    @district = district
     @ca_key = ca_key
   end
 
@@ -35,6 +36,7 @@ class SignSSHKey
       File.open(secret_key_path, 'w') { |f| f.write(ca_key) }
       Process.wait(pid)
     }
+    Event.new(district).notify(message: "Signed public key for user #{user.name}")
 
     File.read(public_key_file.path + "-cert.pub")
   rescue Timeout::Error
