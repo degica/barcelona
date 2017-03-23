@@ -49,7 +49,8 @@ module Barcelona
         ud.add_file("/etc/ssh/ssh_ca_key.pub", "root:root", "644", district.ssh_format_ca_public_key)
         ud.run_commands += [
           'printf "\nTrustedUserCAKeys /etc/ssh/ssh_ca_key.pub\n" >> /etc/ssh/sshd_config',
-          "service sshd restart"
+          'sed -i -e "s/^PermitRootLogin .*/PermitRootLogin no/" /etc/ssh/sshd_config',
+          "service sshd restart",
         ]
         ud.build
       end
