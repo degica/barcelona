@@ -12,6 +12,8 @@ class ContainerInstance
       "set -e",
       # Embed SHA2 hash dockercfg so that instance replacement happens when dockercfg is updated
       "# #{Digest::SHA256.hexdigest(district.dockercfg.to_s)}",
+
+      # Setup swap
       "MEMSIZE=`cat /proc/meminfo | grep MemTotal | awk '{print $2}'`",
       "if [ $MEMSIZE -lt 2097152 ]; then",
       "  SIZE=$((MEMSIZE * 2))k",
@@ -21,15 +23,21 @@ class ContainerInstance
       "  SIZE=8388608k",
       "fi",
       "fallocate -l $SIZE /swap.img && mkswap /swap.img && chmod 600 /swap.img && swapon /swap.img",
+
       "AWS_REGION=#{district.region}",
       "aws configure set s3.signature_version s3v4",
       "aws s3 cp s3://#{district.s3_bucket_name}/#{district.name}/ecs.config /etc/ecs/ecs.config",
+      "chmod 600 /etc/ecs/ecs.config",
+
+      # Configure sshd
       'printf "\nTrustedUserCAKeys /etc/ssh/ssh_ca_key.pub\n" >> /etc/ssh/sshd_config',
       "service sshd restart",
-      "chmod 600 /etc/ecs/ecs.config",
+
       "chkconfig --add barcelona",
       "chkconfig barcelona on",
       "service barcelona start",
+
+      # Configure AWS CloudWatch Logs
       "ec2_id=$(curl http://169.254.169.254/latest/meta-data/instance-id)",
       'sed -i -e "s/{ec2_id}/$ec2_id/g" /etc/awslogs/awslogs.conf',
       'sed -i -e "s/us-east-1/'+district.region+'/g" /etc/awslogs/awscli.conf',
