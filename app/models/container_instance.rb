@@ -42,7 +42,10 @@ class ContainerInstance
       "ec2_id=$(curl http://169.254.169.254/latest/meta-data/instance-id)",
       'sed -i -e "s/{ec2_id}/$ec2_id/g" /etc/awslogs/awslogs.conf',
       'sed -i -e "s/us-east-1/'+district.region+'/g" /etc/awslogs/awscli.conf',
-      "service awslogs start"
+      "service awslogs start",
+
+      # Install AWS Inspector agent
+      "curl https://d1wk0tztpsntt1.cloudfront.net/linux/latest/install | bash"
     ]
 
     user_data.add_file("/etc/ssh/ssh_ca_key.pub", "root:root", "644", district.ssh_format_ca_public_key)

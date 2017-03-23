@@ -51,6 +51,9 @@ module Barcelona
           'printf "\nTrustedUserCAKeys /etc/ssh/ssh_ca_key.pub\n" >> /etc/ssh/sshd_config',
           'sed -i -e "s/^PermitRootLogin .*/PermitRootLogin no/" /etc/ssh/sshd_config',
           "service sshd restart",
+
+          # Install AWS Inspector agent
+          "curl https://d1wk0tztpsntt1.cloudfront.net/linux/latest/install | bash"
         ]
         ud.build
       end
