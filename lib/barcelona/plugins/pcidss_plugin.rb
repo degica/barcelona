@@ -310,11 +310,11 @@ module Barcelona
         template
       end
 
-      def on_created(_, args)
+      def on_created(_, _)
         stack_executor.create_or_update
       end
 
-      def on_updated(_, args)
+      def on_updated(_, _)
         stack_executor.create_or_update
       end
 
