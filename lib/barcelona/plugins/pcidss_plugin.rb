@@ -113,7 +113,7 @@ module Barcelona
         add_resource("AWS::AutoScaling::LaunchConfiguration",
                      "NTPServerLaunchConfiguration") do |j|
           j.IamInstanceProfile ref("NTPServerProfile")
-          j.ImageId "ami-1a15c77b"
+          j.ImageId "ami-56d4ad31"
           j.InstanceType "t2.nano"
           j.AssociatePublicIpAddress true
           j.SecurityGroups [ref("NTPServerSG")]
