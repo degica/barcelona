@@ -8,8 +8,6 @@ class Plugin < ActiveRecord::Base
   validate :validate_existence
   after_create :hook_created
   after_update :hook_updated
-  after_save :save_district
-  after_destroy :save_district
   after_destroy :hook_destroyed
 
   def hook(trigger, origin, arg = nil)
@@ -47,11 +45,6 @@ class Plugin < ActiveRecord::Base
 
   def hook_destroyed
     hook(:destroyed, self)
-  end
-
-  def save_district
-    # trigger district callbacks so that AWS resources are properly updated
-    district.save!
   end
 
   def validate_existence
