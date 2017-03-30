@@ -97,7 +97,8 @@ class District < ActiveRecord::Base
   end
 
   def subnets(network = "Private")
-    @subnets ||= aws.ec2.describe_subnets(
+    @subnets ||= {}
+    @subnets[network] ||= aws.ec2.describe_subnets(
       filters: [
         {name: "vpc-id", values: [vpc_id]},
         {name: 'tag:Network', values: [network]}
