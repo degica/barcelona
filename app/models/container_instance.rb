@@ -34,10 +34,6 @@ class ContainerInstance
       'sed -i -e "s/^PermitRootLogin .*/PermitRootLogin no/" /etc/ssh/sshd_config',
       "service sshd restart",
 
-      "chkconfig --add barcelona",
-      "chkconfig barcelona on",
-      "service barcelona start",
-
       # Configure AWS CloudWatch Logs
       "ec2_id=$(curl http://169.254.169.254/latest/meta-data/instance-id)",
       'sed -i -e "s/{ec2_id}/$ec2_id/g" /etc/awslogs/awslogs.conf',
@@ -55,36 +51,6 @@ class ContainerInstance
       container_id=$(docker ps -q -f "label=com.barcelona.oneoff-id=$oneoff_id")
       [[ -n $container_id ]] && docker exec --detach-keys="ctrl-\\\\,\\\\" -it $container_id $command
     EOS
-
-    user_data.add_file("/etc/init.d/barcelona", "root:root", "755", <<EOS)
-#!/bin/bash
-# chkconfig: 2345 96 04
-# description: Barcelona
-
-set -e
-
-stop() {
-  AWS_REGION=#{district.region}
-  ecs_cluster=`curl http://localhost:51678/v1/metadata | jq -r .Cluster`
-  container_instance_arn=`curl http://localhost:51678/v1/metadata | jq -r .ContainerInstanceArn | cut -d / -f2`
-
-  aws ecs deregister-container-instance --region $AWS_REGION --cluster $ecs_cluster --container-instance $container_instance_arn --force
-  sleep 60
-
-  docker stop -t 90 $(docker ps -q)
-}
-
-case "$1" in
-  start)
-    touch /var/lock/subsys/barcelona
-    ;;
-  stop)
-    stop
-    rm /var/lock/subsys/barcelona
-    ;;
-  *) exit 2;;
-esac
-EOS
 
     # CloudWatch Logs configurations
     # See http://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_cloudwatch_logs.html
