@@ -159,6 +159,115 @@ describe Barcelona::Network::NetworkStack do
           ]
         }
       },
+      "ASGSNSTopic" => {
+        "Type" => "AWS::SNS::Topic",
+        "Properties" => {
+          "Subscription" => [
+            {
+              "Endpoint" => {"Fn::GetAtt" => ["ASGDrainingFunction", "Arn"]},
+              "Protocol" => "lambda"
+            }
+          ]
+        }
+      },
+      "ASGDrainingFunctionRole" => {
+        "Type"=>"AWS::IAM::Role",
+        "Properties" => {
+          "AssumeRolePolicyDocument" => {
+            "Version" => "2012-10-17",
+            "Statement" => [
+              {
+                "Effect"=>"Allow",
+                "Principal" => {
+                  "Service" => ["lambda.amazonaws.com"]
+                },
+                "Action" => ["sts:AssumeRole"]
+              }
+            ]
+          },
+          "Path" => "/",
+          "Policies" => [
+            {
+              "PolicyName" => "barcelona-#{district.name}-asg-draining-function-role",
+              "PolicyDocument" => {
+                "Version"=>"2012-10-17",
+                "Statement" => [
+                  {
+                    "Effect"=>"Allow",
+                    "Action"=>[
+                      "autoscaling:CompleteLifecycleAction",
+                      "ecs:ListContainerInstances",
+                      "ecs:DescribeContainerInstances",
+                      "ecs:UpdateContainerInstancesState",
+                      "ecs:ListTasks",
+                      "logs:CreateLogGroup",
+                      "logs:CreateLogStream",
+                      "logs:PutLogEvents",
+                      "sns:Publish"
+                    ],
+                    "Resource"=>["*"]
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "ASGDrainingFunction" => {
+        "Type" => "AWS::Lambda::Function",
+        "Properties" => {
+          "Code" => {
+            "ZipFile" => kind_of(String)
+          },
+          "Handler" => "index.lambda_handler",
+          "Runtime" => "python2.7",
+          "Timeout" => "10",
+          "Role" => {"Fn::GetAtt" => ["ASGDrainingFunctionRole", "Arn"]},
+          "Environment" => {
+            "Variables" => {
+              "CLUSTER_NAME" => district.name
+            }
+          }
+        },
+      },
+      "ASGDrainingFunctionPermission" => {
+        "Type" => "AWS::Lambda::Permission",
+        "Properties" => {
+          "FunctionName" => {"Ref" => "ASGDrainingFunction"},
+          "Action" => "lambda:InvokeFunction",
+          "Principal" => "sns.amazonaws.com",
+          "SourceArn" => {"Ref" => "ASGSNSTopic"}
+        }
+      },
+      "LifecycleHookRole" => {
+        "Type"=>"AWS::IAM::Role",
+        "Properties" => {
+          "AssumeRolePolicyDocument" => {
+            "Version" => "2012-10-17",
+            "Statement" => [
+              {
+                "Effect"=>"Allow",
+                "Principal" => {
+                  "Service" => ["autoscaling.amazonaws.com"]
+                },
+                "Action" => ["sts:AssumeRole"]
+              }
+            ]
+          },
+          "ManagedPolicyArns" => [
+            "arn:aws:iam::aws:policy/service-role/AutoScalingNotificationAccessRole"
+          ]
+        }
+      },
+      "TerminatingLifecycleHook" => {
+        "Type" => "AWS::AutoScaling::LifecycleHook",
+        "Properties" => {
+          "AutoScalingGroupName" => {"Ref" => "ContainerInstanceAutoScalingGroup"},
+          "LifecycleTransition" => "autoscaling:EC2_INSTANCE_TERMINATING",
+          "NotificationTargetARN" => {"Ref" => "ASGSNSTopic"},
+          "RoleARN" => {"Fn::GetAtt" => ["LifecycleHookRole", "Arn"]}
+        }
+      },
       "InstanceSecurityGroup" => {
         "Type" => "AWS::EC2::SecurityGroup",
         "Properties" => {
