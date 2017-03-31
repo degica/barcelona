@@ -9,7 +9,7 @@ class ContainerInstance
     user_data = InstanceUserData.new
     user_data.packages += ["aws-cli", "jq", "aws-cfn-bootstrap", "awslogs"]
     user_data.run_commands += [
-      "set -e",
+      "set -ex",
       # Embed SHA2 hash dockercfg so that instance replacement happens when dockercfg is updated
       "# #{Digest::SHA256.hexdigest(district.dockercfg.to_s)}",
 
