@@ -22,7 +22,6 @@ services:
       - .:${PWD}
     environment: &env_base
       PORT: 3333
-      RAILS_ENV: development
       DATABASE_URL: postgres://postgres:@db:5432
       ENCRYPTION_KEY: abcdefghijklmn
       GITHUB_ORGANIZATION: 'degica'
