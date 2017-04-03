@@ -83,3 +83,8 @@ See [the official document](https://github.com/docker/docker/blob/bbf644ed62cf81
 By default, Barcelona allows all outbound ports to anywhere.
 For security reasons, you may want to change this Security Group setting.
 Although Barcelona doesn't provide options to change the outbound ports, you can manually update Security Group's "Outbound" setting with AWS web cosole or API.
+When you change Barcelona ECS container instance security group, be aware that some outbound ports are required to make Barcelona work:
+
+- `udp:123`, `0.0.0.0/0`
+- `tcp:80`, `169.254.169.254/32`
+- `tcp:443`, `0.0.0.0/0`
