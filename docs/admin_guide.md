@@ -77,3 +77,9 @@ $ bcn district put-dockercfg <district name> -f <dockercfg file path>
 ```
 
 See [the official document](https://github.com/docker/docker/blob/bbf644ed62cf815cf40ef3de3345fac7ed42588a/docs/sources/use/workingwithrepository.rst#authentication-file) for reference
+
+### Filter Outbound Ports
+
+By default, Barcelona allows all outbound ports to anywhere.
+For security reasons, you may want to change this Security Group setting.
+Although Barcelona doesn't provide options to change the outbound ports, you can manually update Security Group's "Outbound" setting with AWS web cosole or API.
