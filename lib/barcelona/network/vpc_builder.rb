@@ -140,6 +140,14 @@ module Barcelona
           ]
         end
 
+        add_resource("AWS::EC2::SecurityGroupEgress", "PublicELBSecurityGroupEgress") do |j|
+          j.GroupId ref("PublicELBSecurityGroup")
+          j.IpProtocol "tcp"
+          j.FromPort 1
+          j.ToPort 65535
+          j.SourceSecurityGroupId ref("InstanceSecurityGroup")
+        end
+
         add_resource("AWS::EC2::SecurityGroup", "PrivateELBSecurityGroup") do |j|
           j.GroupDescription "SG for Private ELB"
           j.VpcId ref("VPC")
@@ -154,6 +162,14 @@ module Barcelona
           j.Tags [
             tag("barcelona", stack.district.name)
           ]
+        end
+
+        add_resource("AWS::EC2::SecurityGroupEgress", "PrivateELBSecurityGroupEgress") do |j|
+          j.GroupId ref("PrivateELBSecurityGroup")
+          j.IpProtocol "tcp"
+          j.FromPort 1
+          j.ToPort 65535
+          j.SourceSecurityGroupId ref("InstanceSecurityGroup")
         end
 
         add_resource("AWS::EC2::SecurityGroup", "ContainerInstanceAccessibleSecurityGroup") do |j|
@@ -231,10 +247,28 @@ module Barcelona
           ]
           j.SecurityGroupEgress [
             {
-              "IpProtocol" => -1,
-              "FromPort" => -1,
-              "ToPort" => -1,
-              "CidrIp" => "0.0.0.0/0"
+              "IpProtocol" => "udp",
+              "FromPort" => 123,
+              "ToPort" => 123,
+              "CidrIp" => '0.0.0.0/0'
+            },
+            {
+              "IpProtocol" => "tcp",
+              "FromPort" => 22,
+              "ToPort" => 22,
+              "CidrIp" => options[:cidr_block]
+            },
+            {
+              "IpProtocol" => "tcp",
+              "FromPort" => 80,
+              "ToPort" => 80,
+              "CidrIp" => '0.0.0.0/0'
+            },
+            {
+              "IpProtocol" => "tcp",
+              "FromPort" => 443,
+              "ToPort" => 443,
+              "CidrIp" => '0.0.0.0/0'
             }
           ]
           j.Tags [

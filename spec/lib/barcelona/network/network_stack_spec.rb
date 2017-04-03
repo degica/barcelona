@@ -69,6 +69,16 @@ describe Barcelona::Network::NetworkStack do
           "Tags" => [{"Key" => "barcelona", "Value" => district.name}],
         }
       },
+      "PublicELBSecurityGroupEgress" => {
+        "Type" => "AWS::EC2::SecurityGroupEgress",
+        "Properties" => {
+          "GroupId" => {"Ref" => "PublicELBSecurityGroup"},
+          "IpProtocol" => "tcp",
+          "FromPort" => 1,
+          "ToPort" => 65535,
+          "SourceSecurityGroupId" => {"Ref" => "InstanceSecurityGroup"}
+        }
+      },
       "PrivateELBSecurityGroup" => {
         "Type" => "AWS::EC2::SecurityGroup",
         "Properties" => {"GroupDescription" => "SG for Private ELB",
@@ -80,6 +90,16 @@ describe Barcelona::Network::NetworkStack do
                             "CidrIp" => district.cidr_block}],
                           "Tags" => [{"Key" => "barcelona", "Value" => district.name}],
                         }
+      },
+      "PrivateELBSecurityGroupEgress" => {
+        "Type" => "AWS::EC2::SecurityGroupEgress",
+        "Properties" => {
+          "GroupId" => {"Ref" => "PrivateELBSecurityGroup"},
+          "IpProtocol" => "tcp",
+          "FromPort" => 1,
+          "ToPort" => 65535,
+          "SourceSecurityGroupId" => {"Ref" => "InstanceSecurityGroup"}
+        }
       },
       "ContainerInstanceAccessibleSecurityGroup" => {
         "Type" => "AWS::EC2::SecurityGroup",
@@ -192,10 +212,23 @@ describe Barcelona::Network::NetworkStack do
              "ToPort" => 123,
              "CidrIp" => district.cidr_block}],
           "SecurityGroupEgress" => [
-            {"IpProtocol" => -1,
-             "FromPort" => -1,
-             "ToPort" => -1,
-             "CidrIp" => "0.0.0.0/0"}],
+            {"IpProtocol" => "udp",
+             "FromPort" => 123,
+             "ToPort" => 123,
+             "CidrIp" => "0.0.0.0/0"},
+            {"IpProtocol" => "tcp",
+             "FromPort" => 22,
+             "ToPort" => 22,
+             "CidrIp" => district.cidr_block},
+            {"IpProtocol" => "tcp",
+             "FromPort" => 80,
+             "ToPort" => 80,
+             "CidrIp" => "0.0.0.0/0"},
+            {"IpProtocol" => "tcp",
+             "FromPort" => 443,
+             "ToPort" => 443,
+             "CidrIp" => "0.0.0.0/0"},
+          ],
           "Tags" => [{"Key" => "barcelona", "Value" => district.name}]
         }
       },
