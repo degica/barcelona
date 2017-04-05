@@ -339,40 +339,53 @@ describe Barcelona::Network::NetworkStack do
           "Tags" => [{"Key" => "barcelona", "Value" => district.name}]
         }
       },
-      "BastionServer" => {
-        "DependsOn" => ["VPCGatewayAttachment"],
-        "Type" => "AWS::EC2::Instance",
+      "BastionLaunchConfiguration" => {
+        "Type" => "AWS::AutoScaling::LaunchConfiguration",
         "Properties" => {
           "InstanceType" => "t2.nano",
-          "SourceDestCheck" => false,
           "ImageId" => kind_of(String),
           "UserData" => anything,
-          "NetworkInterfaces" => [
-            {
-              "AssociatePublicIpAddress" => true,
-              "DeviceIndex" => 0,
-              "SubnetId" => {
-                "Ref" => "SubnetDmz1"
-              },
-              "GroupSet" => [
-                {"Ref" => "SecurityGroupBastion"}
-              ]
-            }
+          "AssociatePublicIpAddress" => true,
+          "SecurityGroups" => [
+            {"Ref" => "SecurityGroupBastion"}
+          ]
+        }
+      },
+      "BastionAutoScaling" => {
+        "Type" => "AWS::AutoScaling::AutoScalingGroup",
+        "DependsOn" => ["VPCGatewayAttachment"],
+        "Properties" => {
+          "DesiredCapacity" => 1,
+          "MaxSize" => 1,
+          "MinSize" => 1,
+          "HealthCheckType" => "EC2",
+          "LaunchConfigurationName" => {"Ref" => "BastionLaunchConfiguration"},
+          "VPCZoneIdentifier" => [
+            {"Ref" => "SubnetDmz1"},
+            {"Ref" => "SubnetDmz2"}
           ],
           "Tags" => [
             {
               "Key" => "Name",
-              "Value" => {"Fn::Join"=>["-", [{"Ref"=>"AWS::StackName"}, "bastion"]]}
+              "Value" => "barcelona-#{district.name}-bastion",
+              "PropagateAtLaunch" => true
             },
             {
               "Key" => "barcelona",
-              "Value" => district.name
+              "Value" => district.name,
+              "PropagateAtLaunch" => true
             },
             {
               "Key" => "barcelona-role",
-              "Value" => "bastion"
+              "Value" => "bastion",
+              "PropagateAtLaunch" => true
             }
           ]
+        },
+        "UpdatePolicy" => {
+          "AutoScalingReplacingUpdate" => {
+            "WillReplace" => true
+          }
         }
       },
       "ECSInstanceProfile" => {

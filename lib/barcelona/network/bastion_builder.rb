@@ -1,6 +1,6 @@
 module Barcelona
   module Network
-    class BastionServer < CloudFormation::Resource
+    class BastionBuilder < CloudFormation::Builder
       # https://aws.amazon.com/amazon-linux-ami/
       # Amazon Linux AMI 2016.09.0
       AMI_IDS = {
@@ -16,30 +16,18 @@ module Barcelona
         "ca-central-1" => "ami-b48b39d0"
       }
 
-      def self.type
-        "AWS::EC2::Instance"
-      end
-
-      def define_resource(json)
-        super do |j|
-          j.InstanceType "t2.nano"
-          j.SourceDestCheck false
+      def build_resources
+        add_resource("AWS::AutoScaling::LaunchConfiguration", "BastionLaunchConfiguration") do |j|
           j.ImageId AMI_IDS[district.region]
+          j.InstanceType "t2.nano"
+          j.SecurityGroups [ref("SecurityGroupBastion")]
+          j.AssociatePublicIpAddress true
           j.UserData user_data
-          j.NetworkInterfaces [
-            {
-              "AssociatePublicIpAddress" => true,
-              "DeviceIndex" => 0,
-              "SubnetId" => ref("SubnetDmz1"),
-              "GroupSet" => [ref("SecurityGroupBastion")]
-            }
-          ]
-          j.Tags [
-            tag("Name", join("-", cf_stack_name, "bastion")),
-            tag("barcelona", district.name),
-            tag("barcelona-role", "bastion"),
-          ]
         end
+
+        add_resource(BastionAutoScaling, "BastionAutoScaling",
+                     district_name: district.name,
+                     depends_on: ["VPCGatewayAttachment"])
       end
 
       def user_data
@@ -59,7 +47,7 @@ module Barcelona
       end
 
       def district
-        options[:district]
+        stack.district
       end
     end
   end
