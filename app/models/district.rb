@@ -89,11 +89,14 @@ class District < ActiveRecord::Base
   end
 
   def bastion_ip
-    bastion_server_id = stack_resources["BastionServer"]
-    return nil if bastion_server_id.blank?
-
-    resp = aws.ec2.describe_instances(instance_ids: [bastion_server_id])
-    resp.reservations[0].instances[0].public_ip_address if resp.reservations.present?
+    resp = aws.ec2.describe_instances(
+      filters: [
+        {name: 'instance-state-name', values: ['running']},
+        {name: 'tag:barcelona', values: [name]},
+        {name: 'tag:barcelona-role', values: ['bastion']}
+      ]
+    )
+    resp.reservations[0]&.instances&.sort_by(&:launch_time)&.last&.public_ip_address
   end
 
   def subnets(network = "Private")
