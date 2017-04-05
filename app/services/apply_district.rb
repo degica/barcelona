@@ -109,7 +109,11 @@ class ApplyDistrict
     raise RuntimeError.new("Role ARN doesn't exist") if task_role_arn.nil?
 
     iam = new_iam_client(access_key_id, secret_access_key)
-    district_role_name = "barcelona.#{district.name}.api"
+
+    # This identity solves an issue where there are multiple barcelonas
+    # and each barcelona has the same district name (e.g. default)
+    barcelona_identity = Digest::SHA256.hexdigest(task_role_arn).first(8)
+    district_role_name = "barcelona.#{district.name}.api-#{barcelona_identity}"
 
     create_district_role_if_not_exist(iam, district_role_name, task_role_arn)
   end
