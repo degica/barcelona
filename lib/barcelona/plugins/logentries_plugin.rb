@@ -25,12 +25,12 @@ module Barcelona
       end
 
       def on_network_stack_template(_stack, template)
-        bastion_server = template["BastionServer"]
-        return template if bastion_server.nil?
+        bastion_lc = template["BastionLaunchConfiguration"]
+        return template if bastion_lc.nil?
 
-        user_data = InstanceUserData.load_or_initialize(bastion_server["Properties"]["UserData"])
+        user_data = InstanceUserData.load_or_initialize(bastion_lc["Properties"]["UserData"])
         update_user_data(user_data, "bastion")
-        bastion_server["Properties"]["UserData"] = user_data.build
+        bastion_lc["Properties"]["UserData"] = user_data.build
         template
       end
 

@@ -60,7 +60,7 @@ module Barcelona
       it "gets hooked with network_stack_template trigger" do
         district.save!
         template = JSON.load(::Barcelona::Network::NetworkStack.new(district).target!)
-        user_data = InstanceUserData.load(template["Resources"]["BastionServer"]["Properties"]["UserData"])
+        user_data = InstanceUserData.load(template["Resources"]["BastionLaunchConfiguration"]["Properties"]["UserData"])
         plugin = district.plugins.find_by(name: 'pcidss').plugin
         expect(user_data.packages).to include(*described_class::SYSTEM_PACKAGES)
         expect(user_data.run_commands).to include(*plugin.run_commands)
