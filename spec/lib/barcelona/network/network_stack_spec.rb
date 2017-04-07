@@ -115,7 +115,7 @@ describe Barcelona::Network::NetworkStack do
           "DesiredCapacity" => 1,
           "Cooldown" => 0,
           "HealthCheckGracePeriod" => 0,
-          "MaxSize" => 2,
+          "MaxSize" => 3,
           "MinSize" => 1,
           "HealthCheckType" => "EC2",
           "LaunchConfigurationName" => {"Ref" => "ContainerInstanceLaunchConfiguration"},
@@ -132,9 +132,7 @@ describe Barcelona::Network::NetworkStack do
         "UpdatePolicy" => {
           "AutoScalingRollingUpdate" => {
             "MaxBatchSize" => 1,
-            "MinInstancesInService" => 1,
-            "WaitOnResourceSignals" => true,
-            "PauseTime" => "PT60M"
+            "MinInstancesInService" => 1
           }
         }
       },
