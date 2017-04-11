@@ -109,12 +109,14 @@ class Endpoint < ActiveRecord::Base
             immutable: true,
             format: { with: /\A[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]\z/ }
   validates :public, immutable: true
+  validates :ssl_policy, inclusion: {in: %w(intermediate modern)}, presence: true
 
   after_save :apply_stack
   after_destroy :delete_stack
 
   after_initialize do |endpoint|
     endpoint.public = true if endpoint.public.nil?
+    endpoint.ssl_policy ||= "intermediate"
   end
 
   def load_balancer_id
