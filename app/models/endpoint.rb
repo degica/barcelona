@@ -29,6 +29,7 @@ class Endpoint < ActiveRecord::Base
           j.LoadBalancerArn ref("LB")
           j.Port 443
           j.Protocol "HTTPS"
+          j.SslPolicy endpoint.alb_ssl_policy
         end
       end
 
@@ -109,12 +110,15 @@ class Endpoint < ActiveRecord::Base
             immutable: true,
             format: { with: /\A[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]\z/ }
   validates :public, immutable: true
+  validates :ssl_policy, inclusion: {in: %w(intermediate modern)}, presence: true
 
-  after_save :apply_stack
+  after_create :create_stack
+  after_update :update_stack
   after_destroy :delete_stack
 
   after_initialize do |endpoint|
     endpoint.public = true if endpoint.public.nil?
+    endpoint.ssl_policy ||= "intermediate"
   end
 
   def load_balancer_id
@@ -137,6 +141,13 @@ class Endpoint < ActiveRecord::Base
     name
   end
 
+  def alb_ssl_policy
+    {
+      "intermediate" => "ELBSecurityPolicy-2016-08",
+      "modern" => "ELBSecurityPolicy-TLS-1-2-2017-01"
+    }[ssl_policy]
+  end
+
   def cf_executor
     @cf_executor ||= begin
                        stack = Stack.new(self)
@@ -146,8 +157,12 @@ class Endpoint < ActiveRecord::Base
 
   private
 
-  def apply_stack
-    cf_executor.create_or_update
+  def create_stack
+    cf_executor.create
+  end
+
+  def update_stack
+    cf_executor.update
   end
 
   def delete_stack

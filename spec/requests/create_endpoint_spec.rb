@@ -11,6 +11,7 @@ describe "POST /districts/:district/endpoints", type: :request do
     params = {
       name: "my-endpoint",
       public: true,
+      ssl_policy: 'modern',
       certificate_id: 'certificate_id'
     }
     api_request(:post, "/v1/districts/#{district.name}/endpoints", params)
@@ -19,6 +20,7 @@ describe "POST /districts/:district/endpoints", type: :request do
     expect(endpoint["name"]).to eq "my-endpoint"
     expect(endpoint["public"]).to eq true
     expect(endpoint["certificate_id"]).to eq 'certificate_id'
+    expect(endpoint["ssl_policy"]).to eq 'modern'
     expect(endpoint["dns_name"]).to eq "dns.name"
   end
 end

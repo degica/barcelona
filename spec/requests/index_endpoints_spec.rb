@@ -14,7 +14,9 @@ describe "GET /districts/:district/endpoints", type: :request do
     expect(endpoints.count).to eq 2
     expect(endpoints[0]["name"]).to eq "ep1"
     expect(endpoints[0]["dns_name"]).to be_blank
+    expect(endpoints[0]["ssl_policy"]).to eq "intermediate"
     expect(endpoints[1]["name"]).to eq "ep2"
     expect(endpoints[1]["dns_name"]).to be_blank
+    expect(endpoints[1]["ssl_policy"]).to eq "intermediate"
   end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170315092538) do
+ActiveRecord::Schema.define(version: 20170411021604) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -57,6 +57,7 @@ ActiveRecord::Schema.define(version: 20170315092538) do
     t.string   "certificate_id"
     t.datetime "created_at",     null: false
     t.datetime "updated_at",     null: false
+    t.string   "ssl_policy"
     t.index ["district_id", "name"], name: "index_endpoints_on_district_id_and_name", unique: true, using: :btree
     t.index ["district_id"], name: "index_endpoints_on_district_id", using: :btree
   end
