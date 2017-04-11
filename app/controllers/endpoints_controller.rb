@@ -4,7 +4,7 @@ class EndpointsController < ApplicationController
 
   def index
     endpoints = @district.endpoints
-    render json: endpoints, fields: [:name, :public, :certificate_id]
+    render json: endpoints, fields: [:name, :public, :ssl_policy, :certificate_id]
   end
 
   def create
@@ -32,7 +32,8 @@ class EndpointsController < ApplicationController
     params.permit(
       :name,
       :public,
-      :certificate_id
+      :certificate_id,
+      :ssl_policy
     )
   end
 
