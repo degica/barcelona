@@ -29,6 +29,7 @@ class Endpoint < ActiveRecord::Base
           j.LoadBalancerArn ref("LB")
           j.Port 443
           j.Protocol "HTTPS"
+          j.SslPolicy endpoint.alb_ssl_policy
         end
       end
 
@@ -137,6 +138,13 @@ class Endpoint < ActiveRecord::Base
 
   def to_param
     name
+  end
+
+  def alb_ssl_policy
+    {
+      "intermediate" => "ELBSecurityPolicy-2016-08",
+      "modern" => "ELBSecurityPolicy-TLS-1-2-2017-01"
+    }[ssl_policy]
   end
 
   def cf_executor

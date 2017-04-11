@@ -15,6 +15,17 @@ describe Endpoint do
       endpoint.destroy!
     end
   end
+
+  describe "#alb_ssl_policy" do
+    it "is set to default value" do
+      expect(endpoint.alb_ssl_policy).to eq "ELBSecurityPolicy-2016-08"
+    end
+
+    it "is set to 2017-01" do
+      endpoint.ssl_policy = 'modern'
+      expect(endpoint.alb_ssl_policy).to eq "ELBSecurityPolicy-TLS-1-2-2017-01"
+    end
+  end
 end
 
 describe Endpoint::Stack do
