@@ -4,8 +4,14 @@ describe Endpoint do
   let(:endpoint) { build :endpoint }
 
   describe "callbacks" do
-    it "creates or updates cloudformation stack" do
-      expect_any_instance_of(CloudFormation::Executor).to receive(:create_or_update)
+    it "creates cloudformation stack" do
+      expect_any_instance_of(CloudFormation::Executor).to receive(:create)
+      endpoint.save!
+    end
+
+    it "updates cloudformation stack" do
+      endpoint.save!
+      expect_any_instance_of(CloudFormation::Executor).to receive(:update)
       endpoint.save!
     end
 

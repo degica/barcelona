@@ -112,7 +112,8 @@ class Endpoint < ActiveRecord::Base
   validates :public, immutable: true
   validates :ssl_policy, inclusion: {in: %w(intermediate modern)}, presence: true
 
-  after_save :apply_stack
+  after_create :create_stack
+  after_update :update_stack
   after_destroy :delete_stack
 
   after_initialize do |endpoint|
@@ -156,8 +157,12 @@ class Endpoint < ActiveRecord::Base
 
   private
 
-  def apply_stack
-    cf_executor.create_or_update
+  def create_stack
+    cf_executor.create
+  end
+
+  def update_stack
+    cf_executor.update
   end
 
   def delete_stack
