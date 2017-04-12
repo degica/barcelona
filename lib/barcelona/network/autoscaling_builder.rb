@@ -58,6 +58,104 @@ module Barcelona
                      desired_capacity: desired_capacity,
                      district_name: stack.district.name
                     )
+
+        add_resource("AWS::SNS::Topic", "ASGSNSTopic") do |j|
+          j.Subscription [
+            {
+              "Endpoint" => get_attr("ASGDrainingFunction", "Arn"),
+              "Protocol" => "lambda"
+            }
+          ]
+        end
+
+        add_resource("AWS::IAM::Role", "ASGDrainingFunctionRole") do |j|
+          j.AssumeRolePolicyDocument do |j|
+            j.Version "2012-10-17"
+            j.Statement [
+              {
+                "Effect" => "Allow",
+                "Principal" => {
+                  "Service" => ["lambda.amazonaws.com"]
+                },
+                "Action" => ["sts:AssumeRole"]
+              }
+            ]
+          end
+          j.Path "/"
+          j.Policies [
+            {
+              "PolicyName" => "barcelona-#{stack.district.name}-asg-draining-function-role",
+              "PolicyDocument" => {
+                "Version" => "2012-10-17",
+                "Statement" => [
+                  {
+                    "Effect" => "Allow",
+                    "Action" => [
+                      "autoscaling:CompleteLifecycleAction",
+                      "ecs:ListContainerInstances",
+                      "ecs:DescribeContainerInstances",
+                      "ecs:UpdateContainerInstancesState",
+                      "ecs:ListTasks",
+                      "logs:CreateLogGroup",
+                      "logs:CreateLogStream",
+                      "logs:PutLogEvents",
+                      "sns:Publish"
+                    ],
+                    "Resource" => ["*"]
+                  }
+                ]
+              }
+            }
+          ]
+        end
+
+        add_resource("AWS::Lambda::Function", "ASGDrainingFunction") do |j|
+          j.Code do |j|
+            j.ZipFile File.read(Rails.root.join("drain_instance.py"))
+          end
+
+          j.Handler "index.lambda_handler"
+          j.Runtime "python2.7"
+          j.Timeout "10"
+          j.Role get_attr("ASGDrainingFunctionRole", "Arn")
+          j.Environment do |j|
+            j.Variables do |j|
+              j.CLUSTER_NAME stack.district.name
+            end
+          end
+        end
+
+        add_resource("AWS::Lambda::Permission", "ASGDrainingFunctionPermission") do |j|
+          j.FunctionName ref("ASGDrainingFunction")
+          j.Action "lambda:InvokeFunction"
+          j.Principal "sns.amazonaws.com"
+          j.SourceArn ref("ASGSNSTopic")
+        end
+
+        add_resource("AWS::IAM::Role", "LifecycleHookRole") do |j|
+          j.AssumeRolePolicyDocument do |j|
+            j.Version "2012-10-17"
+            j.Statement [
+              {
+                "Effect" => "Allow",
+                "Principal" => {
+                  "Service" => ["autoscaling.amazonaws.com"]
+                },
+                "Action" => ["sts:AssumeRole"]
+              }
+            ]
+          end
+          j.ManagedPolicyArns [
+            "arn:aws:iam::aws:policy/service-role/AutoScalingNotificationAccessRole"
+          ]
+        end
+
+        add_resource("AWS::AutoScaling::LifecycleHook", "TerminatingLifecycleHook") do |j|
+          j.AutoScalingGroupName ref("ContainerInstanceAutoScalingGroup")
+          j.LifecycleTransition "autoscaling:EC2_INSTANCE_TERMINATING"
+          j.NotificationTargetARN ref("ASGSNSTopic")
+          j.RoleARN get_attr("LifecycleHookRole", "Arn")
+        end
       end
 
       def instance_user_data
