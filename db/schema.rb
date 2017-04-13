@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170411021604) do
+ActiveRecord::Schema.define(version: 20170413055930) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -93,8 +93,11 @@ ActiveRecord::Schema.define(version: 20170411021604) do
     t.string   "health_check_path"
     t.text     "rule_conditions"
     t.integer  "rule_priority"
-    t.datetime "created_at",            null: false
-    t.datetime "updated_at",            null: false
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+    t.integer  "health_check_timeout"
+    t.integer  "healthy_threshold_count"
+    t.integer  "unhealthy_threshold_count"
     t.index ["endpoint_id", "service_id"], name: "index_listeners_on_endpoint_id_and_service_id", unique: true, using: :btree
     t.index ["endpoint_id"], name: "index_listeners_on_endpoint_id", using: :btree
     t.index ["service_id"], name: "index_listeners_on_service_id", using: :btree
