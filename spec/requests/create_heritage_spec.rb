@@ -95,4 +95,52 @@ describe "POST /districts/:district/heritages", type: :request do
     let(:version) { 2 }
     it_behaves_like "create"
   end
+
+  context "when listeners is specified" do
+    let(:version) { 2 }
+
+    before do
+      district.endpoints.create!(name: 'endpoint')
+      params[:services][0].delete :hosts
+      params[:services][0].delete :health_check
+      params[:services][0].delete :port_mappings
+      params[:services][0][:listeners] = [
+        {
+          endpoint: 'endpoint',
+          health_check_interval: 33,
+          health_check_path: '/health_check',
+          health_check_timeout: 10,
+          healthy_threshold_count: 7,
+          unhealthy_threshold_count: 8
+        }
+      ]
+    end
+
+    it "creates a heritage" do
+      expect(DeployRunnerJob).to receive(:perform_later)
+      api_request(:post, "/v1/districts/#{district.name}/heritages", params)
+      expect(response.status).to eq 200
+      heritage = JSON.load(response.body)["heritage"]
+      expect(heritage["version"]).to eq version
+      expect(heritage["name"]).to eq "nginx"
+      expect(heritage["image_name"]).to eq "nginx"
+      expect(heritage["image_tag"]).to eq "latest"
+      expect(heritage["before_deploy"]).to eq "echo hello"
+      expect(heritage["scheduled_tasks"][0]["schedule"]).to eq "rate(1 minute)"
+      expect(heritage["scheduled_tasks"][0]["command"]).to eq "echo hello"
+      expect(heritage["services"][0]["name"]).to eq "web"
+      expect(heritage["services"][0]["public"]).to eq true
+      expect(heritage["services"][0]["cpu"]).to eq 128
+      expect(heritage["services"][0]["memory"]).to eq 256
+      expect(heritage["services"][0]["command"]).to eq "nginx"
+      expect(heritage["services"][0]["force_ssl"]).to eq true
+      expect(heritage["services"][0]["reverse_proxy_image"]).to eq "org/custom_revpro:v1.2"
+      expect(heritage["services"][0]["listeners"][0]['endpoint']).to eq 'endpoint'
+      expect(heritage["services"][0]["listeners"][0]['health_check_interval']).to eq 33
+      expect(heritage["services"][0]["listeners"][0]['health_check_path']).to eq '/health_check'
+      expect(heritage["services"][0]["listeners"][0]['health_check_timeout']).to eq 10
+      expect(heritage["services"][0]["listeners"][0]['healthy_threshold_count']).to eq 7
+      expect(heritage["services"][0]["listeners"][0]['unhealthy_threshold_count']).to eq 8
+    end
+  end
 end
