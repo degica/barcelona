@@ -171,7 +171,9 @@ module Backend::Ecs::V2
           j.VpcId district.vpc_id
           j.HealthCheckIntervalSeconds listener.health_check_interval
           j.HealthCheckPath listener.health_check_path
-          j.HealthyThresholdCount 2
+          j.HealthCheckTimeoutSeconds listener.health_check_timeout
+          j.HealthyThresholdCount listener.healthy_threshold_count
+          j.UnhealthyThresholdCount listener.unhealthy_threshold_count
           j.Matcher do |j|
             j.HttpCode "200-299"
           end

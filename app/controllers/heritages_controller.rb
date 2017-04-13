@@ -102,6 +102,9 @@ class HeritagesController < ApplicationController
             :endpoint,
             :health_check_interval,
             :health_check_path,
+            :health_check_timeout,
+            :healthy_threshold_count,
+            :unhealthy_threshold_count,
             :rule_priority,
             rule_conditions: [
               :type,

@@ -22,7 +22,7 @@ describe BuildHeritage do
           listeners: [
             {
               endpoint: endpoint.name,
-              health_check_interval: 5,
+              health_check_interval: 20,
               health_check_path: "/health_check",
               rule_priority: 99,
               rule_conditions: [
@@ -72,7 +72,7 @@ describe BuildHeritage do
       expect(service1.port_mappings.first.lb_port).to eq 80
       expect(service1.port_mappings.first.container_port).to eq 3000
       expect(service1.listeners.count).to eq 1
-      expect(service1.listeners.first.health_check_interval).to eq 5
+      expect(service1.listeners.first.health_check_interval).to eq 20
       expect(service1.listeners.first.health_check_path).to eq "/health_check"
       expect(service1.listeners.first.rule_priority).to eq 99
       expect(service1.listeners.first.rule_conditions).to eq [{"type" => 'path_pattern',
@@ -118,7 +118,7 @@ describe BuildHeritage do
         expect(service1.port_mappings.first.lb_port).to eq 80
         expect(service1.port_mappings.first.container_port).to eq 3000
         expect(service1.listeners.count).to eq 1
-        expect(service1.listeners.first.health_check_interval).to eq 5
+        expect(service1.listeners.first.health_check_interval).to eq 20
         expect(service1.listeners.first.health_check_path).to eq "/health_check"
         expect(service1.listeners.first.endpoint.name).to eq endpoint.name
 
