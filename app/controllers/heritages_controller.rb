@@ -8,20 +8,20 @@ class HeritagesController < ApplicationController
   end
 
   def show
-    render json: @heritage
+    render json: @heritage, include: "services,services.listeners"
   end
 
   def create
     @heritage = BuildHeritage.new(permitted_params, district: @district).execute
     @heritage.save_and_deploy!(without_before_deploy: true, description: "Create")
-    render json: @heritage
+    render json: @heritage, include: "services,services.listeners"
   end
 
   def update
     @heritage = BuildHeritage.new(permitted_params).execute
     @heritage.save_and_deploy!(without_before_deploy: false,
                                description: "Update to #{@heritage.image_path}")
-    render json: @heritage
+    render json: @heritage, include: "services,services.listeners"
   end
 
   def destroy

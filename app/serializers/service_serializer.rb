@@ -4,6 +4,7 @@ class ServiceSerializer < ActiveModel::Serializer
              :reverse_proxy_image, :hosts, :service_type, :force_ssl, :health_check
 
   belongs_to :heritage
+  has_many :listeners
 
   def port_mappings
     object.port_mappings.map do |pm|
