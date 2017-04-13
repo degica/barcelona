@@ -12,6 +12,10 @@ environments:
         listeners:
           - endpoint: barcelona
             health_check_path: /health_check
+            health_check_interval: 12
+            health_check_timeout: 10
+            healthy_threshold_count: 3
+            unhealthy_threshold_count: 3
       - name: worker
         command: rake jobs:work
         cpu: 128
