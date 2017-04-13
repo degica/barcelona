@@ -11,6 +11,10 @@ module Barcelona
           j.DesiredCapacity desired_capacity
           j.Cooldown 0
           j.HealthCheckGracePeriod 0
+          # * 2: When instances are being replaced, instance count temporarily becomes
+          #      desired_count * 2
+          # + 1: There's a limitation "MinInstancesInService must be less than the autoscaling group's MaxSize"
+          #      without + 1, ASG cannot satisfy this requirement when desired_count == 0
           j.MaxSize(desired_capacity * 2 + 1)
           j.MinSize desired_capacity
           j.HealthCheckType "EC2"
