@@ -11,7 +11,11 @@ module Barcelona
           j.DesiredCapacity desired_capacity
           j.Cooldown 0
           j.HealthCheckGracePeriod 0
-          j.MaxSize(desired_capacity + 1)
+          # * 2: When instances are being replaced, instance count temporarily becomes
+          #      desired_count * 2
+          # + 1: There's a limitation "MinInstancesInService must be less than the autoscaling group's MaxSize"
+          #      without + 1, ASG cannot satisfy this requirement when desired_count == 0
+          j.MaxSize(desired_capacity * 2 + 1)
           j.MinSize desired_capacity
           j.HealthCheckType "EC2"
           j.LaunchConfigurationName ref("ContainerInstanceLaunchConfiguration")
@@ -37,10 +41,8 @@ module Barcelona
 
         json.UpdatePolicy do |j|
           j.AutoScalingRollingUpdate do |j|
-            j.MaxBatchSize 1
+            j.MaxBatchSize(desired_capacity > 0 ? desired_capacity : 1)
             j.MinInstancesInService desired_capacity
-            j.WaitOnResourceSignals true
-            j.PauseTime "PT60M"
           end
         end
       end

@@ -160,19 +160,6 @@ module Barcelona
 
       def instance_user_data
         user_data = options[:container_instance].user_data
-        user_data.run_commands += [
-          "start ecs",
-          "sleep 10", # Wait for ecs agent to be running
-          "ecs_cluster=$(curl http://localhost:51678/v1/metadata | jq -r .Cluster)",
-          # Wait for all tasks in the cluster to be running
-          "while : ; do",
-          "  pending_tasks_count=$(aws ecs describe-clusters --region=$AWS_REGION --clusters=$ecs_cluster | jq -r .clusters[0].pendingTasksCount)",
-          "  [[ $pending_tasks_count -eq 0 ]] && break",
-          "  sleep 3",
-          "done",
-          "sleep 30", # Wait for services to be attached to ELB
-          "/opt/aws/bin/cfn-signal -e $? --region $AWS_REGION --stack #{stack.name} --resource ContainerInstanceAutoScalingGroup || true"
-        ]
         user_data.build
       end
 
