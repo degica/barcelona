@@ -13,6 +13,8 @@ class SignSSHKey
   def sign(identity: nil, force_command: nil, validity: "+10m", principals: ["ec2-user", "hopper"])
     raise ArgumentError if user.public_key.blank? || ca_key.blank?
 
+    identity ||= user.name
+
     secret_key_path = Dir::Tmpname.create("sk_fifo", nil) do |tmpname, _, _|
       File.mkfifo(tmpname, 0600)
     end
@@ -24,7 +26,7 @@ class SignSSHKey
     comm = [
       "ssh-keygen",
       "-s", secret_key_path,
-      "-I", identity || user.name,
+      "-I", identity,
       "-n", principals.join(','),
       "-V", validity
     ]
@@ -36,7 +38,7 @@ class SignSSHKey
       File.open(secret_key_path, 'w') { |f| f.write(ca_key) }
       Process.wait(pid)
     }
-    Event.new(district).notify(message: "Signed public key for user #{user.name}")
+    Event.new(district).notify(message: "Signed public key for user #{user.name} with identity #{identity}")
 
     File.read(public_key_file.path + "-cert.pub")
   rescue Timeout::Error
