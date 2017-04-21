@@ -6,6 +6,20 @@ class Endpoint < ActiveRecord::Base
         j.Scheme lb_scheme
         j.SecurityGroups [lb_security_group]
         j.Subnets lb_subnets
+        j.LoadBalancerAttributes [
+          {
+            "Key" => "access_logs.s3.enabled",
+            "Value" => true
+          },
+          {
+            "Key" => "access_logs.s3.bucket",
+            "Value" => endpoint.district.s3_bucket_name
+          },
+          {
+            "Key" => "access_logs.s3.prefix",
+            "Value" => "elb_logs/endpoint/#{endpoint.name}"
+          }
+        ]
         j.Tags [
           tag("barcelona", district.name)
         ]
