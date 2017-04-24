@@ -121,6 +121,13 @@ module Backend::Ecs::V2
             j.Timeout 60
           end
 
+          j.AccessLoggingPolicy do |j|
+            j.Enabled true
+            j.EmitInterval 5 # In minutes
+            j.S3BucketName district.s3_bucket_name
+            j.S3BucketPrefix "elb_logs/heritage/#{service.name}"
+          end
+
           # Enable ProxyProtocol for http/https host ports
           ports = service.port_mappings.where(protocol: %w(http https)).pluck(:host_port)
           ports += service.port_mappings.where(enable_proxy_protocol: true).pluck(:host_port)

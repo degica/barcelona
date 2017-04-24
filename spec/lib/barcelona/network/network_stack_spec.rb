@@ -956,6 +956,30 @@ describe Barcelona::Network::NetworkStack do
         "Properties" => {
           "DisplayName" => "district-#{district.name}-notification"
         }
+      },
+      "BucketPolicy" => {
+        "Type" => "AWS::S3::BucketPolicy",
+        "Properties" => {
+          "Bucket" => district.s3_bucket_name,
+          "PolicyDocument" => {
+            "Statement" => [
+              {
+                "Action" => ["s3:PutObject"],
+                "Effect" => "Allow",
+                "Resource" => {
+                  "Fn::Join" => ["",
+                                 ["arn:aws:s3:::",
+                                  "#{district.s3_bucket_name}/elb_logs/*/AWSLogs/",
+                                  {"Ref" => "AWS::AccountId"},
+                                  "/*"
+                                 ]
+                                ],
+                },
+                "Principal" => {"AWS" => Barcelona::Network::ELB_ACCOUNT_IDS[district.region]}
+              }
+            ]
+          }
+        }
       }
     }
     expect(generated["Resources"]).to match expected
