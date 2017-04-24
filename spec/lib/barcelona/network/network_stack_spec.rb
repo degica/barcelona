@@ -405,7 +405,6 @@ describe Barcelona::Network::NetworkStack do
                   {
                     "Effect"=>"Allow",
                     "Action" => [
-                      "ec2:DescribeInstances",
                       "ecs:DeregisterContainerInstance",
                       "ecs:DiscoverPollEndpoint",
                       "ecs:Poll",

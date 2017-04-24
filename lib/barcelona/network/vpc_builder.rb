@@ -358,7 +358,6 @@ module Barcelona
                   {
                     "Effect" => "Allow",
                     "Action" => [
-                      "ec2:DescribeInstances",
                       "ecs:DeregisterContainerInstance",
                       "ecs:DiscoverPollEndpoint",
                       "ecs:Poll",
