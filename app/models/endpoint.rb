@@ -124,7 +124,7 @@ class Endpoint < ActiveRecord::Base
             immutable: true,
             format: { with: /\A[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]\z/ }
   validates :public, immutable: true
-  validates :ssl_policy, inclusion: {in: %w(intermediate modern)}, presence: true
+  validates :ssl_policy, inclusion: {in: %w(old intermediate modern)}, presence: true
 
   after_create :create_stack
   after_update :update_stack
@@ -157,6 +157,7 @@ class Endpoint < ActiveRecord::Base
 
   def alb_ssl_policy
     {
+      "old" => "ELBSecurityPolicy-TLS-1-0-2015-04",
       "intermediate" => "ELBSecurityPolicy-2016-08",
       "modern" => "ELBSecurityPolicy-TLS-1-2-2017-01"
     }[ssl_policy]
