@@ -88,3 +88,32 @@ When you change Barcelona ECS container instance security group, be aware that s
 - `udp:123`, `0.0.0.0/0`
 - `tcp:80`, `169.254.169.254/32`
 - `tcp:443`, `0.0.0.0/0`
+
+## Plugins
+
+Barcelona provides several plugins which adds/extends Barcelona features.
+
+### PCIDSS plugin
+
+PCIDSS plugin adds security features required by PCI DSS. The features include
+
+- Designated NTP server
+- ClamAV virus scan
+- OSSEC
+  - Barcelona uses [Wazuh](https://github.com/wazuh/wazuh) instead of plain OSSEC
+  
+This plugin doesn't have attributes, so you just run `bcn district put-plugin --apply <district name> pcidss`
+
+#### Wazuh Kibana proxy
+
+Wazuh has a Kibana integration which enables you to see various information on your browser. Since you need to secure access to Kibana, access to Kibana is limited to private network. To access Wazuh Kibana from your browser, you will need to create a nginx proxy which has basic authentication enabled and setup HTTPS configuration.
+
+
+Barcelona provides a simple nginx proxy for Wazuh Kibana. If you want just basic auth and HTTPS, you can use the proxy with the following setup.
+
+- Create `barcelona.yml`
+  - See `dockerfiles/wazuh-kibana-proxy/barcelona.yml`
+- `bcn endpoint create --district=<district name> --public --certificate-arn=<ACM CERT ARN> wazuh-kibana-proxy`
+- `bcn create -e production --district=<district name>`
+- `bcn env set -e production BAUTH_USER=<username> BAUTH_PASSWORD=password KIBANA_URL=ossec-manager.<district name>.bcn`
+- Set domain name for the endpoint
