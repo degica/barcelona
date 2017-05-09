@@ -254,12 +254,6 @@ module Barcelona
           log_stream_name = {ec2_id}/var/log/secure
           datetime_format = %b %d %H:%M:%S
 
-          [/var/log/ecs/audit.log]
-          file = /var/log/ecs/audit.log.*
-          log_group_name = #{log_group_name}
-          log_stream_name = {ec2_id}/var/log/ecs/audit.log
-          datetime_format = %Y-%m-%dT%H:%M:%SZ
-
           [/var/log/ntpstats/ntpd.log]
           file = /var/log/ntpstats/ntpd.log
           log_group_name = #{log_group_name}
