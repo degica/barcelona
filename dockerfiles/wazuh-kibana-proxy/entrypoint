@@ -1,0 +1,7 @@
+#!/bin/sh
+
+export RESOLVER_IP=$(cat /etc/resolv.conf | grep "^nameserver" | sed -e "s/^nameserver //")
+exec render /app/nginx.conf -- \
+  prehook "nginx -V" -- \
+  prehook "htpasswd -bc /app/htpasswd $BAUTH_USER $BAUTH_PASSWORD" -- \
+  /usr/sbin/nginx -c /app/nginx.conf

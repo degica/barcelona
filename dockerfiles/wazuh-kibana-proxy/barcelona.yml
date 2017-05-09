@@ -1,0 +1,14 @@
+environments:
+  production:
+    name: wazuh-kibana-proxy
+    image_name: quay.io/degica/wazuh-kibana-proxy
+    services:
+      - name: web
+        service_type: web
+        cpu: 64
+        memory: 128
+        command: entrypoint
+        force_ssl: true
+        listeners:
+          - endpoint: wazuh-kibana-proxy
+            health_check_path: /health_check

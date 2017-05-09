@@ -1,0 +1,42 @@
+daemon off;
+error_log /dev/stdout notice;
+user nobody nogroup;
+worker_processes 1;
+
+events {
+    worker_connections  1024;
+}
+
+http {
+  server {
+    listen {{ var "PORT" | default "3000" }} default_server;
+    server_name _;
+    access_log /dev/stdout;
+
+    location /health_check {
+      return 200;
+    }
+
+    resolver {{ var "RESOLVER_IP" }} valid=60s;
+    resolver_timeout 10s;
+
+    location / {
+      auth_basic           "Protected";
+      auth_basic_user_file /app/htpasswd;
+
+      set $upstream {{ var "KIBANA_URL" }}:{{ var "KIBANA_PORT" }};
+
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "upgrade";
+      proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
+      proxy_set_header Host $http_host;
+      proxy_redirect off;
+
+      proxy_read_timeout 60;
+      proxy_send_timeout 60;
+
+      proxy_pass http://$upstream;
+    }
+  }
+}
