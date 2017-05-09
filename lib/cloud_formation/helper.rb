@@ -4,8 +4,8 @@ module CloudFormation
       ref("AWS::Region")
     end
 
-    def tag(key, value)
-      {"Key" => key, "Value" => value}
+    def tag(key, value="")
+      {"Key" => key, "Value" => value}.compact
     end
 
     def ref(r)
