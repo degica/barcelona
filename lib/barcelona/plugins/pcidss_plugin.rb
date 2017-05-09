@@ -637,7 +637,12 @@ module Barcelona
           district.subnets("Public").map(&:subnet_id).map { |id|
             "echo server #{id}.ntp.#{district.name}.bcn iburst >> /etc/ntp.conf"
           },
-          "service ntpd restart"
+          "service ntpd restart",
+
+          "yum install -y wazuh-agent",
+          "sed -i 's/<server-ip>.*<\\/server-ip>/<server-hostname>ossec-manager.#{district.name}.bcn<\\/server-hostname>/g' /var/ossec/etc/ossec.conf",
+          "/var/ossec/bin/agent-auth -m ossec-manager.#{district.name}.bcn",
+          "/var/ossec/bin/ossec-control restart"
         ].flatten
       end
 
@@ -645,6 +650,15 @@ module Barcelona
         user_data.packages += SYSTEM_PACKAGES
         user_data.run_commands += run_commands
 
+        user_data.add_file("/etc/yum.repos.d/wazuh.repo", "root:root", "644", <<EOS)
+[wazuh_repo]
+gpgcheck=1
+gpgkey=https://packages.wazuh.com/key/GPG-KEY-WAZUH
+enabled=1
+name=Wazuh
+baseurl=https://packages.wazuh.com/yum/el/7/x86_64
+protect=1
+EOS
         user_data
       end
 
