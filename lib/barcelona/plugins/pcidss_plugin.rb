@@ -232,7 +232,7 @@ module Barcelona
 
         # CloudWatch Logs configurations
         # See http://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_cloudwatch_logs.html
-        log_group_name = "Barcelona/#{district.name}/ntp_server"
+        log_group_name = "Barcelona/#{district.name}/ntp-server"
         user_data.add_file("/etc/awslogs/awslogs.conf", "root:root", "644", <<~EOS)
           [general]
           state_file = /var/lib/awslogs/agent-state
