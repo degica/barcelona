@@ -73,6 +73,7 @@ namespace :bcn do
     heritage.env_vars.build(key: "DISTRICT_NAME", value: district_name, secret: false)
     heritage.env_vars.build(key: "S3_BUCKET_NAME", value: district.s3_bucket_name, secret: false)
     heritage.env_vars.build(key: "CIDR_BLOCK", value: district.cidr_block, secret: false)
+    heritage.env_vars.build(key: "SSH_CA_PUBLIC_KEY", value: district.ssh_ca_public_key, secret: false)
     if acm_cert_arn
       heritage.env_vars.build(key: "ACM_CERT_ARN", value: acm_cert_arn, secret: false)
     end
@@ -124,7 +125,8 @@ EOS
         region: ENV["AWS_REGION"],
         cidr_block: ENV["CIDR_BLOCK"],
         aws_access_key_id: ENV["AWS_ACCESS_KEY_ID"],
-        aws_secret_access_key: ENV["AWS_SECRET_ACCESS_KEY"]
+        aws_secret_access_key: ENV["AWS_SECRET_ACCESS_KEY"],
+        ssh_ca_public_key: ENV["SSH_CA_PUBLIC_KEY"]
       )
 
       endpoint = district.endpoints.create!(name: "barcelona", public: true, certificate_id: ENV["ACM_CERT_ARN"])
