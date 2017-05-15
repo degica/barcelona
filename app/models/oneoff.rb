@@ -59,8 +59,9 @@ class Oneoff < ActiveRecord::Base
   end
 
   def interactive_run_command
+    return nil if self.session_token.nil?
     real_command = run_command.join(' ')
-    [self.id, real_command].join(' ')
+    [self.session_token, real_command].join(' ')
   end
 
   def watch_session_command
