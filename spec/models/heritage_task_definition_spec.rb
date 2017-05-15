@@ -171,9 +171,6 @@ describe HeritageTaskDefinition do
                                   essential: true,
                                   image: heritage.image_path,
                                   environment: [],
-                                  docker_labels: {
-                                    "com.barcelona.oneoff-id" => oneoff.id.to_s
-                                  },
                                   volumes_from: [
                                     {
                                       source_container: "runpack",
@@ -193,6 +190,13 @@ describe HeritageTaskDefinition do
                                 }
                               ]
                            })
+    end
+
+    context "when session_token is not nil" do
+      it "sets user to task definition" do
+        oneoff.session_token = 'session-token'
+        expect(subject[:container_definitions][0][:docker_labels]).to eq({"com.barcelona.oneoff-id" => 'session-token'})
+      end
     end
 
     context "when user is specified" do
