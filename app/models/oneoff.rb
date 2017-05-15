@@ -7,7 +7,7 @@ class Oneoff < ActiveRecord::Base
   delegate :district, to: :heritage
   delegate :aws, to: :district
 
-  attr_accessor :memory, :user
+  attr_accessor :memory, :user, :session_token
 
   after_initialize do |oneoff|
     oneoff.memory ||= 512
@@ -19,6 +19,7 @@ class Oneoff < ActiveRecord::Base
   def run(sync: false, interactive: false)
     raise ArgumentError if sync && interactive
 
+    self.session_token = SecureRandom.uuid if interactive
     definition = HeritageTaskDefinition.oneoff_definition(self)
     aws.ecs.register_task_definition(definition.to_task_definition)
     resp = aws.ecs.run_task(
