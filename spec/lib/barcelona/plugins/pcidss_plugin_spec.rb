@@ -4,7 +4,7 @@ require 'barcelona/plugins/pcidss_plugin'
 module Barcelona
   module Plugins
     describe PcidssStack do
-      let!(:district) do
+      let(:district) do
         create :district, bastion_key_pair: "bastion", plugins_attributes: [
                  {
                    name: 'pcidss',
@@ -13,6 +13,10 @@ module Barcelona
                ]
       end
       let(:stack) { described_class.new(district) }
+
+      before do
+        allow_any_instance_of(PcidssBuilder).to receive(:ossec_volume_az) { 'ap-northeast-1a' }
+      end
 
       it "generates a correct stack template" do
         generated = JSON.load stack.target!
@@ -38,6 +42,10 @@ module Barcelona
                    plugin_attributes: {}
                  }
                ]
+      end
+
+      before do
+        allow_any_instance_of(PcidssBuilder).to receive(:ossec_volume_az) { 'ap-northeast-1a' }
       end
 
       it "gets hooked with container_instance_user_data trigger" do

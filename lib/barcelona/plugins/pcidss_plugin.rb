@@ -415,7 +415,7 @@ module Barcelona
         end
 
         add_resource("AWS::EC2::Volume", "OSSECManagerVolume") do |j|
-          j.AvailabilityZone "ap-northeast-1a"
+          j.AvailabilityZone ossec_volume_az
           j.Encrypted true
           j.Size 8
           j.Tags [
@@ -586,6 +586,12 @@ module Barcelona
             tag("barcelona-role", "pcidss")
           ]
         end
+      end
+
+      def ossec_volume_az
+        district.subnets("Private").find { |s|
+          s.subnet_id == district.stack_resources["SubnetTrusted1"]
+        }.availability_zone
       end
     end
 
