@@ -521,7 +521,6 @@ module Barcelona
           j.GroupDescription "SG for OSSEC Manager Instance"
           j.VpcId district.vpc_id
           j.SecurityGroupIngress [
-            # ERASEME
             {
               "IpProtocol" => "tcp",
               "FromPort" => 22,
