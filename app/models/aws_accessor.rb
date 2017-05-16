@@ -32,6 +32,10 @@ class AwsAccessor
     @sns ||= Aws::SNS::Client.new(client_config)
   end
 
+  def autoscaling
+    @autoscaling ||= Aws::AutoScaling::Client.new(client_config)
+  end
+
   private
 
   def client_config
