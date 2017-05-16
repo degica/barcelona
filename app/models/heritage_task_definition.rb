@@ -21,8 +21,8 @@ class HeritageTaskDefinition
     new(heritage: oneoff.heritage,
         family_name: "#{oneoff.heritage.name}-oneoff",
         app_container_labels: {
-          "com.barcelona.oneoff-id" => oneoff.id.to_s
-        },
+          "com.barcelona.oneoff-id" => oneoff.session_token
+        }.compact,
         cpu: 128,
         memory: oneoff.memory,
         user: oneoff.user
