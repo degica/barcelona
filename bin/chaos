@@ -1,0 +1,20 @@
+#!/usr/bin/env ruby
+
+require 'thor'
+require File.expand_path('../../config/environment', __FILE__)
+
+class CLI < Thor
+  option :only, desc: 'district names', type: :array
+  option :exclude, desc: 'district names', type: :array
+  option :count, desc: 'instance count to terminate', type: :numeric, default: 1
+  desc "execute", "Terminate instances in each district"
+  def execute
+    district_names = options[:only] || District.pluck(:name)
+    district_names = district_names - options[:exclude] if options[:exclude].present?
+    Barcelona::Chaos.run(district_names, count: options[:count])
+  end
+
+  default_task :execute
+end
+
+CLI.start(ARGV)
