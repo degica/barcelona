@@ -17,7 +17,7 @@ module Barcelona
 
       def manager_user_data
         user_data = InstanceUserData.new
-        user_data.packages += ["docker", "jq", "awslogs", "clamav", "clamav-update", "tmpwatch", "fail2ban"]
+        user_data.packages += ["docker", "jq", "awslogs", "clamav", "clamav-update", "tmpwatch", "fail2ban", "yum-cron-security"]
 
         change_batch = {
           "Changes" => [
@@ -38,6 +38,7 @@ module Barcelona
 
         user_data.run_commands += [
           "set -ex",
+          "service yum-cron start",
 
           # awslogs
           "ec2_id=$(curl http://169.254.169.254/latest/meta-data/instance-id)",
@@ -194,7 +195,7 @@ module Barcelona
 
       def ntp_server_user_data
         user_data = InstanceUserData.new
-        user_data.packages += ["aws-cli", "awslogs", "jq"]
+        user_data.packages += ["aws-cli", "awslogs", "jq", "yum-cron-security"]
 
         find_eni_command = [
           "aws ec2 --region=#{district.region} describe-network-interfaces",
@@ -206,6 +207,7 @@ module Barcelona
         ].join(" ")
         user_data.run_commands += [
           "set -ex",
+          "service yum-cron start",
 
           # awslogs
           "ec2_id=$(curl http://169.254.169.254/latest/meta-data/instance-id)",

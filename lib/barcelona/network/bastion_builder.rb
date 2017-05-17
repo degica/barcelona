@@ -36,10 +36,11 @@ module Barcelona
 
       def user_data
         ud = InstanceUserData.new
-        ud.packages += ["aws-cli"]
+        ud.packages += ["aws-cli", "yum-cron-security"]
         ud.add_user("hopper")
         ud.add_file("/etc/ssh/ssh_ca_key.pub", "root:root", "644", district.ssh_format_ca_public_key)
         ud.run_commands += [
+          "service yum-cron start",
           'printf "\nTrustedUserCAKeys /etc/ssh/ssh_ca_key.pub\n" >> /etc/ssh/sshd_config',
           'sed -i -e "s/^PermitRootLogin .*/PermitRootLogin no/" /etc/ssh/sshd_config',
           "service sshd restart",
