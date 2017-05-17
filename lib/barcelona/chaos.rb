@@ -4,7 +4,7 @@ module Barcelona
 
     def self.run(district_names, count:)
       District.where(name: district_names.uniq).each do |d|
-        self.new(d, count).run
+        new(d, count).run
       end
     end
 
@@ -15,8 +15,7 @@ module Barcelona
 
     def run
       instances = district.container_instances.sort_by { |i| i[:launch_time] }
-      non_active_count = instances.select { |i| i[:status] != 'ACTIVE' }.count
-      if non_active_count > 0
+      if instances.detect { |i| i[:status] != 'ACTIVE' }
         notify("#{district.name} has one or more non-active instance(s). Skipping", level: :warn)
         return
       end
