@@ -2,6 +2,10 @@ environments:
   production:
     name: barcelona
     image_name: quay.io/degica/barcelona
+    scheduled_tasks:
+      # 10AM JST every week day
+      - schedule: cron(0 1 ? * MON-FRI *)
+        command: bin/chaos --only staging
     services:
       - name: web
         service_type: web
