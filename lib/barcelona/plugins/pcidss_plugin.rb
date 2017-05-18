@@ -40,6 +40,9 @@ module Barcelona
           "set -ex",
           "service yum-cron start",
 
+          # Install AWS Inspector agent
+          "curl https://d1wk0tztpsntt1.cloudfront.net/linux/latest/install | bash",
+
           # awslogs
           "ec2_id=$(curl http://169.254.169.254/latest/meta-data/instance-id)",
           'sed -i -e "s/{ec2_id}/$ec2_id/g" /etc/awslogs/awslogs.conf',
@@ -208,6 +211,9 @@ module Barcelona
         user_data.run_commands += [
           "set -ex",
           "service yum-cron start",
+
+          # Install AWS Inspector agent
+          "curl https://d1wk0tztpsntt1.cloudfront.net/linux/latest/install | bash",
 
           # awslogs
           "ec2_id=$(curl http://169.254.169.254/latest/meta-data/instance-id)",
