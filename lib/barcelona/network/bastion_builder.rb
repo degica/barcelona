@@ -4,16 +4,20 @@ module Barcelona
       # https://aws.amazon.com/amazon-linux-ami/
       # Amazon Linux AMI 2016.09.0
       AMI_IDS = {
-        "us-east-1" => "ami-c481fad3",
-        "us-east-2" => "ami-71ca9114",
-        "us-west-1" => "ami-de347abe",
-        "us-west-2" => "ami-b04e92d0",
-        "eu-west-1" => "ami-d41d58a7",
-        "eu-central-1" => "ami-0044b96f",
-        "ap-northeast-1" => "ami-1a15c77b",
-        "ap-southeast-1" => "ami-7243e611",
-        "ap-southeast-2" => "ami-55d4e436",
-        "ca-central-1" => "ami-b48b39d0"
+        "us-east-1" => "ami-c58c1dd3",
+        "us-east-2" => "ami-4191b524",
+        "us-west-1" => "ami-7a85a01a",
+        "us-west-2" => "ami-4836a428",
+        "eu-west-1" => "ami-01ccc867",
+        "eu-west-2" => "ami-b6daced2",
+        "eu-central-1" => "ami-b968bad6",
+        "ap-northeast-1" => "ami-923d12f5",
+        "ap-northeast-2" => "ami-9d15c7f3",
+        "ap-southeast-1" => "ami-fc5ae39f",
+        "ap-southeast-2" => "ami-162c2575",
+        "ap-south-1" => "ami-52c7b43d",
+        "ca-central-1" => "ami-0bd66a6f",
+        "sa-east-1" => "ami-37cfad5b"
       }
 
       def build_resources
