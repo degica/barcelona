@@ -294,9 +294,7 @@ module Barcelona
           ]
         end
 
-        add_resource(BastionServer, "BastionServer",
-                     district: stack.district,
-                     depends_on: ["VPCGatewayAttachment"])
+        add_builder BastionBuilder.new(options[:autoscaling])
 
         add_resource("AWS::IAM::Role", "ECSServiceRole") do |j|
           j.AssumeRolePolicyDocument do |j|

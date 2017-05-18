@@ -43,7 +43,7 @@ module Barcelona
 
       it "gets hooked with network_stack_template trigger" do
         template = JSON.load(::Barcelona::Network::NetworkStack.new(district).target!)
-        user_data = InstanceUserData.load(template["Resources"]["BastionServer"]["Properties"]["UserData"])
+        user_data = InstanceUserData.load(template["Resources"]["BastionLaunchConfiguration"]["Properties"]["UserData"])
         expect(user_data.packages).to include(*described_class::SYSTEM_PACKAGES)
         expect(user_data.run_commands).to include(*described_class::RUN_COMMANDS)
       end

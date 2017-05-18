@@ -668,13 +668,13 @@ EOS
       end
 
       def on_network_stack_template(_stack, template)
-        bastion_server = template["BastionServer"]
-        return template if bastion_server.nil?
+        bastion_lc = template["BastionLaunchConfiguration"]
+        return template if bastion_lc.nil?
 
-        user_data = InstanceUserData.load_or_initialize(bastion_server["Properties"]["UserData"])
+        user_data = InstanceUserData.load_or_initialize(bastion_lc["Properties"]["UserData"])
         user_data.packages += SYSTEM_PACKAGES
         user_data.run_commands += run_commands
-        bastion_server["Properties"]["UserData"] = user_data.build
+        bastion_lc["Properties"]["UserData"] = user_data.build
         template
       end
 
