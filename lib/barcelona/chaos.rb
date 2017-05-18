@@ -23,9 +23,7 @@ module Barcelona
       asg = district.aws.autoscaling
 
       # Terminate n oldest instances
-      terminate_count.times do |n|
-        ins = instances[n]
-        break if ins.nil?
+      instances[0...terminate_count].each do |ins|
         notify "Terminating #{ins[:ec2_instance_id]}"
         asg.terminate_instance_in_auto_scaling_group(
           instance_id: ins[:ec2_instance_id],
