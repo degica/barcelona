@@ -5,7 +5,7 @@ environments:
     scheduled_tasks:
       # 10AM JST every week day
       - schedule: cron(0 1 ? * MON-FRI *)
-        command: bin/chaos --only staging
+        command: bin/chaos
     services:
       - name: web
         service_type: web
