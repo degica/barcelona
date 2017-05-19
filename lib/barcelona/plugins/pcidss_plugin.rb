@@ -235,7 +235,7 @@ module Barcelona
           "echo interface listen eth1 >> /etc/ntp.conf",
           "service ntpd restart",
 
-          "service stop sshd"
+          "service sshd stop"
         ]
 
         # CloudWatch Logs configurations
