@@ -21,6 +21,54 @@ module Barcelona
       }
 
       def build_resources
+        add_resource("AWS::EC2::SecurityGroup", "SecurityGroupBastion") do |j|
+          j.GroupDescription "Security Group for bastion servers"
+          j.VpcId ref("VPC")
+          j.SecurityGroupIngress [
+            {
+              "IpProtocol" => "tcp",
+              "FromPort" => 22,
+              "ToPort" => 22,
+              "CidrIp" => "0.0.0.0/0"
+            },
+            {
+              "IpProtocol" => "udp",
+              "FromPort" => 123,
+              "ToPort" => 123,
+              "CidrIp" => options[:cidr_block]
+            }
+          ]
+          j.SecurityGroupEgress [
+            {
+              "IpProtocol" => "udp",
+              "FromPort" => 123,
+              "ToPort" => 123,
+              "CidrIp" => '0.0.0.0/0'
+            },
+            {
+              "IpProtocol" => "tcp",
+              "FromPort" => 22,
+              "ToPort" => 22,
+              "CidrIp" => options[:cidr_block]
+            },
+            {
+              "IpProtocol" => "tcp",
+              "FromPort" => 80,
+              "ToPort" => 80,
+              "CidrIp" => '0.0.0.0/0'
+            },
+            {
+              "IpProtocol" => "tcp",
+              "FromPort" => 443,
+              "ToPort" => 443,
+              "CidrIp" => '0.0.0.0/0'
+            }
+          ]
+          j.Tags [
+            tag("barcelona", stack.district.name)
+          ]
+        end
+
         add_resource("AWS::IAM::InstanceProfile", "BastionProfile") do |j|
           j.Path "/"
           j.Roles [ref("BastionRole")]
