@@ -62,7 +62,21 @@ module Barcelona
               "FromPort" => 443,
               "ToPort" => 443,
               "CidrIp" => '0.0.0.0/0'
-            }
+            },
+            # OSSEC manager
+            {
+              "IpProtocol" => "udp",
+              "FromPort" => 1514,
+              "ToPort" => 1514,
+              "CidrIp" => options[:cidr_block]
+            },
+            # OSSEC authd
+            {
+              "IpProtocol" => "tcp",
+              "FromPort" => 1515,
+              "ToPort" => 1515,
+              "CidrIp" => options[:cidr_block]
+            },
           ]
           j.Tags [
             tag("barcelona", stack.district.name)

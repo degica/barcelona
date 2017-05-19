@@ -246,7 +246,7 @@ module Barcelona
           j.SourceSecurityGroupId ref("InstanceSecurityGroup")
         end
 
-        add_builder BastionBuilder.new(options[:autoscaling])
+        add_builder BastionBuilder.new(options)
 
         add_resource("AWS::IAM::Role", "ECSServiceRole") do |j|
           j.AssumeRolePolicyDocument do |j|

@@ -546,14 +546,14 @@ module Barcelona
               "IpProtocol" => "udp",
               "FromPort" => 1514,
               "ToPort" => 1514,
-              "SourceSecurityGroupId" => district.instance_security_group
+              "CidrIp" => district.cidr_block
             },
             # OSSEC authd
             {
               "IpProtocol" => "tcp",
               "FromPort" => 1515,
               "ToPort" => 1515,
-              "SourceSecurityGroupId" => district.instance_security_group
+              "CidrIp" => district.cidr_block
             },
             # Kibana
             {
