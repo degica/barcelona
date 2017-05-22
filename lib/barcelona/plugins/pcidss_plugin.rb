@@ -297,7 +297,7 @@ module Barcelona
                      "NTPServerLaunchConfiguration") do |j|
           j.IamInstanceProfile ref("NTPServerProfile")
           j.ImageId "ami-56d4ad31"
-          j.InstanceType "t2.nano"
+          j.InstanceType "t2.micro"
           j.AssociatePublicIpAddress true
           j.SecurityGroups [ref("NTPServerSG")]
           j.UserData ntp_server_user_data.build

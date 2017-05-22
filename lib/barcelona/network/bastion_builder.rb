@@ -127,7 +127,7 @@ module Barcelona
         add_resource("AWS::AutoScaling::LaunchConfiguration", "BastionLaunchConfiguration") do |j|
           j.IamInstanceProfile ref("BastionProfile")
           j.ImageId AMI_IDS[district.region]
-          j.InstanceType "t2.nano"
+          j.InstanceType "t2.micro"
           j.SecurityGroups [ref("SecurityGroupBastion")]
           j.AssociatePublicIpAddress true
           j.UserData user_data

@@ -393,7 +393,7 @@ describe Barcelona::Network::NetworkStack do
       "BastionLaunchConfiguration" => {
         "Type" => "AWS::AutoScaling::LaunchConfiguration",
         "Properties" => {
-          "InstanceType" => "t2.nano",
+          "InstanceType" => "t2.micro",
           "IamInstanceProfile" => {"Ref" => "BastionProfile"},
           "ImageId" => kind_of(String),
           "UserData" => anything,
