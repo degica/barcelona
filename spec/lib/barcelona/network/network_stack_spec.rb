@@ -335,14 +335,66 @@ describe Barcelona::Network::NetworkStack do
              "FromPort" => 443,
              "ToPort" => 443,
              "CidrIp" => "0.0.0.0/0"},
+            {"IpProtocol" => "udp",
+             "FromPort" => 1514,
+             "ToPort" => 1514,
+             "CidrIp" => district.cidr_block},
+            {"IpProtocol" => "tcp",
+             "FromPort" => 1515,
+             "ToPort" => 1515,
+             "CidrIp" => district.cidr_block},
           ],
           "Tags" => [{"Key" => "barcelona", "Value" => district.name}]
+        }
+      },
+      "BastionProfile" => {
+        "Type" => "AWS::IAM::InstanceProfile",
+        "Properties" => {
+          "Path" => "/",
+          "Roles" => [{"Ref" => "BastionRole"}]
+        }
+      },
+      "BastionRole" => {
+        "Type"=>"AWS::IAM::Role",
+        "Properties" => {
+          "AssumeRolePolicyDocument" => {
+            "Version"=>"2012-10-17",
+            "Statement" => [
+              {
+                "Effect"=>"Allow",
+                "Principal" => {"Service"=>["ec2.amazonaws.com"]},
+                "Action"=>["sts:AssumeRole"]
+              }
+            ]
+          },
+          "Path"=>"/",
+          "Policies" => [
+            {
+              "PolicyName" => "bastion-role",
+              "PolicyDocument" => {
+                "Version" => "2012-10-17",
+                "Statement" => [
+                  {
+                    "Effect"=>"Allow",
+                    "Action" => [
+                      "logs:CreateLogGroup",
+                      "logs:CreateLogStream",
+                      "logs:DescribeLogStreams",
+                      "logs:PutLogEvents",
+                    ],
+                    "Resource"=>["*"]
+                  }
+                ]
+              }
+            }
+          ]
         }
       },
       "BastionLaunchConfiguration" => {
         "Type" => "AWS::AutoScaling::LaunchConfiguration",
         "Properties" => {
-          "InstanceType" => "t2.nano",
+          "InstanceType" => "t2.micro",
+          "IamInstanceProfile" => {"Ref" => "BastionProfile"},
           "ImageId" => kind_of(String),
           "UserData" => anything,
           "AssociatePublicIpAddress" => true,

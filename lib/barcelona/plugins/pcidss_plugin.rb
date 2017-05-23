@@ -17,7 +17,7 @@ module Barcelona
 
       def manager_user_data
         user_data = InstanceUserData.new
-        user_data.packages += ["docker", "jq", "awslogs", "clamav", "clamav-update", "tmpwatch", "fail2ban"]
+        user_data.packages += ["docker", "jq", "awslogs", "clamav", "clamav-update", "tmpwatch", "fail2ban", "yum-cron-security"]
 
         change_batch = {
           "Changes" => [
@@ -38,6 +38,10 @@ module Barcelona
 
         user_data.run_commands += [
           "set -ex",
+          "service yum-cron start",
+
+          # Install AWS Inspector agent
+          "curl https://d1wk0tztpsntt1.cloudfront.net/linux/latest/install | bash",
 
           # awslogs
           "ec2_id=$(curl http://169.254.169.254/latest/meta-data/instance-id)",
@@ -194,7 +198,7 @@ module Barcelona
 
       def ntp_server_user_data
         user_data = InstanceUserData.new
-        user_data.packages += ["aws-cli", "awslogs", "jq"]
+        user_data.packages += ["aws-cli", "awslogs", "jq", "yum-cron-security"]
 
         find_eni_command = [
           "aws ec2 --region=#{district.region} describe-network-interfaces",
@@ -206,6 +210,10 @@ module Barcelona
         ].join(" ")
         user_data.run_commands += [
           "set -ex",
+          "service yum-cron start",
+
+          # Install AWS Inspector agent
+          "curl https://d1wk0tztpsntt1.cloudfront.net/linux/latest/install | bash",
 
           # awslogs
           "ec2_id=$(curl http://169.254.169.254/latest/meta-data/instance-id)",
@@ -227,7 +235,7 @@ module Barcelona
           "echo interface listen eth1 >> /etc/ntp.conf",
           "service ntpd restart",
 
-          "service stop sshd"
+          "service sshd stop"
         ]
 
         # CloudWatch Logs configurations
@@ -289,7 +297,7 @@ module Barcelona
                      "NTPServerLaunchConfiguration") do |j|
           j.IamInstanceProfile ref("NTPServerProfile")
           j.ImageId "ami-56d4ad31"
-          j.InstanceType "t2.nano"
+          j.InstanceType "t2.micro"
           j.AssociatePublicIpAddress true
           j.SecurityGroups [ref("NTPServerSG")]
           j.UserData ntp_server_user_data.build
@@ -538,14 +546,14 @@ module Barcelona
               "IpProtocol" => "udp",
               "FromPort" => 1514,
               "ToPort" => 1514,
-              "SourceSecurityGroupId" => district.instance_security_group
+              "CidrIp" => district.cidr_block
             },
             # OSSEC authd
             {
               "IpProtocol" => "tcp",
               "FromPort" => 1515,
               "ToPort" => 1515,
-              "SourceSecurityGroupId" => district.instance_security_group
+              "CidrIp" => district.cidr_block
             },
             # Kibana
             {
@@ -674,6 +682,15 @@ EOS
         user_data = InstanceUserData.load_or_initialize(bastion_lc["Properties"]["UserData"])
         user_data.packages += SYSTEM_PACKAGES
         user_data.run_commands += run_commands
+        user_data.add_file("/etc/yum.repos.d/wazuh.repo", "root:root", "644", <<EOS)
+[wazuh_repo]
+gpgcheck=1
+gpgkey=https://packages.wazuh.com/key/GPG-KEY-WAZUH
+enabled=1
+name=Wazuh
+baseurl=https://packages.wazuh.com/yum/el/7/x86_64
+protect=1
+EOS
         bastion_lc["Properties"]["UserData"] = user_data.build
         template
       end

@@ -12,6 +12,7 @@ class ContainerInstance
       "set -ex",
       # Embed SHA2 hash dockercfg so that instance replacement happens when dockercfg is updated
       "# #{Digest::SHA256.hexdigest(district.dockercfg.to_s)}",
+      "yum update -y --security",
 
       # Setup swap
       "MEMSIZE=`cat /proc/meminfo | grep MemTotal | awk '{print $2}'`",
