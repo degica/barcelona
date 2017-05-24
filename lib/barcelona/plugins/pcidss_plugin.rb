@@ -80,7 +80,7 @@ module Barcelona
           "service sshd restart",
 
           # Attach OSSEC volume
-          "volume_id=$(aws ec2 describe-volumes --region ap-northeast-1 --filters Name=tag-key,Values=ossec-manager-volume | jq -r '.Volumes[0].VolumeId')",
+          "volume_id=$(aws ec2 describe-volumes --region ap-northeast-1 --filters Name=tag-key,Values=ossec-manager-volume Name=tag:barcelona,Values=#{district.name} | jq -r '.Volumes[0].VolumeId')",
           "instance_id=$(curl http://169.254.169.254/latest/meta-data/instance-id)",
           "aws ec2 attach-volume --region ap-northeast-1 --volume-id $volume_id --instance-id $instance_id --device /dev/xvdh",
 
