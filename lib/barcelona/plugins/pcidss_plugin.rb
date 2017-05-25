@@ -652,10 +652,13 @@ module Barcelona
           },
           "service ntpd restart",
 
+          # Ignores error on OSSEC installation process.
+          "set +e",
           "yum install -y wazuh-agent",
           "sed -i 's/<server-ip>.*<\\/server-ip>/<server-hostname>ossec-manager.#{district.name}.bcn<\\/server-hostname>/g' /var/ossec/etc/ossec.conf",
           "/var/ossec/bin/agent-auth -m ossec-manager.#{district.name}.bcn",
-          "/var/ossec/bin/ossec-control restart"
+          "/var/ossec/bin/ossec-control restart",
+          "set -e",
         ].flatten
       end
 
