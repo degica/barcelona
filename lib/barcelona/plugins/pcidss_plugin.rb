@@ -497,7 +497,7 @@ module Barcelona
           j.Roles [ref("OSSECManagerRole")]
         end
 
-        add_resource("AWS::AutoScaling::AutoScalingGroup", "OSSECManagerASG") do |j|
+        add_resource("AWS::AutoScaling::AutoScalingGroup", "OSSECManagerASG", depends_on: ["OSSECManagerVolume"]) do |j|
           j.DesiredCapacity 1
           j.HealthCheckGracePeriod 0
           j.MaxSize 1
