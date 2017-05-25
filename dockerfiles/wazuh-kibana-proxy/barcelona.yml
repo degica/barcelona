@@ -1,7 +1,7 @@
 environments:
   production:
     name: wazuh-kibana-proxy
-    image_name: quay.io/degica/wazuh-kibana-proxy
+    image_name: quay.io/degica/barcelona-wazuh-kibana-proxy
     services:
       - name: web
         service_type: web
@@ -10,5 +10,5 @@ environments:
         command: entrypoint
         force_ssl: true
         listeners:
-          - endpoint: wazuh-kibana-proxy
+          - endpoint: wazuh
             health_check_path: /health_check

@@ -80,7 +80,7 @@ module Barcelona
           "service sshd restart",
 
           # Attach OSSEC volume
-          "volume_id=$(aws ec2 describe-volumes --region ap-northeast-1 --filters Name=tag-key,Values=ossec-manager-volume | jq -r '.Volumes[0].VolumeId')",
+          "volume_id=$(aws ec2 describe-volumes --region ap-northeast-1 --filters Name=tag-key,Values=ossec-manager-volume Name=tag:barcelona,Values=#{district.name} | jq -r '.Volumes[0].VolumeId')",
           "instance_id=$(curl http://169.254.169.254/latest/meta-data/instance-id)",
           "aws ec2 attach-volume --region ap-northeast-1 --volume-id $volume_id --instance-id $instance_id --device /dev/xvdh",
 
@@ -497,7 +497,7 @@ module Barcelona
           j.Roles [ref("OSSECManagerRole")]
         end
 
-        add_resource("AWS::AutoScaling::AutoScalingGroup", "OSSECManagerASG") do |j|
+        add_resource("AWS::AutoScaling::AutoScalingGroup", "OSSECManagerASG", depends_on: ["OSSECManagerVolume"]) do |j|
           j.DesiredCapacity 1
           j.HealthCheckGracePeriod 0
           j.MaxSize 1
@@ -652,10 +652,13 @@ module Barcelona
           },
           "service ntpd restart",
 
+          # Ignores error on OSSEC installation process.
+          "set +e",
           "yum install -y wazuh-agent",
           "sed -i 's/<server-ip>.*<\\/server-ip>/<server-hostname>ossec-manager.#{district.name}.bcn<\\/server-hostname>/g' /var/ossec/etc/ossec.conf",
           "/var/ossec/bin/agent-auth -m ossec-manager.#{district.name}.bcn",
-          "/var/ossec/bin/ossec-control restart"
+          "/var/ossec/bin/ossec-control restart",
+          "set -e",
         ].flatten
       end
 
