@@ -8,7 +8,7 @@ class District < ActiveRecord::Base
   has_many :heritages, inverse_of: :district, dependent: :destroy
   has_many :users_districts, dependent: :destroy
   has_many :users, through: :users_districts
-  has_many :plugins, dependent: :delete_all, inverse_of: :district
+  has_many :plugins, dependent: :destroy, inverse_of: :district
   has_many :endpoints, inverse_of: :district, dependent: :destroy
   has_many :notifications, inverse_of: :district, dependent: :destroy
 
