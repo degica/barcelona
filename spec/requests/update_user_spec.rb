@@ -2,8 +2,8 @@ require 'rails_helper'
 
 describe "PATCH /users/:id", type: :request do
   let(:district) { create :district }
-  let(:user) { create :user, roles: [role], districts: [district] }
-  let(:user2) { create :user, name: 'user2', roles: ["developer"], districts: [district] }
+  let(:user) { create :user, roles: [role] }
+  let(:user2) { create :user, roles: ["developer"] }
 
   context "when a user is admin" do
     let(:role) { "admin" }
@@ -34,7 +34,7 @@ end
 
 describe "PATCH /user", type: :request do
   let(:district) { create :district }
-  let(:user) { create :user, roles: ["developer"], districts: [district] }
+  let(:user) { create :user, roles: ["developer"] }
 
   it "updates user information" do
     params = {
