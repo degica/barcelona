@@ -52,6 +52,9 @@ RSpec.configure do |config|
 
   config.before :all do |_example|
     Aws.config[:stub_responses] = true
+
+    ENV['VAULT_URL'] ||= "http://my-vault.com"
+    ENV['VAULT_PATH_PREFIX'] ||= "prefix"
   end
 
   config.before :suite do
