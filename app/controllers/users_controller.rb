@@ -3,8 +3,10 @@ class UsersController < ApplicationController
   before_action :load_user, except: [:index, :login]
 
   def login
-    github_token = request.headers['HTTP_X_GITHUB_TOKEN']
-    user = User.login!(github_token)
+    user = auth_backend.login
+    raise ExceptionHandler::Unauthorized.new("You are not allowed to login") if user.nil?
+
+    user.save!
 
     Event.new.notify(message: "#{user.name} has logged in to Barcelona")
 
@@ -33,7 +35,7 @@ class UsersController < ApplicationController
             else
               current_user
             end
-    authorize @user
+    authorize_resource @user
   end
 
   def update_params

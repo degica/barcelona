@@ -76,9 +76,9 @@ class DistrictsController < ApplicationController
 
   def authorize_district
     if @district.present?
-      authorize @district
+      authorize_resource @district
     else
-      authorize District
+      authorize_resource District
     end
   end
 end
