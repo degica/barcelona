@@ -23,12 +23,15 @@ class SignSSHKey
     public_key_file.write(user.public_key)
     public_key_file.close
 
+    serial_number = SecureRandom.random_number(2 ** 32)
+
     comm = [
       "ssh-keygen",
       "-s", secret_key_path,
       "-I", identity,
       "-n", principals.join(','),
-      "-V", validity
+      "-V", validity,
+      "-z", serial_number
     ]
     comm += ["-O", "force-command='#{force_command}'"] if force_command
     comm += [public_key_file.path]
@@ -38,7 +41,7 @@ class SignSSHKey
       File.open(secret_key_path, 'w') { |f| f.write(ca_key) }
       Process.wait(pid)
     }
-    Event.new(district).notify(message: "Signed public key for user #{user.name} with identity #{identity}")
+    Event.new(district).notify(message: "Signed public key for user #{user.name} with identity #{identity} serial_number: #{serial_number}")
 
     File.read(public_key_file.path + "-cert.pub")
   rescue Timeout::Error
