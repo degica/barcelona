@@ -1,4 +1,8 @@
 class VaultAuth < Auth
+  def enabled?
+    ENV['VAULT_URL'].present?
+  end
+
   def login
     authenticate
   end

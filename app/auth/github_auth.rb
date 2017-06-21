@@ -1,4 +1,8 @@
 class GithubAuth < Auth
+  def enabled?
+    ENV['GITHUB_ORGANIZATION'].present?
+  end
+
   def login
     github_token = request.headers['HTTP_X_GITHUB_TOKEN']
 
