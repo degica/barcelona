@@ -296,7 +296,7 @@ module Barcelona
         add_resource("AWS::AutoScaling::LaunchConfiguration",
                      "NTPServerLaunchConfiguration") do |j|
           j.IamInstanceProfile ref("NTPServerProfile")
-          j.ImageId "ami-56d4ad31"
+          j.ImageId "ami-bbf2f9dc"
           j.InstanceType "t2.micro"
           j.AssociatePublicIpAddress true
           j.SecurityGroups [ref("NTPServerSG")]
@@ -436,7 +436,7 @@ module Barcelona
         add_resource("AWS::AutoScaling::LaunchConfiguration",
                      "OSSECManagerLaunchConfiguration") do |j|
           j.IamInstanceProfile ref("OSSECManagerInstanceProfile")
-          j.ImageId "ami-923d12f5"
+          j.ImageId "ami-bbf2f9dc"
           j.InstanceType "t2.medium"
           j.SecurityGroups [ref("OSSECManagerSG")]
           j.UserData manager_user_data.build
