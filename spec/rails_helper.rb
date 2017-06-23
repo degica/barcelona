@@ -6,6 +6,7 @@ abort("The Rails environment is running in production mode!") if Rails.env.produ
 require 'spec_helper'
 require 'rspec/rails'
 # Add additional requires below this line. Rails is not loaded until this point!
+require 'webmock/rspec'
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories. Files matching `spec/**/*_spec.rb` are
@@ -51,6 +52,10 @@ RSpec.configure do |config|
 
   config.before :all do |_example|
     Aws.config[:stub_responses] = true
+
+    ENV['GITHUB_ORGANIZATION'] = 'degica'
+    ENV['VAULT_URL'] ||= "http://my-vault.com"
+    ENV['VAULT_PATH_PREFIX'] ||= "prefix"
   end
 
   config.before :suite do

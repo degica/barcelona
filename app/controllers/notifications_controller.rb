@@ -43,11 +43,11 @@ class NotificationsController < ApplicationController
 
   def load_notification
     @notification = @district.notifications.find(params[:id])
-    authorize @notification
+    authorize_resource @notification
   end
 
   def authorize_notification
-    authorize(@notification || Notification)
+    authorize_resource(@notification || Notification)
   end
 
   def load_district
