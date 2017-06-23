@@ -149,9 +149,9 @@ module Barcelona
               image: wazuh/wazuh
               restart: always
               ports:
-                - "1514/udp:1514/udp"
+                - "1514:1514/udp"
                 - "1515:1515"
-                - "514/udp:514/udp"
+                - "514:514/udp"
               depends_on:
                 - logstash
               links:
