@@ -102,7 +102,8 @@ module Barcelona
           # Start/Install docker and compose
           "service docker start",
           "usermod -a -G docker ec2-user",
-          "pip install docker-compose",
+          "curl -L https://github.com/docker/compose/releases/download/1.14.0/docker-compose-Linux-x86_64 > /usr/local/bin/docker-compose",
+          "chmod +x /usr/local/bin/docker-compose",
 
           # Setup OSSEC manager
           "sysctl -w vm.max_map_count=262144",
@@ -146,12 +147,12 @@ module Barcelona
           version: '2'
           services:
             wazuh:
-              image: wazuh/wazuh
+              image: wazuh/wazuh:2.0_5.4.2
               restart: always
               ports:
-                - "1514/udp:1514/udp"
+                - "1514:1514/udp"
                 - "1515:1515"
-                - "514/udp:514/udp"
+                - "514:514/udp"
               depends_on:
                 - logstash
               links:
@@ -159,7 +160,7 @@ module Barcelona
               volumes:
                 - /ossec_mnt/ossec_data:/var/ossec/data
             logstash:
-              image: wazuh/wazuh-logstash
+              image: wazuh/wazuh-logstash:2.0_5.4.2
               restart: always
               command: -f /etc/logstash/conf.d/
               links:
@@ -169,7 +170,7 @@ module Barcelona
               environment:
                 - LS_HEAP_SIZE=2048m
             elasticsearch:
-              image: elasticsearch:5.3.0
+              image: elasticsearch:5.4.2
               restart: always
               command: elasticsearch -E node.name="node-1" -E cluster.name="wazuh" -E network.host=0.0.0.0
               environment:
@@ -181,7 +182,7 @@ module Barcelona
               volumes:
                 - /ossec_mnt/elasticsearch:/usr/share/elasticsearch/data
             kibana:
-              image: wazuh/wazuh-kibana
+              image: wazuh/wazuh-kibana:2.0_5.4.2
               restart: always
               ports:
                 - "5601:5601"
@@ -296,7 +297,7 @@ module Barcelona
         add_resource("AWS::AutoScaling::LaunchConfiguration",
                      "NTPServerLaunchConfiguration") do |j|
           j.IamInstanceProfile ref("NTPServerProfile")
-          j.ImageId "ami-56d4ad31"
+          j.ImageId "ami-bbf2f9dc"
           j.InstanceType "t2.micro"
           j.AssociatePublicIpAddress true
           j.SecurityGroups [ref("NTPServerSG")]
@@ -436,7 +437,7 @@ module Barcelona
         add_resource("AWS::AutoScaling::LaunchConfiguration",
                      "OSSECManagerLaunchConfiguration") do |j|
           j.IamInstanceProfile ref("OSSECManagerInstanceProfile")
-          j.ImageId "ami-923d12f5"
+          j.ImageId "ami-bbf2f9dc"
           j.InstanceType "t2.medium"
           j.SecurityGroups [ref("OSSECManagerSG")]
           j.UserData manager_user_data.build
