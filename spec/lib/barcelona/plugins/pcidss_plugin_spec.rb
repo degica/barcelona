@@ -12,7 +12,7 @@ module Barcelona
                  }
                ]
       end
-      let(:stack) { described_class.new(district) }
+      let(:stack) { described_class.new(district, Plugin.find_by(name: 'pcidss')) }
 
       before do
         allow_any_instance_of(PcidssBuilder).to receive(:ossec_volume_az) { 'ap-northeast-1a' }

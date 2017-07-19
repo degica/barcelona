@@ -21,7 +21,6 @@ module Barcelona
 
         change_batch = {
           "Changes" => [
-
             {
               "Action" => "UPSERT",
               "ResourceRecordSet" => {
@@ -147,7 +146,7 @@ module Barcelona
           version: '2'
           services:
             wazuh:
-              image: wazuh/wazuh:2.0_5.4.2
+              image: quay.io/degica/barcelona-wazuh
               restart: always
               ports:
                 - "1514:1514/udp"
@@ -159,6 +158,8 @@ module Barcelona
                 - logstash
               volumes:
                 - /ossec_mnt/ossec_data:/var/ossec/data
+              environment:
+                SLACK_URL: #{options[:slack_url]}
             logstash:
               image: wazuh/wazuh-logstash:2.0_5.4.2
               restart: always
@@ -607,10 +608,10 @@ module Barcelona
     class PcidssStack < CloudFormation::Stack
       attr_accessor :district
 
-      def initialize(district)
+      def initialize(district, plugin)
         stack_name = "#{district.name}-pcidss-plugin"
         @district = district
-        super(stack_name)
+        super(stack_name, slack_url: plugin.plugin_attributes["slack_url"])
       end
 
       def build
@@ -714,7 +715,7 @@ EOS
       private
 
       def stack_executor
-        stack = PcidssStack.new(district)
+        stack = PcidssStack.new(district, self.model)
         CloudFormation::Executor.new(stack, district.aws.cloudformation)
       end
     end
