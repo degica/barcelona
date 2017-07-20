@@ -432,7 +432,21 @@ EOS
               "FromPort" => -1,
               "ToPort" => -1,
               "CidrIp" => '0.0.0.0/0'
-            }
+            },
+            # OSSEC agent
+            {
+              "IpProtocol" => "udp",
+              "FromPort" => 1514,
+              "ToPort" => 1514,
+              "CidrIp" => district.cidr_block
+            },
+            # OSSEC authd
+            {
+              "IpProtocol" => "tcp",
+              "FromPort" => 1515,
+              "ToPort" => 1515,
+              "CidrIp" => district.cidr_block
+            },
           ]
           j.Tags [
             tag("barcelona", district.name),
