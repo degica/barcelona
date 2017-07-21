@@ -237,7 +237,13 @@ module Barcelona
           "echo interface listen eth1 >> /etc/ntp.conf",
           "service ntpd restart",
 
-          "service sshd stop"
+          "service sshd stop",
+
+          # OSSEC agent
+          "yum install -y wazuh-agent",
+          "sed -i 's/<server-ip>.*<\\/server-ip>/<server-hostname>ossec-manager.#{district.name}.bcn<\\/server-hostname>/g' /var/ossec/etc/ossec.conf",
+          "/var/ossec/bin/agent-auth -m ossec-manager.#{district.name}.bcn",
+          "/var/ossec/bin/ossec-control restart",
         ]
 
         # CloudWatch Logs configurations
@@ -269,6 +275,16 @@ module Barcelona
           log_group_name = #{log_group_name}
           log_stream_name = {ec2_id}/var/log/ntpstats/ntpd.log
         EOS
+
+        user_data.add_file("/etc/yum.repos.d/wazuh.repo", "root:root", "644", <<EOS)
+[wazuh_repo]
+gpgcheck=1
+gpgkey=https://packages.wazuh.com/key/GPG-KEY-WAZUH
+enabled=1
+name=Wazuh
+baseurl=https://packages.wazuh.com/yum/el/7/x86_64
+protect=1
+EOS
 
         user_data
       end
@@ -416,7 +432,21 @@ module Barcelona
               "FromPort" => -1,
               "ToPort" => -1,
               "CidrIp" => '0.0.0.0/0'
-            }
+            },
+            # OSSEC agent
+            {
+              "IpProtocol" => "udp",
+              "FromPort" => 1514,
+              "ToPort" => 1514,
+              "CidrIp" => district.cidr_block
+            },
+            # OSSEC authd
+            {
+              "IpProtocol" => "tcp",
+              "FromPort" => 1515,
+              "ToPort" => 1515,
+              "CidrIp" => district.cidr_block
+            },
           ]
           j.Tags [
             tag("barcelona", district.name),

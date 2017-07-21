@@ -63,7 +63,7 @@ module Barcelona
               "ToPort" => 443,
               "CidrIp" => '0.0.0.0/0'
             },
-            # OSSEC manager
+            # OSSEC agent
             {
               "IpProtocol" => "udp",
               "FromPort" => 1514,
