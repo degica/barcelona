@@ -21,6 +21,9 @@ http {
   tcp_nopush on;
   tcp_nodelay on;
 
+  # allow large file upload
+  client_max_body_size 10m;
+
   gzip  on;
   gzip_static  on;
   gzip_http_version 1.0;
