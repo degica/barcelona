@@ -4,20 +4,20 @@ module Barcelona
       # https://aws.amazon.com/amazon-linux-ami/
       # Amazon Linux AMI 2017.03.1
       AMI_IDS = {
-        "us-east-1" => "ami-643b1972",
-        "us-east-2" => "ami-3883a55d",
-        "us-west-1" => "ami-563a1736",
-        "us-west-2" => "ami-a07379d9",
-        "eu-west-1" => "ami-7d50491b",
-        "eu-west-2" => "ami-704e5814",
-        "eu-central-1" => "ami-8da700e2",
-        "ap-northeast-1" => "ami-bbf2f9dc",
-        "ap-northeast-2" => "ami-9bab74f5",
-        "ap-southeast-1" => "ami-58d65b3b",
-        "ap-southeast-2" => "ami-a18392c2",
-        "ap-south-1" => "ami-3c89f653",
-        "ca-central-1" => "ami-20db6444",
-        "sa-east-1" => "ami-1d660d71"
+        "us-east-1" => "ami-4fffc834",
+        "us-east-2" => "ami-ea87a78f",
+        "us-west-1" => "ami-3a674d5a",
+        "us-west-2" => "ami-aa5ebdd2",
+        "eu-west-1" => "ami-ebd02392",
+        "eu-west-2" => "ami-489f8e2c",
+        "eu-central-1" => "ami-657bd20a",
+        "ap-northeast-1" => "ami-4af5022c",
+        "ap-northeast-2" => "ami-8663bae8",
+        "ap-southeast-1" => "ami-fdb8229e",
+        "ap-southeast-2" => "ami-30041c53",
+        "ap-south-1" => "ami-d7abd1b8",
+        "ca-central-1" => "ami-5ac17f3e",
+        "sa-east-1" => "ami-d27203be"
       }
 
       def build_resources

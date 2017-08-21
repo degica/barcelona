@@ -2,19 +2,19 @@ module Barcelona
   module Network
     class AutoscalingBuilder < CloudFormation::Builder
       # http://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html
-      # amzn-ami-2017.03.d-amazon-ecs-optimized
+      # amzn-ami-2017.03.e-amazon-ecs-optimized
       ECS_OPTIMIZED_AMI_IDS = {
-        "us-east-1" => "ami-04351e12",
-        "us-east-2" => "ami-207b5a45",
-        "us-west-1" => "ami-7d664a1d",
-        "us-west-2" => "ami-57d9cd2e",
-        "eu-west-1" => "ami-809f84e6",
-        "eu-west-2" => "ami-ff15039b",
-        "eu-central-1" => "ami-a3a006cc",
-        "ap-northeast-1" => "ami-e4657283",
-        "ap-southeast-1" => "ami-19f7787a",
-        "ap-southeast-2" => "ami-42e9f921",
-        "ca-central-1" => "ami-3da81759"
+        "us-east-1" => "ami-d61027ad",
+        "us-east-2" => "ami-bb8eaede",
+        "us-west-1" => "ami-514e6431",
+        "us-west-2" => "ami-c6f81abe",
+        "eu-west-1" => "ami-bd7e8dc4",
+        "eu-west-2" => "ami-0a85946e",
+        "eu-central-1" => "ami-f15ff69e",
+        "ap-northeast-1" => "ami-ab5ea9cd",
+        "ap-southeast-1" => "ami-ae0b91cd",
+        "ap-southeast-2" => "ami-c3233ba0",
+        "ca-central-1" => "ami-32bb0556"
       }
 
       def ebs_optimized_by_default?

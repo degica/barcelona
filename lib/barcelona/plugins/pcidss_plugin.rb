@@ -314,7 +314,7 @@ EOS
         add_resource("AWS::AutoScaling::LaunchConfiguration",
                      "NTPServerLaunchConfiguration") do |j|
           j.IamInstanceProfile ref("NTPServerProfile")
-          j.ImageId "ami-bbf2f9dc"
+          j.ImageId "ami-4af5022c"
           j.InstanceType "t2.micro"
           j.AssociatePublicIpAddress true
           j.SecurityGroups [ref("NTPServerSG")]
@@ -468,7 +468,7 @@ EOS
         add_resource("AWS::AutoScaling::LaunchConfiguration",
                      "OSSECManagerLaunchConfiguration") do |j|
           j.IamInstanceProfile ref("OSSECManagerInstanceProfile")
-          j.ImageId "ami-bbf2f9dc"
+          j.ImageId "ami-4af5022c"
           j.InstanceType "t2.medium"
           j.SecurityGroups [ref("OSSECManagerSG")]
           j.UserData manager_user_data.build
