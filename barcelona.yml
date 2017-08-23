@@ -1,6 +1,6 @@
 environments:
   production:
-    name: barcelona
+    name: barcelona2
     image_name: quay.io/degica/barcelona
     scheduled_tasks:
       # 10AM JST every week day
@@ -14,7 +14,7 @@ environments:
         command: puma -C config/puma.rb
         force_ssl: true
         listeners:
-          - endpoint: barcelona
+          - endpoint: barcelona-second
             health_check_path: /health_check
       - name: worker
         command: rake jobs:work
