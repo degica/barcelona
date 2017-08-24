@@ -7,3 +7,9 @@
     <group>audit_anom,pci_dss_11.4,pci_dss_10.6.1,</group>
   </rule>
 </group>
+
+<group name="syslog,errors,">
+  <rule id="1003" level="7" overwrite="yes" maxsize="1025" noalert="1">
+    <description>Non standard syslog message (size too large).</description>
+  </rule>
+</group>
