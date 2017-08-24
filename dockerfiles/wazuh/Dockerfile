@@ -6,10 +6,11 @@ RUN groupadd -g 1000 ossec
 RUN useradd -u 1000 -g 1000 ossec
 RUN yum -y update && \
     yum -y install epel-release && \
-    sed -i "s/#baseurl=/baseurl=/" /etc/yum.repos.d/epel.repo && \
-    sed -i "s/mirrorlist=/#mirrorlist=/" /etc/yum.repos.d/epel.repo && \
-    yum -y install openssl postfix mailx cyrus-sasl cyrus-sasl-plain wazuh-manager wazuh-api&& \
+    yum -y install openssl postfix mailx cyrus-sasl cyrus-sasl-plain && \
     yum clean all
+RUN curl --silent --location https://rpm.nodesource.com/setup_6.x | bash - && \
+    yum install -y nodejs
+RUN yum install -y wazuh-manager-2.0.1 wazuh-api-2.0.1
 
 COPY data_dirs.env /data_dirs.env
 COPY init.bash /init.bash
