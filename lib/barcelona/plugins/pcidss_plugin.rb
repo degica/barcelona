@@ -161,7 +161,7 @@ module Barcelona
               environment:
                 SLACK_URL: #{options[:slack_url]}
             logstash:
-              image: wazuh/wazuh-logstash:2.0_5.4.2
+              image: wazuh/wazuh-logstash:2.0.1_5.5.1
               restart: always
               command: -f /etc/logstash/conf.d/
               links:
@@ -171,7 +171,7 @@ module Barcelona
               environment:
                 - LS_HEAP_SIZE=2048m
             elasticsearch:
-              image: elasticsearch:5.4.2
+              image: elasticsearch:5.5.1
               restart: always
               command: elasticsearch -E node.name="node-1" -E cluster.name="wazuh" -E network.host=0.0.0.0
               environment:
@@ -183,7 +183,7 @@ module Barcelona
               volumes:
                 - /ossec_mnt/elasticsearch:/usr/share/elasticsearch/data
             kibana:
-              image: wazuh/wazuh-kibana:2.0_5.4.2
+              image: wazuh/wazuh-kibana:2.0.1_5.5.1
               restart: always
               ports:
                 - "5601:5601"
@@ -191,7 +191,7 @@ module Barcelona
                 - elasticsearch
               links:
                 - wazuh
-                - elasticsearch
+                - elasticsearch:elasticsearch
               entrypoint: sh wait-for-it.sh elasticsearch
         EOS
 
