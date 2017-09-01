@@ -200,7 +200,7 @@ module Barcelona
 
       def ntp_server_user_data
         user_data = InstanceUserData.new
-        user_data.packages += ["aws-cli", "awslogs", "jq", "yum-cron-security"]
+        user_data.packages += ["aws-cli", "awslogs", "jq", "yum-cron-security", "clamav", "clamav-update", "tmpwatch"]
 
         find_eni_command = [
           "aws ec2 --region=#{district.region} describe-network-interfaces",
@@ -210,6 +210,7 @@ module Barcelona
           "Name=tag:barcelona,Values=#{district.name}",
           "Name=tag:barcelona-role,Values=pcidss"
         ].join(" ")
+
         user_data.run_commands += [
           "set -ex",
           "service yum-cron start",
@@ -222,6 +223,14 @@ module Barcelona
           'sed -i -e "s/{ec2_id}/$ec2_id/g" /etc/awslogs/awslogs.conf',
           'sed -i -e "s/us-east-1/'+district.region+'/g" /etc/awslogs/awscli.conf',
           "service awslogs start",
+
+          # Enable freshclam configuration
+          "sed -i 's/^Example$//g' /etc/freshclam.conf",
+          "sed -i 's/^FRESHCLAM_DELAY=disabled-warn.*$//g' /etc/sysconfig/freshclam",
+
+          # Daily full file system scan
+          "echo '0 0 * * * root #{SCAN_COMMAND}' > /etc/cron.d/clamscan",
+          "service crond restart",
 
           "az=$(curl http://169.254.169.254/latest/meta-data/placement/availability-zone)",
           # Find ENI for NTP which is in the same AZ
