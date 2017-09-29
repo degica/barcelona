@@ -323,10 +323,17 @@ module Barcelona
                       "logs:CreateLogStream",
                       "logs:DescribeLogStreams",
                       "logs:PutLogEvents",
-                      "s3:Get*",
-                      "s3:List*"
                     ],
                     "Resource" => ["*"]
+                  },
+                  {
+                    "Effect" => "Allow",
+                    "Action" => [
+                      "s3:GetObject"
+                    ],
+                    "Resource" => [
+                      "arn:aws:s3:::#{stack.district.s3_bucket_name}/#{stack.district.name}/*"
+                    ]
                   }
                 ]
               }
