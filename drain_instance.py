@@ -36,6 +36,7 @@ def lambda_handler(event, context):
         ecs.update_container_instances_state(cluster=clusterName,containerInstances=[ciId],status='DRAINING')
 
     tasks = ecs.list_tasks(cluster=clusterName, containerInstance=ciId)['taskArns']
+    tasks = [ t['taskArn'] for t in ecs.describe_tasks(cluster=clusterName, tasks=tasks)['tasks'] if t['lastStatus'] == 'RUNNING' or (datetime.datetime.now(t['createdAt'].tzinfo) - t['createdAt']).seconds < 1800 ]
     if len(tasks) > 0:
         time.sleep(1)
         session.client('sns').publish(TopicArn=topicArn, Message=json.dumps(msg), Subject='Invoking lambda again')
