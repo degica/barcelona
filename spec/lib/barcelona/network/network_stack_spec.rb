@@ -219,7 +219,7 @@ describe Barcelona::Network::NetworkStack do
           },
           "Handler" => "index.lambda_handler",
           "Runtime" => "python2.7",
-          "Timeout" => "10",
+          "Timeout" => "15",
           "Role" => {"Fn::GetAtt" => ["ASGDrainingFunctionRole", "Arn"]},
           "Environment" => {
             "Variables" => {

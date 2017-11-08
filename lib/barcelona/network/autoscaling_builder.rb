@@ -116,7 +116,7 @@ module Barcelona
 
           j.Handler "index.lambda_handler"
           j.Runtime "python2.7"
-          j.Timeout "10"
+          j.Timeout "15"
           j.Role get_attr("ASGDrainingFunctionRole", "Arn")
           j.Environment do |j|
             j.Variables do |j|
