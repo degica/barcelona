@@ -37,7 +37,7 @@ def lambda_handler(event, context):
 
     tasks = ecs.list_tasks(cluster=clusterName, containerInstance=ciId)['taskArns']
     if len(tasks) > 0:
-        time.sleep(1)
+        time.sleep(5)
         session.client('sns').publish(TopicArn=topicArn, Message=json.dumps(msg), Subject='Invoking lambda again')
     else:
         session.client('autoscaling').complete_lifecycle_action(LifecycleHookName=lifecycleHookName, AutoScalingGroupName=asgName, LifecycleActionResult='CONTINUE', InstanceId=ec2Id)
