@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 5.0'
+gem 'rails', '~> 5.1'
 gem 'pg'
 gem 'aws-sdk'
 gem 'puma'
@@ -32,4 +32,5 @@ group :test do
   gem 'database_rewinder'
   gem 'stub_env'
   gem 'webmock'
+  gem 'rack-test', "~> 0.6.3"
 end
