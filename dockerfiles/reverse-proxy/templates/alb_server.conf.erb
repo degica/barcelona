@@ -31,6 +31,10 @@ server {
     proxy_read_timeout 60;
     proxy_send_timeout 60;
 
+    proxy_buffering on;
+    proxy_buffer_size 8k;
+    proxy_buffers 8 8k;
+
     proxy_pass http://<%= decorator.upstream_name %>;
   }
 }
