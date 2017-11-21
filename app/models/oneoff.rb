@@ -16,7 +16,7 @@ class Oneoff < ActiveRecord::Base
   class ECSResourceError < RuntimeError
   end
 
-  def run(sync: false, interactive: false)
+  def run(sync: false, interactive: false, started_by: "barcelona")
     raise ArgumentError if sync && interactive
 
     self.session_token = SecureRandom.uuid if interactive
@@ -25,6 +25,7 @@ class Oneoff < ActiveRecord::Base
     resp = aws.ecs.run_task(
       cluster: district.name,
       task_definition: definition.family_name,
+      started_by: started_by,
       overrides: {
         container_overrides: [
           {

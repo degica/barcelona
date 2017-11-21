@@ -9,7 +9,7 @@ class OneoffsController < ApplicationController
   def create
     interactive = !!params[:interactive]
     @oneoff = @heritage.oneoffs.create!(create_params)
-    @oneoff.run!(sync: !!params[:sync], interactive: interactive)
+    @oneoff.run!(sync: !!params[:sync], interactive: interactive, started_by: "barcelona/#{current_user.name}")
     json = if interactive
              certificate = @heritage.district.ca_sign_public_key(
                current_user,
