@@ -47,6 +47,7 @@ describe Oneoff do
         with(
           cluster: heritage.district.name,
           task_definition: "#{heritage.name}-oneoff",
+          started_by: "barcelona",
           overrides: {
             container_overrides: [
               {
@@ -66,6 +67,7 @@ describe Oneoff do
                               with(
                                 cluster: heritage.district.name,
                                 task_definition: "#{heritage.name}-oneoff",
+                                started_by: "barcelona",
                                 overrides: {
                                   container_overrides: [
                                     {
