@@ -2,20 +2,23 @@ module Barcelona
   module Network
     class AutoscalingBuilder < CloudFormation::Builder
       # http://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html
-      # amzn-ami-2017.09.c-amazon-ecs-optimized
+      # amzn-ami-2017.09.e-amazon-ecs-optimized
       ECS_OPTIMIZED_AMI_IDS = {
-        "us-east-1"      => "ami-6944c513",
-        "us-east-2"      => "ami-6e56780b",
-        "us-west-1"      => "ami-bbe6dfdb",
-        "us-west-2"      => "ami-f5fc2c8d",
-        "eu-west-1"      => "ami-faa10a83",
-        "eu-west-2"      => "ami-e36b7487",
-        "eu-central-1"   => "ami-1f9f1f70",
-        "ap-northeast-1" => "ami-cb3a8cad",
-        "ap-northeast-2" => "ami-88f85fe6",
-        "ap-southeast-1" => "ami-ca3762a9",
-        "ap-southeast-2" => "ami-a9a14acb",
-        "ca-central-1"   => "ami-cace75ae"
+        "us-east-1"      => "ami-13401669",
+        "us-east-2"      => "ami-901338f5",
+        "us-west-1"      => "ami-b3adacd3",
+        "us-west-2"      => "ami-9a02a9e2",
+        "eu-west-1"      => "ami-7827b301",
+        "eu-west-2"      => "ami-acd5cdc8",
+        "eu-west-3"      => "ami-bd10a7c0",
+        "eu-central-1"   => "ami-b378e8dc",
+        "ap-northeast-1" => "ami-af46dbc9",
+        "ap-northeast-2" => "ami-d6f454b8",
+        "ap-southeast-1" => "ami-fec3b482",
+        "ap-southeast-2" => "ami-b88e7cda",
+        "ca-central-1"   => "ami-e8cb4e8c",
+        "ap-south-1"     => "ami-c80b5fa7",
+        "sa-east-1"      => "ami-ca95d6a6",
       }
 
       def ebs_optimized_by_default?
