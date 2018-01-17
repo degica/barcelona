@@ -168,6 +168,10 @@ module Barcelona
         EOS
 
         ud.run_commands += [
+          "yum erase -y ntp*",
+          "yum install -y chrony",
+          "service chronyd start",
+
           # awslogs
           "ec2_id=$(curl http://169.254.169.254/latest/meta-data/instance-id)",
           'sed -i -e "s/{ec2_id}/$ec2_id/g" /etc/awslogs/awslogs.conf',
