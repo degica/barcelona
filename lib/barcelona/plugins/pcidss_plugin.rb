@@ -64,14 +64,9 @@ module Barcelona
           # SSH session timeout
           "echo 'TMOUT=900 && readonly TMOUT && export TMOUT' > /etc/profile.d/tmout.sh",
 
-          # NTP
-          "sed -i '/^server /s/^/#/' /etc/ntp.conf",
-          "sed -i 's/^logconfig .*/logconfig =all/' /etc/ntp.conf",
-          'echo logfile /var/log/ntpstats/ntpd.log >> /etc/ntp.conf',
-          district.subnets("Public").map(&:subnet_id).map { |id|
-            "echo server #{id}.ntp.#{district.name}.bcn iburst >> /etc/ntp.conf"
-          },
-          "service ntpd restart",
+          "yum erase -y ntp*",
+          "yum install -y chrony",
+          "service chronyd start",
 
           # Configure sshd
           'printf "\nTrustedUserCAKeys /etc/ssh/ssh_ca_key.pub\n" >> /etc/ssh/sshd_config',
@@ -683,15 +678,6 @@ EOS
 
           # SSH session timeout
           "echo 'TMOUT=900 && readonly TMOUT && export TMOUT' > /etc/profile.d/tmout.sh",
-
-          # NTP
-          "sed -i '/^server /s/^/#/' /etc/ntp.conf",
-          "sed -i 's/^logconfig .*/logconfig =all/' /etc/ntp.conf",
-          'echo logfile /var/log/ntpstats/ntpd.log >> /etc/ntp.conf',
-          district.subnets("Public").map(&:subnet_id).map { |id|
-            "echo server #{id}.ntp.#{district.name}.bcn iburst >> /etc/ntp.conf"
-          },
-          "service ntpd restart",
 
           # Ignores error on OSSEC installation process.
           "set +e",

@@ -13,6 +13,10 @@ class ContainerInstance
       # Embed SHA2 hash dockercfg so that instance replacement happens when dockercfg is updated
       "# #{Digest::SHA256.hexdigest(district.dockercfg.to_s)}",
 
+      "yum erase -y ntp*",
+      "yum install -y chrony",
+      "service chronyd start",
+
       # Setup swap
       "MEMSIZE=`cat /proc/meminfo | grep MemTotal | awk '{print $2}'`",
       "if [ $MEMSIZE -lt 2097152 ]; then",
