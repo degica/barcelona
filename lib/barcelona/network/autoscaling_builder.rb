@@ -4,20 +4,20 @@ module Barcelona
       # http://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html
       # amzn-ami-2017.09.g-amazon-ecs-optimized
       ECS_OPTIMIZED_AMI_IDS = {
-        "us-east-1"      => "ami-28456852",
-        "us-east-2"      => "ami-ce1c36ab",
-        "us-west-1"      => "ami-74262414",
-        "us-west-2"      => "ami-decc7fa6",
-        "eu-west-1"      => "ami-1d46df64",
-        "eu-west-2"      => "ami-67cbd003",
-        "eu-central-1"   => "ami-509a053f",
-        "ap-northeast-1" => "ami-872c4ae1",
-        "ap-northeast-2" => "ami-c212b2ac",
-        "ap-southeast-1" => "ami-910d72ed",
-        "ap-southeast-2" => "ami-58bb443a",
-        "ca-central-1"   => "ami-435bde27",
-        "ap-south-1"     => "ami-00491f6f",
-        "sa-east-1"      => "ami-af521fc3",
+        "us-east-1"      => "ami-5e414e24",
+        "us-east-2"      => "ami-67ab9e02",
+        "us-west-1"      => "ami-00898660",
+        "us-west-2"      => "ami-10ed6968",
+        "eu-west-1"      => "ami-880d64f1",
+        "eu-west-2"      => "ami-42a64325",
+        "eu-central-1"   => "ami-63cbae0c",
+        "ap-northeast-1" => "ami-e3166185",
+        "ap-northeast-2" => "ami-0acc6e64",
+        "ap-southeast-1" => "ami-66c98f1a",
+        "ap-southeast-2" => "ami-36867d54",
+        "ca-central-1"   => "ami-4b9c182f",
+        "ap-south-1"     => "ami-ca8ad9a5",
+        "sa-east-1"      => "ami-69f7b805",
       }
 
       def ebs_optimized_by_default?
