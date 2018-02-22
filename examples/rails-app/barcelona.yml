@@ -2,9 +2,6 @@ environments:
   production:
     name: rails-app
     image_name: k2nr/rails-docker-sample
-    scheduled_tasks:
-      - schedule: rate(10 minutes)
-        command: echo hello hello
     services:
       - name: web
         service_type: web
@@ -19,3 +16,20 @@ environments:
             rule_conditions:
               - type: path-pattern
                 value: '*'
+reviewapp:
+  group: example
+  district: test-district
+  base_domain: review.example.com
+  template:
+    image_name: k2nr/rails-docker-sample
+    services:
+      - name: web
+        service_type: web
+        cpu: 128
+        memory: 256
+        command: rails s -p $PORT -b 0.0.0.0
+        listeners:
+          - endpoint: test-review-endpoint
+
+# bcn reviewapp create --subject "/pull/1111" --lifetime 3h --tag pr-1111
+# bcn reviewapp update --subject "/pull/1111"
