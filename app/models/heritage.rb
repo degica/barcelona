@@ -160,6 +160,7 @@ class Heritage < ActiveRecord::Base
   has_many :env_vars, dependent: :destroy
   has_many :oneoffs, dependent: :destroy
   has_many :releases, -> { order 'version DESC' }, dependent: :destroy, inverse_of: :heritage
+  has_one :review_app, dependent: :destroy
   belongs_to :district, inverse_of: :heritages
 
   validates :name,
