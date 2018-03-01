@@ -1,0 +1,32 @@
+#!/usr/bin/env ruby
+
+IMAGE_LOCATION=ARGV.first
+unless IMAGE_LOCATION
+  STDERR.puts "usage: show_ecs_images amzn-ami-2017.09.i-amazon-ecs-optimized"
+  exit 1
+end
+
+AMAZON_OWNER_ID="591542846629"
+REGIONS=%w(
+        us-east-1
+        us-east-2
+        us-west-1
+        us-west-2
+        eu-west-1
+        eu-west-2
+        eu-central-1
+        ap-northeast-1
+        ap-northeast-2
+        ap-southeast-1
+        ap-southeast-2
+        ca-central-1
+        ap-south-1
+        sa-east-1
+)
+
+REGIONS.each do |region|
+  image_id=`aws --region #{region} ec2 describe-images --owners #{AMAZON_OWNER_ID} | jq -r '.Images[] | select(.ImageLocation|match("#{IMAGE_LOCATION}"))|.ImageId'`.chomp
+  puts %Q{        "#{region}"      => "#{image_id}",}
+end
+
+
