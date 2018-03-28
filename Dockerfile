@@ -1,4 +1,4 @@
-FROM degica/rails-base:2.3
+FROM degica/rails-base:2.5
 
 RUN apt-get update && apt-get install -y openssh-client --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
