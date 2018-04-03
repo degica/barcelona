@@ -5,6 +5,9 @@ environments:
     scheduled_tasks:
       - schedule: rate(10 minutes)
         command: echo hello hello
+    environment:
+      RAILS_ENV: production
+      SECRET_KEY_BASE: abcde
     services:
       - name: web
         service_type: web

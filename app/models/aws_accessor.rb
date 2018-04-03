@@ -36,6 +36,15 @@ class AwsAccessor
     @autoscaling ||= Aws::AutoScaling::Client.new(client_config)
   end
 
+  def kms
+    @kms ||= Aws::KMS::Client.new(client_config)
+  end
+
+  def caller_identity
+    sts = Aws::STS::Client.new(client_config)
+    sts.get_caller_identity
+  end
+
   private
 
   def client_config
@@ -47,7 +56,7 @@ class AwsAccessor
       Aws::AssumeRoleCredentials.new(
         client: Aws::STS::Client.new(region: district.region),
         role_arn: district.aws_role,
-        role_session_name: "barcelona-#{district.name}-session-#{Time.now.to_i}",
+        role_session_name: "barcelona-#{district.name}-session",
         duration_seconds: 3600
       )
     else

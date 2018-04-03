@@ -73,6 +73,14 @@ class District < ActiveRecord::Base
     @notification_topic ||= stack_resources["NotificationTopic"]
   end
 
+  def kms_cmk_id
+    @kms_cmk_id ||= stack_resources["DistrictKey"]
+  end
+
+  def generate_data_key
+    aws.kms.generate_data_key(key_id: self.kms_cmk_id, key_spec: "AES_256")
+  end
+
   def publish_sns(text, level: "good", data: {}, subject: nil)
     topic_arn = notification_topic
     return if topic_arn.nil?

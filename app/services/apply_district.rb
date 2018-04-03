@@ -179,6 +179,8 @@ class ApplyDistrict
               "elasticloadbalancing:*",
               "iam:*",
               "ecs:*",
+              "kms:Create*",
+              "kms:GenerateDataKey",
               "cloudformation:*",
               "lambda:*",
               "waf:*",

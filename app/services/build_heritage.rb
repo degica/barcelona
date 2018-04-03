@@ -30,6 +30,17 @@ class BuildHeritage
       end
     end
 
+    if new_params[:env_vars]
+      new_params[:env_vars_attributes] = new_params.delete(:env_vars).map { |key, val|
+        {
+          key: key,
+          value: val,
+          secret: false
+        }
+      }
+    end
+    new_params[:env_vars_attributes] = sync_resources(new_params[:env_vars_attributes], heritage.env_vars, :key, destroy: false)
+
     unless heritage.new_record?
       new_params.delete :name
 
@@ -49,16 +60,18 @@ class BuildHeritage
     new_params
   end
 
-  def sync_resources(attributes, resources, key_key)
+  def sync_resources(attributes, resources, key_key, destroy: true)
     resource_map = resources.pluck(key_key, :id).to_h
     attributes ||= []
     attributes.each do |attr|
       attr[:id] = resource_map[attr[key_key]] if resource_map[attr[key_key]].present?
     end
 
-    resources_to_delete = resource_map.keys - attributes.map { |attr| attr[key_key] }
-    resources_to_delete.each do |k|
-      attributes << {id: resource_map[k], _destroy: '1'}
+    if destroy
+      resources_to_delete = resource_map.keys - attributes.map { |attr| attr[key_key] }
+      resources_to_delete.each do |k|
+        attributes << {id: resource_map[k], _destroy: '1'}
+      end
     end
     attributes
   end

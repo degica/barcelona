@@ -126,6 +126,13 @@ class Heritage < ActiveRecord::Base
                     "arn:aws:s3:::#{heritage.district.s3_bucket_name}/heritages/#{heritage.name}/*",
                     "arn:aws:s3:::#{heritage.district.s3_bucket_name}/certs/*",
                   ]
+                },
+                {
+                  "Effect" => "Allow",
+                  "Action" => ["kms:Decrypt"],
+                  "Resource" => [
+                    join("", "arn:aws:kms:", ref("AWS::Region"), ":", ref("AWS::AccountId"), ":key/", heritage.district.kms_cmk_id)
+                  ]
                 }
               ]
             }

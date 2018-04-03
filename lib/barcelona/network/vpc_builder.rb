@@ -334,6 +334,54 @@ module Barcelona
           ]
         end
 
+        add_resource("AWS::KMS::Key", "DistrictKey") do |j|
+          j.KeyPolicy do |j|
+            j.Version "2012-10-17"
+            j.Statement [
+                          {
+                            "Principal" => {
+                              "AWS" => [
+                                join("", "arn:aws:iam::", ref("AWS::AccountId"), ":root")
+                              ]
+                            },
+                            "Effect" => "Allow",
+                            "Action" => [
+                              "kms:*"
+                            ],
+                            "Resource" => ["*"]
+                          },
+                          {
+                            "Principal" => {
+                              "AWS" => [
+                                stack.district.aws.caller_identity.arn
+                              ]
+                            },
+                            "Effect" => "Allow",
+                            "Action" => [
+                              "kms:GenerateDataKey"
+                            ],
+                            "Resource" => ["*"]
+                          },
+#                          {
+#                            "Principal" => {
+#                              "AWS" => [
+#                                # TODO heritage access
+#                              ]
+#                            },
+#                            "Effect" => "Allow",
+#                            "Action" => [
+#                              "kms:Decrypt"
+#                            ],
+#                            "Resource" => ["*"]
+#                          }
+                        ]
+          end
+          j.Tags [
+            tag("Name", cf_stack_name),
+            tag("barcelona", stack.district.name)
+          ]
+        end
+
         add_resource("AWS::IAM::InstanceProfile", "ECSInstanceProfile") do |j|
           j.Path "/"
           j.Roles [ref("ECSInstanceRole")]
