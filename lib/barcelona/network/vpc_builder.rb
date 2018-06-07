@@ -100,6 +100,51 @@ module Barcelona
           ]
         end
 
+        add_resource("AWS::IAM::Role", "VPCFlowLogsRole") do |j|
+          j.AssumeRolePolicyDocument do |j|
+            j.Version "2012-10-17"
+            j.Statement [
+              {
+                "Effect" => "Allow",
+                "Principal" => {
+                  "Service" => ["vpc-flow-logs.amazonaws.com"]
+                },
+                "Action" => ["sts:AssumeRole"]
+              }
+            ]
+          end
+          j.Path "/"
+          j.Policies [
+            {
+              "PolicyName" => "flowlogs-policy",
+              "PolicyDocument" => {
+                "Version" => "2012-10-17",
+                "Statement" => [
+                  {
+                    "Effect" => "Allow",
+                    "Action" => [
+                      "logs:CreateLogGroup",
+                      "logs:CreateLogStream",
+                      "logs:DescribeLogGroups",
+                      "logs:DescribeLogStreams",
+                      "logs:PutLogEvents"
+                    ],
+                    "Resource" => ["*"]
+                  }
+                ]
+              }
+            }
+          ]
+        end
+
+        add_resource("AWS::EC2::FlowLog", "VPCFlowLogs") do |j|
+          j.DeliverLogsPermissionArn get_attr("VPCFlowLogsRole", "Arn")
+          j.LogGroupName "Barcelona/#{stack.district.name}/vpc-flow-logs"
+          j.ResourceId ref("VPC")
+          j.ResourceType "VPC"
+          j.TrafficType "ALL"
+        end
+
         add_resource("AWS::EC2::InternetGateway", "InternetGateway") do |j|
           j.Tags [
             tag("Name", cf_stack_name),
