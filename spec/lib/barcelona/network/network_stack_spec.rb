@@ -20,6 +20,39 @@ describe Barcelona::Network::NetworkStack do
           "Tags" =>
           [{"Key" => "Name", "Value" => {"Ref" => "AWS::StackName"}},
            {"Key" => "barcelona", "Value" => district.name}]}},
+      "VPCFlowLogs" => {
+        "Type" => "AWS::EC2::FlowLog",
+        "Properties" => {
+          "DeliverLogsPermissionArn" => {
+            "Fn::GetAtt" => ["VPCFlowLogsRole", "Arn"]},
+          "LogGroupName" => "Barcelona/#{district.name}/vpc-flow-logs",
+          "ResourceId" => {"Ref"=>"VPC"},
+          "ResourceType"=>"VPC",
+          "TrafficType"=>"ALL"}},
+      "VPCFlowLogsRole" => {
+        "Type"=>"AWS::IAM::Role",
+        "Properties"=>{
+          "AssumeRolePolicyDocument"=>{
+            "Version"=>"2012-10-17",
+            "Statement"=>[
+              {"Effect"=>"Allow",
+               "Principal"=> {
+                 "Service"=>["vpc-flow-logs.amazonaws.com"]},
+               "Action"=>["sts:AssumeRole"]}
+            ]},
+          "Path"=>"/",
+          "Policies"=>[
+            {"PolicyName"=>"flowlogs-policy",
+             "PolicyDocument"=>{
+               "Version"=>"2012-10-17",
+               "Statement"=>[
+                 {"Effect"=>"Allow",
+                  "Action"=>["logs:CreateLogGroup",
+                             "logs:CreateLogStream",
+                             "logs:DescribeLogGroups",
+                             "logs:DescribeLogStreams",
+                             "logs:PutLogEvents"],
+                  "Resource"=>["*"]}]}}]}},
       "InternetGateway" => {
         "Type" => "AWS::EC2::InternetGateway",
         "Properties" => {
