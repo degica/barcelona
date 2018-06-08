@@ -64,6 +64,7 @@ module Barcelona
           # SSH session timeout
           "echo 'TMOUT=900 && readonly TMOUT && export TMOUT' > /etc/profile.d/tmout.sh",
 
+          # Chrony
           "yum erase -y ntp*",
           "yum install -y chrony",
           "service chronyd start",
