@@ -102,7 +102,7 @@ module Barcelona
 
           # Setup OSSEC manager
           "sysctl -w vm.max_map_count=262144",
-          "cd /tmp && /usr/local/bin/docker-compose up -d"
+          "cd /wazuh && /usr/local/bin/docker-compose up -d"
         ].flatten
 
         # CloudWatch Logs configurations
@@ -138,7 +138,7 @@ module Barcelona
         user_data.add_file("/etc/ssh/ssh_ca_key.pub", "root:root", "644", district.ssh_format_ca_public_key)
 
         # Based on https://github.com/wazuh/wazuh-docker
-        user_data.add_file("/tmp/docker-compose.yml", "root:root", "644", <<~EOS)
+        user_data.add_file("/wazuh/docker-compose.yml", "root:root", "644", <<~EOS)
           version: '2'
           services:
             wazuh:
