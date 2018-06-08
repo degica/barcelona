@@ -473,7 +473,7 @@ EOS
         add_resource("AWS::AutoScaling::LaunchConfiguration",
                      "OSSECManagerLaunchConfiguration") do |j|
           j.IamInstanceProfile ref("OSSECManagerInstanceProfile")
-          j.ImageId "ami-4af5022c"
+          j.ImageId "ami-92df37ed"
           j.InstanceType "t2.medium"
           j.SecurityGroups [ref("OSSECManagerSG")]
           j.UserData manager_user_data.build
