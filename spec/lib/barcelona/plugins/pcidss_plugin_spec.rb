@@ -20,11 +20,6 @@ module Barcelona
 
       it "generates a correct stack template" do
         generated = JSON.load stack.target!
-        expect(generated["Resources"]["NTPServerLaunchConfiguration"]).to be_present
-        expect(generated["Resources"]["NTPServerRole"]).to be_present
-        expect(generated["Resources"]["NTPServerProfile"]).to be_present
-        expect(generated["Resources"]["NTPServerASG"]).to be_present
-        expect(generated["Resources"]["NTPServerSG"]).to be_present
         expect(generated["Resources"]["OSSECManagerVolume"]).to be_present
         expect(generated["Resources"]["OSSECManagerLaunchConfiguration"]).to be_present
         expect(generated["Resources"]["OSSECManagerRole"]).to be_present
