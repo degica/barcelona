@@ -6,6 +6,7 @@ Rails.application.routes.draw do
         post :sign_public_key
       end
 
+      resources :secrets, only: [:create]
       resources :plugins, only: [:index, :show, :destroy]
       put "/plugins/:id", to: "plugins#put"
 

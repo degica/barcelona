@@ -2,36 +2,11 @@ class SecretsController < ApplicationController
   before_action :load_district
 
   def create
-    data_key = @district.generate_data_key
-  end
+    secret = TransitSecret.new(@district)
+    plaintext = Base64.decode64(params.require(:plaintext))
+    enc = secret.create(plaintext)
 
-  private
-
-  def encrypt(key, data, adata)
-    cipher = OpenSSL::Cipher.new('AES-256-GCM')
-    cipher.encrypt
-    cipher.key = key
-    iv = cipher.random_iv
-    cipher.auth_data = adata
-    encrypted = cipher.update(data) + cipher.final
-    atag = cipher.auth_tag
-    {
-      encrypted: encrypted,
-      iv: iv,
-      atag: atag,
-      adata: adata
-    }
-  end
-
-  def decrypt(encrypted:, key:, iv:, atag:, adata:)
-    cipher = OpenSSL::Cipher.new('AES-256-GCM')
-    cipher.decrypt
-    cipher.key = key
-    cipher.iv = iv
-    cipher.auth_tag = atag
-    cipher.auth_data = adata
-    decrypted = cipher.update(content) + cipher.final
-    decrypted
+    render json: {type: "transit", encrypted_value: enc}
   end
 
   def load_district

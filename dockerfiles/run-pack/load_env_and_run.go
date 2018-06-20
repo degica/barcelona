@@ -30,7 +30,11 @@ func loadEnvAndRun(region string, bucket string, envs map[string]string, command
 	}
 
 	for k, v := range kv {
-		err = os.Setenv(k, v)
+		kk, vv, err := resolveTransitSecret(k, v)
+		if err != nil {
+			panic(err)
+		}
+		err = os.Setenv(kk, vv)
 		if err != nil {
 			panic(err)
 		}
@@ -41,4 +45,34 @@ func loadEnvAndRun(region string, bucket string, envs map[string]string, command
 		panic(err)
 	}
 	syscall.Exec(comm, command, os.Environ())
+}
+
+type TransitResolver interface {
+	Resolve(key string, body string) (string, string, error)
+}
+
+type transitResolver struct {
+	kms *kms.Kms
+	cmk string
+}
+
+func NewTransitResolver(cmk string) (TransitResolver, error) {
+	session, err := newSession(region)
+	if err != nil {
+		return nil, err
+	}
+
+	resolver := &transitResolver{
+		kms: kms.New(session),
+		cmk: cmk,
+	}
+
+	return resolver, nil
+}
+
+// Takes key and value
+// Returns unprefixed key and decrypted body or just arguments as-is if not encrypted
+func (r *transitResolver) resolveTransitSecret(key string, body string) (string, string, error) {
+	// TODO
+	return key, body, nil
 }

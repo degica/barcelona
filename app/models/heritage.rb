@@ -237,7 +237,7 @@ class Heritage < ActiveRecord::Base
       }
     )
     if with_environment
-      base[:environment] += env_vars.where(secret: false).map { |e| {name: e.key, value: e.value} }
+      base[:environment] += env_vars.where(secret: false).map { |e| {name: e.key_presentation, value: e.value} }
     end
 
     district.hook_plugins(:heritage_task_definition, self, base)

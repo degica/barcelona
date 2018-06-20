@@ -16,6 +16,15 @@ describe "POST /districts/:district/heritages", type: :request do
           command: "echo hello"
         }
       ],
+      env_vars: {
+        "PLAIN" => "this is plain value",
+        "TRANSIT_SECRET" => {
+          "secret" => {
+            "type" => "transit",
+            "value" => "encrypted value"
+          }
+        }
+      },
       services: [
         {
           name: "web",
@@ -59,6 +68,8 @@ describe "POST /districts/:district/heritages", type: :request do
       expect(heritage["before_deploy"]).to eq "echo hello"
       expect(heritage["scheduled_tasks"][0]["schedule"]).to eq "rate(1 minute)"
       expect(heritage["scheduled_tasks"][0]["command"]).to eq "echo hello"
+      expect(heritage["env_vars"]["PLAIN"]).to eq "this is plain value"
+      expect(heritage["env_vars"]["TRANSIT_SECRET"]).to eq "encrypted value"
       expect(heritage["services"][0]["name"]).to eq "web"
       expect(heritage["services"][0]["public"]).to eq true
       expect(heritage["services"][0]["cpu"]).to eq 128

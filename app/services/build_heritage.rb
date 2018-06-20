@@ -31,10 +31,21 @@ class BuildHeritage
     end
 
     if new_params[:env_vars]
-      new_params[:env_vars_attributes] = new_params.delete(:env_vars).map { |key, val|
+      new_params[:env_vars_attributes] = new_params.delete(:env_vars).map { |key, content|
+        if content.is_a?(String)
+          mode = "plain"
+          value = content
+        elsif content.is_a?(Hash) && content[:secret]
+          mode = content[:secret][:mode]
+          value = content[:secret][:value]
+        else
+          raise "Invalid type"
+        end
+
         {
           key: key,
-          value: val,
+          mode: mode,
+          value: value,
           secret: false
         }
       }
