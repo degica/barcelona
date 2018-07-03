@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :endpoint do
     sequence :name do |n|
       "endpoint#{n}"

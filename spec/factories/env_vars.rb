@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :env_var do
     key "KEY"
     value "VALUE"
