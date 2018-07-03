@@ -420,7 +420,7 @@ module Barcelona
 
           # Ignores error on OSSEC installation process.
           "set +e",
-          "yum install -y wazuh-agent",
+          "yum install -y wazuh-agent-2.0.1",
           "sed -i 's/<server-ip>.*<\\/server-ip>/<server-hostname>ossec-manager.#{district.name}.bcn<\\/server-hostname>/g' /var/ossec/etc/ossec.conf",
           "/var/ossec/bin/agent-auth -m ossec-manager.#{district.name}.bcn",
           "/var/ossec/bin/ossec-control restart",
