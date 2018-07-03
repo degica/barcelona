@@ -28,9 +28,9 @@ describe "DELETE /heritages/:heritage/env_vars", type: :request do
       ]
     }
     api_request :post, "/v1/districts/#{district.name}/heritages", params
-    expect(response).to be_success
+    expect(response).to be_successful
     api_request :post, "/v1/heritages/nginx/env_vars", {env_vars: {"RAILS_ENV" => "production"}}
-    expect(response).to be_success
+    expect(response).to be_successful
   end
 
   it "deletes heritage's environment variables" do
@@ -40,7 +40,7 @@ describe "DELETE /heritages/:heritage/env_vars", type: :request do
 
     expect(DeployRunnerJob).to receive(:perform_later)
     api_request :delete, "/v1/heritages/nginx/env_vars", params
-    expect(response).to be_success
+    expect(response).to be_successful
 
     heritage = JSON.load(response.body)["heritage"]
     expect(heritage["name"]).to eq "nginx"
