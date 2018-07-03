@@ -10,7 +10,7 @@ RUN yum -y update && \
     yum clean all
 RUN curl --silent --location https://rpm.nodesource.com/setup_6.x | bash - && \
     yum install -y nodejs
-RUN yum install -y wazuh-manager-2.1.1 wazuh-api-2.1.1
+RUN yum install -y wazuh-manager-2.0.1 wazuh-api-2.0.1
 
 COPY data_dirs.env /data_dirs.env
 COPY init.bash /init.bash
