@@ -709,8 +709,8 @@ GEM
     pundit (1.1.0)
       activesupport (>= 3.0.0)
     rack (2.0.5)
-    rack-test (0.6.3)
-      rack (>= 1.0)
+    rack-test (1.0.0)
+      rack (>= 1.0, < 3)
     rails (5.2.0)
       actioncable (= 5.2.0)
       actionmailer (= 5.2.0)
@@ -811,7 +811,7 @@ DEPENDENCIES
   pry-rails
   puma
   pundit
-  rack-test (~> 0.6.3)
+  rack-test
   rails (~> 5.1)
   rspec-its
   rspec-rails
