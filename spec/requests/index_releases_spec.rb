@@ -32,7 +32,7 @@ describe "GET /heritages/:heritage/releases", type: :request do
 
   it "shows a release" do
     api_request :get, "/v1/heritages/nginx/releases"
-    expect(response).to be_success
+    expect(response).to be_successful
 
     releases = JSON.load(response.body)["releases"]
     expect(releases[0]["version"]).to eq 2

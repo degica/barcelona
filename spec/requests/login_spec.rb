@@ -22,7 +22,7 @@ describe "POST /login", type: :request do
     let(:user_teams) { [OpenStruct.new(organization: OpenStruct.new(login: "degica"), name: "developers")] }
     it "returns login info" do
       api_request :post, "/v1/login", {}, gh_auth
-      expect(response).to be_success
+      expect(response).to be_successful
       body = JSON.load(response.body)
       expect(body["user"]["name"]).to eq user.name
       expect(body["user"]["token"]).to be_present

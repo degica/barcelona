@@ -34,7 +34,7 @@ describe "POST /heritages/:heritage/oneoffs", type: :request do
       memory: 1024
     }
     api_request :post, "/v1/heritages/#{heritage.name}/oneoffs", params
-    expect(response).to be_success
+    expect(response).to be_successful
     oneoff = JSON.load(response.body)["oneoff"]
     expect(oneoff["task_arn"]).to eq "arn"
     expect(oneoff["container_instance_arn"]).to eq "container_instance_arn"
@@ -66,7 +66,7 @@ describe "POST /heritages/:heritage/oneoffs", type: :request do
       }
 
       api_request :post, "/v1/heritages/#{heritage.name}/oneoffs", params
-      expect(response).to be_success
+      expect(response).to be_successful
       resp = JSON.load(response.body)
       expect(resp["oneoff"]["task_arn"]).to eq "arn"
       expect(resp["oneoff"]["container_instance_arn"]).to eq "container_instance_arn"

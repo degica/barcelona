@@ -39,7 +39,7 @@ describe "POST /heritages/:heritage/env_vars", type: :request do
 
     expect(DeployRunnerJob).to receive(:perform_later)
     api_request :post, "/v1/heritages/nginx/env_vars", params
-    expect(response).to be_success
+    expect(response).to be_successful
 
     heritage = JSON.load(response.body)["heritage"]
     expect(heritage["name"]).to eq "nginx"

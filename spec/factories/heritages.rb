@@ -1,4 +1,4 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :heritage do
     sequence :name do |n|
       "heritage#{n}"

@@ -28,9 +28,9 @@ end
 group :test do
   gem 'rspec-rails'
   gem 'rspec-its'
-  gem 'factory_girl_rails'
+  gem 'factory_bot_rails'
   gem 'database_rewinder'
   gem 'stub_env'
   gem 'webmock'
-  gem 'rack-test', "~> 0.6.3"
+  gem 'rack-test'
 end

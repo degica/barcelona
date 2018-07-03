@@ -52,7 +52,7 @@ describe "updating a heritage" do
 
       expect(DeployRunnerJob).to receive(:perform_later)
       api_request :patch, "/v1/heritages/nginx", params
-      expect(response).to be_success
+      expect(response).to be_successful
 
       heritage = JSON.load(response.body)["heritage"]
       expect(heritage["name"]).to eq "nginx"
@@ -94,7 +94,7 @@ describe "updating a heritage" do
 
       expect(DeployRunnerJob).to receive(:perform_later)
       api_request :post, "/v1/heritages/nginx/trigger/#{token}", params
-      expect(response).to be_success
+      expect(response).to be_successful
       heritage = JSON.load(response.body)["heritage"]
 
       expect(heritage["name"]).to eq "nginx"
@@ -159,7 +159,7 @@ describe "updating a heritage" do
 
       expect(DeployRunnerJob).to receive(:perform_later)
       api_request :patch, "/v1/heritages/nginx", params
-      expect(response).to be_success
+      expect(response).to be_successful
 
       heritage = JSON.load(response.body)["heritage"]
       expect(heritage["name"]).to eq "nginx"
@@ -198,7 +198,7 @@ describe "updating a heritage" do
 
       expect(DeployRunnerJob).to receive(:perform_later)
       api_request :patch, "/v1/heritages/nginx", params
-      expect(response).to be_success
+      expect(response).to be_successful
 
       heritage = JSON.load(response.body)["heritage"]
       expect(heritage["services"].count).to eq 1
