@@ -47,6 +47,7 @@ server {
     proxy_set_header X-Forwarded-Proto $http_x_forwarded_proto;
     <% end %>
     proxy_set_header Host $http_host;
+    proxy_set_header X-Request-Start "t=${msec}";
     proxy_redirect off;
 
     proxy_read_timeout 60;
