@@ -4,7 +4,7 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"encoding/base64"
-	"fmt"
+	"errors"
 	"os"
 	"os/exec"
 	"strings"
@@ -38,20 +38,24 @@ func loadEnvAndRun(region string, bucket string, envs map[string]string, command
 	}
 
 	for k, v := range kv {
+		err = os.Setenv(k, v)
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	for _, e := range os.Environ() {
+		pair := strings.SplitN(e, "=", 2)
 		resolver, err := NewTransitResolver(region)
 		if err != nil {
 			panic(err)
 		}
-		kk, vv, err := resolver.ResolveSecret(k, v)
-		fmt.Println(kk)
-		fmt.Println(vv)
+		k, v, err := resolver.ResolveSecret(pair[0], pair[1])
 		if err != nil {
 			panic(err)
 		}
-		err = os.Setenv(kk, vv)
-		if err != nil {
-			panic(err)
-		}
+		err = os.Setenv(k, v)
+
 	}
 
 	comm, err := exec.LookPath(command[0])
@@ -88,7 +92,7 @@ func (r *TransitResolver) ResolveSecret(key string, body string) (string, string
 		// bcn:transit:v1:<Base64 encoded encrypted data key>:<Base64 encoded encrypted value>
 		vs := strings.SplitN(body, ":", 5)
 		if len(vs) != 5 {
-			return "", "", nil
+			return "", "", errors.New("invalid transit format")
 		}
 
 		encryptedDataKey, err := base64.StdEncoding.DecodeString(vs[3])
