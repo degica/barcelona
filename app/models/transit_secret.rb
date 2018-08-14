@@ -6,8 +6,7 @@ class TransitSecret
   def create(data, adata = "")
     data_key = @district.generate_data_key
     enc = encrypt(key: data_key.plaintext, data: data, adata: adata)
-    enc.merge!(ck: encode(data_key.ciphertext_blob)) # ck == ciphertext key
-    encode(enc.to_json)
+    "bcn:transit:v1:#{encode(data_key.ciphertext_blob)}:#{encode(enc)}"
   end
 
   def encrypt(key:, data:, adata: "")
@@ -18,11 +17,11 @@ class TransitSecret
     cipher.auth_data = adata
     encrypted = cipher.update(data) + cipher.final
     atag = cipher.auth_tag
-    {
-      c: encode(encrypted),
-      iv: encode(iv),
-      t: encode(atag)
-    }
+
+    # This encrypted value is eventually decrpyted by barcelona run pack which is
+    # written in golang and golang's aes lib expects atag to be appended at the tail of ciphertext
+    # See https://jg.gg/2018/01/22/communicating-via-aes-256-gcm-between-nodejs-and-golang/
+    iv + encrypted + atag
   end
 
   private
