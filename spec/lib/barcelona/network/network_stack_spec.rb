@@ -485,10 +485,17 @@ describe Barcelona::Network::NetworkStack do
                       "logs:CreateLogStream",
                       "logs:DescribeLogStreams",
                       "logs:PutLogEvents",
-                      "s3:Get*",
-                      "s3:List*"
                     ],
                     "Resource"=>["*"]
+                  },
+                  {
+                    "Effect" => "Allow",
+                    "Action" => [
+                      "s3:GetObject"
+                    ],
+                    "Resource" => [
+                      "arn:aws:s3:::#{district.s3_bucket_name}/#{district.name}/*"
+                    ]
                   }
                 ]
               }
