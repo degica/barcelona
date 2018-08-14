@@ -4,6 +4,7 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"encoding/base64"
+	"fmt"
 	"os"
 	"os/exec"
 	"strings"
@@ -42,6 +43,8 @@ func loadEnvAndRun(region string, bucket string, envs map[string]string, command
 			panic(err)
 		}
 		kk, vv, err := resolver.ResolveSecret(k, v)
+		fmt.Println(kk)
+		fmt.Println(vv)
 		if err != nil {
 			panic(err)
 		}
