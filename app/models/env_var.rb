@@ -59,7 +59,7 @@ class EnvVar < ActiveRecord::Base
 
   def key_presentation
     if transit?
-      "__BCN_TRANSIT__" + key
+      "__BCN_SECRET__" + key
     else
       key
     end

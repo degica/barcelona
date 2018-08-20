@@ -6,7 +6,7 @@ class TransitSecret
   def create(data, adata = "")
     data_key = @district.generate_data_key
     enc = encrypt(key: data_key.plaintext, data: data, adata: adata)
-    "bcn:transit:v1:#{encode(data_key.ciphertext_blob)}:#{encode(enc)}"
+    "bcn:transit:1:#{encode(data_key.ciphertext_blob)}:#{encode(enc)}"
   end
 
   def encrypt(key:, data:, adata: "")

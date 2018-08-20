@@ -87,9 +87,9 @@ func NewTransitResolver(region string) (*TransitResolver, error) {
 // Takes key and value
 // Returns unprefixed key and decrypted body or just arguments as-is if not encrypted
 func (r *TransitResolver) ResolveSecret(key string, body string) (string, string, error) {
-	if strings.HasPrefix(key, "__BCN_TRANSIT__") {
-		key = strings.TrimPrefix(key, "__BCN_TRANSIT__")
-		// bcn:transit:v1:<Base64 encoded encrypted data key>:<Base64 encoded encrypted value>
+	if strings.HasPrefix(key, "__BCN_SECRET__") {
+		key = strings.TrimPrefix(key, "__BCN_SECRET__")
+		// bcn:transit:1:<Base64 encoded encrypted data key>:<Base64 encoded encrypted value>
 		vs := strings.SplitN(body, ":", 5)
 		if len(vs) != 5 {
 			return "", "", errors.New("invalid transit format")

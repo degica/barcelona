@@ -59,7 +59,7 @@ func TestResolveTransit(t *testing.T) {
 		kmsCli: kmsMock{resp: kms.DecryptOutput{Plaintext: dataKeyBlob}},
 		region: "ap-northeast-1",
 	}
-	key, value, err := resolver.ResolveSecret("__BCN_TRANSIT__ENV_VAR_NAME", body)
+	key, value, err := resolver.ResolveSecret("__BCN_SECRET__ENV_VAR_NAME", body)
 
 	if err != nil {
 		t.Fatalf("err: %s", err)
