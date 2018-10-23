@@ -2,23 +2,23 @@ module Barcelona
   module Network
     class AutoscalingBuilder < CloudFormation::Builder
       # http://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html
-      # amzn-ami-2018.03.g-amazon-ecs-optimized
+      # amzn-ami-2018.03.h-amazon-ecs-optimized
       ECS_OPTIMIZED_AMI_IDS = {
-        "us-east-1"      => "ami-0b9a214f40c38d5eb",
-        "us-east-2"      => "ami-09a64272e7fe706b6",
-        "us-west-1"      => "ami-0e7dd5fe55b87a5fe",
-        "us-west-2"      => "ami-00430184c7bb49914",
-        "eu-west-1"      => "ami-05b65c0f6a75c1c64",
-        "eu-west-2"      => "ami-0209769f0c963e791",
-        "eu-west-3"      => "ami-06b685336aa497c15",
-        "eu-central-1"   => "ami-0bb804e8cd910a664",
-        "ap-northeast-1" => "ami-08681de00a0aae54f",
-        "ap-northeast-2" => "ami-0d947b1901b27a37c",
-        "ap-southeast-1" => "ami-0a3f70f0255af1d29",
-        "ap-southeast-2" => "ami-05b48eda7f92aadbe",
-        "ca-central-1"   => "ami-00d1bdbd447b5933a",
-        "ap-south-1"     => "ami-0590d0dd683026eab",
-        "sa-east-1"      => "ami-01bca91ecf4c1f494",
+        "us-east-1"      => "ami-07eb698ce660402d2",
+        "us-east-2"      => "ami-0a0c6574ce16ce87a",
+        "us-west-1"      => "ami-04c22ba97a0c063c4",
+        "us-west-2"      => "ami-09568291a9d6c804c",
+        "eu-west-1"      => "ami-066826c6a40879d75",
+        "eu-west-2"      => "ami-0cb31bf24b130a0f9",
+        "eu-west-3"      => "ami-0a0948de946510ec0",
+        "eu-central-1"      => "ami-0b9fee3a2d0596ed1",
+        "ap-northeast-1"      => "ami-0edf19001c48838c7",
+        "ap-northeast-2"      => "ami-0b52e57bed048ca48",
+        "ap-southeast-1"      => "ami-08d4fe232c67b81b8",
+        "ap-southeast-2"      => "ami-08c26730c8ee004fa",
+        "ca-central-1"      => "ami-055750f063052ec55",
+        "ap-south-1"      => "ami-05f009513cd58ac90",
+        "sa-east-1"      => "ami-0ada25501ac1375b3",
       }
 
       def ebs_optimized_by_default?
