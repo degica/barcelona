@@ -1,18 +1,24 @@
 module Barcelona
   module Network
     class NatBuilder < CloudFormation::Builder
-      # amzn-ami-vpc-nat-hvm-2016.09.0.20160923-x86_64-ebs
+      # https://aws.amazon.com/jp/amazon-linux-ami/
+      # amzn-ami-vpc-nat-hvm-2018.03.0.20180811-x86_64-ebs
       VPC_NAT_AMI_IDS = {
-        "us-east-1" => "ami-d2ee95c5",
-        "us-east-2" => "ami-9fc299fa",
-        "us-west-1" => "ami-90357bf0",
-        "us-west-2" => "ami-c4469aa4",
-        "eu-west-1" => "ami-d41d58a7",
-        "eu-central-1" => "ami-b646bbd9",
-        "ap-northeast-1" => "ami-831fcde2",
-        "ap-southeast-1" => "ami-9c40e5ff",
-        "ap-southeast-2" => "ami-addbebce",
-        "ca-central-1" => "ami-a88735cc"
+        "us-east-1"      => "ami-0422d936d535c63b1",
+        "us-east-2"      => "ami-0f9c61b5a562a16af",
+        "us-west-1"      => "ami-0d4027d2cdbca669d",
+        "us-west-2"      => "ami-40d1f038",
+        "eu-west-1"      => "ami-0ea87e2bfa81ca08a",
+        "eu-west-2"      => "ami-e6768381",
+        "eu-west-3"      => "ami-0050bb60cea70c5b3",
+        "eu-central-1"      => "ami-06465d49ba60cf770",
+        "ap-northeast-1"      => "ami-0cf78ae724f63bac0",
+        "ap-northeast-2"      => "ami-08cfa02141f9e9bee",
+        "ap-southeast-1"      => "ami-0cf24653bcf894797",
+        "ap-southeast-2"      => "ami-00c1445796bc0a29f",
+        "ca-central-1"      => "ami-b61b96d2",
+        "ap-south-1"      => "ami-0aba92643213491b9",
+        "sa-east-1"      => "ami-09c013530239687aa",
       }
 
       def build_resources
