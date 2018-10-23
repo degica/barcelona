@@ -1,15 +1,7 @@
 #!/usr/bin/env ruby
 
-IMAGE_LOCATION=ARGV.first
-unless IMAGE_LOCATION
-  STDERR.puts "usage: show_ecs_images amzn-ami-2017.09.i-amazon-ecs-optimized"
-  exit 1
-end
-
-AMAZON_OWNER_ID="591542846629"
-
 # us-gov-west-1 is excluded because it requires special privilage
-REGIONS=%w(
+regions=%w(
         us-east-1
         us-east-2
         us-west-1
@@ -26,10 +18,39 @@ REGIONS=%w(
         ap-south-1
         sa-east-1
 )
+def show_image_id_for_amazon_linux(regions)
+  path = '/aws/service/ami-amazon-linux-latest/amzn-ami-hvm-x86_64-gp2'
+  STDERR.puts "getting image id of #{path}..."
 
-REGIONS.each do |region|
-  image_id=`aws --region #{region} ec2 describe-images --owners #{AMAZON_OWNER_ID} | jq -r '.Images[] | select(.ImageLocation|match("#{IMAGE_LOCATION}"))|.ImageId'`.chomp
-  puts %Q{        "#{region}"      => "#{image_id}",}
+  regions.each do |region|
+    image_id=`aws ssm get-parameters --names #{path} --region #{region} --query 'Parameters[0].Value' --output text`.chomp
+    puts %Q{        "#{region}"      => "#{image_id}",}
+  end
 end
 
 
+def show_image_id_for_ecs_optimized(regions)
+  path = '/aws/service/ecs/optimized-ami/amazon-linux/recommended'
+  image_name=`aws ssm get-parameters --names #{path} --region us-east-1 --query 'Parameters[0].Value' --output text | jq -r '.image_name'`
+  STDERR.puts "getting image id of #{path} ( latest version is #{image_name} )..."
+
+  regions.each do |region|
+    image_id=`aws ssm get-parameters --names #{path} --region #{region} --query 'Parameters[0].Value' --output text | jq -r '.image_id'`.chomp
+    puts %Q{        "#{region}"      => "#{image_id}",}
+  end
+end
+
+def show_image_id_for_nat_instance(regions)
+  nat_images = `aws --region us-east-1  ec2 describe-images --owners amazon --filters "Name=name,Values=amzn-ami-vpc-nat-hvm*" --query 'sort_by(Images, &CreationDate)[].Name' --output text`
+  latest_nat_image = nat_images.split.last
+  STDERR.puts "getting image id of nat instances ( latest version is #{latest_nat_image} )..."
+
+  regions.each do |region|
+    image_id=`aws --region #{region}  ec2 describe-images --owners amazon --filters "Name=name,Values=#{latest_nat_image}" --query 'sort_by(Images, &CreationDate)[].ImageId' --output text `.chomp
+    puts %Q{        "#{region}"      => "#{image_id}",}
+  end
+end
+
+show_image_id_for_amazon_linux(regions)
+show_image_id_for_ecs_optimized(regions)
+show_image_id_for_nat_instance(regions)
