@@ -2,23 +2,23 @@ module Barcelona
   module Network
     class AutoscalingBuilder < CloudFormation::Builder
       # http://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html
-      # amzn-ami-2018.03.h-amazon-ecs-optimized
+      # amzn-ami-2018.03.i-amazon-ecs-optimized
       ECS_OPTIMIZED_AMI_IDS = {
-        "us-east-1"      => "ami-07eb698ce660402d2",
-        "us-east-2"      => "ami-0a0c6574ce16ce87a",
-        "us-west-1"      => "ami-04c22ba97a0c063c4",
-        "us-west-2"      => "ami-09568291a9d6c804c",
-        "eu-west-1"      => "ami-066826c6a40879d75",
-        "eu-west-2"      => "ami-0cb31bf24b130a0f9",
-        "eu-west-3"      => "ami-0a0948de946510ec0",
-        "eu-central-1"      => "ami-0b9fee3a2d0596ed1",
-        "ap-northeast-1"      => "ami-0edf19001c48838c7",
-        "ap-northeast-2"      => "ami-0b52e57bed048ca48",
-        "ap-southeast-1"      => "ami-08d4fe232c67b81b8",
-        "ap-southeast-2"      => "ami-08c26730c8ee004fa",
-        "ca-central-1"      => "ami-055750f063052ec55",
-        "ap-south-1"      => "ami-05f009513cd58ac90",
-        "sa-east-1"      => "ami-0ada25501ac1375b3",
+        "us-east-1"      => "ami-045f1b3f87ed83659",
+        "us-east-2"      => "ami-0307f7ccf6ea35750",
+        "us-west-1"      => "ami-0285183bbef6224bd",
+        "us-west-2"      => "ami-01b70aea4161476b7",
+        "eu-west-1"      => "ami-0627e141ce928067c",
+        "eu-west-2"      => "ami-01bee3897bba49d78",
+        "eu-west-3"      => "ami-0f4738fbeb53e6c3a",
+        "eu-central-1"      => "ami-0eaa3baf6969912ba",
+        "ap-northeast-1"      => "ami-05b296a384694dfa4",
+        "ap-northeast-2"      => "ami-00294948a592fc052",
+        "ap-southeast-1"      => "ami-050865a806e0dae53",
+        "ap-southeast-2"      => "ami-02c73ee1100ce3e7a",
+        "ca-central-1"      => "ami-0f552e0a86f08b660",
+        "ap-south-1"      => "ami-01ef9f6a829ae3956",
+        "sa-east-1"      => "ami-084b1eee100c102ee",
       }
 
       def ebs_optimized_by_default?
