@@ -2,7 +2,7 @@ module Barcelona
   module Network
     class BastionBuilder < CloudFormation::Builder
       # https://aws.amazon.com/amazon-linux-ami/
-      # Amazon Linux AMI 2017.03.1
+      # Amazon Linux AMI 2018.03.0
       AMI_IDS = {
         "us-east-1"      => "ami-0ff8a91507f77f867",
         "us-east-2"      => "ami-0b59bfac6be064b78",
