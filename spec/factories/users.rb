@@ -3,7 +3,7 @@ FactoryBot.define do
     sequence :name do |n|
       "user#{n}"
     end
-    roles ["developer"]
+    roles { ["developer"] }
     token { SecureRandom.hex }
   end
 end
