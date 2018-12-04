@@ -211,7 +211,8 @@ module Barcelona
         add_resource("AWS::AutoScaling::LaunchConfiguration",
                      "OSSECManagerLaunchConfiguration") do |j|
           j.IamInstanceProfile ref("OSSECManagerInstanceProfile")
-          j.ImageId "ami-92df37ed"
+          # Bastion AMI is a plain Amazon Linux AMI. we just reuse it for OSSEC manager
+          j.ImageId Barcelona::Network::BastionBuilder::AMI_IDS["ap-northeast-1"]
           j.InstanceType "t2.medium"
           j.SecurityGroups [ref("OSSECManagerSG")]
           j.UserData manager_user_data.build
