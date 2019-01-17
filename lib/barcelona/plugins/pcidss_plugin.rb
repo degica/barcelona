@@ -36,7 +36,7 @@ module Barcelona
 
         user_data.run_commands += [
           "set -ex",
-          'echo "exclude=kernel* docker" >> /etc/yum.conf',
+          'echo "exclude=docker" >> /etc/yum.conf',
           'sed -i -e "s/^update_cmd = .*/update_cmd = security/" /etc/yum/yum-cron.conf',
           'sed -i -e "s/^apply_updates = .*/apply_updates = yes/" /etc/yum/yum-cron.conf',
           "service yum-cron start",
