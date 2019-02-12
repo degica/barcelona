@@ -14,7 +14,8 @@ describe EnvVar do
   end
 
   context "if secret is true" do
-    let(:env_var) { build :env_var, key: "KEY", value: "VALUE", secret: true }
+    let(:heritage) { create :heritage }
+    let(:env_var) { build :env_var, heritage: heritage, key: "KEY", value: "VALUE", secret: true }
 
     it "doesn't save value in DB" do
       expect(env_var.district.aws.s3).to receive(:put_object).with(
