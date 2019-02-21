@@ -13,10 +13,6 @@ class ContainerInstance
       # Embed SHA2 hash dockercfg so that instance replacement happens when dockercfg is updated
       "# #{Digest::SHA256.hexdigest(district.dockercfg.to_s)}",
 
-      "yum erase -y ntp*",
-      "yum install -y chrony",
-      "service chronyd start",
-
       # Setup swap
       "MEMSIZE=`cat /proc/meminfo | grep MemTotal | awk '{print $2}'`",
       "if [ $MEMSIZE -lt 2097152 ]; then",
@@ -42,7 +38,10 @@ class ContainerInstance
       "ec2_id=$(curl http://169.254.169.254/latest/meta-data/instance-id)",
       'sed -i -e "s/{ec2_id}/$ec2_id/g" /etc/awslogs/awslogs.conf',
       'sed -i -e "s/us-east-1/'+district.region+'/g" /etc/awslogs/awscli.conf',
-      "service awslogs start",
+      "systemctl start awslogsd",
+
+      # Install SSM agent
+      "yum install -y https://amazon-ssm-#{district.region}.s3.amazonaws.com/latest/linux_amd64/amazon-ssm-agent.rpm",
 
       # Install AWS Inspector agent
       "curl https://d1wk0tztpsntt1.cloudfront.net/linux/latest/install | bash"

@@ -264,7 +264,7 @@ module Barcelona
           j.Path "/"
           j.Policies [
             {
-              "PolicyName" => "barcelona-ecs-container-instance-role",
+              "PolicyName" => "barcelona-ecs-service-role",
               "PolicyDocument" => {
                 "Version" => "2012-10-17",
                 "Statement" => [
@@ -299,6 +299,9 @@ module Barcelona
             ]
           end
           j.Path "/"
+          j.ManagedPolicyArns ["arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM",
+                               "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role",
+                               "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"]
           j.Policies [
             {
               "PolicyName" => "barcelona-ecs-container-instance-role",
@@ -308,21 +311,6 @@ module Barcelona
                   {
                     "Effect" => "Allow",
                     "Action" => [
-                      "ecs:DeregisterContainerInstance",
-                      "ecs:DiscoverPollEndpoint",
-                      "ecs:Poll",
-                      "ecs:RegisterContainerInstance",
-                      "ecs:StartTelemetrySession",
-                      "ecs:Submit*",
-                      "ecs:DescribeClusters",
-                      "ecr:GetAuthorizationToken",
-                      "ecr:BatchCheckLayerAvailability",
-                      "ecr:GetDownloadUrlForLayer",
-                      "ecr:BatchGetImage",
-                      "logs:CreateLogGroup",
-                      "logs:CreateLogStream",
-                      "logs:DescribeLogStreams",
-                      "logs:PutLogEvents",
                       "s3:Get*",
                       "s3:List*"
                     ],

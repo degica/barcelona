@@ -2,23 +2,23 @@ module Barcelona
   module Network
     class AutoscalingBuilder < CloudFormation::Builder
       # http://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html
-      # amzn-ami-2018.03.m-amazon-ecs-optimized
+      # amzn2-ami-ecs-hvm-2.0
       ECS_OPTIMIZED_AMI_IDS = {
-        "us-east-1"      => "ami-0796380bc6e51157f",
-        "us-east-2"      => "ami-04b61a4d3b11cc8ea",
-        "us-west-1"      => "ami-0c9bd36a7394439a6",
-        "us-west-2"      => "ami-0af5f077b70dafc30",
-        "eu-west-1"      => "ami-0dc3fa046ca0e570c",
-        "eu-west-2"      => "ami-0a9d4bf15de460a01",
-        "eu-west-3"      => "ami-0ad28cde309fa32d1",
-        "eu-central-1"      => "ami-0ce9ac8aed24e9ee5",
-        "ap-northeast-1"      => "ami-06cfa258272c37c0b",
-        "ap-northeast-2"      => "ami-076eb6ae0f9fc6903",
-        "ap-southeast-1"      => "ami-00ae2723e3c86c93e",
-        "ap-southeast-2"      => "ami-08f2011d0deea4967",
-        "ca-central-1"      => "ami-014b53fb2043417a3",
-        "ap-south-1"      => "ami-04224e9b8e778d0d4",
-        "sa-east-1"      => "ami-0ec252e7e0588e54d",
+        "us-east-1"      => "ami-032564940f9afd5c0",
+        "us-east-2"      => "ami-03757cbb3bae03fe7",
+        "us-west-1"      => "ami-030dcc999f03d168b",
+        "us-west-2"      => "ami-0291b991e70d83d33",
+        "eu-west-1"      => "ami-0885003261a52af1c",
+        "eu-west-2"      => "ami-0bcc92a4e661446c1",
+        "eu-west-3"      => "ami-0ab92fbd5dc35efa5",
+        "eu-central-1"      => "ami-08ab7d08250c248ce",
+        "ap-northeast-1"      => "ami-0ea322c77fc5ff655",
+        "ap-northeast-2"      => "ami-0ae0c329bb532b6d0",
+        "ap-southeast-1"      => "ami-060c7b75c31ac0a2a",
+        "ap-southeast-2"      => "ami-046f9a4716a10bfa3",
+        "ca-central-1"      => "ami-0df37f84fc18ba923",
+        "ap-south-1"      => "ami-06016d6b78ec83843",
+        "sa-east-1"      => "ami-002111a63f9ad4724",
       }
 
       def ebs_optimized_by_default?
@@ -37,20 +37,12 @@ module Barcelona
           j.EbsOptimized ebs_optimized_by_default?
           j.BlockDeviceMappings [
             # Root volume
+            # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/al2ami-storage-config.html
             {
               "DeviceName" => "/dev/xvda",
               "Ebs" => {
                 "DeleteOnTermination" => true,
-                "VolumeSize" => 20,
-                "VolumeType" => "gp2"
-              }
-            },
-            # devicemapper volume used by docker
-            {
-              "DeviceName" => "/dev/xvdcz",
-              "Ebs" => {
-                "DeleteOnTermination" => true,
-                "VolumeSize" => 80,
+                "VolumeSize" => 100,
                 "VolumeType" => "gp2"
               }
             }
