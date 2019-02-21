@@ -68,15 +68,29 @@ module Backend::Ecs::V2
                   {
                     "Effect" => "Allow",
                     "Action" => [
-                      "elasticloadbalancing:Describe*",
-                      "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
-                      "elasticloadbalancing:RegisterInstancesWithLoadBalancer",
-                      "elasticloadbalancing:DeregisterTargets",
-                      "elasticloadbalancing:DescribeTargetGroups",
-                      "elasticloadbalancing:DescribeTargetHealth",
-                      "elasticloadbalancing:RegisterTargets",
+                      "ec2:AttachNetworkInterface",
+                      "ec2:CreateNetworkInterface",
+                      "ec2:CreateNetworkInterfacePermission",
+                      "ec2:DeleteNetworkInterface",
+                      "ec2:DeleteNetworkInterfacePermission",
                       "ec2:Describe*",
-                      "ec2:AuthorizeSecurityGroupIngress"
+                      "ec2:DetachNetworkInterface",
+                      "elasticloadbalancing:DeregisterInstancesFromLoadBalancer",
+                      "elasticloadbalancing:DeregisterTargets",
+                      "elasticloadbalancing:Describe*",
+                      "elasticloadbalancing:RegisterInstancesWithLoadBalancer",
+                      "elasticloadbalancing:RegisterTargets",
+                      "route53:ChangeResourceRecordSets",
+                      "route53:CreateHealthCheck",
+                      "route53:DeleteHealthCheck",
+                      "route53:Get*",
+                      "route53:List*",
+                      "route53:UpdateHealthCheck",
+                      "servicediscovery:DeregisterInstance",
+                      "servicediscovery:Get*",
+                      "servicediscovery:List*",
+                      "servicediscovery:RegisterInstance",
+                      "servicediscovery:UpdateInstanceCustomHealthStatus"
                     ],
                     "Resource" => ["*"]
                   }
