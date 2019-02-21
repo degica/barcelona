@@ -4,9 +4,9 @@ init:
 	git submodule update --init
 build: init
 	UID=$(UID) docker-compose build
-setup: build
+setup: init
 	docker-compose run --rm web bin/setup
-up: build
+up: init
 	docker-compose up -d
 restart:
 	docker-compose restart web spring worker

@@ -9,7 +9,6 @@ services:
       args:
         - UID=${UID-1000}
         - APP_HOME=${PWD}
-        - SKIP_BUNDLE=yes
     ports:
      - "3333:3333"
     command: rails s -b 0.0.0.0
