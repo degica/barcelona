@@ -33,7 +33,7 @@ describe "POST /districts", type: :request do
       expect(body["district"]["nat_type"]).to eq "instance"
       expect(body["district"]["cluster_size"]).to eq 1
       expect(body["district"]["cluster_backend"]).to eq "autoscaling"
-      expect(body["district"]["cluster_instance_type"]).to eq "t2.small"
+      expect(body["district"]["cluster_instance_type"]).to eq "t3.small"
     end
 
     context "when running in ECS environment" do

@@ -141,10 +141,10 @@ describe Barcelona::Network::NetworkStack do
         "Properties" => {
           "IamInstanceProfile" => {"Ref"=>"ECSInstanceProfile"},
           "ImageId" => kind_of(String),
-          "InstanceType" => "t2.small",
+          "InstanceType" => "t3.small",
           "SecurityGroups" => [{"Ref"=>"InstanceSecurityGroup"}],
           "UserData" => instance_of(String),
-          "EbsOptimized" => false,
+          "EbsOptimized" => true,
           "BlockDeviceMappings" => [
             {
               "DeviceName"=>"/dev/xvda",
