@@ -48,7 +48,6 @@ module Barcelona
         ci = ContainerInstance.new(district)
         plugin = district.plugins.find_by(name: 'pcidss').plugin
         user_data = YAML.load(Base64.decode64(ci.user_data.build))
-        expect(user_data["packages"]).to include(*described_class::SYSTEM_PACKAGES)
         expect(user_data["runcmd"]).to include(*plugin.run_commands)
       end
 
@@ -57,7 +56,6 @@ module Barcelona
         template = JSON.load(::Barcelona::Network::NetworkStack.new(district).target!)
         user_data = InstanceUserData.load(template["Resources"]["BastionLaunchConfiguration"]["Properties"]["UserData"])
         plugin = district.plugins.find_by(name: 'pcidss').plugin
-        expect(user_data.packages).to include(*described_class::SYSTEM_PACKAGES)
         expect(user_data.run_commands).to include(*plugin.run_commands)
       end
 
