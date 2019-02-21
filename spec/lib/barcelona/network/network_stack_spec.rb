@@ -313,16 +313,8 @@ describe Barcelona::Network::NetworkStack do
             {"IpProtocol" => "tcp",
              "FromPort" => 22,
              "ToPort" => 22,
-             "CidrIp" => "0.0.0.0/0"},
-            {"IpProtocol" => "udp",
-             "FromPort" => 123,
-             "ToPort" => 123,
-             "CidrIp" => district.cidr_block}],
+             "CidrIp" => "0.0.0.0/0"}],
           "SecurityGroupEgress" => [
-            {"IpProtocol" => "udp",
-             "FromPort" => 123,
-             "ToPort" => 123,
-             "CidrIp" => "0.0.0.0/0"},
             {"IpProtocol" => "tcp",
              "FromPort" => 22,
              "ToPort" => 22,
@@ -368,32 +360,16 @@ describe Barcelona::Network::NetworkStack do
             ]
           },
           "Path"=>"/",
-          "Policies" => [
-            {
-              "PolicyName" => "bastion-role",
-              "PolicyDocument" => {
-                "Version" => "2012-10-17",
-                "Statement" => [
-                  {
-                    "Effect"=>"Allow",
-                    "Action" => [
-                      "logs:CreateLogGroup",
-                      "logs:CreateLogStream",
-                      "logs:DescribeLogStreams",
-                      "logs:PutLogEvents",
-                    ],
-                    "Resource"=>["*"]
-                  }
-                ]
-              }
-            }
-          ]
+          "ManagedPolicyArns" => [
+            "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM",
+            "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+          ],
         }
       },
       "BastionLaunchConfiguration" => {
         "Type" => "AWS::AutoScaling::LaunchConfiguration",
         "Properties" => {
-          "InstanceType" => "t2.micro",
+          "InstanceType" => "t3.micro",
           "IamInstanceProfile" => {"Ref" => "BastionProfile"},
           "ImageId" => kind_of(String),
           "UserData" => anything,
