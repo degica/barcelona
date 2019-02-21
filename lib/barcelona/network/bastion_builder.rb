@@ -2,23 +2,23 @@ module Barcelona
   module Network
     class BastionBuilder < CloudFormation::Builder
       # https://aws.amazon.com/amazon-linux-ami/
-      # Amazon Linux AMI 2018.03.0
+      # Amazon Linux 2 AMI
       AMI_IDS = {
-        "us-east-1"      => "ami-0ff8a91507f77f867",
-        "us-east-2"      => "ami-0b59bfac6be064b78",
-        "us-west-1"      => "ami-0bdb828fd58c52235",
-        "us-west-2"      => "ami-a0cfeed8",
-        "eu-west-1"      => "ami-047bb4163c506cd98",
-        "eu-west-2"      => "ami-f976839e",
-        "eu-west-3"      => "ami-0ebc281c20e89ba4b",
-        "eu-central-1"      => "ami-0233214e13e500f77",
-        "ap-northeast-1"      => "ami-06cd52961ce9f0d85",
-        "ap-northeast-2"      => "ami-0a10b2721688ce9d2",
-        "ap-southeast-1"      => "ami-08569b978cc4dfa10",
-        "ap-southeast-2"      => "ami-09b42976632b27e9b",
-        "ca-central-1"      => "ami-0b18956f",
-        "ap-south-1"      => "ami-0912f71e06545ad88",
-        "sa-east-1"      => "ami-07b14488da8ea02a0",
+        "us-east-1"      => "ami-035be7bafff33b6b6",
+        "us-east-2"      => "ami-04328208f4f0cf1fe",
+        "us-west-1"      => "ami-0799ad445b5727125",
+        "us-west-2"      => "ami-032509850cf9ee54e",
+        "eu-west-1"      => "ami-0fad7378adf284ce0",
+        "eu-west-2"      => "ami-0664a710233d7c148",
+        "eu-west-3"      => "ami-0854d53ce963f69d8",
+        "eu-central-1"      => "ami-0eaec5838478eb0ba",
+        "ap-northeast-1"      => "ami-0d7ed3ddb85b521a6",
+        "ap-northeast-2"      => "ami-018a9a930060d38aa",
+        "ap-southeast-1"      => "ami-04677bdaa3c2b6e24",
+        "ap-southeast-2"      => "ami-0c9d48b5db609ad6e",
+        "ca-central-1"      => "ami-0de8b8e4bc1f125fe",
+        "ap-south-1"      => "ami-0937dcc711d38ef3f",
+        "sa-east-1"      => "ami-0b04450959586da29",
       }
 
       def build_resources
@@ -31,21 +31,9 @@ module Barcelona
               "FromPort" => 22,
               "ToPort" => 22,
               "CidrIp" => "0.0.0.0/0"
-            },
-            {
-              "IpProtocol" => "udp",
-              "FromPort" => 123,
-              "ToPort" => 123,
-              "CidrIp" => options[:cidr_block]
             }
           ]
           j.SecurityGroupEgress [
-            {
-              "IpProtocol" => "udp",
-              "FromPort" => 123,
-              "ToPort" => 123,
-              "CidrIp" => '0.0.0.0/0'
-            },
             {
               "IpProtocol" => "tcp",
               "FromPort" => 22,
@@ -103,32 +91,13 @@ module Barcelona
             ]
           end
           j.Path "/"
-          j.Policies [
-            {
-              "PolicyName" => "bastion-role",
-              "PolicyDocument" => {
-                "Version" => "2012-10-17",
-                "Statement" => [
-                  {
-                    "Effect" => "Allow",
-                    "Action" => [
-                      "logs:CreateLogGroup",
-                      "logs:CreateLogStream",
-                      "logs:DescribeLogStreams",
-                      "logs:PutLogEvents",
-                    ],
-                    "Resource" => ["*"]
-                  }
-                ]
-              }
-            }
-          ]
+          j.ManagedPolicyArns ["arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM", "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"]
         end
 
         add_resource("AWS::AutoScaling::LaunchConfiguration", "BastionLaunchConfiguration") do |j|
           j.IamInstanceProfile ref("BastionProfile")
           j.ImageId AMI_IDS[district.region]
-          j.InstanceType "t2.micro"
+          j.InstanceType "t3.micro"
           j.SecurityGroups [ref("SecurityGroupBastion")]
           j.AssociatePublicIpAddress true
           j.UserData user_data
@@ -141,7 +110,7 @@ module Barcelona
 
       def user_data
         ud = InstanceUserData.new
-        ud.packages += ["aws-cli", "awslogs", "yum-cron-security"]
+        ud.packages += ["aws-cli", "awslogs", "yum-cron"]
         ud.add_user("hopper")
         ud.add_file("/etc/ssh/ssh_ca_key.pub", "root:root", "644", district.ssh_format_ca_public_key)
 
@@ -169,15 +138,11 @@ module Barcelona
         EOS
 
         ud.run_commands += [
-          "yum erase -y ntp*",
-          "yum install -y chrony",
-          "service chronyd start",
-
           # awslogs
           "ec2_id=$(curl http://169.254.169.254/latest/meta-data/instance-id)",
           'sed -i -e "s/{ec2_id}/$ec2_id/g" /etc/awslogs/awslogs.conf',
           'sed -i -e "s/us-east-1/'+district.region+'/g" /etc/awslogs/awscli.conf',
-          "service awslogs start",
+          "systemctl start awslogsd",
 
           "service yum-cron start",
           'printf "\nTrustedUserCAKeys /etc/ssh/ssh_ca_key.pub\n" >> /etc/ssh/sshd_config',

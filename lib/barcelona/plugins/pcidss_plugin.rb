@@ -16,7 +16,7 @@ module Barcelona
 
       def manager_user_data
         user_data = InstanceUserData.new
-        user_data.packages += ["docker", "jq", "awslogs", "clamav", "clamav-update", "tmpwatch", "fail2ban", "yum-cron-security"]
+        user_data.packages += ["docker", "jq", "awslogs", "tmpwatch", "yum-cron"]
 
         change_batch = {
           "Changes" => [
@@ -41,6 +41,9 @@ module Barcelona
           'sed -i -e "s/^apply_updates = .*/apply_updates = yes/" /etc/yum/yum-cron.conf',
           "service yum-cron start",
 
+          "amazon-linux-extras install -y epel",
+          "yum install -y clamav clamav-update",
+
           # Install AWS Inspector agent
           "curl https://d1wk0tztpsntt1.cloudfront.net/linux/latest/install | bash",
 
@@ -48,7 +51,7 @@ module Barcelona
           "ec2_id=$(curl http://169.254.169.254/latest/meta-data/instance-id)",
           'sed -i -e "s/{ec2_id}/$ec2_id/g" /etc/awslogs/awslogs.conf',
           'sed -i -e "s/us-east-1/'+district.region+'/g" /etc/awslogs/awscli.conf',
-          "service awslogs start",
+          "systemctl start awslogsd",
 
           # Enable freshclam configuration
           "sed -i 's/^Example$//g' /etc/freshclam.conf",
@@ -58,23 +61,7 @@ module Barcelona
           "echo '0 0 * * * root #{SCAN_COMMAND}' > /etc/cron.d/clamscan",
           "service crond restart",
 
-          # fail2ban configurations
-          "echo '[DEFAULT]' > /etc/fail2ban/jail.local",
-          "echo 'bantime = 1800' >> /etc/fail2ban/jail.local",
-          "service fail2ban restart",
-
-          # SSH session timeout
-          "echo 'TMOUT=900 && readonly TMOUT && export TMOUT' > /etc/profile.d/tmout.sh",
-
-          # Chrony
-          "yum erase -y ntp*",
-          "yum install -y chrony",
-          "service chronyd start",
-
-          # Configure sshd
-          'printf "\nTrustedUserCAKeys /etc/ssh/ssh_ca_key.pub\n" >> /etc/ssh/sshd_config',
-          'sed -i -e "s/^PermitRootLogin .*/PermitRootLogin no/" /etc/ssh/sshd_config',
-          "service sshd restart",
+          "service sshd stop",
 
           # Attach OSSEC volume
           "volume_id=$(aws ec2 describe-volumes --region ap-northeast-1 --filters Name=tag-key,Values=ossec-manager-volume Name=tag:barcelona,Values=#{district.name} | jq -r '.Volumes[0].VolumeId')",
@@ -213,7 +200,7 @@ module Barcelona
           j.IamInstanceProfile ref("OSSECManagerInstanceProfile")
           # Bastion AMI is a plain Amazon Linux AMI. we just reuse it for OSSEC manager
           j.ImageId Barcelona::Network::BastionBuilder::AMI_IDS["ap-northeast-1"]
-          j.InstanceType "t2.medium"
+          j.InstanceType "t3.medium"
           j.SecurityGroups [ref("OSSECManagerSG")]
           j.UserData manager_user_data.build
           j.EbsOptimized false
@@ -243,6 +230,7 @@ module Barcelona
             ]
           end
           j.Path "/"
+          j.ManagedPolicyArns ["arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM", "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"]
           j.Policies [
             {
               "PolicyName" => "ossec-manager-policy",
@@ -254,10 +242,6 @@ module Barcelona
                     "Action" => [
                       "ec2:DescribeVolumes",
                       "ec2:AttachVolume",
-                      "logs:CreateLogGroup",
-                      "logs:CreateLogStream",
-                      "logs:DescribeLogStreams",
-                      "logs:PutLogEvents",
                       "route53:ChangeResourceRecordSets"
                     ],
                     "Resource" => ["*"]
@@ -341,12 +325,6 @@ module Barcelona
           ]
           j.SecurityGroupEgress [
             {
-              "IpProtocol" => "udp",
-              "FromPort" => 123,
-              "ToPort" => 123,
-              "CidrIp" => '0.0.0.0/0'
-            },
-            {
               "IpProtocol" => "tcp",
               "FromPort" => 80,
               "ToPort" => 80,
@@ -396,13 +374,15 @@ module Barcelona
     end
 
     class PcidssPlugin < Base
-      SYSTEM_PACKAGES = ["clamav", "clamav-update", "tmpwatch", "fail2ban"]
       # Exclude different file systems such as /proc and /dev (-xdev)
       # Files that have changed within a day (-mtime -1)
       SCAN_COMMAND = "listfile=`mktemp` && find / -xdev -mtime -1 -type f -fprint $listfile && clamscan -i -f $listfile | logger -t clamscan"
 
       def run_commands
         @run_commands ||= [
+          "amazon-linux-extras install -y epel",
+          "yum install -y clamav clamav-update tmpwatch fail2ban",
+
           # Enable freshclam configuration
           "sed -i 's/^Example$//g' /etc/freshclam.conf",
           "sed -i 's/^FRESHCLAM_DELAY=disabled-warn.*$//g' /etc/sysconfig/freshclam",
@@ -430,7 +410,6 @@ module Barcelona
       end
 
       def on_container_instance_user_data(_instance, user_data)
-        user_data.packages += SYSTEM_PACKAGES
         user_data.run_commands += run_commands
 
         user_data.add_file("/etc/yum.repos.d/wazuh.repo", "root:root", "644", <<EOS)
@@ -450,7 +429,6 @@ EOS
         return template if bastion_lc.nil?
 
         user_data = InstanceUserData.load_or_initialize(bastion_lc["Properties"]["UserData"])
-        user_data.packages += SYSTEM_PACKAGES
         user_data.run_commands += run_commands
         user_data.add_file("/etc/yum.repos.d/wazuh.repo", "root:root", "644", <<EOS)
 [wazuh_repo]
