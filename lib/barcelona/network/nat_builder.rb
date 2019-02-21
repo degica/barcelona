@@ -2,23 +2,23 @@ module Barcelona
   module Network
     class NatBuilder < CloudFormation::Builder
       # https://aws.amazon.com/jp/amazon-linux-ami/
-      # amzn-ami-vpc-nat-hvm-2018.03.0.20180811-x86_64-ebs
+      # amzn-ami-vpc-nat-hvm
       VPC_NAT_AMI_IDS = {
-        "us-east-1"      => "ami-0422d936d535c63b1",
-        "us-east-2"      => "ami-0f9c61b5a562a16af",
-        "us-west-1"      => "ami-0d4027d2cdbca669d",
-        "us-west-2"      => "ami-40d1f038",
-        "eu-west-1"      => "ami-0ea87e2bfa81ca08a",
-        "eu-west-2"      => "ami-e6768381",
-        "eu-west-3"      => "ami-0050bb60cea70c5b3",
-        "eu-central-1"      => "ami-06465d49ba60cf770",
-        "ap-northeast-1"      => "ami-0cf78ae724f63bac0",
-        "ap-northeast-2"      => "ami-08cfa02141f9e9bee",
-        "ap-southeast-1"      => "ami-0cf24653bcf894797",
-        "ap-southeast-2"      => "ami-00c1445796bc0a29f",
-        "ca-central-1"      => "ami-b61b96d2",
-        "ap-south-1"      => "ami-0aba92643213491b9",
-        "sa-east-1"      => "ami-09c013530239687aa",
+        "us-east-1"      => "ami-00a9d4a05375b2763",
+        "us-east-2"      => "ami-00d1f8201864cc10c",
+        "us-west-1"      => "ami-097ad469381034fa2",
+        "us-west-2"      => "ami-0b840e8a1ce4cdf15",
+        "eu-west-1"      => "ami-024107e3e3217a248",
+        "eu-west-2"      => "ami-0ca65a55561666293",
+        "eu-west-3"      => "ami-0641e4dfc1427f114",
+        "eu-central-1"      => "ami-06a5303d47fbd8c60",
+        "ap-northeast-1"      => "ami-00d29e4cb217ae06b",
+        "ap-northeast-2"      => "ami-0d98591cbf9ef1ffd",
+        "ap-southeast-1"      => "ami-01514bb1776d5c018",
+        "ap-southeast-2"      => "ami-062c04ec46aecd204",
+        "ca-central-1"      => "ami-0b32354309da5bba5",
+        "ap-south-1"      => "ami-00b3aa8a93dd09c13",
+        "sa-east-1"      => "ami-057f5d52ff7ae75ae",
       }
 
       def build_resources
@@ -42,7 +42,7 @@ module Barcelona
 
           add_resource("AWS::EC2::Instance", nat_name,
                        depends_on: ["VPCGatewayAttachment"]) do |j|
-            j.InstanceType options[:instance_type] || 't2.nano'
+            j.InstanceType options[:instance_type] || 't3.nano'
             j.SourceDestCheck false
             j.ImageId VPC_NAT_AMI_IDS[stack.district.region]
             j.NetworkInterfaces [
