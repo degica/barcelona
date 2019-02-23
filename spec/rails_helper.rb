@@ -58,12 +58,6 @@ RSpec.configure do |config|
     ENV['VAULT_PATH_PREFIX'] ||= "prefix"
   end
 
-  config.before :suite do
-    DatabaseRewinder.clean_all
-    # or
-    # DatabaseRewinder.clean_with :any_arg_that_would_be_actually_ignored_anyway
-  end
-
   config.before :each do
     stub_const("Gibberish::AES::SJCL::DEFAULTS", {
                  v:1, iter:1, ks:256, ts:96,
@@ -166,9 +160,5 @@ RSpec.configure do |config|
                       physical_resource_id: "barce-VPCGa-1LOOQNJB1WRUG")
              ])
     }
-  end
-
-  config.after :each do
-    DatabaseRewinder.clean
   end
 end
