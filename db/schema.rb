@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2017_06_19_094107) do
+ActiveRecord::Schema.define(version: 2019_02_23_124754) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -69,6 +69,16 @@ ActiveRecord::Schema.define(version: 2017_06_19_094107) do
     t.boolean "secret", default: false
     t.index ["heritage_id", "key"], name: "index_env_vars_on_heritage_id_and_key", unique: true
     t.index ["heritage_id"], name: "index_env_vars_on_heritage_id"
+  end
+
+  create_table "environments", force: :cascade do |t|
+    t.bigint "heritage_id", null: false
+    t.string "name", null: false
+    t.text "value"
+    t.text "value_from"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["heritage_id"], name: "index_environments_on_heritage_id"
   end
 
   create_table "heritages", force: :cascade do |t|
@@ -189,6 +199,7 @@ ActiveRecord::Schema.define(version: 2017_06_19_094107) do
 
   add_foreign_key "endpoints", "districts"
   add_foreign_key "env_vars", "heritages"
+  add_foreign_key "environments", "heritages", on_delete: :cascade
   add_foreign_key "heritages", "districts"
   add_foreign_key "listeners", "endpoints"
   add_foreign_key "listeners", "services"
