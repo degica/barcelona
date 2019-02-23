@@ -30,6 +30,14 @@ class BuildHeritage
       end
     end
 
+    if new_params[:environment]
+      new_params[:environments_attributes] = new_params.delete(:environment).map do |e|
+        e.slice(:name, :value, :value_from)
+      end
+      new_params[:environments_attributes] = sync_resources(new_params[:environments_attributes], heritage.environments, :name)
+    end
+
+
     unless heritage.new_record?
       new_params.delete :name
 

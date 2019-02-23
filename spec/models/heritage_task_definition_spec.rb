@@ -20,12 +20,14 @@ describe HeritageTaskDefinition do
 
     before do
       allow(heritage).to receive(:task_role_id) { "task-role" }
+      allow(heritage).to receive(:task_execution_role_id) { "task-execution-role" }
     end
 
     it "returns a task definition for the service" do
       expect(subject).to eq({
                               family: service.service_name,
                               task_role_arn: "task-role",
+                              execution_role_arn: "task-execution-role",
                               container_definitions: [
                                 {
                                   name: service.service_name,
@@ -35,6 +37,7 @@ describe HeritageTaskDefinition do
                                   image: heritage.image_path,
                                   command: LaunchCommand.new(heritage, service.command).to_command,
                                   environment: [],
+                                  secrets: [],
                                   volumes_from: [
                                     {
                                       source_container: "runpack",
@@ -50,6 +53,7 @@ describe HeritageTaskDefinition do
                                   essential: false,
                                   image: "quay.io/degica/barcelona-run-pack",
                                   environment: [],
+                                  secrets: [],
                                   log_configuration: expected_log_configuration
                                 }
                               ]
@@ -62,6 +66,7 @@ describe HeritageTaskDefinition do
         expect(subject).to eq({
                                 family: service.service_name,
                                 task_role_arn: "task-role",
+                                execution_role_arn: "task-execution-role",
                                 container_definitions: [
                                   {
                                     environment: [
@@ -78,6 +83,7 @@ describe HeritageTaskDefinition do
                                         value: "3000"
                                       }
                                     ],
+                                    secrets: [],
                                     name: service.service_name,
                                     cpu: service.cpu,
                                     memory: service.memory,
@@ -102,6 +108,7 @@ describe HeritageTaskDefinition do
                                     essential: false,
                                     image: "quay.io/degica/barcelona-run-pack",
                                     environment: [],
+                                    secrets: [],
                                     log_configuration: expected_log_configuration
                                   },
                                   {
@@ -129,6 +136,7 @@ describe HeritageTaskDefinition do
                                         value: "false"
                                       }
                                     ],
+                                    secrets: [],
                                     port_mappings: [
                                       {
                                         container_port: 80,
@@ -157,12 +165,14 @@ describe HeritageTaskDefinition do
 
     before do
       allow(heritage).to receive(:task_role_id) { "task-role" }
+      allow(heritage).to receive(:task_execution_role_id) { "task-execution-role" }
     end
 
     it "returns a task definition for the oneoff" do
       expect(subject).to eq({
                               family: "#{heritage.name}-oneoff",
                               task_role_arn: "task-role",
+                              execution_role_arn: "task-execution-role",
                               container_definitions: [
                                 {
                                   name:  "#{heritage.name}-oneoff",
@@ -171,6 +181,7 @@ describe HeritageTaskDefinition do
                                   essential: true,
                                   image: heritage.image_path,
                                   environment: [],
+                                  secrets: [],
                                   volumes_from: [
                                     {
                                       source_container: "runpack",
@@ -186,6 +197,7 @@ describe HeritageTaskDefinition do
                                   essential: false,
                                   image: "quay.io/degica/barcelona-run-pack",
                                   environment: [],
+                                  secrets: [],
                                   log_configuration: expected_log_configuration
                                 }
                               ]
@@ -224,12 +236,14 @@ describe HeritageTaskDefinition do
 
     before do
       allow(heritage).to receive(:task_role_id) { "task-role" }
+      allow(heritage).to receive(:task_execution_role_id) { "task-execution-role" }
     end
 
     it "returns a task definition for the schedule" do
       expect(subject).to eq({
                               "Family" => "#{heritage.name}-schedule",
                               "TaskRoleArn" => "task-role",
+                              "ExecutionRoleArn" => "task-execution-role",
                               "ContainerDefinitions" => [
                                 {
                                   "Name" =>  "#{heritage.name}-schedule",
@@ -238,6 +252,7 @@ describe HeritageTaskDefinition do
                                   "Essential" => true,
                                   "Image" => heritage.image_path,
                                   "Environment" => [],
+                                  "Secrets" => [],
                                   "VolumesFrom" => [
                                     {
                                       "SourceContainer" => "runpack",
@@ -253,6 +268,7 @@ describe HeritageTaskDefinition do
                                   "Essential" => false,
                                   "Image" => "quay.io/degica/barcelona-run-pack",
                                   "Environment" => [],
+                                  "Secrets" => [],
                                   "LogConfiguration" => expected_log_configuration
                                 }
                               ]

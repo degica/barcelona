@@ -47,7 +47,7 @@ class HeritageTaskDefinition
                     end
     end
     ret = {family: family_name, container_definitions: containers}
-    ret = ret.merge(task_role_arn: heritage.task_role_id) unless without_task_role
+    ret = ret.merge(task_role_arn: heritage.task_role_id, execution_role_arn: heritage.task_execution_role_id) unless without_task_role
     if camelize
       ret = deep_transform_keys_with_parent_keys(ret) do |k, parents|
         (parents.last(2) != [:log_configuration, :options] &&

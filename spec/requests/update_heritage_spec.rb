@@ -10,6 +10,10 @@ describe "updating a heritage" do
       image_name: "nginx",
       image_tag: "latest",
       before_deploy: "echo hello",
+      environment: [
+        {name: "ENV_KEY", value: "my value"},
+        {name: "SECRET", value_from: "arn"}
+      ],
       services: [
         {
           name: "web",
@@ -30,7 +34,7 @@ describe "updating a heritage" do
         }
       ]
     }
-    api_request :post, "/v1/districts/#{district.name}/heritages", params
+    api_request :post, "/v1/districts/#{district.name}/heritages?debug=true", params
   end
 
   describe "PATCH /heritages/:heritage", type: :request do
@@ -38,6 +42,10 @@ describe "updating a heritage" do
       params = {
         image_tag: "v3",
         before_deploy: nil,
+        environment: [
+          {name: "ENV2", value: "my value 2"},
+          {name: "SECRET", value_from: "arn"}
+        ],
         services: [
           {
             name: "web",
@@ -59,6 +67,13 @@ describe "updating a heritage" do
       expect(heritage["image_name"]).to eq "nginx"
       expect(heritage["image_tag"]).to eq "v3"
       expect(heritage["before_deploy"]).to eq nil
+      expect(heritage["environment"].count).to eq 2
+      expect(heritage["environment"][0]["name"]).to eq "ENV2"
+      expect(heritage["environment"][0]["value"]).to eq "my value 2"
+      expect(heritage["environment"][0]["value_from"]).to eq nil
+      expect(heritage["environment"][1]["name"]).to eq "SECRET"
+      expect(heritage["environment"][1]["value"]).to eq nil
+      expect(heritage["environment"][1]["value_from"]).to eq "arn"
       web_service = heritage["services"].find { |s| s["name"] == "web" }
       expect(web_service["public"]).to eq true
       expect(web_service["cpu"]).to eq 128

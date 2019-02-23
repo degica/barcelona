@@ -113,6 +113,11 @@ class HeritagesController < ApplicationController
       scheduled_tasks: [
         :schedule,
         :command
+      ],
+      environment: [
+        :name,
+        :value,
+        :value_from
       ]
     ]).tap do |whitelisted|
       if params[:services].present?

@@ -13,6 +13,7 @@ class Heritage < ActiveRecord::Base
           j.ContainerDefinitions definition["ContainerDefinitions"]
           j.Family definition["Family"]
           j.TaskRoleArn ref("TaskRole")
+          j.ExecutionRoleArn ref("TaskExecutionRole")
         end
 
         heritage.scheduled_tasks.each_with_index do |s, i|
@@ -93,6 +94,44 @@ class Heritage < ActiveRecord::Base
         end
       end
 
+      add_resource("AWS::IAM::Role", "TaskExecutionRole") do |j|
+        j.AssumeRolePolicyDocument do |j|
+          j.Version "2012-10-17"
+          j.Statement [
+            {
+              "Effect" => "Allow",
+              "Principal" => {
+                "Service" => ["ecs-tasks.amazonaws.com"]
+              },
+              "Action" => ["sts:AssumeRole"]
+            }
+          ]
+        end
+        j.Path "/"
+        j.ManagedPolicyArns ["arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"]
+        j.Policies [
+          {
+            "PolicyName" => "barcelona-ecs-task-execution-role-#{heritage.name}",
+            "PolicyDocument" => {
+              "Version" => "2012-10-17",
+              "Statement" => [
+                {
+                  "Effect" => "Allow",
+                  "Action" => [
+                    "ssm:GetParameters",
+                    "secretsmanager:GetSecretValue",
+                  ],
+                  "Resource" => [
+                    sub("arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/barcelona/#{heritage.district.name}/*"),
+                    sub("arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:barcelona/#{heritage.district.name}/*"),
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      end
+
       add_resource("AWS::IAM::Role", "TaskRole") do |j|
         j.AssumeRolePolicyDocument do |j|
           j.Version "2012-10-17"
@@ -158,6 +197,7 @@ class Heritage < ActiveRecord::Base
 
   has_many :services, inverse_of: :heritage, dependent: :destroy
   has_many :env_vars, dependent: :destroy
+  has_many :environments
   has_many :oneoffs, dependent: :destroy
   has_many :releases, -> { order 'version DESC' }, dependent: :destroy, inverse_of: :heritage
   belongs_to :district, inverse_of: :heritages
@@ -177,6 +217,7 @@ class Heritage < ActiveRecord::Base
 
   accepts_nested_attributes_for :services, allow_destroy: true
   accepts_nested_attributes_for :env_vars
+  accepts_nested_attributes_for :environments, allow_destroy: true
 
   after_initialize do |heritage|
     heritage.version ||= 2
@@ -230,7 +271,8 @@ class Heritage < ActiveRecord::Base
       }
     )
     if with_environment
-      base[:environment] += env_vars.where(secret: false).map { |e| {name: e.key, value: e.value} }
+      base[:environment] += environment_set
+      base[:secrets] += environments.secrets.map { |e| {name: e.name, value_from: e.namespaced_value_from} }
     end
 
     district.hook_plugins(:heritage_task_definition, self, base)
@@ -244,11 +286,22 @@ class Heritage < ActiveRecord::Base
     cf_executor&.resource_ids["TaskRole"]
   end
 
+  def task_execution_role_id
+    cf_executor&.resource_ids["TaskExecutionRole"]
+  end
+
   def cf_executor
     @cf_executor ||= begin
                        stack = Stack.new(self)
                        CloudFormation::Executor.new(stack, district.aws.cloudformation)
                      end
+  end
+
+  def environment_set
+    legacy_env_vars = env_vars.where(secret: false).map { |e| [e.key, e.value] }.to_h
+    envs = environments.plains.map { |e| [e.name, e.value] }.to_h
+    union = legacy_env_vars.merge(envs)
+    union.map { |k, v| {name: k, value: v} }
   end
 
   private
