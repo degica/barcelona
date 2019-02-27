@@ -22,7 +22,8 @@ module Barcelona
       }
 
       def ebs_optimized_by_default?
-        !!(instance_type =~ /\A(c4|m4|d2)\..*\z/)
+        # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSOptimized.html
+        !!(instance_type =~ /\A(a1|c4|c5.?|d2|f1|g3.?|h1|i3|m4|m5.?|p2|p3(dn)?|r4|r5.?|t3|u-.*|x1.?|z1d)\..*\z/)
       end
 
       def build_resources
