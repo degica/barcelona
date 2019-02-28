@@ -20,6 +20,14 @@ module CloudFormation
       {"Fn::Join" => [sep, vals]}
     end
 
+    def sub(s, mapping = {})
+      if mapping.empty?
+        {"Fn::Sub" => s}
+      else
+        {"Fn::Sub" => [s, mapping]}
+      end
+    end
+
     def select(index, list)
       {"Fn::Select" => [index, list]}
     end
