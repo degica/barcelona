@@ -10,6 +10,8 @@ class Environment < ApplicationRecord
   validates :value_from, presence: true, if: -> { value.blank? }
 
   def namespaced_value_from
+    return value_from if value_from.start_with?("arn:aws:")
+
     s = value_from
     s = "/" + s unless s.start_with?("/")
     s = "/barcelona/#{district.name}" + s unless s.start_with?("/barcelona/#{district.name}")
