@@ -2,9 +2,6 @@ environments:
   production:
     name: rails-app
     image_name: k2nr/rails-docker-sample
-    scheduled_tasks:
-      - schedule: rate(10 minutes)
-        command: echo hello hello
     services:
       - name: web
         service_type: web
@@ -19,3 +16,18 @@ environments:
             rule_conditions:
               - type: path-pattern
                 value: '*'
+review:
+  group: test
+  image_name: quay.io/k2nr/bcn-reviewapp-example
+  environment:
+    - name: RAILS_ENV
+      value: staging
+    - name: DATABASE_URL
+      value_from: komoju_staging/database_url
+  service:
+    service_type: web
+    cpu: 10
+    memory: 128
+    command: nginx -g "daemon off;"
+
+# bcn review deploy branch-name --tag branch-name
