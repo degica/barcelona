@@ -18,8 +18,8 @@ regions=%w(
         ap-south-1
         sa-east-1
 )
-def show_image_id_for_amazon_linux(regions)
-  path = '/aws/service/ami-amazon-linux-latest/amzn-ami-hvm-x86_64-gp2'
+def show_image_id_for_amazon_linux2(regions)
+  path = '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
   STDERR.puts "getting image id of #{path}..."
 
   regions.each do |region|
@@ -51,6 +51,6 @@ def show_image_id_for_nat_instance(regions)
   end
 end
 
-show_image_id_for_amazon_linux(regions)
+show_image_id_for_amazon_linux2(regions)
 show_image_id_for_ecs_optimized(regions)
 show_image_id_for_nat_instance(regions)
