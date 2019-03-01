@@ -21,7 +21,7 @@ class LaunchCommand
       "load-env-and-run",
       "--region", heritage.district.region,
       "--bucket-name", heritage.district.s3_bucket_name,
-      heritage.env_vars.where(secret: true).map { |e| ["-e", "#{e.key}=#{e.s3_path}"] },
+      heritage.legacy_secrets.map { |e| ["-e", "#{e.key}=#{e.s3_path}"] },
       @command
     ].flatten
   end

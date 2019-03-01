@@ -304,6 +304,10 @@ class Heritage < ActiveRecord::Base
     union.map { |k, v| {name: k, value: v} }
   end
 
+  def legacy_secrets
+    env_vars.where(secret: true).where.not(key: environments.secrets.pluck(:name))
+  end
+
   private
 
   def update_services(release, without_before_deploy)
