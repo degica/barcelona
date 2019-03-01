@@ -23,7 +23,7 @@ describe ReviewApp do
       expect{review_app.save!}.to_not raise_error
 
       expect(review_app.heritage).to be_present
-      expect(review_app.heritage.name).to eq "review-#{review_app.unique_slug}"
+      expect(review_app.heritage.name).to eq "review-#{review_app.slug_digest}"
       expect(review_app.heritage.services[0].listeners[0].endpoint).to eq group.endpoint
       expect(review_app.heritage.services[0].listeners[0].rule_priority).to eq review_app.rule_priority_from_subject
       expect(review_app.heritage.services[0].listeners[0].rule_conditions[0]["type"]).to eq "host-header"
