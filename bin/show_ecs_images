@@ -30,7 +30,7 @@ end
 
 
 def show_image_id_for_ecs_optimized(regions)
-  path = '/aws/service/ecs/optimized-ami/amazon-linux/recommended'
+  path = '/aws/service/ecs/optimized-ami/amazon-linux-2/recommended'
   image_name=`aws ssm get-parameters --names #{path} --region us-east-1 --query 'Parameters[0].Value' --output text | jq -r '.image_name'`
   STDERR.puts "getting image id of #{path} ( latest version is #{image_name} )..."
 

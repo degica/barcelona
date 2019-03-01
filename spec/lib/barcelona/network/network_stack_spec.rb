@@ -148,11 +148,7 @@ describe Barcelona::Network::NetworkStack do
           "BlockDeviceMappings" => [
             {
               "DeviceName"=>"/dev/xvda",
-              "Ebs" => {"DeleteOnTermination"=>true, "VolumeSize"=>20, "VolumeType"=>"gp2"}
-            },
-            {
-              "DeviceName"=>"/dev/xvdcz",
-              "Ebs" => {"DeleteOnTermination"=>true, "VolumeSize"=>80, "VolumeType"=>"gp2"}
+              "Ebs" => {"DeleteOnTermination"=>true, "VolumeSize"=>100, "VolumeType"=>"gp2"}
             }
           ]
         }
@@ -437,6 +433,11 @@ describe Barcelona::Network::NetworkStack do
             ]
           },
           "Path"=>"/",
+          "ManagedPolicyArns" => [
+            "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM",
+            "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role",
+            "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+          ],
           "Policies" => [
             {
               "PolicyName" => "barcelona-ecs-container-instance-role",
@@ -446,21 +447,6 @@ describe Barcelona::Network::NetworkStack do
                   {
                     "Effect"=>"Allow",
                     "Action" => [
-                      "ecs:DeregisterContainerInstance",
-                      "ecs:DiscoverPollEndpoint",
-                      "ecs:Poll",
-                      "ecs:RegisterContainerInstance",
-                      "ecs:StartTelemetrySession",
-                      "ecs:Submit*",
-                      "ecs:DescribeClusters",
-                      "ecr:GetAuthorizationToken",
-                      "ecr:BatchCheckLayerAvailability",
-                      "ecr:GetDownloadUrlForLayer",
-                      "ecr:BatchGetImage",
-                      "logs:CreateLogGroup",
-                      "logs:CreateLogStream",
-                      "logs:DescribeLogStreams",
-                      "logs:PutLogEvents",
                       "s3:Get*",
                       "s3:List*"
                     ],
@@ -490,7 +476,7 @@ describe Barcelona::Network::NetworkStack do
           "Path" => "/",
           "Policies" => [
             {
-              "PolicyName" => "barcelona-ecs-container-instance-role",
+              "PolicyName" => "barcelona-ecs-service-role",
               "PolicyDocument" => {
                 "Version"=>"2012-10-17",
                 "Statement" => [
