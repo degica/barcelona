@@ -2,7 +2,7 @@ class ReviewApp < ApplicationRecord
   belongs_to :heritage, dependent: :destroy, autosave: true
   belongs_to :review_group
 
-  attr_accessor :image_name, :image_tag, :retention_hours, :service_params, :before_deploy, :environment
+  attr_accessor :image_name, :image_tag, :service_params, :before_deploy, :environment
   validates :subject, :image_name, :image_tag, :retention_hours, :service_params, presence: true
   validates :subject, format: {with: /\A[a-z0-9][a-z0-9-]*[a-z0-9]\z/}
 
@@ -34,6 +34,7 @@ class ReviewApp < ApplicationRecord
   end
 
   def deploy
+    touch
     self.heritage.deploy!(description: "ReviewApp for #{subject}")
     CleanupReviewAppJob.set(wait: retention_hours.hours).perform_later(self)
   end
@@ -53,5 +54,9 @@ class ReviewApp < ApplicationRecord
 
   def to_param
     subject
+  end
+
+  def expired?(now=Time.current)
+    updated_at < (now - retention_hours.hours)
   end
 end

@@ -163,6 +163,7 @@ ActiveRecord::Schema.define(version: 2019_02_23_161003) do
     t.bigint "heritage_id", null: false
     t.bigint "review_group_id", null: false
     t.string "subject", null: false
+    t.integer "retention_hours", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["heritage_id"], name: "index_review_apps_on_heritage_id", unique: true
