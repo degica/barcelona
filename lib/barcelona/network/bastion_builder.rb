@@ -4,21 +4,21 @@ module Barcelona
       # https://aws.amazon.com/amazon-linux-ami/
       # Amazon Linux 2 AMI
       AMI_IDS = {
-        "us-east-1"      => "ami-035be7bafff33b6b6",
-        "us-east-2"      => "ami-04328208f4f0cf1fe",
-        "us-west-1"      => "ami-0799ad445b5727125",
-        "us-west-2"      => "ami-032509850cf9ee54e",
-        "eu-west-1"      => "ami-0fad7378adf284ce0",
-        "eu-west-2"      => "ami-0664a710233d7c148",
-        "eu-west-3"      => "ami-0854d53ce963f69d8",
-        "eu-central-1"      => "ami-0eaec5838478eb0ba",
-        "ap-northeast-1"      => "ami-0d7ed3ddb85b521a6",
-        "ap-northeast-2"      => "ami-018a9a930060d38aa",
-        "ap-southeast-1"      => "ami-04677bdaa3c2b6e24",
-        "ap-southeast-2"      => "ami-0c9d48b5db609ad6e",
-        "ca-central-1"      => "ami-0de8b8e4bc1f125fe",
-        "ap-south-1"      => "ami-0937dcc711d38ef3f",
-        "sa-east-1"      => "ami-0b04450959586da29",
+        "us-east-1"      => "ami-02da3a138888ced85",
+        "us-east-2"      => "ami-0de7daa7385332688",
+        "us-west-1"      => "ami-09bfcadb25ee95bec",
+        "us-west-2"      => "ami-095cd038eef3e5074",
+        "eu-west-1"      => "ami-02a39bdb8e8ee056a",
+        "eu-west-2"      => "ami-07a5200f3fa9c33d3",
+        "eu-west-3"      => "ami-0e9073d7ac75f4491",
+        "eu-central-1"      => "ami-07f1fbbff759e24dd",
+        "ap-northeast-1"      => "ami-097473abce069b8e9",
+        "ap-northeast-2"      => "ami-045e355a6004a67c4",
+        "ap-southeast-1"      => "ami-00158b185c8cc09dc",
+        "ap-southeast-2"      => "ami-0c3228fd049cdb151",
+        "ca-central-1"      => "ami-05f9d71283317f5c9",
+        "ap-south-1"      => "ami-03103e7ded4c02ef8",
+        "sa-east-1"      => "ami-095a33e72f6bb89c3",
       }
 
       def build_resources
