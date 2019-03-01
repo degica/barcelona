@@ -7,7 +7,7 @@ class ReviewAppsController < ApplicationController
     reviewapp = group.review_apps.find_or_initialize_by(subject: params[:subject])
     reviewapp.attributes = {
       subject: params[:subject],
-      retention_hours: 12,
+      retention_hours: 24,
       image_name: params[:image_name],
       image_tag: params[:image_tag],
       before_deploy: params[:before_deploy],
