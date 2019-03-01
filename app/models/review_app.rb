@@ -11,7 +11,7 @@ class ReviewApp < ApplicationRecord
 
   def build_heritage
     params = {
-      name: "review-#{unique_slug}",
+      name: "review-#{slug_digest}",
       image_name: image_name,
       image_tag: image_tag,
       before_deploy: before_deploy,
@@ -44,12 +44,15 @@ class ReviewApp < ApplicationRecord
   end
 
   def rule_priority_from_subject
-    digest = Digest::SHA256.hexdigest(subject)
-    (digest[0..5].to_i(16) % 50000) + 1
+    (slug_digest.to_i(16) % 50000) + 1
   end
 
-  def unique_slug
-    Digest::SHA256.hexdigest(review_group.name + "---" + subject)[0...8]
+  def slug
+    review_group.name + "---" + subject
+  end
+
+  def slug_digest
+    Digest::SHA256.hexdigest(slug)[0...8]
   end
 
   def to_param
