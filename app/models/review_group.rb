@@ -41,7 +41,7 @@ class ReviewGroup < ApplicationRecord
 
   class Stack < CloudFormation::Stack
     def initialize(group)
-      stack_name = "#{group.district.name}-reviewapp-group-#{group.name}"
+      stack_name = "#{group.district.name}-reviewgroup-#{group.name}"
       super(stack_name, group: group)
     end
 
