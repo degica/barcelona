@@ -13,6 +13,7 @@ class Environment < ApplicationRecord
 
   before_validation do
     if ssm_path
+      s = ssm_path
       s = "/" + ssm_path unless ssm_path.start_with?("/")
       s = "/barcelona/#{district.name}" + s unless s.start_with?("/barcelona/#{district.name}")
       self.value_from = s
