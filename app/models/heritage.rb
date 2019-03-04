@@ -272,7 +272,9 @@ class Heritage < ActiveRecord::Base
     )
     if with_environment
       base[:environment] += environment_set
-      base[:secrets] += environments.secrets.map { |e| {name: e.name, value_from: e.value_from} }
+      if environments.any?
+        base[:secrets] = environments.secrets.map { |e| {name: e.name, value_from: e.value_from} }
+      end
     end
 
     district.hook_plugins(:heritage_task_definition, self, base)

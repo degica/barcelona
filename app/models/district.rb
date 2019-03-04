@@ -152,7 +152,6 @@ class District < ActiveRecord::Base
   def base_task_definition
     base = {
       environment: [],
-      secrets: []
     }
     hook_plugins(:district_task_definition, self, base)
   end

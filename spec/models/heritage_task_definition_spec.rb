@@ -37,7 +37,6 @@ describe HeritageTaskDefinition do
                                   image: heritage.image_path,
                                   command: LaunchCommand.new(heritage, service.command).to_command,
                                   environment: [],
-                                  secrets: [],
                                   volumes_from: [
                                     {
                                       source_container: "runpack",
@@ -53,7 +52,6 @@ describe HeritageTaskDefinition do
                                   essential: false,
                                   image: "quay.io/degica/barcelona-run-pack",
                                   environment: [],
-                                  secrets: [],
                                   log_configuration: expected_log_configuration
                                 }
                               ]
@@ -83,7 +81,6 @@ describe HeritageTaskDefinition do
                                         value: "3000"
                                       }
                                     ],
-                                    secrets: [],
                                     name: service.service_name,
                                     cpu: service.cpu,
                                     memory: service.memory,
@@ -108,7 +105,6 @@ describe HeritageTaskDefinition do
                                     essential: false,
                                     image: "quay.io/degica/barcelona-run-pack",
                                     environment: [],
-                                    secrets: [],
                                     log_configuration: expected_log_configuration
                                   },
                                   {
@@ -136,7 +132,6 @@ describe HeritageTaskDefinition do
                                         value: "false"
                                       }
                                     ],
-                                    secrets: [],
                                     port_mappings: [
                                       {
                                         container_port: 80,
@@ -181,7 +176,6 @@ describe HeritageTaskDefinition do
                                   essential: true,
                                   image: heritage.image_path,
                                   environment: [],
-                                  secrets: [],
                                   volumes_from: [
                                     {
                                       source_container: "runpack",
@@ -197,7 +191,6 @@ describe HeritageTaskDefinition do
                                   essential: false,
                                   image: "quay.io/degica/barcelona-run-pack",
                                   environment: [],
-                                  secrets: [],
                                   log_configuration: expected_log_configuration
                                 }
                               ]
@@ -252,7 +245,6 @@ describe HeritageTaskDefinition do
                                   "Essential" => true,
                                   "Image" => heritage.image_path,
                                   "Environment" => [],
-                                  "Secrets" => [],
                                   "VolumesFrom" => [
                                     {
                                       "SourceContainer" => "runpack",
@@ -268,7 +260,6 @@ describe HeritageTaskDefinition do
                                   "Essential" => false,
                                   "Image" => "quay.io/degica/barcelona-run-pack",
                                   "Environment" => [],
-                                  "Secrets" => [],
                                   "LogConfiguration" => expected_log_configuration
                                 }
                               ]
