@@ -149,7 +149,7 @@ class Endpoint < ActiveRecord::Base
   end
 
   def dns_name
-    cf_executor.outputs&.dig("DNSName")
+    cf_executor.outputs["DNSName"]
   end
 
   def to_param

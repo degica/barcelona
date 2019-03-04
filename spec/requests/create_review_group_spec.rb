@@ -24,6 +24,10 @@ describe "POST /v1/review_groups", type: :request do
     let(:roles) { ["admin"] }
 
     it "creates a review group" do
+      allow_any_instance_of(CloudFormation::Executor).to receive(:outputs) {
+        {"DNSName" => "dns.name"}
+      }
+
       api_request(:post, "/v1/review_groups", params)
       expect(response.status).to eq 200
       group = JSON.load(response.body)["review_group"]
