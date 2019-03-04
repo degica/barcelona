@@ -23,7 +23,7 @@ review:
     - name: RAILS_ENV
       value: staging
     - name: DATABASE_URL
-      value_from: komoju_staging/database_url
+      ssm_path: komoju_staging/database_url
   service:
     service_type: web
     cpu: 10
