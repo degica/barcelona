@@ -8,6 +8,12 @@ class DeployRunnerJob < ActiveJob::Base
         return
       end
 
+      loop do
+        break unless heritage.cf_executor.in_progress?
+        puts "Waiting for heritage stack to be complete"
+        sleep 5
+      end
+
       notify(heritage, message: "Deploying to #{heritage.district.name} district: #{description}")
       before_deploy = heritage.before_deploy
       if before_deploy.present? && !without_before_deploy

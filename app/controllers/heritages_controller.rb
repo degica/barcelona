@@ -3,6 +3,10 @@ class HeritagesController < ApplicationController
   before_action :load_heritage, except: [:index, :create, :trigger]
   skip_before_action :authenticate, only: [:trigger]
 
+  # Declarative environment doesn't work for scheduled tasks because scheduled tasks use CloudFormation
+  # for creating task definitions and CF still does not support `ContainerDefinitions.Secrets` parameters.
+  before_action :forbid_environment, only: [:create, :update, :trigger], unless: -> { Rails.env.test? }
+
   def index
     render json: @district.heritages
   end
@@ -113,6 +117,11 @@ class HeritagesController < ApplicationController
       scheduled_tasks: [
         :schedule,
         :command
+      ],
+      environment: [
+        :name,
+        :value,
+        :value_from
       ]
     ]).tap do |whitelisted|
       if params[:services].present?
@@ -129,5 +138,9 @@ class HeritagesController < ApplicationController
 
   def load_district
     @district = District.find_by!(name: params[:district_id])
+  end
+
+  def forbid_environment
+    raise "Specifying environment is not yet supproted for normal deployments" if params[:environment].present?
   end
 end
