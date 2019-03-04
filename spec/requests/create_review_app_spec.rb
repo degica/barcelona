@@ -44,17 +44,17 @@ describe "POST /v1/:review_group/apps", type: :request do
     expect(review_app["heritage"]["scheduled_tasks"]).to be_empty
   end
 
-  context "trigger API" do
+  context "ci API" do
     it "creates a heritage" do
       allow(DeployRunnerJob).to receive(:perform_later)
-      api_request(:post, "/v1/review_groups/#{review_group.name}/apps/trigger/#{review_group.token}", params, {"X-Barcelona-Token" => nil})
+      api_request(:post, "/v1/review_groups/#{review_group.name}/ci/apps/#{review_group.token}", params, {"X-Barcelona-Token" => nil})
       expect(response.status).to eq 200
     end
 
     context "with wrong token" do
       it "creates a heritage" do
         allow(DeployRunnerJob).to receive(:perform_later)
-        api_request(:post, "/v1/review_groups/#{review_group.name}/apps/trigger/wrong-token", params, {"X-Barcelona-Token" => nil})
+        api_request(:post, "/v1/review_groups/#{review_group.name}/ci/apps/wrong-token", params, {"X-Barcelona-Token" => nil})
         expect(response.status).to eq 404
       end
     end

@@ -1,6 +1,5 @@
 class ReviewAppsController < ApplicationController
-  skip_before_action :authenticate, only: [:trigger]
-  before_action :authorize_app, only: [:create, :trigger]
+  skip_before_action :authenticate, only: [:ci_create, :ci_delete]
 
   def create
     group = ReviewGroup.find_by!(name: params[:review_group_id])
@@ -14,12 +13,13 @@ class ReviewAppsController < ApplicationController
       environment: (params[:environment] || []).map { |e| e.permit!.to_h },
       service_params: (params[:service] || {}).permit!.to_h
     }
+    authorize_resource reviewapp
     reviewapp.save!
 
     render json: reviewapp
   end
 
-  def trigger
+  def ci_create
     group = ReviewGroup.find_by!(name: params[:review_group_id])
 
     if Rack::Utils.secure_compare(params[:token], group.token)
@@ -43,7 +43,13 @@ class ReviewAppsController < ApplicationController
     head 204
   end
 
-  def authorize_app
-    authorize_resource ReviewApp
+  def ci_delete
+    group = ReviewGroup.find_by!(name: params[:review_group_id])
+
+    if Rack::Utils.secure_compare(params[:token], group.token)
+      destroy
+    else
+      raise ExceptionHandler::NotFound
+    end
   end
 end

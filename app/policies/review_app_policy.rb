@@ -3,7 +3,11 @@ class ReviewAppPolicy < ApplicationPolicy
     user.developer?
   end
 
-  def trigger?
+  def ci_create?
+    true
+  end
+
+  def ci_delete?
     true
   end
 

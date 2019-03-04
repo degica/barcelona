@@ -28,7 +28,8 @@ Rails.application.routes.draw do
     resources :users, only: [:index, :show, :update]
     resources :review_groups do
       resources :review_apps, path: "/apps"
-      post "/apps/trigger/:token", to: "review_apps#trigger"
+      post   "/ci/apps/:token", to: "review_apps#ci_create"
+      delete "/ci/apps/:token/:id", to: "review_apps#ci_delete"
     end
 
     post "/login", to: "users#login"
