@@ -16,12 +16,13 @@ describe "POST /v1/:review_group/apps", type: :request do
         {name: "ENV", value: "value"},
         {name: "SECRET", value_from: "/secret/env"}
       ],
-      service: {
+      services: [{
+        name: "web",
         service_type: "web",
         cpu: 128,
         memory: 256,
         command: "nginx",
-      }
+      }]
     }
   end
 

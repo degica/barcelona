@@ -4,15 +4,7 @@ class ReviewAppsController < ApplicationController
   def create
     group = ReviewGroup.find_by!(name: params[:review_group_id])
     reviewapp = group.review_apps.find_or_initialize_by(subject: params[:subject])
-    reviewapp.attributes = {
-      subject: params[:subject],
-      retention_hours: 24,
-      image_name: params[:image_name],
-      image_tag: params[:image_tag],
-      before_deploy: params[:before_deploy],
-      environment: (params[:environment] || []).map { |e| e.permit!.to_h },
-      service_params: (params[:service] || {}).permit!.to_h
-    }
+    reviewapp.attributes = permitted_params
     authorize_resource reviewapp
     reviewapp.save!
 
@@ -51,5 +43,31 @@ class ReviewAppsController < ApplicationController
     else
       raise ExceptionHandler::NotFound
     end
+  end
+
+  private
+
+  def permitted_params
+    params.permit([
+                    :subject,
+                    :retention,
+                    :image_name,
+                    :image_tag,
+                    :before_deploy,
+                    environment: [
+                      :name,
+                      :value,
+                      :ssm_path,
+                      :value_from
+                    ],
+                    services: [
+                      :name,
+                      :service_type,
+                      :cpu,
+                      :memory,
+                      :command,
+                      :force_ssl
+                    ]
+                  ])
   end
 end

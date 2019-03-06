@@ -2,32 +2,34 @@ class ReviewApp < ApplicationRecord
   belongs_to :heritage, dependent: :destroy, autosave: true
   belongs_to :review_group
 
-  attr_accessor :image_name, :image_tag, :service_params, :before_deploy, :environment
-  validates :subject, :image_name, :image_tag, :retention_hours, :service_params, presence: true
+  attr_accessor :image_name, :image_tag, :services, :before_deploy, :environment
+  validates :subject, :image_name, :image_tag, :retention, :services, presence: true
   validates :subject, format: {with: /\A[a-z0-9][a-z0-9-]*[a-z0-9]\z/}
+  validates :retention, numericality: {greater_than: 0, less_than: 24 * 3600 * 30}
 
   before_validation :build_heritage
+  before_validation do
+    self.retention ||= 24 * 3600
+  end
   after_save :deploy
 
   def build_heritage
+    web_service = services.find{ |s| s[:service_type].to_s == "web" }
+    web_service[:listeners] = [
+      {
+        endpoint: review_group.endpoint.name,
+        rule_priority: rule_priority_from_subject,
+        rule_conditions: [{type: "host-header", value: domain}]
+      }
+    ]
+
     params = {
       name: "review-#{slug_digest}",
       image_name: image_name,
       image_tag: image_tag,
       before_deploy: before_deploy,
       environment: environment,
-      services: [
-        service_params.merge(
-          name: "review",
-          listeners: [
-            {
-              endpoint: review_group.endpoint.name,
-              rule_priority: rule_priority_from_subject,
-              rule_conditions: [{type: "host-header", value: domain}]
-            }
-          ]
-        )
-      ]
+      services: services
     }
 
     self.heritage = BuildHeritage.new(params, district: review_group.district).execute
@@ -36,7 +38,7 @@ class ReviewApp < ApplicationRecord
   def deploy
     touch
     self.heritage.deploy!(description: "ReviewApp for #{subject}")
-    CleanupReviewAppJob.set(wait: retention_hours.hours).perform_later(self)
+    CleanupReviewAppJob.set(wait: retention).perform_later(self)
   end
 
   def domain
@@ -60,6 +62,6 @@ class ReviewApp < ApplicationRecord
   end
 
   def expired?(now=Time.current)
-    updated_at < (now - retention_hours.hours)
+    updated_at < (now - retention.seconds)
   end
 end

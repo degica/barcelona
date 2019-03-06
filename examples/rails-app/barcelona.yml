@@ -24,10 +24,11 @@ review:
       value: staging
     - name: DATABASE_URL
       ssm_path: komoju_staging/database_url
-  service:
-    service_type: web
-    cpu: 10
-    memory: 128
-    command: nginx -g "daemon off;"
+  services:
+    - name: web
+      service_type: web
+      cpu: 10
+      memory: 128
+      command: nginx -g "daemon off;"
 
 # bcn review deploy branch-name --tag branch-name

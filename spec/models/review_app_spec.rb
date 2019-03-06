@@ -9,13 +9,14 @@ describe ReviewApp do
         subject: "subject",
         image_name: "image",
         image_tag: "tag",
-        retention_hours: 12,
+        retention: 12 * 3600,
         before_deploy: "true",
         environment: [],
-        service_params: {
+        services: [{
+          name: "review",
           command: "true",
           service_type: "web",
-        }
+        }]
       )
     }
 
