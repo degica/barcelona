@@ -27,32 +27,37 @@ module Barcelona
       end
 
       def build_resources
-        add_resource("AWS::AutoScaling::LaunchConfiguration",
-                     "ContainerInstanceLaunchConfiguration") do |j|
-
-          j.IamInstanceProfile ref("ECSInstanceProfile")
-          j.ImageId ECS_OPTIMIZED_AMI_IDS[stack.district.region]
-          j.InstanceType instance_type
-          j.SecurityGroups [ref("InstanceSecurityGroup")]
-          j.UserData instance_user_data
-          j.EbsOptimized ebs_optimized_by_default?
-          j.BlockDeviceMappings [
-            # Root volume
-            # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/al2ami-storage-config.html
-            {
-              "DeviceName" => "/dev/xvda",
-              "Ebs" => {
-                "DeleteOnTermination" => true,
-                "VolumeSize" => 100,
-                "VolumeType" => "gp2"
+        add_resource("AWS::EC2::LaunchTemplate", "ContainerInstanceLaunchTemplate") do |j|
+          j.LaunchTemplateName "barcelona-#{stack.district.name}-container-instance"
+          j.LaunchTemplateData do |j|
+            j.ImageId ECS_OPTIMIZED_AMI_IDS[stack.district.region]
+            j.SecurityGroupIds [ref("InstanceSecurityGroup")]
+            # TODO test ebs optimized with t2 and t3
+            j.IamInstanceProfile do |j|
+              j.Name ref("ECSInstanceProfile")
+            end
+            j.BlockDeviceMappings [
+              # Root volume
+              # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/al2ami-storage-config.html
+              {
+                "DeviceName" => "/dev/xvda",
+                "Ebs" => {
+                  "DeleteOnTermination" => true,
+                  "VolumeSize" => 100,
+                  "VolumeType" => "gp2"
+                }
               }
-            }
-          ]
+            ]
+            j.UserData instance_user_data
+          end
         end
 
         add_resource(AutoScalingGroup,
                      "ContainerInstanceAutoScalingGroup",
                      desired_capacity: desired_capacity,
+                     on_demand_percentage: stack.district.auto_scaling_on_demand_percentage,
+                     spot_instance_pools: stack.district.auto_scaling_spot_instance_pools,
+                     instance_types: stack.district.auto_scaling_instance_types,
                      district_name: stack.district.name
                     )
 
@@ -158,10 +163,6 @@ module Barcelona
       def instance_user_data
         user_data = options[:container_instance].user_data
         user_data.build
-      end
-
-      def instance_type
-        options[:instance_type]
       end
 
       def desired_capacity

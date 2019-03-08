@@ -18,7 +18,20 @@ module Barcelona
           j.MaxSize(desired_capacity * 2 + 1)
           j.MinSize desired_capacity
           j.HealthCheckType "EC2"
-          j.LaunchConfigurationName ref("ContainerInstanceLaunchConfiguration")
+          j.MixedInstancesPolicy do |j|
+            j.InstancesDistribution do |j|
+              j.OnDemandBaseCapacity 0
+              j.OnDemandPercentageAboveBaseCapacity options[:on_demand_percentage]
+              j.SpotInstancePools options[:spot_instance_pools]
+            end
+            j.LaunchTemplate do |j|
+              j.LaunchTemplateSpecification do |j|
+                j.LaunchTemplateId ref("ContainerInstanceLaunchTemplate")
+                j.Version get_attr("ContainerInstanceLaunchTemplate", "LatestVersionNumber")
+              end
+              j.Overrides(options[:instance_types].map { |t| {"InstanceType" => t} })
+            end
+          end
           j.VPCZoneIdentifier [ref("SubnetTrusted1"), ref("SubnetTrusted2")]
           j.Tags [
             {

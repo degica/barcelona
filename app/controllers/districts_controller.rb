@@ -4,7 +4,7 @@ class DistrictsController < ApplicationController
 
   def index
     @districts = District.all
-    render json: @districts, fields: [:name, :region, :cluster_size, :cluster_instance_type, :stack_name, :aws_access_key_id, :aws_role]
+    render json: @districts, fields: [:name, :region, :cluster_size, :stack_name, :aws_access_key_id, :aws_role]
   end
 
   def show
@@ -62,9 +62,11 @@ class DistrictsController < ApplicationController
       :region,
       :nat_type,
       :cluster_size,
-      :cluster_instance_type,
+      :auto_scaling_on_demand_percentage,
+      :auto_scaling_spot_instance_pools,
       :aws_access_key_id,
-      :aws_secret_access_key
+      :aws_secret_access_key,
+      auto_scaling_instance_types: [],
     ).tap do |whitelisted|
       whitelisted[:dockercfg] = params[:dockercfg].permit! if params[:dockercfg].present?
     end

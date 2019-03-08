@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_23_124754) do
+ActiveRecord::Schema.define(version: 2019_03_08_082333) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -48,6 +48,9 @@ ActiveRecord::Schema.define(version: 2019_02_23_124754) do
     t.string "region"
     t.text "ssh_ca_public_key"
     t.string "aws_role"
+    t.integer "auto_scaling_on_demand_percentage", default: 100, null: false
+    t.integer "auto_scaling_spot_instance_pools", default: 2, null: false
+    t.text "auto_scaling_instance_types"
   end
 
   create_table "endpoints", force: :cascade do |t|
@@ -159,6 +162,29 @@ ActiveRecord::Schema.define(version: 2019_02_23_124754) do
     t.index ["heritage_id"], name: "index_releases_on_heritage_id"
   end
 
+  create_table "review_apps", force: :cascade do |t|
+    t.bigint "heritage_id", null: false
+    t.bigint "review_group_id", null: false
+    t.string "subject", null: false
+    t.integer "retention", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["heritage_id"], name: "index_review_apps_on_heritage_id", unique: true
+    t.index ["review_group_id"], name: "index_review_apps_on_review_group_id"
+  end
+
+  create_table "review_groups", force: :cascade do |t|
+    t.bigint "endpoint_id", null: false
+    t.string "name", null: false
+    t.string "base_domain", null: false
+    t.string "token", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["endpoint_id"], name: "index_review_groups_on_endpoint_id"
+    t.index ["name"], name: "index_review_groups_on_name", unique: true
+    t.index ["token"], name: "index_review_groups_on_token", unique: true
+  end
+
   create_table "services", force: :cascade do |t|
     t.string "name", null: false
     t.integer "cpu"
@@ -208,6 +234,9 @@ ActiveRecord::Schema.define(version: 2019_02_23_124754) do
   add_foreign_key "plugins", "districts"
   add_foreign_key "port_mappings", "services"
   add_foreign_key "releases", "heritages"
+  add_foreign_key "review_apps", "heritages"
+  add_foreign_key "review_apps", "review_groups"
+  add_foreign_key "review_groups", "endpoints"
   add_foreign_key "services", "heritages"
   add_foreign_key "users_districts", "districts"
   add_foreign_key "users_districts", "users"

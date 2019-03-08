@@ -18,6 +18,8 @@ class District < ActiveRecord::Base
   validates :region, :s3_bucket_name, :stack_name, :cidr_block, presence: true, immutable: true
   validates :nat_type, inclusion: {in: %w(instance managed_gateway managed_gateway_multi_az)}, allow_nil: true
   validates :cluster_size, numericality: {greater_than_or_equal_to: 0}
+  validates :auto_scaling_on_demand_percentage, numericality: {greater_than_or_equal_to: 0, less_than_or_eaual_to: 100}
+  validates :auto_scaling_spot_instance_pools, numericality: {greater_than: 0}
 
   ECS_REGIONS = Aws.
                 partition("aws").
@@ -184,8 +186,7 @@ class District < ActiveRecord::Base
     self.nat_type       ||= "instance"
     self.cluster_size   ||= 1
     self.cluster_instance_type ||= "t3.small"
-    self.auto_scaling_on_demand_base_capacity ||= 0
-    self.auto_scaling_on_demand_percentage_above_base_capacity ||= 100
+    self.auto_scaling_on_demand_percentage ||= 100
     self.auto_scaling_spot_instance_pools ||= 2
     self.auto_scaling_instance_types ||= ["t3.small", "t2.small"]
   end

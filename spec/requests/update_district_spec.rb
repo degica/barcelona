@@ -24,7 +24,7 @@ describe "PATCH /districts/:district", type: :request do
 
       params = {
         cluster_size: 10,
-        cluster_instance_type: "m4.large",
+        auto_scaling_instance_types: ["m5.large", "m4.large"],
         dockercfg: dockercfg
       }
 
@@ -34,7 +34,7 @@ describe "PATCH /districts/:district", type: :request do
       district.reload
 
       expect(district.cluster_size).to eq 10
-      expect(district.cluster_instance_type).to eq "m4.large"
+      expect(district.auto_scaling_instance_types).to eq ["m5.large", "m4.large"]
       expect(district.dockercfg).to eq dockercfg
     end
 

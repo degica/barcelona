@@ -19,7 +19,6 @@ module Barcelona::Network
         nat_type: district.nat_type,
         autoscaling: {
           container_instance: ContainerInstance.new(district),
-          instance_type: district.cluster_instance_type,
           desired_capacity: district.cluster_size
         }
       }

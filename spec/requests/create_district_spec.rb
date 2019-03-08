@@ -32,8 +32,9 @@ describe "POST /districts", type: :request do
       expect(body["district"]["s3_bucket_name"]).to match %r{barcelona-district-[0-9]+}
       expect(body["district"]["nat_type"]).to eq "instance"
       expect(body["district"]["cluster_size"]).to eq 1
-      expect(body["district"]["cluster_backend"]).to eq "autoscaling"
-      expect(body["district"]["cluster_instance_type"]).to eq "t3.small"
+      expect(body["district"]["auto_scaling_instance_types"]).to eq ["t3.small", "t2.small"]
+      expect(body["district"]["auto_scaling_on_demand_percentage"]).to eq 100
+      expect(body["district"]["auto_scaling_spot_instance_pools"]).to eq 2
     end
 
     context "when running in ECS environment" do
