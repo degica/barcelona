@@ -30,28 +30,12 @@ module Barcelona
             public: true,
             az_index: az_index,
             nat_type: nil,
-            network_acl_entries: [
-              {from: 22,   to: 22,    protocol: "tcp", cidr: "0.0.0.0/0"},
-              {from: 80,   to: 80,    protocol: "tcp", cidr: "0.0.0.0/0"},
-              {from: 443,  to: 443,   protocol: "tcp", cidr: "0.0.0.0/0"},
-              {from: 1024, to: 65535, protocol: "tcp", cidr: "0.0.0.0/0"},
-              {from: 1024, to: 65535, protocol: "udp", cidr: "0.0.0.0/0"},
-              {from: 123,  to: 123,   protocol: "udp", cidr: "0.0.0.0/0"}
-            ]
           )
           add_builder SubnetBuilder.new(
             name: 'trusted',
             vpc_cidr_block: options[:cidr_block],
             public: false,
             az_index: az_index,
-            network_acl_entries: [
-              {from: 22,   to: 22,    protocol: "tcp", cidr: "10.0.0.0/8"},
-              {from: 80,   to: 80,    protocol: "tcp", cidr: "0.0.0.0/0"},
-              {from: 443,  to: 443,   protocol: "tcp", cidr: "0.0.0.0/0"},
-              {from: 1024, to: 65535, protocol: "tcp", cidr: "0.0.0.0/0"},
-              {from: 1024, to: 65535, protocol: "udp", cidr: "0.0.0.0/0"},
-              {from: 123,  to: 123,   protocol: "udp", cidr: "0.0.0.0/0"}
-            ]
           )
         end
 

@@ -28,60 +28,6 @@ module Barcelona
           end
         end
 
-        add_resource("AWS::EC2::NetworkAcl", network_acl_name) do |j|
-          j.VpcId ref("VPC")
-          j.Tags [
-            tag("Name", join("-", cf_stack_name, network_type)),
-            tag("barcelona", stack.district.name),
-            tag("Network", network_type.camelize)
-          ]
-        end
-
-        network_acl_entries.each_with_index do |entry, i|
-          add_resource("AWS::EC2::NetworkAclEntry",
-                       "InboundNetworkAclEntry#{name.camelize}#{i}") do |j|
-            j.NetworkAclId ref(network_acl_name)
-            j.RuleNumber 100 + i
-            j.RuleAction "allow"
-            j.Egress false
-            j.CidrBlock entry[:cidr]
-            j.PortRange do |j|
-              j.From entry[:from]
-              j.To entry[:to]
-            end
-            protocol = entry[:protocol] || :tcp
-            j.Protocol PROTOCOL_MAP[protocol.to_sym]
-          end
-        end
-
-        add_resource("AWS::EC2::NetworkAclEntry",
-                     "InboundNetworkAclEntry#{name.camelize}ICMP") do |j|
-          j.NetworkAclId ref(network_acl_name)
-          j.RuleNumber 200
-          j.RuleAction "allow"
-          j.Egress false
-          j.CidrBlock "0.0.0.0/0"
-          j.Icmp do |j|
-            j.Type(-1)
-            j.Code(-1)
-          end
-          j.Protocol PROTOCOL_MAP[:icmp]
-        end
-
-        add_resource("AWS::EC2::NetworkAclEntry",
-                     "OutboundNetworkAclEntry#{name.camelize}") do |j|
-          j.NetworkAclId ref(network_acl_name)
-          j.RuleNumber 100
-          j.Protocol(-1)
-          j.RuleAction "allow"
-          j.Egress true
-          j.CidrBlock "0.0.0.0/0"
-          j.PortRange do |j|
-            j.From 0
-            j.To 65535
-          end
-        end
-
         add_resource("AWS::EC2::Subnet", subnet_name) do |j|
           j.VpcId ref("VPC")
           j.CidrBlock subnet_cidr_block
@@ -97,12 +43,6 @@ module Barcelona
                      "SubnetRouteTableAssociation#{name.camelize}") do |j|
           j.SubnetId ref(subnet_name)
           j.RouteTableId ref(route_table_name)
-        end
-
-        add_resource("AWS::EC2::SubnetNetworkAclAssociation",
-                     "SubnetNetworkAclAssociation#{name.camelize}") do |j|
-          j.SubnetId ref(subnet_name)
-          j.NetworkAclId ref(network_acl_name)
         end
       end
 
