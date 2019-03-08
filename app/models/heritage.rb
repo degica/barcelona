@@ -86,6 +86,13 @@ class Heritage < ActiveRecord::Base
                       "logs:PutLogEvents",
                     ],
                     "Resource" => ["*"]
+                  },
+                  {
+                    "Effect" => "Allow",
+                    "Action" => [
+                      "iam:PassRole"
+                    ],
+                    "Resource" => [get_attr("TaskExecutionRole", "Arn")]
                   }
                 ]
               }
