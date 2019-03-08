@@ -1,6 +1,8 @@
 class District < ActiveRecord::Base
   include EncryptAttribute
 
+  self.ignored_columns = ['cluster_backend']
+
   before_validation :set_default_attributes
   before_create :assign_default_users
   after_destroy :delete_notification_stack
@@ -15,7 +17,6 @@ class District < ActiveRecord::Base
   validates :name, presence: true, uniqueness: true, immutable: true
   validates :region, :s3_bucket_name, :stack_name, :cidr_block, presence: true, immutable: true
   validates :nat_type, inclusion: {in: %w(instance managed_gateway managed_gateway_multi_az)}, allow_nil: true
-  validates :cluster_backend, inclusion: {in: %w(autoscaling)}
   validates :cluster_size, numericality: {greater_than_or_equal_to: 0}
 
   ECS_REGIONS = Aws.
@@ -28,6 +29,7 @@ class District < ActiveRecord::Base
   validate :presence_of_access_key_or_role, if: -> { !Rails.env.test? }
 
   serialize :dockercfg, JSON
+  serialize :auto_scaling_instance_types, JSON
 
   encrypted_attribute :aws_secret_access_key, secret_key: ENV['ENCRYPTION_KEY']
 
@@ -180,9 +182,12 @@ class District < ActiveRecord::Base
     self.cidr_block     ||= "10.#{Random.rand(256)}.0.0/16"
     self.stack_name     ||= "barcelona-#{name}"
     self.nat_type       ||= "instance"
-    self.cluster_backend  ||= 'autoscaling'
-    self.cluster_size     ||= 1
+    self.cluster_size   ||= 1
     self.cluster_instance_type ||= "t3.small"
+    self.auto_scaling_on_demand_base_capacity ||= 0
+    self.auto_scaling_on_demand_percentage_above_base_capacity ||= 100
+    self.auto_scaling_spot_instance_pools ||= 2
+    self.auto_scaling_instance_types ||= ["t3.small", "t2.small"]
   end
 
   def network_stack
