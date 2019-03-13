@@ -139,44 +139,46 @@ class Heritage < ActiveRecord::Base
         ]
       end
 
-      add_resource("AWS::IAM::Role", "TaskRole") do |j|
-        j.AssumeRolePolicyDocument do |j|
-          j.Version "2012-10-17"
-          j.Statement [
+      unless heritage.review?
+        add_resource("AWS::IAM::Role", "TaskRole") do |j|
+          j.AssumeRolePolicyDocument do |j|
+            j.Version "2012-10-17"
+            j.Statement [
+              {
+                "Effect" => "Allow",
+                "Principal" => {
+                  "Service" => ["ecs-tasks.amazonaws.com"]
+                },
+                "Action" => ["sts:AssumeRole"]
+              }
+            ]
+          end
+          j.Path "/"
+          j.Policies [
             {
-              "Effect" => "Allow",
-              "Principal" => {
-                "Service" => ["ecs-tasks.amazonaws.com"]
-              },
-              "Action" => ["sts:AssumeRole"]
+              "PolicyName" => "barcelona-ecs-task-role-#{heritage.name}",
+              "PolicyDocument" => {
+                "Version" => "2012-10-17",
+                "Statement" => [
+                  {
+                    "Effect" => "Allow",
+                    "Action" => ["logs:CreateLogStream",
+                                 "logs:PutLogEvents"],
+                    "Resource" => ["*"]
+                  },
+                  {
+                    "Effect" => "Allow",
+                    "Action" => ["s3:GetObject"],
+                    "Resource" => [
+                      "arn:aws:s3:::#{heritage.district.s3_bucket_name}/heritages/#{heritage.name}/*",
+                      "arn:aws:s3:::#{heritage.district.s3_bucket_name}/certs/*",
+                    ]
+                  }
+                ]
+              }
             }
           ]
         end
-        j.Path "/"
-        j.Policies [
-          {
-            "PolicyName" => "barcelona-ecs-task-role-#{heritage.name}",
-            "PolicyDocument" => {
-              "Version" => "2012-10-17",
-              "Statement" => [
-                {
-                  "Effect" => "Allow",
-                  "Action" => ["logs:CreateLogStream",
-                               "logs:PutLogEvents"],
-                  "Resource" => ["*"]
-                },
-                {
-                  "Effect" => "Allow",
-                  "Action" => ["s3:GetObject"],
-                  "Resource" => [
-                    "arn:aws:s3:::#{heritage.district.s3_bucket_name}/heritages/#{heritage.name}/*",
-                    "arn:aws:s3:::#{heritage.district.s3_bucket_name}/certs/*",
-                  ]
-                }
-              ]
-            }
-          }
-        ]
       end
     end
 
@@ -207,6 +209,7 @@ class Heritage < ActiveRecord::Base
   has_many :environments
   has_many :oneoffs, dependent: :destroy
   has_many :releases, -> { order 'version DESC' }, dependent: :destroy, inverse_of: :heritage
+  has_one :review_app, dependent: :destroy, autosave: false
   belongs_to :district, inverse_of: :heritages
 
   validates :name,
@@ -250,11 +253,15 @@ class Heritage < ActiveRecord::Base
     "#{image_name}:#{tag}"
   end
 
-  def save_and_deploy!(without_before_deploy: false, description: "")
-    save!
+  def deploy!(without_before_deploy: false, description: "")
     release = releases.create!(description: description)
     update_services(release, without_before_deploy)
     release
+  end
+
+  def save_and_deploy!(without_before_deploy: false, description: "")
+    save!
+    deploy!(without_before_deploy: without_before_deploy, description: description)
   end
 
   def regenerate_token
@@ -292,7 +299,11 @@ class Heritage < ActiveRecord::Base
   end
 
   def task_role_id
-    cf_executor&.resource_ids["TaskRole"]
+    if review?
+      review_app.review_group.task_role_id
+    else
+      cf_executor&.resource_ids["TaskRole"]
+    end
   end
 
   def task_execution_role_id
@@ -315,6 +326,10 @@ class Heritage < ActiveRecord::Base
 
   def legacy_secrets
     env_vars.where(secret: true).where.not(key: environments.secrets.pluck(:name))
+  end
+
+  def review?
+    review_app.present?
   end
 
   private

@@ -117,6 +117,7 @@ class Endpoint < ActiveRecord::Base
   belongs_to :district, inverse_of: :endpoints
   has_many :listeners, inverse_of: :endpoint
   has_many :services, through: :listeners
+  has_many :review_groups, dependent: :destroy
 
   validates :name,
             presence: true,

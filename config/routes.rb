@@ -26,6 +26,11 @@ Rails.application.routes.draw do
     end
 
     resources :users, only: [:index, :show, :update]
+    resources :review_groups do
+      resources :review_apps, path: "/apps"
+      post   "/ci/apps/:token", to: "review_apps#ci_create"
+      delete "/ci/apps/:token/:id", to: "review_apps#ci_delete"
+    end
 
     post "/login", to: "users#login"
     patch "/user", to: "users#update"

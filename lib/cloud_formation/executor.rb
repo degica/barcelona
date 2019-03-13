@@ -72,7 +72,9 @@ module CloudFormation
     end
 
     def outputs
-      Hash[*describe.outputs.map{ |o| [o.output_key, o.output_value] }.flatten]
+      if describe
+        Hash[*describe.outputs.map{ |o| [o.output_key, o.output_value] }.flatten]
+      end
     end
 
     def delete
