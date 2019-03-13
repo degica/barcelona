@@ -1,9 +1,9 @@
 class ReviewAppsController < ApplicationController
   skip_before_action :authenticate, only: [:ci_create, :ci_delete]
+  before_action :load_review_group
 
   def create
-    group = ReviewGroup.find_by!(name: params[:review_group_id])
-    reviewapp = group.review_apps.find_or_initialize_by(subject: params[:subject])
+    reviewapp = @review_group.review_apps.find_or_initialize_by(subject: params[:subject])
     reviewapp.attributes = permitted_params
     authorize_resource reviewapp
     reviewapp.save!
@@ -12,9 +12,7 @@ class ReviewAppsController < ApplicationController
   end
 
   def ci_create
-    group = ReviewGroup.find_by!(name: params[:review_group_id])
-
-    if Rack::Utils.secure_compare(params[:token], group.token)
+    if Rack::Utils.secure_compare(params[:token], @review_group.token)
       create
     else
       raise ExceptionHandler::NotFound
@@ -22,13 +20,11 @@ class ReviewAppsController < ApplicationController
   end
 
   def index
-    group = ReviewGroup.find_by!(name: params[:review_group_id])
-    render json: group.review_apps
+    render json: @review_group.review_apps
   end
 
   def destroy
-    group = ReviewGroup.find_by!(name: params[:review_group_id])
-    review_app = group.review_apps.find_by!(subject: params[:id])
+    review_app = @review_group.review_apps.find_by!(subject: params[:id])
     authorize_resource review_app
     review_app.destroy!
 
@@ -36,9 +32,7 @@ class ReviewAppsController < ApplicationController
   end
 
   def ci_delete
-    group = ReviewGroup.find_by!(name: params[:review_group_id])
-
-    if Rack::Utils.secure_compare(params[:token], group.token)
+    if Rack::Utils.secure_compare(params[:token], @review_group.token)
       destroy
     else
       raise ExceptionHandler::NotFound
@@ -46,6 +40,10 @@ class ReviewAppsController < ApplicationController
   end
 
   private
+
+  def load_review_group
+    @review_group = ReviewGroup.find_by!(name: params[:review_group_id])
+  end
 
   def permitted_params
     params.permit([
