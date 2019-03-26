@@ -28,7 +28,7 @@ class ReviewApp < ApplicationRecord
       image_name: image_name,
       image_tag: image_tag,
       before_deploy: before_deploy,
-      environment: environment,
+      environment: computed_environment,
       services: services
     }
 
@@ -63,5 +63,11 @@ class ReviewApp < ApplicationRecord
 
   def expired?(now=Time.current)
     updated_at < (now - retention.seconds)
+  end
+
+  def computed_environment
+    environment + [
+      {name: "BARCELONA_REVIEWAPP_DOMAIN", value: domain}
+    ]
   end
 end

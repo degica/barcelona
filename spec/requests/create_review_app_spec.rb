@@ -36,11 +36,13 @@ describe "POST /v1/:review_group/apps", type: :request do
     expect(review_app["heritage"]["image_name"]).to eq params[:image_name]
     expect(review_app["heritage"]["image_tag"]).to eq params[:image_tag]
     expect(review_app["heritage"]["before_deploy"]).to eq "before_deploy_command"
-    expect(review_app["heritage"]["environment"].count).to eq 2
-    expect(review_app["heritage"]["environment"][0]["name"]).to eq "ENV"
-    expect(review_app["heritage"]["environment"][0]["value"]).to eq "value"
-    expect(review_app["heritage"]["environment"][1]["name"]).to eq "SECRET"
-    expect(review_app["heritage"]["environment"][1]["value_from"]).to eq "/secret/env"
+    expect(review_app["heritage"]["environment"].count).to eq 3
+    expect(review_app["heritage"]["environment"][0]["name"]).to eq "BARCELONA_REVIEWAPP_DOMAIN"
+    expect(review_app["heritage"]["environment"][0]["value"]).to eq review_app["domain"]
+    expect(review_app["heritage"]["environment"][1]["name"]).to eq "ENV"
+    expect(review_app["heritage"]["environment"][1]["value"]).to eq "value"
+    expect(review_app["heritage"]["environment"][2]["name"]).to eq "SECRET"
+    expect(review_app["heritage"]["environment"][2]["value_from"]).to eq "/secret/env"
     expect(review_app["heritage"]["token"]).to be_a String
     expect(review_app["heritage"]["scheduled_tasks"]).to be_empty
   end
@@ -88,13 +90,15 @@ describe "POST /v1/:review_group/apps", type: :request do
       expect(review_app["heritage"]["image_name"]).to eq params[:image_name]
       expect(review_app["heritage"]["image_tag"]).to eq "next_version"
       expect(review_app["heritage"]["before_deploy"]).to eq "before_deploy_command"
-      expect(review_app["heritage"]["environment"].count).to eq 3
-      expect(review_app["heritage"]["environment"][0]["name"]).to eq "ENV"
-      expect(review_app["heritage"]["environment"][0]["value"]).to eq "value1"
-      expect(review_app["heritage"]["environment"][1]["name"]).to eq "ENV2"
-      expect(review_app["heritage"]["environment"][1]["value"]).to eq "value2"
-      expect(review_app["heritage"]["environment"][2]["name"]).to eq "SECRET"
-      expect(review_app["heritage"]["environment"][2]["value_from"]).to eq "/secret/env"
+      expect(review_app["heritage"]["environment"].count).to eq 4
+      expect(review_app["heritage"]["environment"][0]["name"]).to eq "BARCELONA_REVIEWAPP_DOMAIN"
+      expect(review_app["heritage"]["environment"][0]["value"]).to eq review_app["domain"]
+      expect(review_app["heritage"]["environment"][1]["name"]).to eq "ENV"
+      expect(review_app["heritage"]["environment"][1]["value"]).to eq "value1"
+      expect(review_app["heritage"]["environment"][2]["name"]).to eq "ENV2"
+      expect(review_app["heritage"]["environment"][2]["value"]).to eq "value2"
+      expect(review_app["heritage"]["environment"][3]["name"]).to eq "SECRET"
+      expect(review_app["heritage"]["environment"][3]["value_from"]).to eq "/secret/env"
       expect(review_app["heritage"]["token"]).to be_a String
       expect(review_app["heritage"]["scheduled_tasks"]).to be_empty
     end
