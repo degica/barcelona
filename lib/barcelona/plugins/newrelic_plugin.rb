@@ -12,8 +12,8 @@ module Barcelona
         user_data.add_file("/etc/yum.repos.d/newrelic-infra.repo", "root:root", "644", <<~EOS)
           [newrelic-infra]
           name=New Relic Infrastructure
-          baseurl=http://download.newrelic.com/infrastructure_agent/linux/yum/el/7/x86_64
-          gpgkey=http://download.newrelic.com/infrastructure_agent/gpg/newrelic-infra.gpg
+          baseurl=https://download.newrelic.com/infrastructure_agent/linux/yum/el/7/x86_64
+          gpgkey=https://download.newrelic.com/infrastructure_agent/gpg/newrelic-infra.gpg
           gpgcheck=1
           repo_gpgcheck=1
         EOS
