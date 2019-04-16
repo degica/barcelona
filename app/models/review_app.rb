@@ -15,13 +15,11 @@ class ReviewApp < ApplicationRecord
 
   def build_heritage
     web_service = services.find{ |s| s[:service_type].to_s == "web" }
-    web_service[:listeners] = [
-      {
-        endpoint: review_group.endpoint.name,
-        rule_priority: rule_priority_from_subject,
-        rule_conditions: [{type: "host-header", value: domain}]
-      }
-    ]
+    web_service[:listeners] = [{}] if web_service[:listeners].blank?
+    web_service[:listeners][0][:endpoint] = review_group.endpoint.name
+    web_service[:listeners][0][:rule_priority] = rule_priority_from_subject
+    web_service[:listeners][0][:rule_conditions] ||= []
+    web_service[:listeners][0][:rule_conditions] << {type: "host-header", value: domain}
 
     params = {
       name: "review-#{slug_digest}",
