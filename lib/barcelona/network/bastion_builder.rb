@@ -1,24 +1,24 @@
 module Barcelona
   module Network
     class BastionBuilder < CloudFormation::Builder
-      # https://aws.amazon.com/amazon-linux-ami/
+      # https://aws.amazon.com/amazon-linux-2/release-notes/
       # Amazon Linux 2 AMI
       AMI_IDS = {
-        "us-east-1"      => "ami-02da3a138888ced85",
-        "us-east-2"      => "ami-0de7daa7385332688",
-        "us-west-1"      => "ami-09bfcadb25ee95bec",
-        "us-west-2"      => "ami-095cd038eef3e5074",
-        "eu-west-1"      => "ami-02a39bdb8e8ee056a",
-        "eu-west-2"      => "ami-07a5200f3fa9c33d3",
-        "eu-west-3"      => "ami-0e9073d7ac75f4491",
-        "eu-central-1"      => "ami-07f1fbbff759e24dd",
-        "ap-northeast-1"      => "ami-097473abce069b8e9",
-        "ap-northeast-2"      => "ami-045e355a6004a67c4",
-        "ap-southeast-1"      => "ami-00158b185c8cc09dc",
-        "ap-southeast-2"      => "ami-0c3228fd049cdb151",
-        "ca-central-1"      => "ami-05f9d71283317f5c9",
-        "ap-south-1"      => "ami-03103e7ded4c02ef8",
-        "sa-east-1"      => "ami-095a33e72f6bb89c3",
+        "us-east-1"      => "ami-0c6b1d09930fac512",
+        "us-east-2"      => "ami-0ebbf2179e615c338",
+        "us-west-1"      => "ami-015954d5e5548d13b",
+        "us-west-2"      => "ami-0cb72367e98845d43",
+        "eu-west-1"      => "ami-030dbca661d402413",
+        "eu-west-2"      => "ami-0009a33f033d8b7b6",
+        "eu-west-3"      => "ami-0ebb3a801d5fb8b9b",
+        "eu-central-1"      => "ami-0ebe657bc328d4e82",
+        "ap-northeast-1"      => "ami-00d101850e971728d",
+        "ap-northeast-2"      => "ami-08ab3f7e72215fe91",
+        "ap-southeast-1"      => "ami-0b5a47f8865280111",
+        "ap-southeast-2"      => "ami-0fb7513bcdc525c3b",
+        "ca-central-1"      => "ami-08a9b721ecc5b0a53",
+        "ap-south-1"      => "ami-00e782930f1c3dbc7",
+        "sa-east-1"      => "ami-058141e091292ecf0",
       }
 
       def build_resources
