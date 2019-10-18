@@ -25,7 +25,7 @@ RUN apt-get update \
       libsqlite3-0 \
       libxslt1.1 \
       libxml2 \
-      libcurl3 \
+      libcurl3-gnutls \
       openssh-client \
  && rm -rf /var/lib/apt/lists/*
 
