@@ -8,7 +8,7 @@ COPY Gemfile.lock $APP_HOME/
 
 RUN bundle install -j=4 --without development test
 
-FROM ruby:2.6.1-slim
+FROM ruby:2.6.5-slim-buster
 
 ENV APP_HOME=/app
 ENV PATH=$APP_HOME/bin:$PATH
