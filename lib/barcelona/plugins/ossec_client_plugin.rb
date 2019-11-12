@@ -1,11 +1,12 @@
-# PCIDSS plugin
-### This plugin adds the following resources/configuration to a district
-### - Installs Clam AV in all instances. Scans run every day.
-### - Installs fail2ban in all instances
-### - Installs OSSEC agent in all instances
-### - Adds OSSEC manager in the private subnet
-###
-### Currently this plugin works only in Tokyo (ap-notheast-1) region
+# OssecClient plugin
+# This plugin adds a wazuh agent which connects to existing ossec manager
+# Usage: bcn district put-plugin discrict1 ossec_client -a server_hostname=ossec-manager.local 
+# To connect a ossec manager in other VPC, you need to ...
+# - Add VPC to Route53 Hosted Zone
+# - Create a peering connection
+# - Add an entry for peering to both Container VPC and ossec manager VPC
+# - Allow access from Container VPC to ossec manager VPC
+
 
 module Barcelona
   module Plugins
