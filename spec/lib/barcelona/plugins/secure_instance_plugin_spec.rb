@@ -17,18 +17,24 @@ module Barcelona
 
       shared_examples_for('secure instance') do
         it "applies security update" do
-          expect(user_data["bootcmd"]).to include("yum update -y --security")
-          expect(user_data["bootcmd"]).to include("reboot")
+          expect(user_data["bootcmd"]).to include(/yum update -y --security/)
+          expect(user_data["bootcmd"]).to include(/reboot/)
         end
 
-        it "installs required packages" do
-          %w(clamav clamav-update tmpwatch fail2ban).each do |pkg|
-            expect(user_data["packages"]).to include(pkg)
+        it "installs required packages for pcidss" do
+          expect(user_data["runcmd"]).to include(/yum install -y clamav clamav-update tmpwatch fail2ban/)
+        end
+
+        it "configure auditd as recommended in CIS" do
+          audit_rules = user_data['write_files'].find do |f|
+            f['path'] == '/etc/audit/rules.d/audit.rules'
           end
+
+          expect(audit_rules["content"]).to match(%r[-w /var/log/lastlog -p wa -k logins])
         end
       end
 
-      context "gets hooked with container_instance_user_data trigger" do
+      context "when hooked with container_instance_user_data trigger" do
         before do
           district.save!
         end
@@ -37,7 +43,7 @@ module Barcelona
         it_behaves_like('secure instance')
       end
 
-      context "gets hooked with network_stack_template trigger" do
+      context "when hooked with network_stack_template trigger" do
         before do
           district.save!
         end
