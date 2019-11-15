@@ -1,18 +1,10 @@
-# OssecClient plugin
-# This plugin adds a wazuh agent which connects to existing ossec manager
-# Usage: bcn district put-plugin discrict1 ossec_client -a server_hostname=ossec-manager.local 
-# To connect a ossec manager in other VPC, you need to ...
-# - Add VPC to Route53 Hosted Zone
-# - Create a peering connection
-# - Add an entry for peering to both Container VPC and ossec manager VPC
-# - Allow access from Container VPC to ossec manager VPC
-
+# Itamae plugin
+# This plugin installs Itamae and apply the specified recipe on initialize
+# Usage: bcn district put-plugin essa-test itamae -a recipe_url=s3://barcelona-essa-test-1573458106/itamae_recipes/recipe.tar.gz
 
 module Barcelona
   module Plugins
-   
     class ItamaePlugin < Base
-
       def on_container_instance_user_data(_instance, user_data)
         install_itamae(user_data)
         apply_itamae_recipe(user_data, attributes['recipe_url'], 'barcelona_container')
@@ -71,6 +63,7 @@ module Barcelona
           [Install]
           WantedBy=multi-user.target
         EOS
+
         user_data.run_commands += [
           'systemctl start itamae'
         ]

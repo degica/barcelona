@@ -34,6 +34,7 @@ module Barcelona
 
         def apply_security_update_on_the_first_boot
           self.boot_commands += <<~EOS.split("\n")
+
             if [ -f /root/.security_update_applied ]
             then
               echo 'security update was already applied, continue initializing...'
@@ -44,6 +45,7 @@ module Barcelona
               echo 'security update was applied, cotinue initialize after reboot...'
               reboot
             fi
+
           EOS
         end
 
