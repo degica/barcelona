@@ -44,7 +44,8 @@ describe "updating a heritage" do
         before_deploy: nil,
         environment: [
           {name: "ENV2", value: "my value 2"},
-          {name: "SECRET", value_from: "arn"}
+          {name: "SECRET", value_from: "arn"},
+          {name: "VALUE_HIDDEN_IN_SSM", ssm_path: "heritage1/key1"}
         ],
         services: [
           {
@@ -67,13 +68,16 @@ describe "updating a heritage" do
       expect(heritage["image_name"]).to eq "nginx"
       expect(heritage["image_tag"]).to eq "v3"
       expect(heritage["before_deploy"]).to eq nil
-      expect(heritage["environment"].count).to eq 2
+      expect(heritage["environment"].count).to eq 3
       expect(heritage["environment"][0]["name"]).to eq "ENV2"
       expect(heritage["environment"][0]["value"]).to eq "my value 2"
       expect(heritage["environment"][0]["value_from"]).to eq nil
       expect(heritage["environment"][1]["name"]).to eq "SECRET"
       expect(heritage["environment"][1]["value"]).to eq nil
       expect(heritage["environment"][1]["value_from"]).to eq "arn"
+      expect(heritage["environment"][2]["name"]).to eq "VALUE_HIDDEN_IN_SSM"
+      expect(heritage["environment"][2]["value"]).to eq nil
+      expect(heritage["environment"][2]["value_from"]).to eq "/barcelona/#{district.name}/heritage1/key1"
       web_service = heritage["services"].find { |s| s["name"] == "web" }
       expect(web_service["public"]).to eq true
       expect(web_service["cpu"]).to eq 128

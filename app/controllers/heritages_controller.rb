@@ -117,7 +117,8 @@ class HeritagesController < ApplicationController
       environment: [
         :name,
         :value,
-        :value_from
+        :value_from,
+        :ssm_path
       ]
     ]).tap do |whitelisted|
       if params[:services].present?
