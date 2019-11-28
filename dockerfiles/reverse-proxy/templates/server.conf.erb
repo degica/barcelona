@@ -33,8 +33,6 @@ server {
   real_ip_header proxy_protocol;
   <% end %>
 
-  keepalive_timeout 5;
-
   location / {
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection "upgrade";

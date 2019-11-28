@@ -33,7 +33,7 @@ http {
   gzip_vary on;
   gzip_disable "MSIE [1-6].(?!.*SV1)";
 
-  keepalive_timeout  5;
+  keepalive_timeout  75;
   server_tokens off;
 
   upstream <%= upstream_name %> {
