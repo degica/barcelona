@@ -51,22 +51,8 @@ module Barcelona
           itamae local roles/#{role}.rb -y nodes/#{role}.yml -l info > /var/log/itamae.log
         EOS
 
-        user_data.add_file("/etc/systemd/system/itamae.service", "root:root", "644", <<~EOS)
-          [Unit]
-          Description=Download Itamae recipe and apply it
-          After=syslog.target network.target
-
-          [Service]
-          Type=oneshot
-
-          ExecStart=/usr/local/bin/apply_itamae.sh
-
-          [Install]
-          WantedBy=multi-user.target
-        EOS
-
         user_data.run_commands += [
-          'systemctl start itamae'
+          '/usr/local/bin/apply_itamae.sh'
         ]
       end
     end

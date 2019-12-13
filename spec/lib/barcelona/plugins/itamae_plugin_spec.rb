@@ -21,12 +21,12 @@ module Barcelona
           expect(user_data["runcmd"]).to include(%r[gem install itamae])
         end
 
-        it "configures itamae as a systemd oneshot service" do
-          itamae_service = user_data['write_files'].find do |f|
-            f['path'] == '/etc/systemd/system/itamae.service'
+        it "install itamae and apply recipe" do
+          itamae_command = user_data['write_files'].find do |f|
+            f['path'] == '/usr/local/bin/apply_itamae.sh'
           end
-          expect(itamae_service['content']).to match %r[itamae]
-          expect(user_data["runcmd"]).to include("systemctl start itamae")
+          expect(itamae_command['content']).to match %r[itamae]
+          expect(user_data["runcmd"]).to include("/usr/local/bin/apply_itamae.sh")
         end
       end
 
