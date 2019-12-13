@@ -31,7 +31,8 @@ module Barcelona
         user_data.run_commands += <<~EOS.split("\n")
           amazon-linux-extras install ruby2.4
           yum install -y ruby-devel
-          gem install itamae io-console -N
+          gem install itamae -v '1.10.6' -N
+          gem install io-console -N
         EOS
       end
 

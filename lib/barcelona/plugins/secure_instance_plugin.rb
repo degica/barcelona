@@ -9,6 +9,8 @@ module Barcelona
 
       def on_container_instance_user_data(_instance, user_data)
         user_data.extend SecureUserData
+        user_data.install_tools_for_pcidss
+        user_data.install_tcp_wrappers
         user_data
       end
 
@@ -18,20 +20,13 @@ module Barcelona
 
         user_data = InstanceUserData.load_or_initialize(bastion_lc["Properties"]["UserData"])
         user_data.extend SecureUserData
+        user_data.apply_security_update_on_the_first_boot
+        user_data.install_tools_for_pcidss
         bastion_lc["Properties"]["UserData"] = user_data.build
         template
       end
 
       module SecureUserData
-        def self.extended(obj)
-          obj.configure_security
-        end
-
-        def configure_security
-          apply_security_update_on_the_first_boot
-          install_tools_for_pcidss
-        end
-
         def apply_security_update_on_the_first_boot
           self.boot_commands += <<~EOS.split("\n")
 
@@ -74,6 +69,10 @@ module Barcelona
             # SSH session timeout
             "echo 'TMOUT=900 && readonly TMOUT && export TMOUT' > /etc/profile.d/tmout.sh",
           ]
+        end
+
+        def install_tcp_wrappers
+          self.packages += ['tcp_wrappers']
         end
       end
     end
