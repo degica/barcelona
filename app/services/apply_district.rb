@@ -100,10 +100,6 @@ class ApplyDistrict
     aws.ecs.create_cluster(cluster_name: district.name)
   end
 
-  def create_or_update_network_stack
-    district.stack_executor.create_or_update
-  end
-
   def create_district_role(access_key_id, secret_access_key)
     task_role_arn = ecs_task_credentials&.dig("RoleArn")
     raise RuntimeError.new("Role ARN doesn't exist") if task_role_arn.nil?
