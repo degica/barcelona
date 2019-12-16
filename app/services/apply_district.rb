@@ -34,7 +34,7 @@ class ApplyDistrict
   def apply
     district.save!
     update_ecs_config
-    district.stack_executor.update
+    district.stack_executor.update(change_set: true)
   end
 
   def destroy!
