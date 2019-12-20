@@ -19,7 +19,7 @@ services:
      - vault
     volumes:
       - bundle:/usr/local/bundle
-      - .:${PWD}
+      - .:/app
     environment: &env_base
       PORT: 3333
       DATABASE_URL: postgres://postgres:@db:5432
