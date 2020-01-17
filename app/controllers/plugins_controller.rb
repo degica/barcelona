@@ -21,7 +21,6 @@ class PluginsController < ApplicationController
 
   def destroy
     @plugin.destroy!
-    render status: 204, nothing: true
     head 204
   end
 

@@ -25,5 +25,9 @@ describe "PUT /districts/:district/plugins/:id", type: :request do
     expect(plugin["attributes"]).to eq({"token" => "fghijk"})
 
     expect(district.plugins.pluck(:name)).to eq ["logentries"]
+
+    # delete
+    api_request :delete, "/v1/districts/#{district.name}/plugins/#{name}", params
+    expect(response.status).to eq 204
   end
 end
