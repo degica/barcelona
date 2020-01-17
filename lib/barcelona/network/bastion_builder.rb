@@ -57,14 +57,14 @@ module Barcelona
               "IpProtocol" => "udp",
               "FromPort" => 1514,
               "ToPort" => 1514,
-              "CidrIp" => options[:cidr_block]
+              "CidrIp" => '0.0.0.0/0'
             },
             # OSSEC authd
             {
               "IpProtocol" => "tcp",
               "FromPort" => 1515,
               "ToPort" => 1515,
-              "CidrIp" => options[:cidr_block]
+              "CidrIp" => '0.0.0.0/0'
             },
           ]
           j.Tags [

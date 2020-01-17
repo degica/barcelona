@@ -326,11 +326,11 @@ describe Barcelona::Network::NetworkStack do
             {"IpProtocol" => "udp",
              "FromPort" => 1514,
              "ToPort" => 1514,
-             "CidrIp" => district.cidr_block},
+             "CidrIp" => "0.0.0.0/0"},
             {"IpProtocol" => "tcp",
              "FromPort" => 1515,
              "ToPort" => 1515,
-             "CidrIp" => district.cidr_block},
+             "CidrIp" => "0.0.0.0/0"},
           ],
           "Tags" => [{"Key" => "barcelona", "Value" => district.name}]
         }
