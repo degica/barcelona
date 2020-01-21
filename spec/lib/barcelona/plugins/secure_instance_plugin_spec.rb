@@ -52,8 +52,11 @@ module Barcelona
         it_behaves_like('pcidss tools')
 
         it "applies security update" do
-          expect(user_data["bootcmd"]).to include(/yum update -y --security/)
-          expect(user_data["bootcmd"]).to include(/reboot/)
+          # the first command must be the checking of security update
+          expect(user_data["runcmd"][1]).to eq('if [ -f /root/.security_update_applied ]')
+          expect(user_data["runcmd"]).to include(/yum update -y --security/)
+          expect(user_data["runcmd"]).to include(/reboot/)
+          expect(user_data["cloud_final_modules"]).to eq [['scripts-user', 'always']]
         end
       end
     end
