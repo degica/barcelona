@@ -28,7 +28,8 @@ module Barcelona
 
       module SecureUserData
         def apply_security_update_on_the_first_boot
-          self.boot_commands += <<~EOS.split("\n")
+          self.cloud_final_modules = [['scripts-user', 'always']] # run runcmd on every boot
+          self.run_commands.unshift *<<~EOS.split("\n")
 
             if [ -f /root/.security_update_applied ]
             then
