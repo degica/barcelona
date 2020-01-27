@@ -50,6 +50,15 @@ module Barcelona
           # Files that have changed within a day (-mtime -1)
           scan_command = "listfile=`mktemp` && find / -xdev -mtime -1 -type f -fprint $listfile && clamscan -i -f $listfile | logger -t clamscan"
 
+          # fail2ban configurations
+          self.add_file("/etc/fail2ban/jail.local", "root:root", "644", <<~EOS)
+            [DEFAULT]
+            bantime = 1800
+            [sshd]
+            enabled = true
+            action = iptables[name=SSH, port=ssh, protocol=tcp]
+          EOS
+
           self.run_commands += [
             "amazon-linux-extras install -y epel",
             "yum install -y clamav clamav-update tmpwatch fail2ban",
@@ -62,10 +71,8 @@ module Barcelona
             "echo '0 0 * * * root #{scan_command}' > /etc/cron.d/clamscan",
             "service crond restart",
 
-            # fail2ban configurations
-            "echo '[DEFAULT]' > /etc/fail2ban/jail.local",
-            "echo 'bantime = 1800' >> /etc/fail2ban/jail.local",
-            "service fail2ban restart",
+            # fail2ban 
+            "systemctl restart fail2ban",
 
             # SSH session timeout
             "echo 'TMOUT=900 && readonly TMOUT && export TMOUT' > /etc/profile.d/tmout.sh",

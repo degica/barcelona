@@ -19,6 +19,16 @@ module Barcelona
         it "installs required packages for pcidss" do
           expect(user_data["runcmd"]).to include(/yum install -y clamav clamav-update tmpwatch fail2ban/)
         end
+
+        it "installs and configures fail2ban" do
+          jail_local = user_data['write_files'].find do |f|
+            f['path'] == '/etc/fail2ban/jail.local'
+          end
+
+          expect(user_data["runcmd"]).to include("systemctl restart fail2ban")
+          expect(jail_local['content']).to include %q{[sshd]}
+          expect(jail_local['content']).to include %q{action = iptables[name=SSH, port=ssh, protocol=tcp]}
+        end
       end
 
       context "when hooked with container_instance_user_data trigger" do
