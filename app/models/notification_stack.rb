@@ -64,7 +64,7 @@ class NotificationStack < CloudFormation::Stack
                 j.DISTRICT stack.district.name
               end
             end
-            j.Runtime "nodejs8.10"
+            j.Runtime "nodejs12.x"
             j.Code do |j|
               j.ZipFile slack_notification_code
             end
