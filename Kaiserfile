@@ -1,0 +1,45 @@
+dockerfile 'Dockerfile'
+
+db 'postgres:alpine',
+   port: 5432,
+   data_dir: '/var/lib/postgresql/data',
+   params: '-e POSTGRES_PASSWORD=example',
+   waitscript_params: "
+     -e PG_HOST=<%= db_container_name %>
+     -e PG_USER=postgres
+     -e PGPASSWORD=example
+     -e PG_DATABASE=postgres",
+   waitscript: <<~SCRIPT
+     #!/bin/sh
+
+     RETRIES=5
+
+     until psql -h $PG_HOST -U $PG_USER -d $PG_DATABASE -c "select 1" > /dev/null 2>&1 || [ $RETRIES -eq 0 ]; do
+       echo "Waiting for postgres server, $((RETRIES--)) remaining attempts..."
+       sleep 1
+     done
+   SCRIPT
+
+vault_app_name = ENV['VAULT_APP_NAME'] || 'vault'
+vault_host = ENV['VAULT_HOST'] || "#{vault_app_name}.localhost.labs.degica.com"
+
+app_params "
+  -e DATABASE_URL=postgres://postgres:example@<%= db_container_name %>:5432
+  -e ENCRYPTION_KEY=abcdefghijklmn
+  -e GITHUB_ORGANIZATION='degica'
+  -e GITHUB_DEVELOPER_TEAM='developers'
+  -e GITHUB_ADMIN_TEAM='Admin developers'
+  -e VAULT_URL=http://#{vault_host}
+  -e VAULT_PATH_PREFIX=degica
+"
+
+attach_mount '.rspec', '/app/.rspec'
+attach_mount 'app', '/app/app'
+attach_mount 'config', '/app/config'
+attach_mount 'db', '/app/db'
+attach_mount 'dockerfiles', '/app/dockerfiles'
+attach_mount 'lib', '/app/lib'
+attach_mount 'spec', '/app/spec'
+
+expose '3000'
+db_reset_command 'sh -c "rails db:setup"'

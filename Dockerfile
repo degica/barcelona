@@ -27,7 +27,10 @@ RUN apt-get update \
       libxml2 \
       libcurl3-gnutls \
       openssh-client \
- && rm -rf /var/lib/apt/lists/*
+ && rm -rf /var/lib/apt/lists/* \
+ && mkdir $APP_HOME/tmp \
+ && mkdir $APP_HOME/log \
+ && chown -R app $APP_HOME
 
 COPY --from=builder /usr/local/bundle /usr/local/bundle
 ADD --chown=app:app . $APP_HOME
