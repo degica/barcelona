@@ -1,7 +1,6 @@
 class OneoffsController < ApplicationController
   before_action :load_heritage, only: [:create]
   before_action :load_oneoff, except: [:index, :create]
-  before_action :authorize_heritage
 
   def show
     render json: @oneoff
@@ -37,6 +36,7 @@ class OneoffsController < ApplicationController
 
   def load_heritage
     @heritage = Heritage.find_by!(name: params[:heritage_id])
+    Pundit::authorize current_user, @heritage, :run?
   end
 
   def load_oneoff

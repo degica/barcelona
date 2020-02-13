@@ -24,7 +24,17 @@ describe "POST /heritages/:heritage/oneoffs", type: :request do
     )
   }
 
+  it 'fails to create oneoff task if no permission' do
+    params = {
+      command: "rake db:migrate",
+      memory: 1024
+    }
+    api_request :post, "/v1/heritages/#{heritage.name}/oneoffs", params
+    expect(response).to_not be_successful
+  end
+
   it "creates a oneoff task" do
+    create :permission, user: user, key: "heritage.run.#{heritage.name}"
     expect_any_instance_of(Aws::ECS::Client).to receive(:run_task) do
       run_task_response_mock
     end
@@ -56,6 +66,7 @@ describe "POST /heritages/:heritage/oneoffs", type: :request do
     end
 
     it "creates a interactive oneoff task" do
+      create :permission, user: user, key: "heritage.run.#{heritage.name}"
       expect_any_instance_of(Aws::ECS::Client).to receive(:run_task) do
         run_task_response_mock
       end
