@@ -2,6 +2,8 @@ class ApplicationController < ActionController::API
   before_action :authenticate
   before_action :authorize_action
 
+  rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
+
   attr_accessor :current_user
 
   def authenticate
@@ -32,5 +34,11 @@ class ApplicationController < ActionController::API
                        else
                          GithubAuth.new(request)
                        end
+  end
+
+  private
+
+  def user_not_authorized
+    raise ExceptionHandler::Forbidden.new("You are not allowed to do this")
   end
 end

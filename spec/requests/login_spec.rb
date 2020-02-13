@@ -27,6 +27,11 @@ describe "POST /login", type: :request do
       expect(body["user"]["name"]).to eq user.name
       expect(body["user"]["token"]).to be_present
     end
+
+    it 'sets permissions after logging in' do
+      api_request :post, "/v1/login", {}, gh_auth
+      expect(User.last.allowed_to?('users', 'edit')).to eq true
+    end
   end
 
   context "when user team is not allowed to login" do

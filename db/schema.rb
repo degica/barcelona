@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_23_161003) do
+ActiveRecord::Schema.define(version: 2020_02_12_095609) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -126,6 +126,15 @@ ActiveRecord::Schema.define(version: 2019_02_23_161003) do
     t.datetime "updated_at", null: false
     t.text "command"
     t.index ["heritage_id"], name: "index_oneoffs_on_heritage_id"
+  end
+
+  create_table "permissions", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "key", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "key"], name: "index_permissions_on_user_id_and_key", unique: true
+    t.index ["user_id"], name: "index_permissions_on_user_id"
   end
 
   create_table "plugins", force: :cascade do |t|

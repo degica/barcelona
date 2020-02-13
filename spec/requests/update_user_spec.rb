@@ -36,6 +36,10 @@ describe "PATCH /user", type: :request do
   let(:district) { create :district }
   let(:user) { create :user, roles: ["developer"] }
 
+  before do
+    create :permission, user: user, key: 'users.update'
+  end
+
   it "updates user information" do
     params = {
       "public_key" => "ssh-rsa aaaaaaaa"

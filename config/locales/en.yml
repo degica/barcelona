@@ -21,3 +21,5 @@
 
 en:
   hello: "Hello world"
+  pundit:
+    default: 'You cannot perform this action.'

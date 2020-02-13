@@ -3,31 +3,7 @@ class DistrictPolicy < ApplicationPolicy
     user.admin?
   end
 
-  def update?
-    user.admin?
-  end
-
-  def destroy?
-    user.admin?
-  end
-
-  def index?
-    user.developer?
-  end
-
-  def launch_instances?
-    user.developer?
-  end
-
-  def terminate_instance?
-    user.developer?
-  end
-
-  def apply_stack?
-    user.admin?
-  end
-
-  def sign_public_key?
-    user.admin?
+  def method_missing(method_name, *args, &block)
+    user.allowed_to?('district', method_name[0..-2], record.name)
   end
 end

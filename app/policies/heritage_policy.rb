@@ -1,0 +1,2 @@
+class HeritagePolicy < ApplicationPolicy
+end

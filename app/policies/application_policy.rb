@@ -6,32 +6,30 @@ class ApplicationPolicy
     @record = record
   end
 
-  def index?
-    false
-  end
-
-  def show?
-    scope.where(id: record.id).exists?
-  end
-
   def create?
-    false
+    user.allowed_to?(record.name.downcase, 'create')
   end
 
   def new?
     create?
   end
 
+  def index?
+    user.allowed_to?(record.name.downcase, 'index')
+  end
+
+  def method_missing(method_name, *args, &block)
+    user.allowed_to?(record.class.name.downcase, method_name[0..-2])
+  end
+
+  def respond_to?(method_name, *args)
+    return true if method_name.to_s.end_with?('?')
+
+    false
+  end
+
   def update?
-    false
-  end
-
-  def edit?
-    update?
-  end
-
-  def destroy?
-    false
+    edit?
   end
 
   def scope

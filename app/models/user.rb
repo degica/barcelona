@@ -1,5 +1,6 @@
 class User < ActiveRecord::Base
   has_many :users_districts
+  has_many :permissions
 
   attr_accessor :token
 
@@ -27,6 +28,13 @@ class User < ActiveRecord::Base
 
   def to_param
     name
+  end
+
+  def allowed_to?(*args)
+    return true if admin?
+    return true if permissions.exists?(key: args.join('.'))
+
+    false
   end
 
   private

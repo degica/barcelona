@@ -6,6 +6,7 @@ class UsersController < ApplicationController
     user = auth_backend.login
     raise ExceptionHandler::Unauthorized.new("You are not allowed to login") if user.nil?
 
+    user.permissions.create!(key: 'users.edit')
     user.save!
 
     Event.new.notify(message: "#{user.name} has logged in to Barcelona")
