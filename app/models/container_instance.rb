@@ -40,9 +40,6 @@ class ContainerInstance
       'sed -i -e "s/us-east-1/'+district.region+'/g" /etc/awslogs/awscli.conf',
       "systemctl start awslogsd",
 
-      # Install SSM agent
-      "yum install -y https://amazon-ssm-#{district.region}.s3.amazonaws.com/latest/linux_amd64/amazon-ssm-agent.rpm",
-
       # Install AWS Inspector agent
       "curl https://d1wk0tztpsntt1.cloudfront.net/linux/latest/install | bash"
     ]
