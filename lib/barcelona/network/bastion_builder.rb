@@ -3,22 +3,24 @@ module Barcelona
     class BastionBuilder < CloudFormation::Builder
       # https://aws.amazon.com/amazon-linux-2/release-notes/
       # Amazon Linux 2 AMI
+      # You can see the latest version stored in public SSM parameter store
+      # https://ap-northeast-1.console.aws.amazon.com/systems-manager/parameters/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2/description?region=ap-northeast-1
       AMI_IDS = {
-        "us-east-1"      => "ami-00dc79254d0461090",
-        "us-east-2"      => "ami-00bf61217e296b409",
-        "us-west-1"      => "ami-024c80694b5b3e51a",
-        "us-west-2"      => "ami-0a85857bfc5345c38",
-        "eu-west-1"      => "ami-040ba9174949f6de4",
-        "eu-west-2"      => "ami-00e8b55a2e841be44",
-        "eu-west-3"      => "ami-05a51ff00c1d77571",
-        "eu-central-1"      => "ami-0f3a43fbf2d3899f7",
-        "ap-northeast-1"      => "ami-0064e711cbc7a825e",
-        "ap-northeast-2"      => "ami-02b3330196502d247",
-        "ap-southeast-1"      => "ami-00942d7cd4f3ca5c0",
-        "ap-southeast-2"      => "ami-08a74056dfd30c986",
-        "ca-central-1"      => "ami-007dbcbce3118978b",
-        "ap-south-1"      => "ami-040c7ad0a93be494e",
-        "sa-east-1"      => "ami-053f8b6627112b46e",
+        "us-east-1"      => "ami-0a887e401f7654935",
+        "us-east-2"      => "ami-0e38b48473ea57778",
+        "us-west-1"      => "ami-01c94064639c71719",
+        "us-west-2"      => "ami-0e8c04af2729ff1bb",
+        "eu-west-1"      => "ami-099a8245f5daa82bf",
+        "eu-west-2"      => "ami-0389b2a3c4948b1a0",
+        "eu-west-3"      => "ami-0fd9bce3a3384b635",
+        "eu-central-1"      => "ami-0df0e7600ad0913a9",
+        "ap-northeast-1"      => "ami-0af1df87db7b650f4",
+        "ap-northeast-2"      => "ami-0a93a08544874b3b7",
+        "ap-southeast-1"      => "ami-0f02b24005e4aec36",
+        "ap-southeast-2"      => "ami-0f767afb799f45102",
+        "ca-central-1"      => "ami-00db12b46ef5ebc36",
+        "ap-south-1"      => "ami-0d9462a653c34dab7",
+        "sa-east-1"      => "ami-080a223be3de0c3b8",
       }
 
       def build_resources
