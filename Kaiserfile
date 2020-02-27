@@ -1,6 +1,6 @@
 require 'fileutils'
 
-File.write('.kaiser.dockerfile', File.read('Dockerfile').sub('--without development test', ''))
+File.write('.kaiser.dockerfile', File.read('Dockerfile').sub('--without development test', '') + "\nRUN rm /app/bin/spring")
 dockerfile '.kaiser.dockerfile'
 FileUtils.rm '.kaiser.dockerfile'
 
