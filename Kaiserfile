@@ -1,4 +1,8 @@
-dockerfile 'Dockerfile'
+require 'fileutils'
+
+File.write('.kaiser.dockerfile', File.read('Dockerfile').sub('--without development test', ''))
+dockerfile '.kaiser.dockerfile'
+FileUtils.rm '.kaiser.dockerfile'
 
 db 'postgres:alpine',
    port: 5432,
@@ -26,11 +30,11 @@ vault_host = ENV['VAULT_HOST'] || "#{vault_app_name}.localhost.labs.degica.com"
 app_params "
   -e DATABASE_URL=postgres://postgres:example@<%= db_container_name %>:5432
   -e ENCRYPTION_KEY=abcdefghijklmn
-  -e GITHUB_ORGANIZATION='degica'
-  -e GITHUB_DEVELOPER_TEAM='developers'
-  -e GITHUB_ADMIN_TEAM='Admin developers'
-  -e VAULT_URL=http://#{vault_host}
-  -e VAULT_PATH_PREFIX=degica
+  -e GITHUB_ORGANIZATION='dojiko'
+  -e GITHUB_DEVELOPER_TEAM='dev'
+  -e GITHUB_ADMIN_TEAM='admin'
+  -e VAULT_URL=https://#{vault_host}
+  -e VAULT_PATH_PREFIX=dojiko
 "
 
 attach_mount '.rspec', '/app/.rspec'
