@@ -22,6 +22,7 @@ class PortMapping < ActiveRecord::Base
   scope :lb_registerable, -> { where.not(protocol: "udp") }
   scope :tcp, -> { where(protocol: "tcp") }
   scope :udp, -> { where(protocol: "udp") }
+  scope :http, -> { where(protocol: "http") }
 
   def self.to_task_definition
     self.all.map { |pm|

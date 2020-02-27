@@ -63,7 +63,9 @@ class Service < ActiveRecord::Base
   end
 
   def web_container_port
-    3000
+    return 3000 unless http_port_mapping.present?
+
+    http_port_mapping.container_port
   end
 
   def http_port_mapping
@@ -91,6 +93,7 @@ class Service < ActiveRecord::Base
 
   def create_port_mappings
     return unless web?
+    return if self.port_mappings.count.nonzero? # No need to create these if already specified
 
     self.port_mappings.create!(container_port: web_container_port, protocol: 'http')
     self.port_mappings.create!(container_port: web_container_port, protocol: 'https')
