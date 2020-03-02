@@ -15,6 +15,7 @@ $ bcn endpoint create --district=<district name> --certificate-arn=<ACM certific
 - `--district`: District name where you want to create a new endpoint
 - `--certificate-arn` ACM Certificate ARN
   - If you specify this option, Barcelona automatically configures the endpoint so that it accepts HTTPS requests.
+  - Note that if you do not specify it, HTTPS will not be available on your endpoint.
 - `--public`: If specified, Endpoint accepts requests from the Internet. If not, Endpoint is visible only from district's private network
 
 ## Heritage
