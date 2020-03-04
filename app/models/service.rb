@@ -93,10 +93,14 @@ class Service < ActiveRecord::Base
 
   def create_port_mappings
     return unless web?
-    return if self.port_mappings.count.nonzero? # No need to create these if already specified
 
-    self.port_mappings.create!(container_port: web_container_port, protocol: 'http')
-    self.port_mappings.create!(container_port: web_container_port, protocol: 'https')
+    if http_port_mapping.blank?
+      self.port_mappings.create!(container_port: web_container_port, protocol: 'http')
+    end
+
+    if https_port_mapping.blank?
+      self.port_mappings.create!(container_port: web_container_port, protocol: 'https')
+    end
   end
 
   def backend
