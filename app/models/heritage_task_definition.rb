@@ -118,7 +118,6 @@ class HeritageTaskDefinition
     base[:docker_labels] = @app_container_labels if @app_container_labels.present?
 
     base = base.merge(
-      cpu: cpu,
       memory: memory,
       volumes_from: [
         {
@@ -127,6 +126,7 @@ class HeritageTaskDefinition
         }
       ]
     ).compact
+    base[:cpu] = cpu if cpu.present?
     base[:command] = LaunchCommand.new(heritage, command).to_command if command.present?
     base[:port_mappings] = port_mappings.to_task_definition if port_mappings.present?
     base[:user] = user if user.present?

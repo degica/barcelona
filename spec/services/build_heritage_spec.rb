@@ -81,7 +81,7 @@ describe BuildHeritage do
 
       service2 = heritage.services.second
       expect(service2.name).to eq "worker"
-      expect(service2.cpu).to eq 256
+      expect(service2.cpu).to be_nil
       expect(service2.memory).to eq 512
       expect(service2.command).to eq "rake jobs:work"
       expect(service2.port_mappings.count).to eq 0
@@ -124,7 +124,7 @@ describe BuildHeritage do
 
         service2 = @updated_heritage.services.second
         expect(service2.name).to eq "worker"
-        expect(service2.cpu).to eq 256
+        expect(service2.cpu).to be_nil
         expect(service2.memory).to eq 512
         expect(service2.command).to eq "rake jobs:offwork"
         expect(service2.port_mappings.count).to eq 0
@@ -159,7 +159,7 @@ describe BuildHeritage do
 
         service2 = @updated_heritage.services.second
         expect(service2.name).to eq "worker"
-        expect(service2.cpu).to eq 256
+        expect(service2.cpu).to be_nil
         expect(service2.memory).to eq 512
         expect(service2.command).to eq "rake jobs:offwork"
         expect(service2.port_mappings.count).to eq 0
@@ -217,7 +217,7 @@ describe BuildHeritage do
 
         service2 = @updated_heritage.services.second
         expect(service2.name).to eq "worker"
-        expect(service2.cpu).to eq 256
+        expect(service2.cpu).to be_nil
         expect(service2.memory).to eq 512
         expect(service2.command).to eq "rake jobs:work"
         expect(service2.port_mappings.count).to eq 0
