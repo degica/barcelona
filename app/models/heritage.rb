@@ -271,7 +271,6 @@ class Heritage < ActiveRecord::Base
   def base_task_definition(task_name, with_environment: true)
     base = district.base_task_definition.merge(
       name: task_name,
-      cpu: 256,
       memory: 256,
       essential: true,
       image: image_path,

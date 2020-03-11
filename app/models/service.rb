@@ -12,7 +12,7 @@ class Service < ActiveRecord::Base
             presence: true,
             uniqueness: {scope: :heritage_id},
             format: { with: /\A[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]\z/ }
-  validates :cpu, numericality: {greater_than: 0}
+  validates :cpu, numericality: {greater_than: 0}, allow_nil: true
   validates :memory, numericality: {greater_than: 0}
   validates :service_type, inclusion: { in: %w(default web) }
   validates :name, :service_type, :public, immutable: true
@@ -24,7 +24,6 @@ class Service < ActiveRecord::Base
   accepts_nested_attributes_for :listeners, allow_destroy: true
 
   after_initialize do |service|
-    service.cpu ||= 256
     service.memory ||= 512
     service.reverse_proxy_image ||= DEFAULT_REVERSE_PROXY
     service.service_type ||= 'default'
