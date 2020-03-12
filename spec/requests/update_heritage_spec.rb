@@ -49,6 +49,7 @@ describe "updating a heritage" do
         ],
         services: [
           {
+            cpu: 128,
             name: "web",
             command: "true"
           },
@@ -88,6 +89,35 @@ describe "updating a heritage" do
       worker_service = heritage["services"].find { |s| s["name"] == "worker" }
       expect(worker_service["command"]).to eq "rake jobs:work"
     end
+
+    it "updates a heritage to cpu = nil" do
+      params = {
+        image_tag: "v3",
+        before_deploy: nil,
+        services: [
+          {
+            name: "web",
+            command: "true"
+          },
+          {
+            name: "worker",
+            command: "rake jobs:work"
+          }
+        ]
+      }
+
+      expect(Heritage.last.services.find_by(name: 'web').cpu).to eq 128
+
+      expect(DeployRunnerJob).to receive(:perform_later)
+      api_request :patch, "/v1/heritages/nginx", params
+      expect(response).to be_successful
+      heritage = JSON.load(response.body)["heritage"]
+      token = JSON.load(response.body)["heritage"]["token"]
+      web_service = heritage["services"].find { |s| s["name"] == "web" }
+
+      expect(web_service["cpu"]).to be_nil
+      expect(Heritage.last.services.find_by(name: 'web').cpu).to be_nil
+    end
   end
 
   describe "POST /heritages/:heritage/trigger/:token", type: :request do
@@ -99,6 +129,7 @@ describe "updating a heritage" do
         before_deploy: nil,
         services: [
           {
+            cpu: 128,
             name: "web",
             command: "true"
           },
@@ -129,6 +160,37 @@ describe "updating a heritage" do
       expect(web_service["port_mappings"][0]["lb_port"]).to eq 80
       expect(web_service["port_mappings"][0]["container_port"]).to eq 80
     end
+
+    it "updates a heritage to cpu = nil" do
+      params = {
+        image_tag: "v3",
+        before_deploy: nil,
+        services: [
+          {
+            name: "web",
+            command: "true"
+          },
+          {
+            name: "worker",
+            command: "rake jobs:work"
+          }
+        ]
+      }
+
+      token = JSON.load(response.body)["heritage"]["token"]
+
+      expect(Heritage.last.services.find_by(name: 'web').cpu).to eq 128
+
+      expect(DeployRunnerJob).to receive(:perform_later)
+      api_request :post, "/v1/heritages/nginx/trigger/#{token}", params
+      expect(response).to be_successful
+      heritage = JSON.load(response.body)["heritage"]
+      web_service = heritage["services"].find { |s| s["name"] == "web" }
+
+      expect(web_service["cpu"]).to be_nil
+      expect(Heritage.last.services.find_by(name: 'web').cpu).to be_nil
+    end
+
   end
 
   describe "with wrong heritage token", type: :request do
@@ -162,6 +224,7 @@ describe "updating a heritage" do
         before_deploy: nil,
         services: [
           {
+            cpu: 128,
             name: "web",
             command: "true"
           },
@@ -209,6 +272,7 @@ describe "updating a heritage" do
         before_deploy: nil,
         services: [
           {
+            cpu: 128,
             name: "web",
             command: "true"
           }
