@@ -16,7 +16,8 @@ before_script:
 - psql -c 'create database travis_ci_test;' -U postgres
 script:
 - set -e
-- bundle exec rake db:setup spec
+- bundle exec rake db:setup
+- rspec
 - bcnd
 notifications:
   slack:
