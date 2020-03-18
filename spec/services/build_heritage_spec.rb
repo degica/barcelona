@@ -237,7 +237,7 @@ describe BuildHeritage do
         @updated_heritage.save!
       end
 
-      it "updates listners" do
+      it "updates listeners" do
         service1 = @updated_heritage.services.first
         expect(service1).to be_present
         expect(service1.listeners.count).to eq 1

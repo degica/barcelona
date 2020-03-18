@@ -91,8 +91,8 @@ class BuildHeritage
 
   def execute
     heritage.district = district if district.present?
-    heritage.attributes = prenullify_params
-    heritage.attributes = params
+    heritage.assign_attributes prenullify_params
+    heritage.assign_attributes params
     heritage
   end
 end
