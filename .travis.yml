@@ -17,7 +17,7 @@ before_script:
 script:
 - set -e
 - bundle exec rake db:setup
-- rspec
+- bundle exec rspec
 - bcnd
 notifications:
   slack:
