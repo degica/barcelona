@@ -77,6 +77,9 @@ class BuildHeritage
     [:cpu]
   end
 
+  # This method sets fields defined in #nullables to nil before applying
+  # updates to them, so that any deletions in barcelona.yml are detected
+  # properly.
   def prenullify_params
     nullifiers = []
     heritage.services.each do |service|
