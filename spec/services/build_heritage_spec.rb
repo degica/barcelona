@@ -231,7 +231,7 @@ describe BuildHeritage do
     context "changing endpoints" do
       let(:endpoint2) { district.endpoints.create!(name: "load-balancer2") }
       before do
-        new_params = params.dup
+        new_params = params.deep_dup
         new_params[:services][0][:listeners][0] = {endpoint: endpoint2.name}
         @updated_heritage = BuildHeritage.new(new_params).execute
         @updated_heritage.save!
