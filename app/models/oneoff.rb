@@ -34,7 +34,7 @@ class Oneoff < ActiveRecord::Base
             # Ideally Barcelona should not override LANG but because all official docker images
             # doesn't set LANG as UTF8 we can't use multi byte characters in
             # the interactive session without this override
-            environment: interactive ? [{name: "LANG", value: "C.UTF-8"}] : []
+            environment: [{name: "LANG", value: "C.UTF-8"}]
           }
         ]
       }
