@@ -204,23 +204,21 @@ describe BuildHeritage do
       it "adds a service" do
         expect(@updated_heritage.services.count).to eq 3
 
-        service1 = @updated_heritage.services.first
-        expect(service1.id).to be_present
-        expect(service1.name).to eq "web"
-        expect(service1.cpu).to eq 128
-        expect(service1.memory).to eq 128
-        expect(service1.command).to eq "rails s"
-        expect(service1.public).to eq true
-        expect(service1.port_mappings.count).to eq 1
-        expect(service1.port_mappings.first.lb_port).to eq 80
-        expect(service1.port_mappings.first.container_port).to eq 3000
+        webservice = @updated_heritage.services.find_by(name: 'web')
+        expect(webservice.id).to be_present
+        expect(webservice.cpu).to eq 128
+        expect(webservice.memory).to eq 128
+        expect(webservice.command).to eq "rails s"
+        expect(webservice.public).to eq true
+        expect(webservice.port_mappings.count).to eq 1
+        expect(webservice.port_mappings.first.lb_port).to eq 80
+        expect(webservice.port_mappings.first.container_port).to eq 3000
 
-        service2 = @updated_heritage.services.second
-        expect(service2.name).to eq "worker"
-        expect(service2.cpu).to be_nil
-        expect(service2.memory).to eq 512
-        expect(service2.command).to eq "rake jobs:work"
-        expect(service2.port_mappings.count).to eq 0
+        workerservice = @updated_heritage.services.find_by(name: 'worker')
+        expect(workerservice.cpu).to be_nil
+        expect(workerservice.memory).to eq 512
+        expect(workerservice.command).to eq "rake jobs:work"
+        expect(workerservice.port_mappings.count).to eq 0
 
         service3 = @updated_heritage.services.third
         expect(service3.name).to eq "another-service"
@@ -237,13 +235,13 @@ describe BuildHeritage do
         @updated_heritage.save!
       end
 
-      it "updates listners" do
-        service1 = @updated_heritage.services.first
-        expect(service1).to be_present
-        expect(service1.listeners.count).to eq 1
-        expect(service1.listeners.first.health_check_interval).to eq 10
-        expect(service1.listeners.first.health_check_path).to eq "/"
-        expect(service1.listeners.first.endpoint.name).to eq endpoint2.name
+      it "updates listeners" do
+        webservice = @updated_heritage.services.find_by(name: 'web')
+        expect(webservice).to be_present
+        expect(webservice.listeners.count).to eq 1
+        expect(webservice.listeners.first.health_check_interval).to eq 10
+        expect(webservice.listeners.first.health_check_path).to eq "/"
+        expect(webservice.listeners.first.endpoint.name).to eq endpoint2.name
       end
     end
 
