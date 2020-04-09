@@ -30,7 +30,7 @@ module Barcelona
       end
 
       def tags
-        ["-e", %Q{TAGS="barcelona,barcelona-dd-agent,district:#{district.name}"}]
+        ["-e", %Q{DD_TAGS="barcelona,barcelona-dd-agent,district:#{district.name}"}]
       end
 
       def api_key
