@@ -42,9 +42,11 @@ services:
       - bundle:/usr/local/bundle
       - .:${PWD}
   db:
-    image: postgres:9.5
+    image: postgres:11
     environment:
       PGDATA: /data
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST_AUTH_METHOD: trust
     healthcheck:
       test: echo "\\l" | psql -U postgres
     volumes:
