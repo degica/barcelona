@@ -12,20 +12,25 @@ module Barcelona
       private
 
       def agent_command
-        ["docker", "run", "-d",
-         "--name", "dd-agent",
+        ["DOCKER_CONTENT_TRUST=1",
+         "docker", "run", "-d",
+         "--name", "datadog-agent",
          "-h", "`hostname`",
-         "-v", "/var/run/docker.sock:/var/run/docker.sock",
+         "-v", "/var/run/docker.sock:/var/run/docker.sock:ro",
          "-v", "/proc/:/host/proc/:ro",
          "-v", "/cgroup/:/host/sys/fs/cgroup:ro",
-         "-e", "API_KEY=#{api_key}",
-         tags,
-         "datadog/docker-dd-agent:latest"
+         "-v", "/opt/datadog-agent/run:/opt/datadog-agent/run:rw",
+         "-e", "DD_API_KEY=#{api_key}",
+         "-e", "DD_LOGS_ENABLED=true",
+         "-e", "DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true",
+         "-e", "DD_AC_EXCLUDE=name:datadog-agent",
+         *tags,
+         "datadog/agent:latest"
         ].flatten.compact.join(" ")
       end
 
       def tags
-        "-e TAGS=\"barcelona,barcelona-dd-agent,district:#{district.name}\""
+        ["-e", %Q{DD_TAGS="barcelona,barcelona-dd-agent,district:#{district.name}"}]
       end
 
       def api_key
