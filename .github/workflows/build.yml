@@ -1,0 +1,35 @@
+---
+name: build
+jobs:
+  build:
+    container:
+      image: ruby:2.5.3
+      env:
+        DATABASE_URL: postgres://postgres:@localhost:5432/travis_ci_test
+        ENCRYPTION_KEY: abcdefghijklmn
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: before_install
+      run: bundle install
+    - name: before_script
+      run: |-
+        npm install -g barcelona
+        gem install bcnd --no-ri --no-rdoc
+        psql -c 'create database travis_ci_test;' -U postgres
+    - name: script
+      run: |-
+        set -e
+        bundle exec rake db:setup
+        bundle exec rspec
+        bcnd
+    services:
+      postgresql:
+        image: postgresql:9.4
+'on':
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
