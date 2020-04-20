@@ -5,27 +5,32 @@ jobs:
     container:
       image: ruby:2.5.3
       env:
-        DATABASE_URL: postgres://postgres:@localhost:5432/travis_ci_test
+        DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres
         ENCRYPTION_KEY: abcdefghijklmn
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v2
     - name: before_install
       run: bundle install
-    - name: before_script
-      run: |-
-        npm install -g barcelona
-        gem install bcnd --no-ri --no-rdoc
-        psql -c 'create database travis_ci_test;' -U postgres
     - name: script
       run: |-
         set -e
+        bundle exec rake db:create
         bundle exec rake db:setup
         bundle exec rspec
-        bcnd
     services:
-      postgresql:
-        image: postgresql:9.4
+      postgres:
+        # Docker Hub image
+        image: postgres:11
+        # Provide the password for postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 'on':
   push:
     branches:
