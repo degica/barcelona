@@ -85,6 +85,7 @@ class HeritagesController < ApplicationController
         :public,
         :service_type,
         :force_ssl,
+        :web_container_port,
         {
           port_mappings: [
             :lb_port,

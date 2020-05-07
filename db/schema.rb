@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_23_161003) do
+ActiveRecord::Schema.define(version: 2020_05_06_082137) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -196,6 +196,7 @@ ActiveRecord::Schema.define(version: 2019_02_23_161003) do
     t.boolean "force_ssl"
     t.text "hosts"
     t.text "health_check"
+    t.integer "web_container_port"
     t.index ["heritage_id"], name: "index_services_on_heritage_id"
   end
 

@@ -41,4 +41,5 @@ group :test do
   gem 'stub_env'
   gem 'webmock'
   gem 'rack-test'
+  gem 'rspec-collection_matchers'
 end
