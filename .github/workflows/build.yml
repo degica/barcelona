@@ -1,0 +1,40 @@
+---
+name: build
+jobs:
+  build:
+    container:
+      image: ruby:2.5.3
+      env:
+        DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres
+        ENCRYPTION_KEY: abcdefghijklmn
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: before_install
+      run: bundle install
+    - name: script
+      run: |-
+        set -e
+        bundle exec rake db:create
+        bundle exec rake db:setup
+        bundle exec rspec
+    services:
+      postgres:
+        # Docker Hub image
+        image: postgres:11
+        # Provide the password for postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+'on':
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
