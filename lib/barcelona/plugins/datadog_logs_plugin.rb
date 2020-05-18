@@ -42,11 +42,11 @@ module Barcelona
           $InputTCPServerRun #{LOCAL_LOGGER_PORT}
 
           ## Set the Datadog Format to send the logs
-          $template DatadogFormat,"<DATADOG_API_KEY> <%pri%>%protocol-version% %timestamp:::date-rfc3339% %HOSTNAME% %app-name% - - [metas ddsource=\"<MY_SOURCE_NAME>\" ddtags=\"env:dev,<KEY:VALUE>\"] %msg%\n"
+          $template DatadogFormat,"#{api_key} <%pri%>%protocol-version% %timestamp:::date-rfc3339% %HOSTNAME% %app-name% - - [metas ddsource=\\"host\\" ddtags=\\"barcelona,barcelona-dd-agent,district:#{district.name},barcelona:#{district.name}\\"] %msg%\\n"
 
           ## Define the destination for the logs
 
-          $DefaultNetstreamDriverCAFile /etc/ssl/certs/ca-certificates.crt
+          $DefaultNetstreamDriverCAFile /etc/ssl/certs/ca-bundle.crt
           $ActionSendStreamDriver gtls
           $ActionSendStreamDriverMode 1
           $ActionSendStreamDriverAuthMode x509/name
@@ -67,6 +67,10 @@ module Barcelona
 
       def token
         model.plugin_attributes["token"]
+      end
+
+      def api_key
+        attributes["api_key"]
       end
     end
   end

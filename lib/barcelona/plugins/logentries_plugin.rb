@@ -37,19 +37,19 @@ module Barcelona
       private
 
       def rsyslog_conf(role)
-        <<EOS
-$ModLoad imtcp
-$InputTCPServerRun #{LOCAL_LOGGER_PORT}
+        <<~EOS
+          $ModLoad imtcp
+          $InputTCPServerRun #{LOCAL_LOGGER_PORT}
 
-$DefaultNetstreamDriverCAFile /etc/ssl/certs/ca-bundle.crt
-$ActionSendStreamDriver gtls
-$ActionSendStreamDriverMode 1
-$ActionSendStreamDriverAuthMode x509/name
-$ActionSendStreamDriverPermittedPeer *.logentries.com
+          $DefaultNetstreamDriverCAFile /etc/ssl/certs/ca-bundle.crt
+          $ActionSendStreamDriver gtls
+          $ActionSendStreamDriverMode 1
+          $ActionSendStreamDriverAuthMode x509/name
+          $ActionSendStreamDriverPermittedPeer *.logentries.com
 
-$template LogentriesTemplate,"#{token} %syslogtag% role=#{role} hostname=%hostname% %msg:1:1024%\\n"
-*.* @@data.logentries.com:443;LogentriesTemplate
-EOS
+          $template LogentriesTemplate,"#{token} %syslogtag% role=#{role} hostname=%hostname% %msg:1:1024%\\n"
+          *.* @@data.logentries.com:443;LogentriesTemplate
+        EOS
       end
 
       def update_user_data(user_data, role)

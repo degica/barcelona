@@ -22,8 +22,7 @@ module Barcelona
          "-v", "/opt/datadog-agent/run:/opt/datadog-agent/run:rw",
          "-e", "DD_API_KEY=#{api_key}",
          "-e", "DD_LOGS_ENABLED=true",
-         "-e", "DD_LOGS_CONFIG_CONTAINER_COLLECT_ALL=true",
-         "-e", "DD_AC_EXCLUDE=name:datadog-agent",
+         "-e", "DD_AC_INCLUDE='name:ecs-agent name:datadog-agent'",
          *tags,
          "datadog/agent:latest"
         ].flatten.compact.join(" ")
