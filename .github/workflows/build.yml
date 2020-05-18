@@ -18,6 +18,15 @@ jobs:
         bundle exec rake db:create
         bundle exec rake db:setup
         bundle exec rspec
+    - name: deploy
+      if: ${{ github.ref == 'refs/heads/master' }}
+      env:
+        BARCELONA_ENDPOINT: https://barcelona.degica.com
+        MAINLINE_HERITAGE_TOKEN: ${{ secrets.MAINLINE_HERITAGE_TOKEN }}
+        QUAY_REPOSITORY: degica/barcelona
+        QUAY_TOKEN: ${{ secrets.QUAY_TOKEN }}
+      run: |-
+        bcnd
     services:
       postgres:
         # Docker Hub image
