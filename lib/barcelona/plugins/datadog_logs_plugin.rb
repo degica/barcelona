@@ -4,6 +4,7 @@ module Barcelona
       LOCAL_LOGGER_PORT = 514
       SYSTEM_PACKAGES = %w[rsyslog-gnutls ca-certificates]
       RUN_COMMANDS = [
+        'sed "s/%HOSTNAME%/`curl http://169.254.169.254/latest/meta-data/instance-id`/g" /etc/rsyslog.d/datadog.conf',
         "service rsyslog restart"
       ]
 
@@ -42,7 +43,7 @@ module Barcelona
           $InputTCPServerRun #{LOCAL_LOGGER_PORT}
 
           ## Set the Datadog Format to send the logs
-          $template DatadogFormat,"#{api_key} <%pri%>%protocol-version% %timestamp:::date-rfc3339% %HOSTNAME% %app-name% - - [metas ddsource=\\"host\\" ddtags=\\"barcelona,barcelona-dd-agent,district:#{district.name},barcelona:#{district.name}\\"] %msg%\\n"
+          $template DatadogFormat,"#{api_key} <%pri%>%protocol-version% %timestamp:::date-rfc3339% %HOSTNAME% %app-name% - - [metas ddsource=\\"rsyslog\\" ddtags=\\"barcelona,barcelona-dd-agent,district:#{district.name},barcelona:#{district.name}\\"] %msg%\\n"
 
           ## Define the destination for the logs
 
