@@ -26,6 +26,7 @@ jobs:
         QUAY_REPOSITORY: degica/barcelona
         QUAY_TOKEN: ${{ secrets.QUAY_TOKEN }}
       run: |-
+        gem install bcnd --no-ri --no-rdoc
         bcnd
     services:
       postgres:
