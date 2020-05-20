@@ -8,7 +8,7 @@ module Barcelona
       ]
 
       def on_container_instance_user_data(_instance, user_data)
-        update_user_data(user_data, "ci") # ci stands for Container Instance
+        update_user_data(user_data, "app")
         user_data
       end
 
@@ -18,7 +18,7 @@ module Barcelona
             log_driver: "syslog",
             options: {
               "syslog-address" => "tcp://127.0.0.1:#{LOCAL_LOGGER_PORT}",
-              "tag" => task_definition[:name]
+              "tag" => "{{.FullID}}_#{task_definition[:name]}"
             }
           }
         )

@@ -4,7 +4,11 @@ module Barcelona
       LOCAL_LOGGER_PORT = 514
       SYSTEM_PACKAGES = %w[rsyslog-gnutls ca-certificates]
       RUN_COMMANDS = [
-        'sed "s/%HOSTNAME%/`curl http://169.254.169.254/latest/meta-data/instance-id`/g" /etc/rsyslog.d/datadog.conf',
+        # set up hostname properly on the host so we don't end up identifying the host differently
+        # and pay an extra 23 dollars for each phantom host that posts logs on datadog
+        'sed "s/{{HOSTNAME}}/`curl http://169.254.169.254/latest/meta-data/instance-id`/g" /etc/rsyslog.d/datadog.conf > temp' ,
+        'cp temp /etc/rsyslog.d/datadog.conf',
+        'rm temp',
         "service rsyslog restart"
       ]
 
@@ -19,7 +23,7 @@ module Barcelona
             log_driver: "syslog",
             options: {
               "syslog-address" => "tcp://127.0.0.1:#{LOCAL_LOGGER_PORT}",
-              "tag" => task_definition[:name]
+              "tag" => "{{.FullID}}_#{task_definition[:name]}"
             }
           }
         )
@@ -43,7 +47,9 @@ module Barcelona
           $InputTCPServerRun #{LOCAL_LOGGER_PORT}
 
           ## Set the Datadog Format to send the logs
-          $template DatadogFormat,"#{api_key} <%pri%>%protocol-version% %timestamp:::date-rfc3339% %HOSTNAME% %app-name% - - [metas ddsource=\\"rsyslog\\" ddtags=\\"barcelona,barcelona-dd-agent,district:#{district.name},barcelona:#{district.name}\\"] %msg%\\n"
+          ## We have a lot of app-name munging to stay compatible with rsyslog and datadogs
+          ## conventions for associating containers with logs
+          $template DatadogFormat,"#{api_key} <%pri%>%protocol-version% %timestamp:::date-rfc3339% {{HOSTNAME}} %app-name:R,ERE,2,FIELD:([a-z0-9]{64}_(.+)$)--end% - - [metas ddsource=\\"rsyslog\\" ddtags=\\"barcelona,barcelona-dd-agent,district:#{district.name},barcelona:#{district.name},container_id:%app-name:R,ERE,0,BLANK:([a-z0-9]{64})--end%\\"] %msg%\\n"
 
           ## Define the destination for the logs
 

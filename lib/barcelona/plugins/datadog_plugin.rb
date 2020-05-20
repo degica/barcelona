@@ -43,7 +43,7 @@ module Barcelona
             - barcelona:#{district.name}
             - barcelona-dd-agent
             - district:#{district.name}
-            - role:#{district.name}
+            - role:app
         DATADOG_YAML
 
         user_data.add_file("/etc/datadog-agent/conf.d/docker.d/docker_daemon.yaml", "root:root", "000755", <<~YAML)
