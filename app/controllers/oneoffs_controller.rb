@@ -9,7 +9,10 @@ class OneoffsController < ApplicationController
   def create
     interactive = !!params[:interactive]
     @oneoff = @heritage.oneoffs.create!(create_params)
-    @oneoff.run!(sync: !!params[:sync], interactive: interactive, started_by: "barcelona/#{current_user.name}")
+    @oneoff.run!(sync: !!params[:sync],
+                 interactive: interactive,
+                 started_by: "barcelona/#{current_user.name}",
+                 env_vars: env_var_params)
     json = if interactive
              certificate = @heritage.district.ca_sign_public_key(
                current_user,
@@ -32,6 +35,23 @@ class OneoffsController < ApplicationController
       :memory,
       :user
     )
+  end
+
+  def env_var_params
+    return {} if params[:env_vars].nil?
+
+    raise ExceptionHandler::BadRequest.new("env_vars should be a hash") unless params[:env_vars].is_a? ActionController::Parameters
+
+    params[:env_vars].each do |key, value|
+      if !key.is_a? String
+        raise ExceptionHandler::BadRequest.new("Keys in env_vars should be strings")
+      end
+      if !value.is_a? String
+        raise ExceptionHandler::BadRequest.new("Values in env_vars should be strings")
+      end
+    end
+
+    params[:env_vars].permit(params[:env_vars].keys)
   end
 
   def load_heritage
