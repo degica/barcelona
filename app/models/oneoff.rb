@@ -27,8 +27,7 @@ class Oneoff < ActiveRecord::Base
     definition = HeritageTaskDefinition.oneoff_definition(self)
     aws.ecs.register_task_definition(definition.to_task_definition)
 
-    vars = {}
-    vars = { "LANG" => "C.UTF-8" } if interactive
+    vars = { "LANG" => "C.UTF-8" }
     vars = vars.merge(env_vars)
 
     resp = aws.ecs.run_task(
