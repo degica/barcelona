@@ -29,8 +29,9 @@ jobs:
         QUAY_REPOSITORY: degica/barcelona
         QUAY_TOKEN: ${{ secrets.QUAY_TOKEN }}
       run: |-
+        curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
         apt-get update
-        apt-get install -y npm
+        apt-get install -y nodejs
         npm install -g barcelona
         gem install bcnd -N
         bcnd
