@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 5.2'
+gem 'rails', '~> 5.2.4.3'
 gem 'pg'
 gem 'aws-sdk-autoscaling'
 gem 'aws-sdk-cloudformation'
