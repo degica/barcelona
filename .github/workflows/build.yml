@@ -35,7 +35,9 @@ jobs:
         apt-get install -y nodejs
         npm install -g barcelona
         gem install bcnd -N
-        TRAVIS_COMMIT=$GITHUB_SHA bcnd
+        export TRAVIS_COMMIT=$GITHUB_SHA
+        echo $TRAVIS_COMMIT
+        bcnd
     services:
       postgres:
         # Docker Hub image
