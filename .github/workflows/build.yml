@@ -29,6 +29,8 @@ jobs:
         QUAY_REPOSITORY: degica/barcelona
         QUAY_TOKEN: ${{ secrets.QUAY_TOKEN }}
       run: |-
+        apt-get update
+        apt-get install -y npm
         npm install -g barcelona
         gem install bcnd -N
         bcnd
