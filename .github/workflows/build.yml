@@ -25,7 +25,6 @@ jobs:
         TRAVIS_BRANCH: master              # until we add github actions support
         TRAVIS_PULL_REQUEST: 'false'       # and tell it this is not a PR
         TRAVIS_REPO_SLUG: degica/barcelona # and let it know the repo
-        TRAVIS_COMMIT: $GITHUB_SHA
         BARCELONA_ENDPOINT: https://barcelona.degica.com
         MAINLINE_HERITAGE_TOKEN: ${{ secrets.MAINLINE_HERITAGE_TOKEN }}
         QUAY_REPOSITORY: degica/barcelona
@@ -36,7 +35,7 @@ jobs:
         apt-get install -y nodejs
         npm install -g barcelona
         gem install bcnd -N
-        bcnd
+        TRAVIS_COMMIT=$GITHUB_SHA bcnd
     services:
       postgres:
         # Docker Hub image
