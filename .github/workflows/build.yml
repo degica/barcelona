@@ -21,12 +21,14 @@ jobs:
     - name: deploy
       if: ${{ github.ref == 'refs/heads/master' }}
       env:
+        TRAVIS: 'true'          # Trick bcnd to think we are on travis
+        TRAVIS_BRANCH: master   # until we add github actions support
         BARCELONA_ENDPOINT: https://barcelona.degica.com
         MAINLINE_HERITAGE_TOKEN: ${{ secrets.MAINLINE_HERITAGE_TOKEN }}
         QUAY_REPOSITORY: degica/barcelona
         QUAY_TOKEN: ${{ secrets.QUAY_TOKEN }}
       run: |-
-        gem install bcnd
+        gem install bcnd -N
         bcnd
     services:
       postgres:
