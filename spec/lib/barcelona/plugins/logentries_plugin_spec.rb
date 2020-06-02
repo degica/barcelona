@@ -25,7 +25,7 @@ module Barcelona
         expect(definition[:log_configuration]).to eq(log_driver: "syslog",
                                                      options: {
                                                        "syslog-address" => "tcp://127.0.0.1:514",
-                                                       "tag" => "heritage"
+                                                       "tag" => "{{.FullID}}_heritage"
                                                      })
       end
 
