@@ -1,60 +1,29 @@
----
 name: build
 jobs:
   build:
     container:
-      image: ruby:2.5.3
+      image: docker:git
       env:
-        DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres
-        ENCRYPTION_KEY: abcdefghijklmn
+        DOCKER_REPOSITORY: quay.io/degica/barcelona
+        DOCKER_BUILDKIT: '1'
+        QUAY_USERNAME: degica+github_actions
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v2
-    - name: before_install
-      run: bundle install
+    - name: setup
+      run: git submodule update --init
     - name: script
       run: |-
-        set -e
-        bundle exec rake db:create
-        bundle exec rake db:setup
-        bundle exec rspec
-    - name: deploy
-      if: ${{ github.ref == 'refs/heads/master' }}
-      env:
-        TRAVIS: 'true'                     # Trick bcnd to think we are on travis
-        TRAVIS_BRANCH: master              # until we add github actions support
-        TRAVIS_PULL_REQUEST: 'false'       # and tell it this is not a PR
-        TRAVIS_REPO_SLUG: degica/barcelona # and let it know the repo
-        BARCELONA_ENDPOINT: https://barcelona.degica.com
-        MAINLINE_HERITAGE_TOKEN: ${{ secrets.MAINLINE_HERITAGE_TOKEN }}
-        QUAY_REPOSITORY: degica/barcelona
-        QUAY_TOKEN: ${{ secrets.QUAY_TOKEN }}
-      run: |-
-        curl -sL https://deb.nodesource.com/setup_12.x | bash -
-        apt-get update
-        apt-get install -y nodejs
-        npm install -g barcelona
-        gem install bcnd -N
-        export TRAVIS_COMMIT=$GITHUB_SHA
-        echo $TRAVIS_COMMIT
-        bcnd
-    services:
-      postgres:
-        # Docker Hub image
-        image: postgres:11
-        # Provide the password for postgres
-        env:
-          POSTGRES_PASSWORD: postgres
-        # Set health checks to wait until postgres has started
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+        docker login -u "$QUAY_USERNAME" -p "${{ secrets.QUAY_TOKEN }}" quay.io
+
+        # push a tag named after the branch for debugging.
+        # if the branch does not get provided, it's not too important anyway
+        docker build . -t $DOCKER_REPOSITORY:$GITHUB_HEAD_REF --pull || true
+        docker push $DOCKER_REPOSITORY:$GITHUB_HEAD_REF || true
+
+        docker build . -t $DOCKER_REPOSITORY:$GITHUB_SHA --pull
+        docker push $DOCKER_REPOSITORY:$GITHUB_SHA
 'on':
   push:
-    branches:
-    - master
-  pull_request:
-    branches:
+    branches-ignore:
     - master
