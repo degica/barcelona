@@ -13,7 +13,7 @@ jobs:
         curl -L -o bcn.zip https://github.com/degica/barcelona-cli/releases/latest/download/bcn_linux_amd64.zip
         unzip ./bcn.zip && mv ./bcn /usr/bin/bcn
     - name: script
-      run: bcn deploy -q -e production --tag $GITHUB_SHA --heritage-token {{ secrets.MAINLINE_HERITAGE_TOKEN }}
+      run: bcn deploy -q -e production --tag $GITHUB_SHA --heritage-token ${{ secrets.MAINLINE_HERITAGE_TOKEN }}
 'on':
   push:
     branches:
