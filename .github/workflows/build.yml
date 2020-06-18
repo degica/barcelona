@@ -35,5 +35,8 @@ jobs:
       run: bcn deploy -q -e production --tag $GITHUB_SHA --heritage-token ${{ secrets.MAINLINE_HERITAGE_TOKEN }}
 'on':
   push:
-    branches-ignore:
+    branches:
+    - master
+  pull_request:
+    branches:
     - master
