@@ -24,6 +24,7 @@ jobs:
 
         docker build . -t $DOCKER_REPOSITORY:$GITHUB_SHA --pull
         docker push $DOCKER_REPOSITORY:$GITHUB_SHA
+        echo ${{ github.ref }}
     - name: deploy_setup
       if: github.ref == 'refs/head/master'
       run: |-
