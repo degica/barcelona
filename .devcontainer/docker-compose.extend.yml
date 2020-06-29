@@ -1,0 +1,8 @@
+version: '3.1'
+services:
+  web:
+    command: sleep infinity
+    environment:
+      SHELL: /bin/bash
+    volumes:
+      - ~/.gitconfig:/home/app/.gitconfig
