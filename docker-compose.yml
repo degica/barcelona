@@ -3,6 +3,7 @@ services:
   web: &app_base
     depends_on:
       - db
+      - vault
     build:
       context: .
       dockerfile: Dockerfile.development
@@ -44,7 +45,7 @@ services:
     volumes:
       - pgdata:/data
   vault:
-    image: vault:0.7.2
+    image: vault:1.4.2
     ports:
       - "8200:8200"
     environment:
