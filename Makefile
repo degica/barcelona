@@ -9,4 +9,4 @@ setup: init
 up: init
 	docker-compose up -d
 restart:
-	docker-compose restart web spring worker
+	docker-compose restart web worker
