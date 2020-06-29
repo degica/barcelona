@@ -27,6 +27,9 @@ gem 'sqlite3'
 group :development, :test do
   gem 'pry-rails'
   gem 'pry-byebug'
+  gem 'debase'
+  gem 'ruby-debug-ide'
+  gem 'solargraph'
 end
 
 group :development do
