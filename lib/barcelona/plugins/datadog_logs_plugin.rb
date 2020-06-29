@@ -17,18 +17,6 @@ module Barcelona
         user_data
       end
 
-      def on_heritage_task_definition(_heritage, task_definition)
-        task_definition.merge(
-          log_configuration: {
-            log_driver: "syslog",
-            options: {
-              "syslog-address" => "tcp://127.0.0.1:#{LOCAL_LOGGER_PORT}",
-              "tag" => "{{.FullID}}_#{task_definition[:name]}"
-            }
-          }
-        )
-      end
-
       def on_network_stack_template(_stack, template)
         bastion_lc = template["BastionLaunchConfiguration"]
         return template if bastion_lc.nil?

@@ -11,6 +11,11 @@ class Environment < ApplicationRecord
 
   attr_accessor :ssm_path
 
+  def ssm_path=(v)
+    attribute_will_change!("value_from")
+    @ssm_path = v
+  end
+
   before_validation do
     if ssm_path
       s = ssm_path

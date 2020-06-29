@@ -28,6 +28,7 @@ describe HeritageTaskDefinition do
                               family: service.service_name,
                               task_role_arn: "task-role",
                               execution_role_arn: "task-execution-role",
+                              volumes: [{host: {}, name: "firelens-config"}],
                               container_definitions: [
                                 {
                                   name: service.service_name,
@@ -65,6 +66,7 @@ describe HeritageTaskDefinition do
                                 family: service.service_name,
                                 task_role_arn: "task-role",
                                 execution_role_arn: "task-execution-role",
+                                volumes: [{host: {}, name: "firelens-config"}],
                                 container_definitions: [
                                   {
                                     environment: [
@@ -157,6 +159,7 @@ describe HeritageTaskDefinition do
                                 family: service.service_name,
                                 task_role_arn: "task-role",
                                 execution_role_arn: "task-execution-role",
+                                volumes: [{host: {}, name: "firelens-config"}],
                                 container_definitions: [
                                   {
                                     environment: [
@@ -260,6 +263,7 @@ describe HeritageTaskDefinition do
                               family: "#{heritage.name}-oneoff",
                               task_role_arn: "task-role",
                               execution_role_arn: "task-execution-role",
+                              volumes: [{host: {}, name: "firelens-config"}],
                               container_definitions: [
                                 {
                                   name:  "#{heritage.name}-oneoff",
@@ -329,6 +333,7 @@ describe HeritageTaskDefinition do
                               "Family" => "#{heritage.name}-schedule",
                               "TaskRoleArn" => "task-role",
                               "ExecutionRoleArn" => "task-execution-role",
+                              "Volumes" => [{"Host" => {}, "Name" => "firelens-config"}],
                               "ContainerDefinitions" => [
                                 {
                                   "Name" =>  "#{heritage.name}-schedule",

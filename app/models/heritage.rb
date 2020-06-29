@@ -132,6 +132,22 @@ class Heritage < ActiveRecord::Base
                     sub("arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/barcelona/#{heritage.district.name}/*"),
                     sub("arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:barcelona/#{heritage.district.name}/*"),
                   ]
+                },
+                {
+                  "Effect" => "Allow",
+                  "Action" => ["s3:GetObject"],
+                  "Resource" => [
+                    "arn:aws:s3:::#{heritage.district.s3_bucket_name}/heritages/#{heritage.name}/*",
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:GetBucketLocation"
+                  ],
+                  "Resource": [
+                    "arn:aws:s3:::#{heritage.district.s3_bucket_name}"
+                  ]
                 }
               ]
             }
@@ -162,8 +178,11 @@ class Heritage < ActiveRecord::Base
                 "Statement" => [
                   {
                     "Effect" => "Allow",
-                    "Action" => ["logs:CreateLogStream",
-                                 "logs:PutLogEvents"],
+                    "Action" => ["logs:CreateLogGroup",
+                                 "logs:CreateLogStream",
+                                 "logs:PutLogEvents",
+                                 "firehose:PutRecordBatch"
+                                ],
                     "Resource" => ["*"]
                   },
                   {
@@ -218,8 +237,12 @@ class Heritage < ActiveRecord::Base
             immutable: true,
             format: { with: /\A[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]\z/ }
   validates :district, presence: true
+  validates :log_driver, exclusion: {in: ["syslog"]}, if: -> {
+    district.plugins.pluck(:name).any? { |n| n.in? ["logentries", "datadog_logs"] }
+  }
 
   serialize :scheduled_tasks, JSON
+  serialize :log_options, JSON
 
   before_validation do |heritage|
     heritage.regenerate_token if heritage.token.blank?
@@ -268,12 +291,32 @@ class Heritage < ActiveRecord::Base
     self.token = SecureRandom.uuid
   end
 
-  def base_task_definition(task_name, with_environment: true)
-    base = district.base_task_definition.merge(
-      name: task_name,
-      memory: 256,
-      essential: true,
-      image: image_path,
+  def log_driver
+    spr = super
+    # For backward-compatibility:
+    # If log_driver is not specified *and* the district has a plugin that formerly overwrote heritage's log configuration to syslog,
+    # the heritage should use the syslog driver to keep the log settings the same as before.
+    if spr.nil? && district.plugins.pluck(:name).any? { |n| n.in? ["logentries", "datadog_logs"] }
+      "syslog"
+    else
+      spr || "cloudwatch"
+    end
+  end
+
+  def syslog_configuration(task_name)
+    {
+      log_configuration: {
+        log_driver: "syslog",
+        options: {
+          "syslog-address" => "tcp://127.0.0.1:514",
+          "tag" => "{{.FullID}}_#{task_name}"
+        }
+      }
+    }
+  end
+
+  def cloudwatch_logs_configuration(task_name)
+    {
       log_configuration: {
         log_driver: "awslogs",
         options: {
@@ -282,13 +325,51 @@ class Heritage < ActiveRecord::Base
           "awslogs-stream-prefix" => name
         }
       }
+    }
+  end
+
+  def firelens_configuration(task_name)
+    # Supports only custom config file mode
+    {
+      depends_on: [
+        {
+          container_name: "log_router",
+          condition: "START"
+        }
+      ],
+      log_configuration: {
+        log_driver: "awsfirelens"
+      }
+    }
+  end
+
+  def log_configuration(task_name)
+    case log_driver.to_s
+    when "syslog"
+      syslog_configuration(task_name)
+    when "cloudwatch"
+      cloudwatch_logs_configuration(task_name)
+    when "firelens"
+      firelens_configuration(task_name)
+    end
+  end
+
+  def base_task_definition(task_name, with_environment: true)
+    base = district.base_task_definition.merge(
+      name: task_name,
+      memory: 256,
+      essential: true,
+      image: image_path,
     )
+
     if with_environment
       base[:environment] += environment_set
       if environments.any?
         base[:secrets] = environments.secrets.map { |e| {name: e.name, value_from: e.value_from} }
       end
     end
+
+    base = base.merge(log_configuration(task_name))
 
     district.hook_plugins(:heritage_task_definition, self, base)
   end

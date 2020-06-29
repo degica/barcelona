@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_06_082137) do
+ActiveRecord::Schema.define(version: 2020_06_28_053150) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -92,6 +92,8 @@ ActiveRecord::Schema.define(version: 2020_05_06_082137) do
     t.string "token"
     t.integer "version"
     t.text "scheduled_tasks"
+    t.string "log_driver"
+    t.text "log_options"
     t.index ["district_id"], name: "index_heritages_on_district_id"
     t.index ["name"], name: "index_heritages_on_name", unique: true
   end

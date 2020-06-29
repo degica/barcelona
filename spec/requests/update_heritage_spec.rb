@@ -14,6 +14,9 @@ describe "updating a heritage" do
         {name: "ENV_KEY", value: "my value"},
         {name: "SECRET", value_from: "arn"}
       ],
+      scheduled_tasks: [
+        {schedule: "rate(1 minute)", command: "rake some:task"}
+      ],
       services: [
         {
           name: "web",
@@ -47,6 +50,9 @@ describe "updating a heritage" do
           {name: "SECRET", value_from: "arn"},
           {name: "VALUE_HIDDEN_IN_SSM", ssm_path: "heritage1/key1"}
         ],
+        scheduled_tasks: [
+          {schedule: "rate(1 minute)", command: "rake some:task"}
+        ],
         services: [
           {
             cpu: 128,
@@ -79,6 +85,9 @@ describe "updating a heritage" do
       expect(heritage["environment"][2]["name"]).to eq "VALUE_HIDDEN_IN_SSM"
       expect(heritage["environment"][2]["value"]).to eq nil
       expect(heritage["environment"][2]["value_from"]).to eq "/barcelona/#{district.name}/heritage1/key1"
+      expect(heritage["scheduled_tasks"].count).to eq 1
+      expect(heritage["scheduled_tasks"][0]["schedule"]).to eq "rate(1 minute)"
+      expect(heritage["scheduled_tasks"][0]["command"]).to eq "rake some:task"
       web_service = heritage["services"].find { |s| s["name"] == "web" }
       expect(web_service["public"]).to eq true
       expect(web_service["cpu"]).to eq 128
@@ -117,6 +126,24 @@ describe "updating a heritage" do
 
       expect(web_service["cpu"]).to be_nil
       expect(Heritage.last.services.find_by(name: 'web').cpu).to be_nil
+    end
+  end
+
+  describe "Removing scheduled_tasks, services, environment entry", type: :request do
+    it "updates a heritage" do
+      params = {
+        image_tag: "v3",
+        before_deploy: nil
+      }
+
+      expect(DeployRunnerJob).to receive(:perform_later)
+      api_request :patch, "/v1/heritages/nginx", params
+      expect(response).to be_successful
+
+      heritage = JSON.load(response.body)["heritage"]
+      expect(heritage["environment"].count).to eq 0
+      expect(heritage["services"].count).to eq 0
+      expect(heritage["scheduled_tasks"].count).to eq 0
     end
   end
 

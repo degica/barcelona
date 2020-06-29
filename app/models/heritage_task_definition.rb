@@ -39,6 +39,9 @@ class HeritageTaskDefinition
 
   def to_task_definition(without_task_role: false, camelize: false)
     containers = [container_definition, run_pack_definition]
+    if heritage.log_driver == "firelens"
+      containers += [firelens_config_container, log_router_definition]
+    end
     if web_service?
       containers << case mode
                     when :tcp
@@ -49,6 +52,14 @@ class HeritageTaskDefinition
     end
     ret = {family: family_name, container_definitions: containers}
     ret = ret.merge(task_role_arn: heritage.task_role_id, execution_role_arn: heritage.task_execution_role_id) unless without_task_role
+    ret = ret.merge(
+      volumes: [
+        {
+          name: "firelens-config",
+          host: {},
+        }
+      ]
+    )
     if camelize
       ret = deep_transform_keys_with_parent_keys(ret) do |k, parents|
         (parents.last(2) != [:log_configuration, :options] &&
@@ -135,6 +146,29 @@ class HeritageTaskDefinition
     base
   end
 
+  def firelens_config_container
+    base = heritage.base_task_definition("firelens-config-container", with_environment: true)
+    base.merge(
+      memory_reservation: 10,
+      essential: false,
+      command: ["sh", "-c", "mkdir -p /app/firelens && echo $FIRELENS_GOOGLE_SERVICE_CREDENTIALS_BODY > /app/firelens/google_service_credentials.json"],
+      log_configuration: {
+        log_driver: "awslogs",
+        options: {
+          "awslogs-group" => heritage.log_group_name,
+          "awslogs-region" => district.region,
+          "awslogs-stream-prefix" => "firelens_config_container"
+        },
+      },
+      mount_points: [
+        {
+          source_volume: "firelens-config",
+          container_path: "/app/firelens"
+        }
+      ]
+    ).compact
+  end
+
   def run_pack_definition
     base = heritage.base_task_definition("runpack", with_environment: false)
     base.merge(
@@ -209,5 +243,47 @@ class HeritageTaskDefinition
         }
       ]
     )
+  end
+
+  def log_router_definition
+    base = heritage.base_task_definition("log_router")
+    base[:environment] += [
+      {name: "GOOGLE_SERVICE_CREDENTIALS", value: "/ext/google_service_credentials.json"}
+    ]
+    base.merge(
+      essential: true,
+      image: "906394416424.dkr.ecr.#{district.region}.amazonaws.com/aws-for-fluent-bit:latest",
+      name: "log_router",
+      firelens_configuration: {
+        type: "fluentbit",
+        options: {
+          "config-file-type" => "file",
+          "config-file-value" => "/ext/ext.conf"
+        }
+      },
+      log_configuration: {
+        log_driver: "awslogs",
+        options: {
+          "awslogs-group" => heritage.log_group_name,
+          "awslogs-region" => district.region,
+          "awslogs-stream-prefix" => "firelens_log_router"
+        },
+      },
+      mount_points: [
+        {
+          source_volume: "firelens-config",
+          container_path: "/ext",
+          read_only: true
+        }
+      ],
+      depends_on: [
+        {
+          container_name: "firelens-config-container",
+          condition: "COMPLETE"
+        }
+      ],
+      cpu: nil,
+      memory_reservation: 50
+    ).compact
   end
 end

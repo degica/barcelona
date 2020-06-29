@@ -2,6 +2,12 @@ environments:
   production:
     name: rails-app
     image_name: k2nr/rails-docker-sample
+    log_configuration:
+#      log_driver: cloudwatch
+#      log_driver: syslog # for logentries, dd-agent, etc.
+      log_driver: firelens
+      options:
+        config_directory: /firelens
     services:
       - name: web
         service_type: web

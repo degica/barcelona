@@ -14,21 +14,6 @@ module Barcelona
         ]
       end
 
-      it "gets hooked with heritage_task_definition trigger" do
-        heritage = district.heritages.create(name: 'heritage',
-                                             image_name: "docker_image",
-                                             env_vars_attributes: [
-                                               {key: "ENVIRONMENT", value: "VALUE"}
-                                             ])
-        definition = heritage.base_task_definition("heritage")
-        expect(definition[:name]).to eq "heritage"
-        expect(definition[:log_configuration]).to eq(log_driver: "syslog",
-                                                     options: {
-                                                       "syslog-address" => "tcp://127.0.0.1:514",
-                                                       "tag" => "{{.FullID}}_heritage"
-                                                     })
-      end
-
       it "gets hooked with container_instance_user_data trigger" do
         ci = ContainerInstance.new(district)
         user_data = YAML.load(Base64.decode64(ci.user_data.build))
