@@ -1,0 +1,15 @@
+// See https://aka.ms/vscode-remote/devcontainer.json for format details.
+{
+  "name": "barcelona remote",
+  "dockerComposeFile": [
+    "../docker-compose.yml",
+    "docker-compose.extend.yml",
+  ],
+  "service": "web",
+  "workspaceFolder": "/app",
+  "extensions": [
+    "rebornix.ruby",
+    "castwide.solargraph",
+  ],
+  "shutdownAction": "none"
+}
