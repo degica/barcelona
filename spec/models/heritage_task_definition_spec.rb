@@ -20,12 +20,14 @@ describe HeritageTaskDefinition do
 
     before do
       allow(heritage).to receive(:task_role_id) { "task-role" }
+      allow(heritage).to receive(:task_execution_role_id) { "task-execution-role" }
     end
 
     it "returns a task definition for the service" do
       expect(subject).to eq({
                               family: service.service_name,
                               task_role_arn: "task-role",
+                              execution_role_arn: "task-execution-role",
                               container_definitions: [
                                 {
                                   name: service.service_name,
@@ -62,6 +64,7 @@ describe HeritageTaskDefinition do
         expect(subject).to eq({
                                 family: service.service_name,
                                 task_role_arn: "task-role",
+                                execution_role_arn: "task-execution-role",
                                 container_definitions: [
                                   {
                                     environment: [
@@ -147,6 +150,98 @@ describe HeritageTaskDefinition do
                               })
       end
     end
+    context "when a service is web service with non-default port" do
+      let(:service) { create :web_service, heritage: heritage, web_container_port: 6000 }
+      it "returns a task definition for the service" do
+        expect(subject).to eq({
+                                family: service.service_name,
+                                task_role_arn: "task-role",
+                                execution_role_arn: "task-execution-role",
+                                container_definitions: [
+                                  {
+                                    environment: [
+                                      {
+                                        name: "HOST_PORT_HTTP_6000",
+                                        value: service.http_port_mapping.host_port.to_s
+                                      },
+                                      {
+                                        name: "HOST_PORT_HTTPS_6000",
+                                        value: service.https_port_mapping.host_port.to_s
+                                      },
+                                      {
+                                        name: "PORT",
+                                        value: "6000"
+                                      }
+                                    ],
+                                    name: service.service_name,
+                                    cpu: service.cpu,
+                                    memory: service.memory,
+                                    essential: true,
+                                    image: heritage.image_path,
+                                    command: LaunchCommand.new(heritage, service.command).to_command,
+                                    volumes_from: [
+                                      {
+                                        source_container: "runpack",
+                                        read_only: true
+                                      }
+                                    ],
+                                    port_mappings: [
+                                      {container_port: 6000, protocol: "tcp"}
+                                    ],
+                                    log_configuration: expected_log_configuration
+                                  },
+                                  {
+                                    name: "runpack",
+                                    cpu: 1,
+                                    memory: 16,
+                                    essential: false,
+                                    image: "quay.io/degica/barcelona-run-pack",
+                                    environment: [],
+                                    log_configuration: expected_log_configuration
+                                  },
+                                  {
+                                    name: "#{service.service_name}-revpro",
+                                    cpu: 128,
+                                    memory: 128,
+                                    essential: true,
+                                    image: service.reverse_proxy_image,
+                                    links: ["#{service.service_name}:backend"],
+                                    environment: [
+                                      {
+                                        name: "AWS_REGION",
+                                        value: district.region,
+                                      },
+                                      {
+                                        name: "UPSTREAM_NAME",
+                                        value: "backend"
+                                      },
+                                      {
+                                        name: "UPSTREAM_PORT",
+                                        value: "6000"
+                                      },
+                                      {
+                                        name: "FORCE_SSL",
+                                        value: "false"
+                                      }
+                                    ],
+                                    port_mappings: [
+                                      {
+                                        container_port: 80,
+                                        host_port: service.http_port_mapping.host_port,
+                                        protocol: "tcp"
+                                      },
+                                      {
+                                        container_port: 443,
+                                        host_port: service.https_port_mapping.host_port,
+                                        protocol: "tcp"
+                                      }
+                                    ],
+                                    log_configuration: expected_log_configuration
+                                  }
+                                ]
+                              })
+      end
+    end
   end
 
   describe ".oneonff_definition" do
@@ -157,12 +252,14 @@ describe HeritageTaskDefinition do
 
     before do
       allow(heritage).to receive(:task_role_id) { "task-role" }
+      allow(heritage).to receive(:task_execution_role_id) { "task-execution-role" }
     end
 
     it "returns a task definition for the oneoff" do
       expect(subject).to eq({
                               family: "#{heritage.name}-oneoff",
                               task_role_arn: "task-role",
+                              execution_role_arn: "task-execution-role",
                               container_definitions: [
                                 {
                                   name:  "#{heritage.name}-oneoff",
@@ -224,12 +321,14 @@ describe HeritageTaskDefinition do
 
     before do
       allow(heritage).to receive(:task_role_id) { "task-role" }
+      allow(heritage).to receive(:task_execution_role_id) { "task-execution-role" }
     end
 
     it "returns a task definition for the schedule" do
       expect(subject).to eq({
                               "Family" => "#{heritage.name}-schedule",
                               "TaskRoleArn" => "task-role",
+                              "ExecutionRoleArn" => "task-execution-role",
                               "ContainerDefinitions" => [
                                 {
                                   "Name" =>  "#{heritage.name}-schedule",

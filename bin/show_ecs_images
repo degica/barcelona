@@ -1,0 +1,56 @@
+#!/usr/bin/env ruby
+
+# us-gov-west-1 is excluded because it requires special privilage
+regions=%w(
+        us-east-1
+        us-east-2
+        us-west-1
+        us-west-2
+        eu-west-1
+        eu-west-2
+        eu-west-3
+        eu-central-1
+        ap-northeast-1
+        ap-northeast-2
+        ap-southeast-1
+        ap-southeast-2
+        ca-central-1
+        ap-south-1
+        sa-east-1
+)
+def show_image_id_for_amazon_linux2(regions)
+  path = '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
+  STDERR.puts "getting image id of #{path}..."
+
+  regions.each do |region|
+    image_id=`aws ssm get-parameters --names #{path} --region #{region} --query 'Parameters[0].Value' --output text`.chomp
+    puts %Q{        "#{region}"      => "#{image_id}",}
+  end
+end
+
+
+def show_image_id_for_ecs_optimized(regions)
+  path = '/aws/service/ecs/optimized-ami/amazon-linux-2/recommended'
+  image_name=`aws ssm get-parameters --names #{path} --region us-east-1 --query 'Parameters[0].Value' --output text | jq -r '.image_name'`
+  STDERR.puts "getting image id of #{path} ( latest version is #{image_name} )..."
+
+  regions.each do |region|
+    image_id=`aws ssm get-parameters --names #{path} --region #{region} --query 'Parameters[0].Value' --output text | jq -r '.image_id'`.chomp
+    puts %Q{        "#{region}"      => "#{image_id}",}
+  end
+end
+
+def show_image_id_for_nat_instance(regions)
+  nat_images = `aws --region us-east-1  ec2 describe-images --owners amazon --filters "Name=name,Values=amzn-ami-vpc-nat-hvm*" --query 'sort_by(Images, &CreationDate)[].Name' --output text`
+  latest_nat_image = nat_images.split.last
+  STDERR.puts "getting image id of nat instances ( latest version is #{latest_nat_image} )..."
+
+  regions.each do |region|
+    image_id=`aws --region #{region}  ec2 describe-images --owners amazon --filters "Name=name,Values=#{latest_nat_image}" --query 'sort_by(Images, &CreationDate)[].ImageId' --output text `.chomp
+    puts %Q{        "#{region}"      => "#{image_id}",}
+  end
+end
+
+show_image_id_for_amazon_linux2(regions)
+show_image_id_for_ecs_optimized(regions)
+show_image_id_for_nat_instance(regions)

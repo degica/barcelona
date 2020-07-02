@@ -27,10 +27,10 @@ describe "GET /heritages/:heritage", type: :request do
       ]
     }
     api_request :post, "/v1/districts/#{district.name}/heritages", params
-    expect(response).to be_success
+    expect(response).to be_successful
 
     api_request :get, "/v1/heritages/nginx"
-    expect(response).to be_success
+    expect(response).to be_successful
 
     heritage = JSON.load(response.body)["heritage"]
     expect(heritage["name"]).to eq "nginx"

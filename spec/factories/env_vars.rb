@@ -1,8 +1,8 @@
-FactoryGirl.define do
+FactoryBot.define do
   factory :env_var do
-    key "KEY"
-    value "VALUE"
-    secret false
+    key { "KEY" }
+    value { "VALUE" }
+    secret { false }
     association :heritage
   end
 end

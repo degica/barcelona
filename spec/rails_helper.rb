@@ -32,7 +32,7 @@ RSpec.configure do |config|
   # examples within a transaction, remove the following line or assign false
   # instead of true.
   config.use_transactional_fixtures = true
-  config.include FactoryGirl::Syntax::Methods
+  config.include FactoryBot::Syntax::Methods
   config.include StubEnv::Helpers
 
   # RSpec Rails can automatically mix in different behaviours to your tests
@@ -56,12 +56,6 @@ RSpec.configure do |config|
     ENV['GITHUB_ORGANIZATION'] = 'degica'
     ENV['VAULT_URL'] ||= "http://my-vault.com"
     ENV['VAULT_PATH_PREFIX'] ||= "prefix"
-  end
-
-  config.before :suite do
-    DatabaseRewinder.clean_all
-    # or
-    # DatabaseRewinder.clean_with :any_arg_that_would_be_actually_ignored_anyway
   end
 
   config.before :each do
@@ -166,9 +160,5 @@ RSpec.configure do |config|
                       physical_resource_id: "barce-VPCGa-1LOOQNJB1WRUG")
              ])
     }
-  end
-
-  config.after :each do
-    DatabaseRewinder.clean
   end
 end

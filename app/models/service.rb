@@ -1,5 +1,6 @@
 class Service < ActiveRecord::Base
   DEFAULT_REVERSE_PROXY = 'quay.io/degica/barcelona-reverse-proxy:latest'
+  WEB_CONTAINER_PORT_DEFAULT = 3000
 
   belongs_to :heritage, inverse_of: :services
   has_many :listeners, inverse_of: :service, dependent: :destroy
@@ -12,7 +13,7 @@ class Service < ActiveRecord::Base
             presence: true,
             uniqueness: {scope: :heritage_id},
             format: { with: /\A[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]\z/ }
-  validates :cpu, numericality: {greater_than: 0}
+  validates :cpu, numericality: {greater_than: 0}, allow_nil: true
   validates :memory, numericality: {greater_than: 0}
   validates :service_type, inclusion: { in: %w(default web) }
   validates :name, :service_type, :public, immutable: true
@@ -24,7 +25,6 @@ class Service < ActiveRecord::Base
   accepts_nested_attributes_for :listeners, allow_destroy: true
 
   after_initialize do |service|
-    service.cpu ||= 256
     service.memory ||= 512
     service.reverse_proxy_image ||= DEFAULT_REVERSE_PROXY
     service.service_type ||= 'default'
@@ -33,6 +33,7 @@ class Service < ActiveRecord::Base
   end
 
   after_create :create_port_mappings
+  after_save :update_port_mappings
   after_destroy :delete_service
 
   delegate :district, to: :heritage
@@ -63,7 +64,7 @@ class Service < ActiveRecord::Base
   end
 
   def web_container_port
-    3000
+    super or WEB_CONTAINER_PORT_DEFAULT
   end
 
   def http_port_mapping
@@ -95,6 +96,14 @@ class Service < ActiveRecord::Base
     self.port_mappings.create!(container_port: web_container_port, protocol: 'http')
     self.port_mappings.create!(container_port: web_container_port, protocol: 'https')
   end
+
+  def update_port_mappings
+    return unless web?
+
+    self.port_mappings.where(protocol: 'http').update_all(container_port: self.web_container_port)
+    self.port_mappings.where(protocol: 'https').update_all(container_port: self.web_container_port)
+  end
+
 
   def backend
     @backend ||= case heritage.version

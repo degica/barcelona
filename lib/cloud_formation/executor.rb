@@ -25,14 +25,27 @@ module CloudFormation
       client.create_stack(options)
     end
 
-    def update
-      client.update_stack(stack_options)
+    def update(change_set: false)
+      if change_set
+        create_change_set
+      else
+        client.update_stack(stack_options)
+      end
     rescue Aws::CloudFormation::Errors::ValidationError => e
       if e.message == "No updates are to be performed."
         Rails.logger.warn "No updates are to be performed."
       else
         raise e
       end
+    end
+
+    def create_change_set(type: "UPDATE")
+      dt = Time.current.strftime("%Y-%m-%d-%H%M%S")
+      options = stack_options.merge({
+        change_set_name: "changeset-#{dt}",
+        change_set_type: type,
+      })
+      client.create_change_set(options)
     end
 
     def stack_options
@@ -72,7 +85,9 @@ module CloudFormation
     end
 
     def outputs
-      Hash[*describe.outputs.map{ |o| [o.output_key, o.output_value] }.flatten]
+      if describe
+        Hash[*describe.outputs.map{ |o| [o.output_key, o.output_value] }.flatten]
+      end
     end
 
     def delete

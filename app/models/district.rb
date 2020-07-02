@@ -151,7 +151,7 @@ class District < ActiveRecord::Base
 
   def base_task_definition
     base = {
-      environment: []
+      environment: [],
     }
     hook_plugins(:district_task_definition, self, base)
   end
@@ -182,7 +182,7 @@ class District < ActiveRecord::Base
     self.nat_type       ||= "instance"
     self.cluster_backend  ||= 'autoscaling'
     self.cluster_size     ||= 1
-    self.cluster_instance_type ||= "t2.small"
+    self.cluster_instance_type ||= "t3.small"
   end
 
   def network_stack

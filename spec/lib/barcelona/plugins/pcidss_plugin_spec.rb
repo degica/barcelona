@@ -20,11 +20,6 @@ module Barcelona
 
       it "generates a correct stack template" do
         generated = JSON.load stack.target!
-        expect(generated["Resources"]["NTPServerLaunchConfiguration"]).to be_present
-        expect(generated["Resources"]["NTPServerRole"]).to be_present
-        expect(generated["Resources"]["NTPServerProfile"]).to be_present
-        expect(generated["Resources"]["NTPServerASG"]).to be_present
-        expect(generated["Resources"]["NTPServerSG"]).to be_present
         expect(generated["Resources"]["OSSECManagerVolume"]).to be_present
         expect(generated["Resources"]["OSSECManagerLaunchConfiguration"]).to be_present
         expect(generated["Resources"]["OSSECManagerRole"]).to be_present
@@ -53,7 +48,6 @@ module Barcelona
         ci = ContainerInstance.new(district)
         plugin = district.plugins.find_by(name: 'pcidss').plugin
         user_data = YAML.load(Base64.decode64(ci.user_data.build))
-        expect(user_data["packages"]).to include(*described_class::SYSTEM_PACKAGES)
         expect(user_data["runcmd"]).to include(*plugin.run_commands)
       end
 
@@ -62,7 +56,6 @@ module Barcelona
         template = JSON.load(::Barcelona::Network::NetworkStack.new(district).target!)
         user_data = InstanceUserData.load(template["Resources"]["BastionLaunchConfiguration"]["Properties"]["UserData"])
         plugin = district.plugins.find_by(name: 'pcidss').plugin
-        expect(user_data.packages).to include(*described_class::SYSTEM_PACKAGES)
         expect(user_data.run_commands).to include(*plugin.run_commands)
       end
 

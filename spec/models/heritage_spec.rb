@@ -33,6 +33,64 @@ describe Heritage do
       it { expect(heritage.image_path).to eq "nginx:master" }
     end
   end
+
+  describe "legacy env_var and declarative env combinations" do
+    subject { heritage.environment_set.sort_by { |e| e[:name] } }
+    let(:heritage) { create :heritage }
+
+    context "when only env_vars exist" do
+      before do
+        heritage.env_vars.create!(key: "env", value: "value")
+      end
+
+      it { is_expected.to eq [{name: "env", value: "value"}]}
+    end
+
+    context "when only environment exist" do
+      before do
+        heritage.environments.create!(name: "env", value: "value")
+      end
+      it { is_expected.to eq [{name: "env", value: "value"}]}
+    end
+
+    context "when both exist" do
+      before do
+        heritage.env_vars.create!(key: "env", value: "value")
+        heritage.env_vars.create!(key: "env2", value: "value2")
+        heritage.environments.create!(name: "env", value: "value_new")
+        heritage.environments.create!(name: "env3", value: "value3")
+      end
+
+      it { is_expected.to eq [{name: "env", value: "value_new"},
+                              {name: "env2", value: "value2"},
+                              {name: "env3", value: "value3"}]}
+    end
+  end
+
+  describe "#legacy_secrets" do
+    subject { heritage.legacy_secrets.order("key").pluck(:key) }
+    let(:heritage) { create :heritage }
+
+    context "when there are only legacy secrets" do
+      before do
+        heritage.env_vars.create!(key: "env", value: "abc", secret: true)
+        heritage.env_vars.create!(key: "env2", value: "abc", secret: true)
+      end
+
+      it { is_expected.to eq ["env", "env2"] }
+    end
+
+    context "when there are both legacy secrets and value_from" do
+      before do
+        heritage.env_vars.create!(key: "env", value: "abc", secret: true)
+        heritage.env_vars.create!(key: "env2", value: "abc", secret: true)
+        heritage.environments.create!(name: "env", value_from: "arn")
+        heritage.environments.create!(name: "env3", value_from: "arn")
+      end
+
+      it { is_expected.to eq ["env2"] }
+    end
+  end
 end
 
 describe Heritage::Stack do

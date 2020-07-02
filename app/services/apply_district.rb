@@ -34,7 +34,7 @@ class ApplyDistrict
   def apply
     district.save!
     update_ecs_config
-    district.stack_executor.update
+    district.stack_executor.update(change_set: true)
   end
 
   def destroy!
@@ -98,10 +98,6 @@ class ApplyDistrict
 
   def create_ecs_cluster
     aws.ecs.create_cluster(cluster_name: district.name)
-  end
-
-  def create_or_update_network_stack
-    district.stack_executor.create_or_update
   end
 
   def create_district_role(access_key_id, secret_access_key)

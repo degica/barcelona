@@ -10,6 +10,10 @@ describe "updating a heritage" do
       image_name: "nginx",
       image_tag: "latest",
       before_deploy: "echo hello",
+      environment: [
+        {name: "ENV_KEY", value: "my value"},
+        {name: "SECRET", value_from: "arn"}
+      ],
       services: [
         {
           name: "web",
@@ -30,11 +34,63 @@ describe "updating a heritage" do
         }
       ]
     }
-    api_request :post, "/v1/districts/#{district.name}/heritages", params
+    api_request :post, "/v1/districts/#{district.name}/heritages?debug=true", params
   end
 
   describe "PATCH /heritages/:heritage", type: :request do
     it "updates a heritage" do
+      params = {
+        image_tag: "v3",
+        before_deploy: nil,
+        environment: [
+          {name: "ENV2", value: "my value 2"},
+          {name: "SECRET", value_from: "arn"},
+          {name: "VALUE_HIDDEN_IN_SSM", ssm_path: "heritage1/key1"}
+        ],
+        services: [
+          {
+            cpu: 128,
+            name: "web",
+            command: "true"
+          },
+          {
+            name: "worker",
+            command: "rake jobs:work"
+          }
+        ]
+      }
+
+      expect(DeployRunnerJob).to receive(:perform_later)
+      api_request :patch, "/v1/heritages/nginx", params
+      expect(response).to be_successful
+
+      heritage = JSON.load(response.body)["heritage"]
+      expect(heritage["name"]).to eq "nginx"
+      expect(heritage["image_name"]).to eq "nginx"
+      expect(heritage["image_tag"]).to eq "v3"
+      expect(heritage["before_deploy"]).to eq nil
+      expect(heritage["environment"].count).to eq 3
+      expect(heritage["environment"][0]["name"]).to eq "ENV2"
+      expect(heritage["environment"][0]["value"]).to eq "my value 2"
+      expect(heritage["environment"][0]["value_from"]).to eq nil
+      expect(heritage["environment"][1]["name"]).to eq "SECRET"
+      expect(heritage["environment"][1]["value"]).to eq nil
+      expect(heritage["environment"][1]["value_from"]).to eq "arn"
+      expect(heritage["environment"][2]["name"]).to eq "VALUE_HIDDEN_IN_SSM"
+      expect(heritage["environment"][2]["value"]).to eq nil
+      expect(heritage["environment"][2]["value_from"]).to eq "/barcelona/#{district.name}/heritage1/key1"
+      web_service = heritage["services"].find { |s| s["name"] == "web" }
+      expect(web_service["public"]).to eq true
+      expect(web_service["cpu"]).to eq 128
+      expect(web_service["memory"]).to eq 256
+      expect(web_service["command"]).to eq "true"
+      expect(web_service["port_mappings"][0]["lb_port"]).to eq 80
+      expect(web_service["port_mappings"][0]["container_port"]).to eq 80
+      worker_service = heritage["services"].find { |s| s["name"] == "worker" }
+      expect(worker_service["command"]).to eq "rake jobs:work"
+    end
+
+    it "updates a heritage to cpu = nil" do
       params = {
         image_tag: "v3",
         before_deploy: nil,
@@ -50,24 +106,17 @@ describe "updating a heritage" do
         ]
       }
 
+      expect(Heritage.last.services.find_by(name: 'web').cpu).to eq 128
+
       expect(DeployRunnerJob).to receive(:perform_later)
       api_request :patch, "/v1/heritages/nginx", params
-      expect(response).to be_success
-
+      expect(response).to be_successful
       heritage = JSON.load(response.body)["heritage"]
-      expect(heritage["name"]).to eq "nginx"
-      expect(heritage["image_name"]).to eq "nginx"
-      expect(heritage["image_tag"]).to eq "v3"
-      expect(heritage["before_deploy"]).to eq nil
+      token = JSON.load(response.body)["heritage"]["token"]
       web_service = heritage["services"].find { |s| s["name"] == "web" }
-      expect(web_service["public"]).to eq true
-      expect(web_service["cpu"]).to eq 128
-      expect(web_service["memory"]).to eq 256
-      expect(web_service["command"]).to eq "true"
-      expect(web_service["port_mappings"][0]["lb_port"]).to eq 80
-      expect(web_service["port_mappings"][0]["container_port"]).to eq 80
-      worker_service = heritage["services"].find { |s| s["name"] == "worker" }
-      expect(worker_service["command"]).to eq "rake jobs:work"
+
+      expect(web_service["cpu"]).to be_nil
+      expect(Heritage.last.services.find_by(name: 'web').cpu).to be_nil
     end
   end
 
@@ -75,6 +124,44 @@ describe "updating a heritage" do
     let(:district) { create :district }
 
     it "updates a heritage" do
+      params = {
+        image_tag: "v3",
+        before_deploy: nil,
+        services: [
+          {
+            cpu: 128,
+            name: "web",
+            command: "true"
+          },
+          {
+            name: "worker",
+            command: "rake jobs:work"
+          }
+        ]
+      }
+
+      token = JSON.load(response.body)["heritage"]["token"]
+
+      expect(DeployRunnerJob).to receive(:perform_later)
+      api_request :post, "/v1/heritages/nginx/trigger/#{token}", params
+      expect(response).to be_successful
+      heritage = JSON.load(response.body)["heritage"]
+
+      expect(heritage["name"]).to eq "nginx"
+      expect(heritage["image_name"]).to eq "nginx"
+      expect(heritage["image_tag"]).to eq "v3"
+      expect(heritage["before_deploy"]).to eq nil
+      web_service = heritage["services"].find { |s| s["name"] == "web" }
+      expect(web_service["name"]).to eq "web"
+      expect(web_service["public"]).to eq true
+      expect(web_service["cpu"]).to eq 128
+      expect(web_service["memory"]).to eq 256
+      expect(web_service["command"]).to eq "true"
+      expect(web_service["port_mappings"][0]["lb_port"]).to eq 80
+      expect(web_service["port_mappings"][0]["container_port"]).to eq 80
+    end
+
+    it "updates a heritage to cpu = nil" do
       params = {
         image_tag: "v3",
         before_deploy: nil,
@@ -92,24 +179,18 @@ describe "updating a heritage" do
 
       token = JSON.load(response.body)["heritage"]["token"]
 
+      expect(Heritage.last.services.find_by(name: 'web').cpu).to eq 128
+
       expect(DeployRunnerJob).to receive(:perform_later)
       api_request :post, "/v1/heritages/nginx/trigger/#{token}", params
-      expect(response).to be_success
+      expect(response).to be_successful
       heritage = JSON.load(response.body)["heritage"]
-
-      expect(heritage["name"]).to eq "nginx"
-      expect(heritage["image_name"]).to eq "nginx"
-      expect(heritage["image_tag"]).to eq "v3"
-      expect(heritage["before_deploy"]).to eq nil
       web_service = heritage["services"].find { |s| s["name"] == "web" }
-      expect(web_service["name"]).to eq "web"
-      expect(web_service["public"]).to eq true
-      expect(web_service["cpu"]).to eq 128
-      expect(web_service["memory"]).to eq 256
-      expect(web_service["command"]).to eq "true"
-      expect(web_service["port_mappings"][0]["lb_port"]).to eq 80
-      expect(web_service["port_mappings"][0]["container_port"]).to eq 80
+
+      expect(web_service["cpu"]).to be_nil
+      expect(Heritage.last.services.find_by(name: 'web').cpu).to be_nil
     end
+
   end
 
   describe "with wrong heritage token", type: :request do
@@ -143,6 +224,7 @@ describe "updating a heritage" do
         before_deploy: nil,
         services: [
           {
+            cpu: 128,
             name: "web",
             command: "true"
           },
@@ -159,7 +241,7 @@ describe "updating a heritage" do
 
       expect(DeployRunnerJob).to receive(:perform_later)
       api_request :patch, "/v1/heritages/nginx", params
-      expect(response).to be_success
+      expect(response).to be_successful
 
       heritage = JSON.load(response.body)["heritage"]
       expect(heritage["name"]).to eq "nginx"
@@ -190,6 +272,7 @@ describe "updating a heritage" do
         before_deploy: nil,
         services: [
           {
+            cpu: 128,
             name: "web",
             command: "true"
           }
@@ -198,7 +281,7 @@ describe "updating a heritage" do
 
       expect(DeployRunnerJob).to receive(:perform_later)
       api_request :patch, "/v1/heritages/nginx", params
-      expect(response).to be_success
+      expect(response).to be_successful
 
       heritage = JSON.load(response.body)["heritage"]
       expect(heritage["services"].count).to eq 1

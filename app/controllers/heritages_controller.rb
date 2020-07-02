@@ -85,6 +85,7 @@ class HeritagesController < ApplicationController
         :public,
         :service_type,
         :force_ssl,
+        :web_container_port,
         {
           port_mappings: [
             :lb_port,
@@ -113,6 +114,12 @@ class HeritagesController < ApplicationController
       scheduled_tasks: [
         :schedule,
         :command
+      ],
+      environment: [
+        :name,
+        :value,
+        :value_from,
+        :ssm_path
       ]
     ]).tap do |whitelisted|
       if params[:services].present?

@@ -18,7 +18,7 @@ module Barcelona
         it "gets hooked with container_instance_user_data trigger" do
           ci = ContainerInstance.new(district)
           user_data = YAML.load(Base64.decode64(ci.user_data.build))
-          expect(user_data["runcmd"].last).to eq "docker run -d --name dd-agent -h `hostname` -v /var/run/docker.sock:/var/run/docker.sock -v /proc/:/host/proc/:ro -v /cgroup/:/host/sys/fs/cgroup:ro -e API_KEY=abcdef -e TAGS=\"barcelona,barcelona-dd-agent,district:#{district.name}\" datadog/docker-dd-agent:latest"
+          expect(user_data["runcmd"].last).to eq "DD_AGENT_MAJOR_VERSION=7 DD_API_KEY=abcdef bash -c \"$(curl -L https://raw.githubusercontent.com/DataDog/datadog-agent/master/cmd/agent/install_script.sh)\" && usermod -a -G docker dd-agent && usermod -a -G systemd-journal dd-agent && systemctl restart datadog-agent"
         end
       end
     end

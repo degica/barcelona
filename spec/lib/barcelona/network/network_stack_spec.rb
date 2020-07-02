@@ -141,18 +141,14 @@ describe Barcelona::Network::NetworkStack do
         "Properties" => {
           "IamInstanceProfile" => {"Ref"=>"ECSInstanceProfile"},
           "ImageId" => kind_of(String),
-          "InstanceType" => "t2.small",
+          "InstanceType" => "t3.small",
           "SecurityGroups" => [{"Ref"=>"InstanceSecurityGroup"}],
           "UserData" => instance_of(String),
-          "EbsOptimized" => false,
+          "EbsOptimized" => true,
           "BlockDeviceMappings" => [
             {
               "DeviceName"=>"/dev/xvda",
-              "Ebs" => {"DeleteOnTermination"=>true, "VolumeSize"=>20, "VolumeType"=>"gp2"}
-            },
-            {
-              "DeviceName"=>"/dev/xvdcz",
-              "Ebs" => {"DeleteOnTermination"=>true, "VolumeSize"=>80, "VolumeType"=>"gp2"}
+              "Ebs" => {"DeleteOnTermination"=>true, "VolumeSize"=>100, "VolumeType"=>"gp2"}
             }
           ]
         }
@@ -218,8 +214,8 @@ describe Barcelona::Network::NetworkStack do
             "ZipFile" => kind_of(String)
           },
           "Handler" => "index.lambda_handler",
-          "Runtime" => "python2.7",
-          "Timeout" => "10",
+          "Runtime" => "python3.7",
+          "Timeout" => "15",
           "Role" => {"Fn::GetAtt" => ["ASGDrainingFunctionRole", "Arn"]},
           "Environment" => {
             "Variables" => {
@@ -313,16 +309,8 @@ describe Barcelona::Network::NetworkStack do
             {"IpProtocol" => "tcp",
              "FromPort" => 22,
              "ToPort" => 22,
-             "CidrIp" => "0.0.0.0/0"},
-            {"IpProtocol" => "udp",
-             "FromPort" => 123,
-             "ToPort" => 123,
-             "CidrIp" => district.cidr_block}],
+             "CidrIp" => "0.0.0.0/0"}],
           "SecurityGroupEgress" => [
-            {"IpProtocol" => "udp",
-             "FromPort" => 123,
-             "ToPort" => 123,
-             "CidrIp" => "0.0.0.0/0"},
             {"IpProtocol" => "tcp",
              "FromPort" => 22,
              "ToPort" => 22,
@@ -368,32 +356,16 @@ describe Barcelona::Network::NetworkStack do
             ]
           },
           "Path"=>"/",
-          "Policies" => [
-            {
-              "PolicyName" => "bastion-role",
-              "PolicyDocument" => {
-                "Version" => "2012-10-17",
-                "Statement" => [
-                  {
-                    "Effect"=>"Allow",
-                    "Action" => [
-                      "logs:CreateLogGroup",
-                      "logs:CreateLogStream",
-                      "logs:DescribeLogStreams",
-                      "logs:PutLogEvents",
-                    ],
-                    "Resource"=>["*"]
-                  }
-                ]
-              }
-            }
-          ]
+          "ManagedPolicyArns" => [
+            "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM",
+            "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+          ],
         }
       },
       "BastionLaunchConfiguration" => {
         "Type" => "AWS::AutoScaling::LaunchConfiguration",
         "Properties" => {
-          "InstanceType" => "t2.micro",
+          "InstanceType" => "t3.micro",
           "IamInstanceProfile" => {"Ref" => "BastionProfile"},
           "ImageId" => kind_of(String),
           "UserData" => anything,
@@ -461,6 +433,11 @@ describe Barcelona::Network::NetworkStack do
             ]
           },
           "Path"=>"/",
+          "ManagedPolicyArns" => [
+            "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM",
+            "arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role",
+            "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+          ],
           "Policies" => [
             {
               "PolicyName" => "barcelona-ecs-container-instance-role",
@@ -470,21 +447,6 @@ describe Barcelona::Network::NetworkStack do
                   {
                     "Effect"=>"Allow",
                     "Action" => [
-                      "ecs:DeregisterContainerInstance",
-                      "ecs:DiscoverPollEndpoint",
-                      "ecs:Poll",
-                      "ecs:RegisterContainerInstance",
-                      "ecs:StartTelemetrySession",
-                      "ecs:Submit*",
-                      "ecs:DescribeClusters",
-                      "ecr:GetAuthorizationToken",
-                      "ecr:BatchCheckLayerAvailability",
-                      "ecr:GetDownloadUrlForLayer",
-                      "ecr:BatchGetImage",
-                      "logs:CreateLogGroup",
-                      "logs:CreateLogStream",
-                      "logs:DescribeLogStreams",
-                      "logs:PutLogEvents",
                       "s3:Get*",
                       "s3:List*"
                     ],
@@ -514,7 +476,7 @@ describe Barcelona::Network::NetworkStack do
           "Path" => "/",
           "Policies" => [
             {
-              "PolicyName" => "barcelona-ecs-container-instance-role",
+              "PolicyName" => "barcelona-ecs-service-role",
               "PolicyDocument" => {
                 "Version"=>"2012-10-17",
                 "Statement" => [

@@ -66,18 +66,27 @@ describe "POST /districts/:district/heritages", type: :request do
       expect(heritage["services"][0]["command"]).to eq "nginx"
       expect(heritage["services"][0]["force_ssl"]).to eq true
       expect(heritage["services"][0]["reverse_proxy_image"]).to eq "org/custom_revpro:v1.2"
-      expect(heritage["services"][0]["port_mappings"][0]["lb_port"]).to eq 3333
-      expect(heritage["services"][0]["port_mappings"][0]["container_port"]).to eq 3333
-      expect(heritage["services"][0]["port_mappings"][0]["host_port"]).to be_a Integer
-      expect(heritage["services"][0]["port_mappings"][0]["protocol"]).to eq "udp"
-      expect(heritage["services"][0]["port_mappings"][1]["lb_port"]).to eq 80
-      expect(heritage["services"][0]["port_mappings"][1]["container_port"]).to eq 3000
-      expect(heritage["services"][0]["port_mappings"][1]["host_port"]).to be_a Integer
-      expect(heritage["services"][0]["port_mappings"][1]["protocol"]).to eq "http"
-      expect(heritage["services"][0]["port_mappings"][2]["lb_port"]).to eq 443
-      expect(heritage["services"][0]["port_mappings"][2]["container_port"]).to eq 3000
-      expect(heritage["services"][0]["port_mappings"][2]["host_port"]).to be_a Integer
-      expect(heritage["services"][0]["port_mappings"][2]["protocol"]).to eq "https"
+
+      udp_mapping = heritage["services"][0]["port_mappings"].find do |port_mapping|
+        port_mapping["lb_port"]  == 3333
+      end
+      expect(udp_mapping["host_port"]).to be_a Integer
+      expect(udp_mapping["protocol"]).to eq "udp"
+
+      http_mapping = heritage["services"][0]["port_mappings"].find do |port_mapping|
+        port_mapping["lb_port"]  == 80
+      end
+      expect(http_mapping["container_port"]).to eq 3000
+      expect(http_mapping["host_port"]).to be_a Integer
+      expect(http_mapping["protocol"]).to eq "http"
+
+      https_mapping = heritage["services"][0]["port_mappings"].find do |port_mapping|
+        port_mapping["lb_port"]  == 443
+      end
+      expect(https_mapping["container_port"]).to eq 3000
+      expect(https_mapping["host_port"]).to be_a Integer
+      expect(https_mapping["protocol"]).to eq "https"
+
       expect(heritage["services"][0]["health_check"]["protocol"]).to eq "tcp"
       expect(heritage["services"][0]["health_check"]["port"]).to eq 1111
       expect(heritage["services"][0]["hosts"][0]["hostname"]).to eq "awesome-app.degica.com"

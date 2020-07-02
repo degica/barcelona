@@ -16,15 +16,24 @@ class Oneoff < ActiveRecord::Base
   class ECSResourceError < RuntimeError
   end
 
-  def run(sync: false, interactive: false)
+  def env_var_arrayize(env_vars)
+    env_vars.map { |k, v| {name: k, value: v} }
+  end
+
+  def run(sync: false, interactive: false, started_by: "barcelona", env_vars: {})
     raise ArgumentError if sync && interactive
 
     self.session_token = SecureRandom.uuid if interactive
     definition = HeritageTaskDefinition.oneoff_definition(self)
     aws.ecs.register_task_definition(definition.to_task_definition)
+
+    vars = { "LANG" => "C.UTF-8" }
+    vars = vars.merge(env_vars)
+
     resp = aws.ecs.run_task(
       cluster: district.name,
       task_definition: definition.family_name,
+      started_by: started_by,
       overrides: {
         container_overrides: [
           {
@@ -33,7 +42,7 @@ class Oneoff < ActiveRecord::Base
             # Ideally Barcelona should not override LANG but because all official docker images
             # doesn't set LANG as UTF8 we can't use multi byte characters in
             # the interactive session without this override
-            environment: interactive ? [{name: "LANG", value: "C.UTF-8"}] : []
+            environment: env_var_arrayize(vars)
           }
         ]
       }

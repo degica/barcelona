@@ -13,7 +13,8 @@ class HeritageTaskDefinition
         force_ssl: service.force_ssl,
         hosts: service.hosts,
         reverse_proxy_image: service.reverse_proxy_image,
-        mode: (service.listeners.present?) ? :alb : :tcp
+        mode: (service.listeners.present?) ? :alb : :tcp,
+        web_container_port: service.web_container_port
        )
   end
 
@@ -47,7 +48,7 @@ class HeritageTaskDefinition
                     end
     end
     ret = {family: family_name, container_definitions: containers}
-    ret = ret.merge(task_role_arn: heritage.task_role_id) unless without_task_role
+    ret = ret.merge(task_role_arn: heritage.task_role_id, execution_role_arn: heritage.task_execution_role_id) unless without_task_role
     if camelize
       ret = deep_transform_keys_with_parent_keys(ret) do |k, parents|
         (parents.last(2) != [:log_configuration, :options] &&
@@ -73,7 +74,7 @@ class HeritageTaskDefinition
     end
   end
 
-  def initialize(heritage:, family_name:, user: nil, cpu:, memory:, command: nil, port_mappings: nil, is_web_service: false, force_ssl: false, hosts: [], app_container_labels: {}, reverse_proxy_image: nil, mode: nil)
+  def initialize(heritage:, family_name:, user: nil, cpu:, memory:, command: nil, port_mappings: nil, is_web_service: false, force_ssl: false, hosts: [], app_container_labels: {}, reverse_proxy_image: nil, mode: nil, web_container_port: 3000)
     @heritage = heritage
     @family_name = family_name
     @user = user
@@ -87,6 +88,7 @@ class HeritageTaskDefinition
     @reverse_proxy_image = reverse_proxy_image
     @app_container_labels = app_container_labels
     @mode = mode
+    @web_container_port = web_container_port
   end
 
   def web_service?
@@ -94,7 +96,7 @@ class HeritageTaskDefinition
   end
 
   def web_container_port
-    3000
+    @web_container_port
   end
 
   def container_definition

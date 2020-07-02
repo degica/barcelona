@@ -13,6 +13,7 @@ class Heritage < ActiveRecord::Base
           j.ContainerDefinitions definition["ContainerDefinitions"]
           j.Family definition["Family"]
           j.TaskRoleArn ref("TaskRole")
+          j.ExecutionRoleArn ref("TaskExecutionRole")
         end
 
         heritage.scheduled_tasks.each_with_index do |s, i|
@@ -49,7 +50,7 @@ class Heritage < ActiveRecord::Base
         add_resource("AWS::Lambda::Function", "ScheduleHandler") do |j|
           j.Handler "index.handler"
           j.Role get_attr("ScheduleHandlerRole", "Arn")
-          j.Runtime "nodejs4.3"
+          j.Runtime "nodejs12.x"
           j.Timeout 60
           j.Code do |j|
             j.ZipFile schedule_handler_code
@@ -85,6 +86,13 @@ class Heritage < ActiveRecord::Base
                       "logs:PutLogEvents",
                     ],
                     "Resource" => ["*"]
+                  },
+                  {
+                    "Effect" => "Allow",
+                    "Action" => [
+                      "iam:PassRole"
+                    ],
+                    "Resource" => [get_attr("TaskExecutionRole", "Arn")]
                   }
                 ]
               }
@@ -93,7 +101,7 @@ class Heritage < ActiveRecord::Base
         end
       end
 
-      add_resource("AWS::IAM::Role", "TaskRole") do |j|
+      add_resource("AWS::IAM::Role", "TaskExecutionRole") do |j|
         j.AssumeRolePolicyDocument do |j|
           j.Version "2012-10-17"
           j.Statement [
@@ -107,30 +115,70 @@ class Heritage < ActiveRecord::Base
           ]
         end
         j.Path "/"
+        j.ManagedPolicyArns ["arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"]
         j.Policies [
           {
-            "PolicyName" => "barcelona-ecs-task-role-#{heritage.name}",
+            "PolicyName" => "barcelona-ecs-task-execution-role-#{heritage.name}",
             "PolicyDocument" => {
               "Version" => "2012-10-17",
               "Statement" => [
                 {
                   "Effect" => "Allow",
-                  "Action" => ["logs:CreateLogStream",
-                               "logs:PutLogEvents"],
-                  "Resource" => ["*"]
-                },
-                {
-                  "Effect" => "Allow",
-                  "Action" => ["s3:GetObject"],
+                  "Action" => [
+                    "ssm:GetParameters",
+                    "secretsmanager:GetSecretValue",
+                  ],
                   "Resource" => [
-                    "arn:aws:s3:::#{heritage.district.s3_bucket_name}/heritages/#{heritage.name}/*",
-                    "arn:aws:s3:::#{heritage.district.s3_bucket_name}/certs/*",
+                    sub("arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/barcelona/#{heritage.district.name}/*"),
+                    sub("arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:barcelona/#{heritage.district.name}/*"),
                   ]
                 }
               ]
             }
           }
         ]
+      end
+
+      unless heritage.review?
+        add_resource("AWS::IAM::Role", "TaskRole") do |j|
+          j.AssumeRolePolicyDocument do |j|
+            j.Version "2012-10-17"
+            j.Statement [
+              {
+                "Effect" => "Allow",
+                "Principal" => {
+                  "Service" => ["ecs-tasks.amazonaws.com"]
+                },
+                "Action" => ["sts:AssumeRole"]
+              }
+            ]
+          end
+          j.Path "/"
+          j.Policies [
+            {
+              "PolicyName" => "barcelona-ecs-task-role-#{heritage.name}",
+              "PolicyDocument" => {
+                "Version" => "2012-10-17",
+                "Statement" => [
+                  {
+                    "Effect" => "Allow",
+                    "Action" => ["logs:CreateLogStream",
+                                 "logs:PutLogEvents"],
+                    "Resource" => ["*"]
+                  },
+                  {
+                    "Effect" => "Allow",
+                    "Action" => ["s3:GetObject"],
+                    "Resource" => [
+                      "arn:aws:s3:::#{heritage.district.s3_bucket_name}/heritages/#{heritage.name}/*",
+                      "arn:aws:s3:::#{heritage.district.s3_bucket_name}/certs/*",
+                    ]
+                  }
+                ]
+              }
+            }
+          ]
+        end
       end
     end
 
@@ -158,8 +206,10 @@ class Heritage < ActiveRecord::Base
 
   has_many :services, inverse_of: :heritage, dependent: :destroy
   has_many :env_vars, dependent: :destroy
+  has_many :environments
   has_many :oneoffs, dependent: :destroy
   has_many :releases, -> { order 'version DESC' }, dependent: :destroy, inverse_of: :heritage
+  has_one :review_app, dependent: :destroy, autosave: false
   belongs_to :district, inverse_of: :heritages
 
   validates :name,
@@ -177,6 +227,7 @@ class Heritage < ActiveRecord::Base
 
   accepts_nested_attributes_for :services, allow_destroy: true
   accepts_nested_attributes_for :env_vars
+  accepts_nested_attributes_for :environments, allow_destroy: true
 
   after_initialize do |heritage|
     heritage.version ||= 2
@@ -202,11 +253,15 @@ class Heritage < ActiveRecord::Base
     "#{image_name}:#{tag}"
   end
 
-  def save_and_deploy!(without_before_deploy: false, description: "")
-    save!
+  def deploy!(without_before_deploy: false, description: "")
     release = releases.create!(description: description)
     update_services(release, without_before_deploy)
     release
+  end
+
+  def save_and_deploy!(without_before_deploy: false, description: "")
+    save!
+    deploy!(without_before_deploy: without_before_deploy, description: description)
   end
 
   def regenerate_token
@@ -216,7 +271,6 @@ class Heritage < ActiveRecord::Base
   def base_task_definition(task_name, with_environment: true)
     base = district.base_task_definition.merge(
       name: task_name,
-      cpu: 256,
       memory: 256,
       essential: true,
       image: image_path,
@@ -230,7 +284,10 @@ class Heritage < ActiveRecord::Base
       }
     )
     if with_environment
-      base[:environment] += env_vars.where(secret: false).map { |e| {name: e.key, value: e.value} }
+      base[:environment] += environment_set
+      if environments.any?
+        base[:secrets] = environments.secrets.map { |e| {name: e.name, value_from: e.value_from} }
+      end
     end
 
     district.hook_plugins(:heritage_task_definition, self, base)
@@ -241,7 +298,15 @@ class Heritage < ActiveRecord::Base
   end
 
   def task_role_id
-    cf_executor&.resource_ids["TaskRole"]
+    if review?
+      review_app.review_group.task_role_id
+    else
+      cf_executor&.resource_ids["TaskRole"]
+    end
+  end
+
+  def task_execution_role_id
+    cf_executor&.resource_ids["TaskExecutionRole"]
   end
 
   def cf_executor
@@ -249,6 +314,21 @@ class Heritage < ActiveRecord::Base
                        stack = Stack.new(self)
                        CloudFormation::Executor.new(stack, district.aws.cloudformation)
                      end
+  end
+
+  def environment_set
+    legacy_env_vars = env_vars.where(secret: false).map { |e| [e.key, e.value] }.to_h
+    envs = environments.plains.map { |e| [e.name, e.value] }.to_h
+    union = legacy_env_vars.merge(envs)
+    union.map { |k, v| {name: k, value: v} }
+  end
+
+  def legacy_secrets
+    env_vars.where(secret: true).where.not(key: environments.secrets.pluck(:name))
+  end
+
+  def review?
+    review_app.present?
   end
 
   private

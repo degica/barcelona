@@ -2,7 +2,7 @@
 ## Bootstrap
 
 To start using Barcelona, you'll first need to deploy Barcelona API service.
-Install docker in your machine and run the bellow command.
+Install docker on your machine and run the bellow command.
 
 ```
 $ docker run --rm -it quay.io/degica/barcelona bin/bootstrap
@@ -12,7 +12,6 @@ $ docker run --rm -it quay.io/degica/barcelona bin/bootstrap
 
 1. Download [Barcelona client](https://github.com/degica/barcelona-cli/releases)
 2. Unzip and place the binary on your `PATH`
-
 
 ## Login Barcelona
 

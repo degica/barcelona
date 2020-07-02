@@ -2,23 +2,28 @@ module Barcelona
   module Network
     class AutoscalingBuilder < CloudFormation::Builder
       # http://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html
-      # amzn-ami-2017.03.f-amazon-ecs-optimized
+      # amzn2-ami-ecs-hvm-2.0
       ECS_OPTIMIZED_AMI_IDS = {
-        "us-east-1"      => "ami-9eb4b1e5",
-        "us-east-2"      => "ami-1c002379",
-        "us-west-1"      => "ami-4a2c192a",
-        "us-west-2"      => "ami-1d668865",
-        "eu-west-1"      => "ami-8fcc32f6",
-        "eu-west-2"      => "ami-cb1101af",
-        "eu-central-1"   => "ami-0460cb6b",
-        "ap-northeast-1" => "ami-b743bed1",
-        "ap-southeast-1" => "ami-9d1f7efe",
-        "ap-southeast-2" => "ami-c1a6bda2",
-        "ca-central-1"   => "ami-b677c9d2"
+        "us-east-1"      => "ami-0b22c910bce7178b6",
+        "us-east-2"      => "ami-0b29e28ad09b4e536",
+        "us-west-1"      => "ami-0560993025898e8e8",
+        "us-west-2"      => "ami-0633e2a3c7135c18a",
+        "eu-west-1"      => "ami-0cf112c4c967e0437",
+        "eu-west-2"      => "ami-038863f4c20d2d63d",
+        "eu-west-3"      => "ami-00a12748018f55f56",
+        "eu-central-1"      => "ami-08c4be469fbdca0fa",
+        "ap-northeast-1"      => "ami-0471ea40c46b4325d",
+        "ap-northeast-2"      => "ami-0a42b1e2c5f22035c",
+        "ap-southeast-1"      => "ami-00100469ca2a34fa3",
+        "ap-southeast-2"      => "ami-02446908683d78c79",
+        "ca-central-1"      => "ami-01a7c134a00678ad6",
+        "ap-south-1"      => "ami-0c20a67db6e1c7258",
+        "sa-east-1"      => "ami-0e720f8542a11d10b",
       }
 
       def ebs_optimized_by_default?
-        !!(instance_type =~ /\A(c4|m4|d2)\..*\z/)
+        # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/EBSOptimized.html
+        !!(instance_type =~ /\A(a1|c4|c5.?|d2|f1|g3.?|h1|i3|m4|m5.?|p2|p3(dn)?|r4|r5.?|t3|u-.*|x1.?|z1d)\..*\z/)
       end
 
       def build_resources
@@ -33,20 +38,12 @@ module Barcelona
           j.EbsOptimized ebs_optimized_by_default?
           j.BlockDeviceMappings [
             # Root volume
+            # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/al2ami-storage-config.html
             {
               "DeviceName" => "/dev/xvda",
               "Ebs" => {
                 "DeleteOnTermination" => true,
-                "VolumeSize" => 20,
-                "VolumeType" => "gp2"
-              }
-            },
-            # devicemapper volume used by docker
-            {
-              "DeviceName" => "/dev/xvdcz",
-              "Ebs" => {
-                "DeleteOnTermination" => true,
-                "VolumeSize" => 80,
+                "VolumeSize" => 100,
                 "VolumeType" => "gp2"
               }
             }
@@ -115,8 +112,8 @@ module Barcelona
           end
 
           j.Handler "index.lambda_handler"
-          j.Runtime "python2.7"
-          j.Timeout "10"
+          j.Runtime "python3.7"
+          j.Timeout "15"
           j.Role get_attr("ASGDrainingFunctionRole", "Arn")
           j.Environment do |j|
             j.Variables do |j|

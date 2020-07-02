@@ -1,0 +1,44 @@
+name: build
+jobs:
+  build:
+    container:
+      image: docker:git
+      env:
+        BARCELONA_ENDPOINT: https://barcelona.degica.com
+        DOCKER_REPOSITORY: quay.io/degica/barcelona
+        DOCKER_BUILDKIT: '1'
+        QUAY_USERNAME: degica+github_actions
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: setup
+      run: git submodule update --init
+    - name: script
+      run: |-
+        docker login -u "$QUAY_USERNAME" -p "${{ secrets.QUAY_TOKEN }}" quay.io
+
+        # push a tag named after the branch for debugging.
+        # if the branch does not get provided, it's not too important anyway
+        docker build . -t $DOCKER_REPOSITORY:$GITHUB_HEAD_REF --pull || true
+        docker push $DOCKER_REPOSITORY:$GITHUB_HEAD_REF || true
+
+        docker build . -t $DOCKER_REPOSITORY:$GITHUB_SHA --pull
+        docker push $DOCKER_REPOSITORY:$GITHUB_SHA
+        echo ${{ github.ref }}
+    - name: deploy_setup
+      if: github.ref == 'refs/heads/master'
+      run: |-
+        apk add curl
+        curl -L -o bcn.zip https://github.com/degica/barcelona-cli/releases/latest/download/bcn_linux_amd64.zip
+        unzip ./bcn.zip && mv ./bcn /usr/bin/bcn
+
+    - name: deploy_script
+      if: github.ref == 'refs/heads/master'
+      run: bcn deploy -q -e production --tag $GITHUB_SHA --heritage-token ${{ secrets.MAINLINE_HERITAGE_TOKEN }}
+'on':
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master

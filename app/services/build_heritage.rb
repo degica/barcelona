@@ -30,6 +30,15 @@ class BuildHeritage
       end
     end
 
+    if new_params[:environment]
+      new_params[:environments_attributes] = new_params.delete(:environment).map do |e|
+        e.slice(:name, :value, :value_from, :ssm_path)
+      end
+      new_params[:environments_attributes] = sync_resources(
+        new_params[:environments_attributes], heritage.environments, :name
+      )
+    end
+
     unless heritage.new_record?
       new_params.delete :name
 
@@ -49,23 +58,44 @@ class BuildHeritage
     new_params
   end
 
-  def sync_resources(attributes, resources, key_key)
-    resource_map = resources.pluck(key_key, :id).to_h
+  def sync_resources(attributes, curr_attributes, resource_key)
+    attr_map = curr_attributes.pluck(resource_key, :id).to_h
     attributes ||= []
+
     attributes.each do |attr|
-      attr[:id] = resource_map[attr[key_key]] if resource_map[attr[key_key]].present?
+      attr[:id] = attr_map[attr[resource_key]] if attr_map[attr[resource_key]].present?
     end
 
-    resources_to_delete = resource_map.keys - attributes.map { |attr| attr[key_key] }
+    resources_to_delete = attr_map.keys - attributes.map { |attr| attr[resource_key] }
     resources_to_delete.each do |k|
-      attributes << {id: resource_map[k], _destroy: '1'}
+      attributes << {id: attr_map[k], _destroy: '1'}
     end
     attributes
   end
 
+  def nullables
+    [:cpu]
+  end
+
+  # This method sets fields defined in #nullables to nil before applying
+  # updates to them, so that any deletions in barcelona.yml are detected
+  # properly.
+  def prenullify_params
+    nullifiers = []
+    heritage.services.each do |service|
+      nuller_hash = {}
+      nullables.each do |nullable|
+        nuller_hash[nullable] = nil
+      end
+      nullifiers << { id: service.id, **nuller_hash }
+    end
+    {"services_attributes" => nullifiers}
+  end
+
   def execute
     heritage.district = district if district.present?
-    heritage.attributes = params
+    heritage.assign_attributes prenullify_params
+    heritage.assign_attributes params
     heritage
   end
 end
