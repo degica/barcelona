@@ -53,7 +53,7 @@
             "program": "${workspaceRoot}/bin/rspec",
             "args": [
                 "--pattern",
-                "${workspaceRoot}/spec/**/*_rspec.rb"
+                "${workspaceRoot}/spec/**/*_spec.rb"
             ]
         },
         {
