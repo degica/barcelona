@@ -3,6 +3,7 @@ services:
   web: &app_base
     depends_on:
       - db
+      - vault
     build:
       context: .
       dockerfile: Dockerfile.development
@@ -33,14 +34,6 @@ services:
     <<: *app_base
     ports: []
     command: rake jobs:work
-  spring:
-    <<: *app_base
-    ports: []
-    command: spring server
-    pid: host
-    volumes:
-      - bundle:/usr/local/bundle
-      - .:${PWD}
   db:
     image: postgres:11
     environment:
@@ -52,7 +45,7 @@ services:
     volumes:
       - pgdata:/data
   vault:
-    image: vault:0.7.2
+    image: vault:1.4.2
     ports:
       - "8200:8200"
     environment:
