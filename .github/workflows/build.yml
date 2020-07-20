@@ -9,6 +9,7 @@ jobs:
         DOCKER_BUILDKIT: '1'
         QUAY_USERNAME: degica+github_actions
     runs-on: ubuntu-18.04
+    if: ${{ github.ref != 'refs/heads/master' }}
     steps:
     - uses: actions/checkout@v2
     - name: setup
