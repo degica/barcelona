@@ -1,0 +1,16 @@
+version: '3.8'
+services:
+    revpro:
+        build: .
+        ports:
+            - "50132:80"
+        links:
+            - web
+        environment:
+            UPSTREAM_NAME: web
+            UPSTREAM_PORT: 50133
+    web:
+        image: yeasy/simple-web
+        ports: 
+            - "50133:80"
+
