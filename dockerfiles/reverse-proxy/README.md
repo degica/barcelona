@@ -1,6 +1,6 @@
 # reverse-proxy
 
-The reverse-proxy Dockerfile is the Barcelona support reverse proxy (based on nginx) that is configured to cleanly integrate with the other Barcelona images.
+The reverse-proxy Dockerfile is the Barcelona supported reverse proxy (based on nginx) that is configured to cleanly integrate with the other Barcelona images.
 
 ## Testing
 
