@@ -9,23 +9,24 @@ jobs:
         DOCKER_BUILDKIT: '1'
         QUAY_USERNAME: degica+github_actions
     runs-on: ubuntu-18.04
-    if: ${{ github.ref != 'refs/heads/master' }}
     steps:
     - uses: actions/checkout@v2
     - name: setup
       run: git submodule update --init
     - name: script
       run: |-
-        docker login -u "$QUAY_USERNAME" -p "${{ secrets.QUAY_TOKEN }}" quay.io
-
-        # push a tag named after the branch for debugging.
-        # if the branch does not get provided, it's not too important anyway
         docker build . -t $DOCKER_REPOSITORY:$GITHUB_HEAD_REF --pull || true
-        docker push $DOCKER_REPOSITORY:$GITHUB_HEAD_REF || true
-
         docker build . -t $DOCKER_REPOSITORY:$GITHUB_SHA --pull
-        docker push $DOCKER_REPOSITORY:$GITHUB_SHA
         echo ${{ github.ref }}
+
+    - name: push_images
+      if: github.ref == 'refs/heads/master'
+      run: |-
+        # push a tag named after the branch for debugging.
+        docker login -u "$QUAY_USERNAME" -p "${{ secrets.QUAY_TOKEN }}" quay.io
+        docker push $DOCKER_REPOSITORY:$GITHUB_HEAD_REF || true
+        docker push $DOCKER_REPOSITORY:$GITHUB_SHA
+
     - name: deploy_setup
       if: github.ref == 'refs/heads/master'
       run: |-
