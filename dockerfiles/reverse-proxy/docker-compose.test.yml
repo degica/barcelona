@@ -11,6 +11,7 @@ services:
             UPSTREAM_PORT: 80
             FORCE_SSL: "false"
             DISABLE_PROXY_PROTOCOL: "true"
+            FILTER_LOGS: "true"
     web:
         image: yeasy/simple-web
 

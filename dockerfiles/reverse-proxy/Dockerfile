@@ -8,6 +8,7 @@ RUN apt-get update && \
 
 ADD templates /templates
 COPY render_template.rb /render_template.rb
+COPY maskQueryParams.js /etc/nginx/maskQueryParams.js
 COPY entrypoint /entrypoint
 
 ENTRYPOINT ["/entrypoint"]

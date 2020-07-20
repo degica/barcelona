@@ -29,7 +29,7 @@ class ServerDecorator
   end
 end
 
-### Environement variables example
+### Environment variables example
 # UPSTREAM_NAME=backend.local
 # UPSTREAM_PORT=3000
 # HTTP_HOSTS=login.example.com,web-front.example.com
@@ -63,9 +63,27 @@ def server_conf_template_path
   end
 end
 
+def main_log_format
+  <<~LOG_FORMAT
+    '$proxy_protocol_addr - [$time_local] '
+    '"$request" $status $body_bytes_sent '
+    '"$http_referer" "$http_user_agent"'
+  LOG_FORMAT
+end
+
+def filtered_log_format
+  <<~LOG_FORMAT
+    '$proxy_protocol_addr - [$time_local] '
+    '"$request_method $request_uri_masked $server_protocol" '
+    '$status $body_bytes_sent '
+    '"$http_referer" "$http_user_agent"'
+  LOG_FORMAT
+end
+
 render_template('/templates/nginx.conf.erb', '/etc/nginx/nginx.conf',
   upstream_name: ENV['UPSTREAM_NAME'],
-  upstream_port: ENV['UPSTREAM_PORT']
+  upstream_port: ENV['UPSTREAM_PORT'],
+  log_format: ENV['FILTER_LOGS'] == 'true' ? filtered_log_format : main_log_format,
 )
 
 hosts = (ENV['HTTP_HOSTS'] || "").split(',')
