@@ -8,9 +8,9 @@ services:
             - web
         environment:
             UPSTREAM_NAME: web
-            UPSTREAM_PORT: 50133
+            UPSTREAM_PORT: 80
+            FORCE_SSL: "false"
+            DISABLE_PROXY_PROTOCOL: "true"
     web:
         image: yeasy/simple-web
-        ports: 
-            - "50133:80"
 
