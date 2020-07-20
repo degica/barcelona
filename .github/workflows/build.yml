@@ -22,7 +22,6 @@ jobs:
     - name: push_images
       if: github.ref == 'refs/heads/master'
       run: |-
-        # push a tag named after the branch for debugging.
         docker login -u "$QUAY_USERNAME" -p "${{ secrets.QUAY_TOKEN }}" quay.io
         docker push $DOCKER_REPOSITORY:$GITHUB_HEAD_REF || true
         docker push $DOCKER_REPOSITORY:$GITHUB_SHA
