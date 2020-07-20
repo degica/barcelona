@@ -80,10 +80,14 @@ def filtered_log_format
   LOG_FORMAT
 end
 
+def log_format
+  ENV['FILTER_LOGS'] == 'true' ? filtered_log_format : main_log_format
+end
+
 render_template('/templates/nginx.conf.erb', '/etc/nginx/nginx.conf',
   upstream_name: ENV['UPSTREAM_NAME'],
   upstream_port: ENV['UPSTREAM_PORT'],
-  log_format: ENV['FILTER_LOGS'] == 'true' ? filtered_log_format : main_log_format,
+  log_format: log_format,
 )
 
 hosts = (ENV['HTTP_HOSTS'] || "").split(',')
