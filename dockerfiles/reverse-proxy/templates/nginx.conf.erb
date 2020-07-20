@@ -17,9 +17,6 @@ http {
 
   js_include maskQueryParams.js;
   js_set $request_uri_masked maskQueryParams;
-  <%# log_format main '$proxy_protocol_addr - [$time_local] '
-                  '"$request" $status $body_bytes_sent '
-                  '"$http_referer" "$http_user_agent"';%>
 
   log_format main <%= log_format %>;
 
