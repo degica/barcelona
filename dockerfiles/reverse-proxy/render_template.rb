@@ -63,7 +63,7 @@ def server_conf_template_path
   end
 end
 
-def main_log_format
+def unfiltered_log_format
   <<~LOG_FORMAT
     '$proxy_protocol_addr - [$time_local] '
     '"$request" $status $body_bytes_sent '
@@ -81,7 +81,7 @@ def filtered_log_format
 end
 
 def log_format
-  ENV['FILTER_LOGS'] == 'true' ? filtered_log_format : main_log_format
+  ENV['FILTER_LOGS'] == 'true' ? filtered_log_format : unfiltered_log_format
 end
 
 render_template('/templates/nginx.conf.erb', '/etc/nginx/nginx.conf',
