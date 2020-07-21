@@ -15,16 +15,17 @@ jobs:
       run: git submodule update --init
     - name: script
       run: |-
-        docker login -u "$QUAY_USERNAME" -p "${{ secrets.QUAY_TOKEN }}" quay.io
-
-        # push a tag named after the branch for debugging.
-        # if the branch does not get provided, it's not too important anyway
         docker build . -t $DOCKER_REPOSITORY:$GITHUB_HEAD_REF --pull || true
-        docker push $DOCKER_REPOSITORY:$GITHUB_HEAD_REF || true
-
         docker build . -t $DOCKER_REPOSITORY:$GITHUB_SHA --pull
-        docker push $DOCKER_REPOSITORY:$GITHUB_SHA
         echo ${{ github.ref }}
+
+    - name: push_images
+      if: github.ref == 'refs/heads/master'
+      run: |-
+        docker login -u "$QUAY_USERNAME" -p "${{ secrets.QUAY_TOKEN }}" quay.io
+        docker push $DOCKER_REPOSITORY:$GITHUB_HEAD_REF || true
+        docker push $DOCKER_REPOSITORY:$GITHUB_SHA
+
     - name: deploy_setup
       if: github.ref == 'refs/heads/master'
       run: |-
