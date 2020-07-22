@@ -4,7 +4,7 @@ class ReviewApp < ApplicationRecord
 
   attr_accessor :image_name, :image_tag, :services, :before_deploy, :environment
   validates :subject, :image_name, :image_tag, :retention, :services, presence: true
-  validates :subject, format: {with: /\A[a-z0-9][a-z0-9-]*[a-z0-9]\z/}
+  validates :subject, format: {with: /\A[a-z0-9][a-z0-9(-|_)]*[a-z0-9]\z/}
   validates :retention, numericality: {greater_than: 0, less_than: 24 * 3600 * 30}
 
   before_validation :build_heritage
@@ -40,7 +40,7 @@ class ReviewApp < ApplicationRecord
   end
 
   def domain
-    "#{subject}.#{review_group.base_domain}"
+    "#{sanitized_subject}.#{review_group.base_domain}"
   end
 
   def rule_priority_from_subject
@@ -48,7 +48,7 @@ class ReviewApp < ApplicationRecord
   end
 
   def slug
-    review_group.name + "---" + subject
+    review_group.name + "---" + sanitized_subject
   end
 
   def slug_digest
@@ -56,7 +56,7 @@ class ReviewApp < ApplicationRecord
   end
 
   def to_param
-    subject
+    sanitized_subject
   end
 
   def expired?(now=Time.current)
@@ -67,5 +67,10 @@ class ReviewApp < ApplicationRecord
     environment + [
       {name: "BARCELONA_REVIEWAPP_DOMAIN", value: domain}
     ]
+  end
+
+  # replace underscores if present - not valid as subdomain
+  def sanitized_subject
+    subject.gsub('_', '-')
   end
 end
