@@ -19,6 +19,7 @@ class VaultAuth < Auth
 
   def authorize_action
     capabilities = get_capabilities
+
     authorized = case request.method
                  when "POST"
                    capabilities.include? "create"
@@ -49,6 +50,7 @@ class VaultAuth < Auth
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true if uri.scheme == 'https'
     res = http.request(req)
+
     raise ExceptionHandler::Forbidden.new("Your Vault token does not have a permission for #{req.path}") if res.code.to_i > 299
 
     JSON.load(res.body)
@@ -64,6 +66,7 @@ class VaultAuth < Auth
     req = Net::HTTP::Post.new("/v1/sys/capabilities-self")
     req.body = {path: path}.to_json
     res = request_vault(req)
+
     res["capabilities"]
   end
 
