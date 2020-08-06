@@ -63,9 +63,30 @@ def server_conf_template_path
   end
 end
 
+def default_log_format
+  <<~LOG_FORMAT
+    '$proxy_protocol_addr - [$time_local] '
+    '"$request" $status $body_bytes_sent '
+    '"$http_referer" "$http_user_agent"'
+  LOG_FORMAT
+end
+
+def no_query_params_log_format
+  <<~LOG_FORMAT
+    '$proxy_protocol_addr - [$time_local] '
+    '"$request_method $uri $server_protocol" $status $body_bytes_sent '
+    '"$http_referer" "$http_user_agent"'
+  LOG_FORMAT
+end
+
+def log_format
+  ENV['REMOVE_PARAMS_FROM_LOGS'] == 'true' ? no_query_params_log_format : default_log_format
+end
+
 render_template('/templates/nginx.conf.erb', '/etc/nginx/nginx.conf',
   upstream_name: ENV['UPSTREAM_NAME'],
-  upstream_port: ENV['UPSTREAM_PORT']
+  upstream_port: ENV['UPSTREAM_PORT'],
+  log_format: log_format,
 )
 
 hosts = (ENV['HTTP_HOSTS'] || "").split(',')
