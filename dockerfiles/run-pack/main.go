@@ -5,9 +5,11 @@ import (
 	"strings"
 
 	"github.com/urfave/cli"
+	"github.com/honeybadger-io/honeybadger-go"
 )
 
 func main() {
+	defer honeybadger.Monitor()
 	app := cli.NewApp()
 	app.Name = "barcelona-run"
 	app.Version = "0.0.1"

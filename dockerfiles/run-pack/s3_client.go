@@ -42,7 +42,10 @@ func newSession(region string) (*session.Session, error) {
 			return nil, err
 		}
 
-		sess, err := session.NewSession(&aws.Config{Region: &region})
+		sess, err := session.NewSession(&aws.Config{
+            CredentialsChainVerboseErrors: aws.Bool(true),
+			Region: &region,
+		})
 		if err != nil {
 			return nil, err
 		}
@@ -55,7 +58,10 @@ func newSession(region string) (*session.Session, error) {
 		}
 		return sess, err
 	} else {
-		sess, err := session.NewSession(&aws.Config{Region: &region})
+		sess, err := session.NewSession(&aws.Config{
+            CredentialsChainVerboseErrors: aws.Bool(true),
+			Region: &region,
+		})
 		if err != nil {
 			return nil, err
 		}

@@ -1,4 +1,4 @@
-FROM alpine:3.5
+FROM alpine
 
 ENV GOPATH /.go
 ENV GOBIN $GOPATH/bin
@@ -10,8 +10,7 @@ RUN apk add --no-cache go curl git gcc libc-dev \
   && cd $GOPATH/src/app \
   && mkdir -p $GOBIN \
   && mkdir /barcelona \
-  && curl https://glide.sh/get | sh \
-  && glide install \
+  && go mod download \
   && go build -o /barcelona/barcelona-run --ldflags '-linkmode external -extldflags "-static"' \
   && rm -rf /.go \
   && apk del --purge go curl git gcc libc-dev

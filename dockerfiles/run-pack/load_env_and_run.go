@@ -20,6 +20,7 @@ func getValues(c S3Client, m map[string]string) (map[string]string, error) {
 
 func loadEnvAndRun(region string, bucket string, envs map[string]string, command []string) {
 	cli, err := NewS3Client(region, bucket)
+
 	if err != nil {
 		panic(err)
 	}
