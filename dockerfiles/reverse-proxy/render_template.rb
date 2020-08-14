@@ -75,7 +75,7 @@ def no_query_params_log_format
   <<~LOG_FORMAT
     '$proxy_protocol_addr - [$time_local] '
     '"$request_method $uri $server_protocol" $status $body_bytes_sent '
-    '"$http_referer" "$http_user_agent"'
+    '"$http_user_agent"'
   LOG_FORMAT
 end
 
