@@ -1,5 +1,5 @@
 class GithubAuth < Auth
-  def enabled?
+  def self.enabled?
     ENV['GITHUB_ORGANIZATION'].present?
   end
 

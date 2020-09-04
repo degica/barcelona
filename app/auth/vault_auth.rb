@@ -1,5 +1,5 @@
 class VaultAuth < Auth
-  def enabled?
+  def self.enabled?
     ENV['VAULT_URL'].present?
   end
 
