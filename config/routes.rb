@@ -21,6 +21,18 @@ Rails.application.routes.draw do
         post "/releases/:version/rollback", to: "releases#rollback"
       end
 
+      resources :heritages, except: [:new, :edit] do
+        post   :env_vars, on: :member, to: "heritages#set_env_vars"
+        delete :env_vars, on: :member, to: "heritages#delete_env_vars"
+
+        post "/trigger/:token", to: "heritages#trigger"
+        resources :oneoffs, only: [:show, :create]
+
+        get "/releases", to: "releases#index"
+        get "/releases/:version", to: "releases#show"
+        post "/releases/:version/rollback", to: "releases#rollback"
+      end
+
       resources :endpoints, except: [:new, :edit]
       resources :notifications, except: [:new, :edit]
     end
