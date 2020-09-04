@@ -1,16 +1,59 @@
+class VaultAuthResponse
+  def initialize(resp)
+    @resp = resp
+  end
+
+  def username
+    data.dig('auth', 'metadata', 'username')
+  end
+
+  def org
+    data.dig('auth', 'metadata', 'org')
+  end
+
+  def policies
+    data.dig('auth', 'policies')
+  end
+
+  def client_token
+    data.dig('auth', 'client_token')
+  end
+
+  private
+
+  def data
+    JSON.parse @resp.body
+  end
+end
+
 class VaultAuth < Auth
   def self.enabled?
     ENV['VAULT_URL'].present?
   end
 
   def login
-    authenticate
+    req = Net::HTTP::Post.new("/v1/auth/github/login")
+    req.body = {token: vault_token}.to_json
+
+    http = Net::HTTP.new(vault_uri.host, vault_uri.port)
+    res = http.request(req)
+
+    if res.code != "200"
+      raise ExceptionHandler::Forbidden.new("You are not authorized to do that action")
+    end
+
+    auth_response = VaultAuthResponse.new(res)
+    if auth_response.username
+      user = User.find_or_create_by!(name: auth_response.username)
+      user.auth = 'vault'
+      user.token = auth_response.client_token
+      user.roles = auth_response.policies
+      user
+    end
   end
 
   def authenticate
-    res = lookup
-    username = res.dig("data", "meta", "username")
-    @current_user = User.find_or_create_by!(name: username) if username
+    @current_user = User.find_by_token(vault_token)
   end
 
   # Ignore resource based authorization
@@ -40,15 +83,18 @@ class VaultAuth < Auth
 
   private
 
+  def vault_uri
+    URI(ENV['VAULT_URL'])
+  end
+
   def vault_token
     request.headers['HTTP_X_VAULT_TOKEN']
   end
 
   def request_vault(req)
     req['X-Vault-Token'] = vault_token
-    uri = URI(ENV['VAULT_URL'])
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = true if uri.scheme == 'https'
+    http = Net::HTTP.new(vault_uri.host, vault_uri.port)
+    http.use_ssl = true if vault_uri.scheme == 'https'
     res = http.request(req)
 
     raise ExceptionHandler::Forbidden.new("Your Vault token does not have a permission for #{req.path}") if res.code.to_i > 299
@@ -63,15 +109,13 @@ class VaultAuth < Auth
                ''
              end
     path = "secret/Barcelona#{prefix}#{request.path}"
-    req = Net::HTTP::Post.new("/v1/sys/capabilities-self")
-    req.body = {path: path}.to_json
+    p "*************** #{path}"
+    req = Net::HTTP::Get.new("/v1/sys/capabilities-self")
+    #req.body = {paths: [path]}.to_json
     res = request_vault(req)
 
-    res["capabilities"]
-  end
+    p res
 
-  def lookup
-    req = Net::HTTP::Get.new("/v1/auth/token/lookup-self")
-    request_vault(req)
+    res["capabilities"]
   end
 end
