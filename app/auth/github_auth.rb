@@ -3,6 +3,10 @@ class GithubAuth < Auth
     ENV['GITHUB_ORGANIZATION'].present?
   end
 
+  def name
+    "github"
+  end
+
   def login
     github_token = request.headers['HTTP_X_GITHUB_TOKEN']
 

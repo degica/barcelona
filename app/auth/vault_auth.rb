@@ -7,6 +7,10 @@ class VaultAuth < Auth
     authenticate
   end
 
+  def name
+    "vault"
+  end
+
   def authenticate
     res = lookup
     username = res.dig("data", "meta", "username")
@@ -49,7 +53,7 @@ class VaultAuth < Auth
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = true if uri.scheme == 'https'
     res = http.request(req)
-    raise ExceptionHandler::Forbidden.new("Your Vault token does not have a permission for #{req.path}") if res.code.to_i > 299
+    raise ExceptionHandler::Forbidden.new("Couldn't get capabilities. the token is invalid or expired") if res.code.to_i > 299
 
     JSON.load(res.body)
   end
