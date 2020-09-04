@@ -4,7 +4,7 @@ describe VaultAuth do
   let(:auth) { VaultAuth.new(request) }
   before do
     stub_const('ENV', {
-      'VAULT_URL' => 'http://vault-url',
+      'VAULT_URL' => 'https://vault-url',
       'VAULT_PATH_PREFIX' => ''
     })
   end

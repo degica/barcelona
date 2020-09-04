@@ -47,6 +47,7 @@ class VaultAuth < Auth
     req['X-Vault-Token'] = vault_token
     uri = URI(ENV['VAULT_URL'])
     http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = true if uri.scheme == 'https'
     res = http.request(req)
     raise ExceptionHandler::Forbidden.new("Your Vault token does not have a permission for #{req.path}") if res.code.to_i > 299
 
