@@ -97,7 +97,10 @@ class VaultAuth < Auth
     http.use_ssl = true if vault_uri.scheme == 'https'
     res = http.request(req)
 
-    raise ExceptionHandler::Forbidden.new("Your Vault token does not have a permission for #{req.path}") if res.code.to_i > 299
+    if res.code.to_i > 299
+      Rails.logger.error "ERROR: Vault returned code #{res.code} and #{res.body.inspect}"
+      raise ExceptionHandler::Forbidden.new("Your Vault token does not have a permission for #{req.path}")
+    end
 
     JSON.load(res.body)
   end
@@ -109,12 +112,10 @@ class VaultAuth < Auth
                ''
              end
     path = "secret/Barcelona#{prefix}#{request.path}"
-    p "*************** #{path}"
-    req = Net::HTTP::Get.new("/v1/sys/capabilities-self")
-    #req.body = {paths: [path]}.to_json
-    res = request_vault(req)
 
-    p res
+    req = Net::HTTP::Post.new("/v1/sys/capabilities-self")
+    req.body = {paths: [path]}.to_json
+    res = request_vault(req)
 
     res["capabilities"]
   end
