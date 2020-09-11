@@ -1,31 +1,3 @@
-class VaultAuthResponse
-  def initialize(resp)
-    @resp = resp
-  end
-
-  def username
-    data.dig('auth', 'metadata', 'username')
-  end
-
-  def org
-    data.dig('auth', 'metadata', 'org')
-  end
-
-  def policies
-    data.dig('auth', 'policies')
-  end
-
-  def client_token
-    data.dig('auth', 'client_token')
-  end
-
-  private
-
-  def data
-    JSON.parse @resp.body
-  end
-end
-
 class VaultAuth < Auth
   def self.enabled?
     ENV['VAULT_URL'].present?
@@ -42,7 +14,7 @@ class VaultAuth < Auth
       raise ExceptionHandler::Forbidden.new("You are not authorized to do that action")
     end
 
-    auth_response = VaultAuthResponse.new(res)
+    auth_response = Vault::AuthResponse.new(res)
     if auth_response.username
       user = User.find_or_create_by!(name: auth_response.username)
       user.auth = 'vault'
@@ -61,22 +33,7 @@ class VaultAuth < Auth
   end
 
   def authorize_action
-    capabilities = get_capabilities
-
-    authorized = case request.method
-                 when "POST"
-                   capabilities.include? "create"
-                 when "PATCH", "PUT"
-                   capabilities.include? "update"
-                 when "GET"
-                   capabilities.include? "read"
-                 when "DELETE"
-                   capabilities.include? "delete"
-                 else
-                   raise ExceptionHandler::Unauthorized.new("HTTP method not supported")
-                 end
-
-    unless authorized || capabilities.include?("root")
+    if !cap_probe.authorized?(request.path, request.method)
       raise ExceptionHandler::Forbidden.new("You are not authorized to do that action")
     end
   end
@@ -87,36 +44,15 @@ class VaultAuth < Auth
     URI(ENV['VAULT_URL'])
   end
 
+  def vault_path_prefix
+    ENV['VAULT_PATH_PREFIX']
+  end
+
   def vault_token
     request.headers['HTTP_X_VAULT_TOKEN']
   end
 
-  def request_vault(req)
-    req['X-Vault-Token'] = vault_token
-    http = Net::HTTP.new(vault_uri.host, vault_uri.port)
-    http.use_ssl = true if vault_uri.scheme == 'https'
-    res = http.request(req)
-
-    if res.code.to_i > 299
-      Rails.logger.error "ERROR: Vault returned code #{res.code} and #{res.body.inspect}"
-      raise ExceptionHandler::Forbidden.new("Your Vault token does not have a permission for #{req.path}")
-    end
-
-    JSON.load(res.body)
-  end
-
-  def get_capabilities
-    prefix = if ENV['VAULT_PATH_PREFIX']
-               '/' + ENV['VAULT_PATH_PREFIX']
-             else
-               ''
-             end
-    path = "secret/Barcelona#{prefix}#{request.path}"
-
-    req = Net::HTTP::Post.new("/v1/sys/capabilities-self")
-    req.body = {paths: [path]}.to_json
-    res = request_vault(req)
-
-    res["capabilities"]
+  def cap_probe
+    @cap_probe ||= Vault::CapProbe.new(vault_uri, vault_token, vault_path_prefix)
   end
 end
