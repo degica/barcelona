@@ -3,7 +3,7 @@ require 'rails_helper'
 describe "API request with Vault token", type: :request do
   let(:vault_token) { 'vault-token' }
   let(:district) { create :district }
-  let(:user) { create :user }
+  let(:user) { create :user, token: 'vault-token' }
 
   before do
     stub_const('ENV', {
@@ -11,13 +11,13 @@ describe "API request with Vault token", type: :request do
       'VAULT_PATH_PREFIX' => ''
     })
 
-    stub_request(:get, "#{ENV['VAULT_URL']}/v1/auth/token/lookup-self").
+    stub_request(:get, "http://vault-url/v1/auth/token/lookup-self").
       with(headers: {"X-Vault-Token" => vault_token}).
-      to_return(body: {data: {meta: {username: user.name}}}.to_json)
+      to_return(body: {auth: {metadata: {username: user.name}}}.to_json)
 
-    stub_request(:post, "#{ENV['VAULT_URL']}/v1/sys/capabilities-self").
+    stub_request(:post, "http://vault-url/v1/sys/capabilities-self").
       with(headers: {"X-Vault-Token" => vault_token},
-           body: {path: "secret/Barcelona/#{ENV['VAULT_PATH_PREFIX']}/v1/user"}.to_json
+           body: {paths: ["secret/Barcelona/v1/user"]}.to_json
           ).
       to_return(body: {capabilities: capabilities}.to_json)
   end

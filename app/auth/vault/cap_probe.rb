@@ -1,5 +1,15 @@
 module Vault
   class CapProbe
+
+    # Maps HTTP methods to vault actions
+    METHOD_MAP = {
+      'POST' => 'create',
+      'PATCH' => 'update',
+      'PUT' => 'update',
+      'GET' => 'read',
+      'DELETE' => 'delete'
+    }
+
     def initialize(vault_uri, vault_token, vault_path_prefix)
       @vault_uri = vault_uri
       @vault_token = vault_token
@@ -14,18 +24,12 @@ module Vault
 
     def authorized?(path, method)
       capabilities = retrieve_capabilites(path)
-      case method
-      when "POST"
-        capabilities.include? "create"
-      when "PATCH", "PUT"
-        capabilities.include? "update"
-      when "GET"
-        capabilities.include? "read"
-      when "DELETE"
-        capabilities.include? "delete"
-      else
-        raise ExceptionHandler::Unauthorized.new("HTTP method not supported")
-      end
+      return true if capabilities.include? 'root'
+
+      vault_method = METHOD_MAP[method]
+      raise ExceptionHandler::Unauthorized.new("HTTP method not supported") if vault_method.nil?
+
+      capabilities.include? vault_method
     end
 
     def retrieve_capabilites(path)
