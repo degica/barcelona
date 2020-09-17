@@ -9,7 +9,8 @@ FileUtils.rm '.kaiser.dockerfile'
 def_db postgres: { version: 'alpine', root_password: 'example' }
 
 vault_app_name = ENV['VAULT_APP_NAME'] || 'vault'
-vault_host = ENV['VAULT_HOST'] || "#{vault_app_name}.localhost.labs.degica.com"
+vault_host = ENV['VAULT_HOST'] || "http://vault-app"
+vault_port = ENV['VAULT_PORT'] || '8211'
 
 app_params "
   -e RAILS_ENV=development
@@ -18,7 +19,7 @@ app_params "
   -e GITHUB_ORGANIZATION='dojiko'
   -e GITHUB_DEVELOPER_TEAM='dev'
   -e GITHUB_ADMIN_TEAM='admin'
-  -e VAULT_URL=https://vault-app:8211
+  -e VAULT_URL=#{vault_host}:#{vault_port}
   -e VAULT_PATH_PREFIX=dojiko
 "
 
