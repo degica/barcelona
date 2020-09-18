@@ -28,8 +28,9 @@ services:
       GITHUB_ORGANIZATION: 'degica'
       GITHUB_DEVELOPER_TEAM: 'developers'
       GITHUB_ADMIN_TEAM: 'Admin developers'
-      VAULT_URL: http://vault:8200
-      VAULT_PATH_PREFIX: degica
+      # Uncomment to use vault auth
+      # VAULT_URL: http://vault:8200
+      # VAULT_PATH_PREFIX: degica
   worker:
     <<: *app_base
     ports: []
@@ -45,7 +46,7 @@ services:
     volumes:
       - pgdata:/data
   vault:
-    image: vault:1.4.2
+    image: vault:1.5.2
     ports:
       - "8200:8200"
     environment:
