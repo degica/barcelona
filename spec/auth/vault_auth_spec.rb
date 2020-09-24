@@ -8,6 +8,7 @@ describe VaultAuth do
     allow(auth).to receive(:vault_uri) { URI('https://vault-url') }
     allow(auth).to receive(:vault_path_prefix) { 'dejiko' }
     allow(auth).to receive(:cap_probe) { cap_probe }
+    allow(VaultAuth).to receive(:enabled?) { true }
   end
 
   describe "#authenticate" do
