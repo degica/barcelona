@@ -6,10 +6,8 @@ describe "API request with Vault token", type: :request do
   let(:user) { create :user, token: 'vault-token' }
 
   before do
-    stub_const('ENV', {
-      'VAULT_URL' => 'http://vault-url',
-      'VAULT_PATH_PREFIX' => ''
-    })
+    stub_env('VAULT_URL', 'http://vault-url')
+    stub_env('VAULT_PATH_PREFIX', '')
 
     stub_request(:get, "http://vault-url/v1/auth/token/lookup-self").
       with(headers: {"X-Vault-Token" => vault_token}).

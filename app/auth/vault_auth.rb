@@ -1,6 +1,10 @@
 class VaultAuth < Auth
+  def self.vault_url
+    ENV['VAULT_URL']
+  end
+
   def self.enabled?
-    ENV['VAULT_URL'].present?
+    vault_url.present?
   end
 
   def login
@@ -11,7 +15,7 @@ class VaultAuth < Auth
     res = http.request(req)
 
     if res.code != "200"
-      raise ExceptionHandler::Forbidden.new("You are not authorized to do that action")
+      raise ExceptionHandler::Unauthorized.new("You are not authorized to do that action")
     end
 
     auth_response = Vault::AuthResponse.new(res)
@@ -41,7 +45,7 @@ class VaultAuth < Auth
   private
 
   def vault_uri
-    URI(ENV['VAULT_URL'])
+    URI(VaultAuth.vault_url)
   end
 
   def vault_path_prefix

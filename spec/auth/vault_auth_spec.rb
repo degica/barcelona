@@ -5,10 +5,10 @@ describe VaultAuth do
   let(:cap_probe) { instance_double(Vault::CapProbe) }
 
   before do
-    allow(auth).to receive(:vault_uri) { URI('https://vault-url') }
+    allow(VaultAuth).to receive(:vault_url) { 'https://vault-url' }
+    allow(VaultAuth).to receive(:enabled?) { true }
     allow(auth).to receive(:vault_path_prefix) { 'dejiko' }
     allow(auth).to receive(:cap_probe) { cap_probe }
-    allow(VaultAuth).to receive(:enabled?) { true }
   end
 
   describe "#authenticate" do
@@ -25,6 +25,9 @@ describe VaultAuth do
 
       expect(auth.authenticate.name).to eq 'johnsmith'
     end
+  end
+
+  describe "#login" do
   end
 
   describe '#authorize_action' do

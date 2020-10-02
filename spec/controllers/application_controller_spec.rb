@@ -4,6 +4,7 @@ describe ApplicationController do
   describe "#auth_backend" do
     context "when github auth is enabled" do
       before do
+        stub_env("VAULT_URL", nil)
         stub_env("GITHUB_ORGANIZATION", "degica")
       end
 
@@ -14,6 +15,7 @@ describe ApplicationController do
 
     context "when vault auth is enabled" do
       before do
+        stub_env("GITHUB_ORGANIZATION", nil)
         stub_env("VAULT_URL", "https://vault.degica.com")
       end
 

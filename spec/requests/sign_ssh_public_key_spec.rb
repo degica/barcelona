@@ -8,26 +8,28 @@ describe "POST /districts/:district/sign_public_key", type: :request do
     "#{key.ssh_type} #{[key.to_blob].pack('m0')}"
   end
 
-  before do
-    allow_any_instance_of(District).to receive(:get_ca_key) { ca_key_pair.to_pem }
-  end
-
-  context "when a user is a developer" do
-    let(:user) { create :user, roles: ["developer"], public_key: public_key }
-    it "returns 403" do
-      api_request :post, "/v1/districts/#{district.name}/sign_public_key"
-      expect(response.status).to eq 403
+  given_auth(GithubAuth) do
+    before do
+      allow_any_instance_of(District).to receive(:get_ca_key) { ca_key_pair.to_pem }
     end
-  end
 
-  context "when a user is an admin" do
-    let(:user) { create :user, roles: ["admin"], public_key: public_key }
-    it "udpates a district" do
-      api_request :post, "/v1/districts/#{district.name}/sign_public_key"
-      expect(response.status).to eq 200
-      resp = JSON.parse(response.body)
-      expect(resp["district"]).to be_present
-      expect(resp["certificate"]).to be_a String
+    context "when a user is a developer" do
+      let(:user) { create :user, roles: ["developer"], public_key: public_key }
+      it "returns 403" do
+        api_request :post, "/v1/districts/#{district.name}/sign_public_key"
+        expect(response.status).to eq 403
+      end
+    end
+
+    context "when a user is an admin" do
+      let(:user) { create :user, roles: ["admin"], public_key: public_key }
+      it "udpates a district" do
+        api_request :post, "/v1/districts/#{district.name}/sign_public_key"
+        expect(response.status).to eq 200
+        resp = JSON.parse(response.body)
+        expect(resp["district"]).to be_present
+        expect(resp["certificate"]).to be_a String
+      end
     end
   end
 end
