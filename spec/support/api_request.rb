@@ -16,6 +16,7 @@ module Support
       context "given #{auth_class} authentication" do
         before do
           allow_any_instance_of(ApplicationController).to receive(:auth_backend_class) { auth_class }
+          allow(auth_class).to receive(:enabled?) { true }
         end
 
         instance_eval(&block)
