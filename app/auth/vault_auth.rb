@@ -9,7 +9,7 @@ class VaultAuth < Auth
 
   def login
     req = Net::HTTP::Post.new("/v1/auth/github/login")
-    req.body = {token: vault_token}.to_json
+    req.body = { token: vault_token }.to_json
 
     http = Net::HTTP.new(vault_uri.host, vault_uri.port)
     res = http.request(req)
@@ -24,6 +24,7 @@ class VaultAuth < Auth
       user.auth = 'vault'
       user.token = auth_response.client_token
       user.roles = auth_response.policies
+      user.save
       user
     end
   end
