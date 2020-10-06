@@ -76,6 +76,8 @@ class HeritagesController < ApplicationController
       :image_name,
       :image_tag,
       :before_deploy,
+      :scheduled_task_cpu,
+      :scheduled_task_memory,
       services: [
         :name,
         :cpu,

@@ -45,11 +45,10 @@ describe "POST /districts/:district/heritages", type: :request do
     }
   end
 
-
   shared_examples "create" do
     it "creates a heritage" do
       expect(DeployRunnerJob).to receive(:perform_later)
-      api_request(:post, "/v1/districts/#{district.name}/heritages", params)
+      api_request(:post, "/v1/districts/#{district.name}/heritages?debug=true", params)
       expect(response.status).to eq 200
       heritage = JSON.load(response.body)["heritage"]
       expect(heritage["version"]).to eq version
@@ -103,5 +102,18 @@ describe "POST /districts/:district/heritages", type: :request do
   context "when version is 2" do
     let(:version) { 2 }
     it_behaves_like "create"
+
+    it 'accepts scheduled task cpu and memory' do
+      test_params = params
+      test_params[:scheduled_task_cpu] = '100'
+      test_params[:scheduled_task_memory] = '123'
+      api_request(:post, "/v1/districts/#{district.name}/heritages?debug=true", test_params)
+
+      expect(response.status).to eq 200
+
+      heritage = Heritage.last
+      expect(heritage.scheduled_task_memory).to eq 123
+      expect(heritage.scheduled_task_cpu).to eq 100
+    end
   end
 end

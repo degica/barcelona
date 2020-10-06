@@ -33,8 +33,8 @@ class HeritageTaskDefinition
   def self.schedule_definition(heritage)
     new(heritage: heritage,
         family_name: "#{heritage.name}-schedule",
-        cpu: 128,
-        memory: 512)
+        cpu: heritage.scheduled_task_cpu,
+        memory: heritage.scheduled_task_memory)
   end
 
   def to_task_definition(without_task_role: false, camelize: false)

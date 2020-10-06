@@ -357,5 +357,41 @@ describe HeritageTaskDefinition do
                               ]
                            })
     end
+
+    it "returns a task definition for the schedule with the proper params" do
+      allow(heritage).to receive(:scheduled_task_cpu) { 444 }
+      allow(heritage).to receive(:scheduled_task_memory) { 666 }
+      expect(subject).to eq({
+                              "Family" => "#{heritage.name}-schedule",
+                              "TaskRoleArn" => "task-role",
+                              "ExecutionRoleArn" => "task-execution-role",
+                              "ContainerDefinitions" => [
+                                {
+                                  "Name" =>  "#{heritage.name}-schedule",
+                                  "Cpu" => 444,
+                                  "Memory" => 666,
+                                  "Essential" => true,
+                                  "Image" => heritage.image_path,
+                                  "Environment" => [],
+                                  "VolumesFrom" => [
+                                    {
+                                      "SourceContainer" => "runpack",
+                                      "ReadOnly" => true
+                                    }
+                                  ],
+                                  "LogConfiguration" => expected_log_configuration
+                                },
+                                {
+                                  "Name" => "runpack",
+                                  "Cpu" => 1,
+                                  "Memory" => 16,
+                                  "Essential" => false,
+                                  "Image" => "quay.io/degica/barcelona-run-pack",
+                                  "Environment" => [],
+                                  "LogConfiguration" => expected_log_configuration
+                                }
+                              ]
+                           })
+    end
   end
 end
