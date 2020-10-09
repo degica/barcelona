@@ -57,6 +57,8 @@ namespace :bcn do
       ENV["BOOTSTRAP_DATABASE_URL"] = "postgresql://#{stack.db_user}:#{db_password}@#{db_endpoint}:5432/#{stack.db_name}"
     end
 
+    secret_key_base = SecureRandom.hex(64)
+
     # Run oneoff task that runs inside the VPC and creates barcelona service and endpoint
     heritage = district.heritages.new(
       name: "barcelona-bootstrap",
@@ -68,6 +70,7 @@ namespace :bcn do
     heritage.env_vars.build(key: "AWS_REGION", value: region, secret: false)
     heritage.env_vars.build(key: "AWS_ACCESS_KEY_ID", value: access_key_id, secret: false)
     heritage.env_vars.build(key: "AWS_SECRET_ACCESS_KEY", value: secret_key, secret: true)
+    heritage.env_vars.build(key: "SECRET_KEY_BASE", value: secret_key_base, secret: true)
     heritage.env_vars.build(key: "RAILS_ENV", value: "production", secret: false)
     heritage.env_vars.build(key: "RAILS_LOG_TO_STDOUT", value: "true", secret: false)
     heritage.env_vars.build(key: "DISTRICT_NAME", value: district_name, secret: false)
@@ -142,7 +145,7 @@ EOS
           {key: "RAILS_LOG_TO_STDOUT", value: "true", secret: false},
           {key: "GITHUB_ORGANIZATION", value: ENV['GITHUB_ORGANIZATION'], secret: false},
           {key: "DATABASE_URL",  value: ENV["DATABASE_URL"], secret: true},
-          {key: "SECRET_KEY_BASE", value: SecureRandom.hex(64), secret: true},
+          {key: "SECRET_KEY_BASE", value: secret_key_base, secret: true},
           {key: "ENCRYPTION_KEY", value: ENV["ENCRYPTION_KEY"], secret: true}
         ],
         services_attributes: [
