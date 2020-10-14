@@ -36,6 +36,34 @@ describe ReviewApp do
       review_app.save!
     end
 
+    context 'when a subject includes underscores' do
+      let(:review_app) {
+        group.review_apps.new(
+          subject: "subject_with_underscores",
+          image_name: "image",
+          image_tag: "tag",
+          retention: 12 * 3600,
+          before_deploy: "true",
+          environment: [],
+          services: [{
+            name: "review",
+            command: "true",
+            service_type: "web",
+          }]
+        )
+      }
+
+      it 'passes validation' do
+        expect{review_app.save!}.to_not raise_error
+      end
+
+      it "converts the underscores to hyphens" do
+        expect(review_app.to_param).to eq('subject-with-underscores')
+        expect(review_app.slug).to eq('review---subject-with-underscores')
+      end
+
+    end
+
     context "when a service def has listeners" do
       let(:review_app) {
         group.review_apps.new(
