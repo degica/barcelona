@@ -8,29 +8,15 @@ class VaultAuth < Auth
   end
 
   def login
-    req = Net::HTTP::Post.new("/v1/auth/github/login")
-    req.body = { token: vault_token }.to_json
-
-    http = Net::HTTP.new(vault_uri.host, vault_uri.port)
-    res = http.request(req)
-
-    if res.code != "200"
-      raise ExceptionHandler::Unauthorized.new("You are not authorized to do that action")
-    end
-
-    auth_response = Vault::AuthResponse.new(res)
-    if auth_response.username
-      user = User.find_or_create_by!(name: auth_response.username)
-      user.auth = 'vault'
-      user.token = auth_response.client_token
-      user.roles = auth_response.policies
-      user.save
-      user
-    end
+    authenticate
   end
 
   def authenticate
-    @current_user = User.find_by_token(vault_token)
+    user = User.new(name: "vault-user-#{vault_token.hash.to_s(16)}")
+    user.auth = 'vault'
+    user.token = vault_token
+    user.roles = []
+    @current_user = user
   end
 
   # Ignore resource based authorization

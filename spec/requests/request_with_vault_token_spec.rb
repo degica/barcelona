@@ -27,8 +27,8 @@ describe "API request with Vault token", type: :request do
       api_request_vault :get, "/v1/user"
       expect(response.status).to eq 200
       body = JSON.load(response.body)["user"]
-      expect(body["name"]).to eq user.name
-      expect(body["roles"]).to eq ["developer"]
+      expect(body["name"]).to start_with('vault-user-')
+      expect(body["roles"]).to eq []
     end
   end
 

@@ -20,44 +20,16 @@ describe VaultAuth do
       )
     end
 
-    it 'gets the user of the token' do
-      User.create(name: 'johnsmith', token: 'abcd')
-
-      expect(auth.authenticate.name).to eq 'johnsmith'
+    it 'returns a ghost user that is not persisted' do
+      expect(auth.authenticate).to_not be_persisted
     end
   end
 
   describe "#login" do
-    let(:request) do
-      double(
-        headers: {'HTTP_X_VAULT_TOKEN' => 'abcgithubtoken'},
-        method: "POST",
-        path: 'v1/login'
-      )
-    end
-
-    it 'contacts vault to login' do
-      stub_request(:post, "http://vault-url:443/v1/auth/github/login").
-        with(body: {token: 'abcgithubtoken'}.to_json).
-        to_return(body: {
-          auth: {
-            metadata: {
-              username: 'xavier',
-              org: 'xforce'
-            },
-            policies: ['mutant', 'x-man'],
-            client_token: 'abcdefvault'
-          }
-        }.to_json)
-
+    let(:request) { double({}) }
+    it 'calls authenticate' do
+      expect(auth).to receive(:authenticate)
       auth.login
-
-      user = User.last
-      expect(user.name).to eq 'xavier'
-      expect(user.auth).to eq 'vault'
-      expect(user.roles).to eq ['mutant', 'x-man']
-
-      expect(User.find_by_token('abcdefvault')).to eq user
     end
   end
 
