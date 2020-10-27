@@ -47,8 +47,11 @@ module Barcelona
           # Install AWS Inspector agent
           "curl https://d1wk0tztpsntt1.cloudfront.net/linux/latest/install | bash",
 
+          # imdsv2
+          'IMDSTOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 3600"`',
+
           # awslogs
-          "ec2_id=$(curl http://169.254.169.254/latest/meta-data/instance-id)",
+          'ec2_id=$(curl -H "X-aws-ec2-metadata-token: $IMDSTOKEN" -v http://169.254.169.254/latest/meta-data/instance-id)',
           'sed -i -e "s/{ec2_id}/$ec2_id/g" /etc/awslogs/awslogs.conf',
           'sed -i -e "s/us-east-1/'+district.region+'/g" /etc/awslogs/awscli.conf',
           "systemctl start awslogsd",
@@ -65,11 +68,11 @@ module Barcelona
 
           # Attach OSSEC volume
           "volume_id=$(aws ec2 describe-volumes --region ap-northeast-1 --filters Name=tag-key,Values=ossec-manager-volume Name=tag:barcelona,Values=#{district.name} | jq -r '.Volumes[0].VolumeId')",
-          "instance_id=$(curl http://169.254.169.254/latest/meta-data/instance-id)",
+          'instance_id=$(curl -H "X-aws-ec2-metadata-token: $IMDSTOKEN" -v http://169.254.169.254/latest/meta-data/instance-id)',
           "aws ec2 attach-volume --region ap-northeast-1 --volume-id $volume_id --instance-id $instance_id --device /dev/xvdh",
 
           # Register its private IP to Route53
-          "private_ip=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)",
+          'private_ip=$(curl -H "X-aws-ec2-metadata-token: $IMDSTOKEN" -v http://169.254.169.254/latest/meta-data/local-ipv4)',
           "change_batch=$(echo '#{change_batch}' | sed -e \"s/{private_ip}/$private_ip/\")",
           "aws route53 change-resource-record-sets --hosted-zone-id #{district.private_hosted_zone_id} --change-batch $change_batch",
 

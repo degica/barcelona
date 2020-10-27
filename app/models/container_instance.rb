@@ -13,6 +13,9 @@ class ContainerInstance
       # Embed SHA2 hash dockercfg so that instance replacement happens when dockercfg is updated
       "# #{Digest::SHA256.hexdigest(district.dockercfg.to_s)}",
 
+      # Get IMDSv2 token that expires in 1 hour
+      'IMDSTOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 3600"`',
+
       # Setup swap
       "MEMSIZE=`cat /proc/meminfo | grep MemTotal | awk '{print $2}'`",
       "if [ $MEMSIZE -lt 2097152 ]; then",
@@ -26,6 +29,7 @@ class ContainerInstance
 
       "AWS_REGION=#{district.region}",
       "aws configure set s3.signature_version s3v4",
+
       "aws s3 cp s3://#{district.s3_bucket_name}/#{district.name}/ecs.config /etc/ecs/ecs.config",
       "chmod 600 /etc/ecs/ecs.config",
 
@@ -35,7 +39,7 @@ class ContainerInstance
       "service sshd restart",
 
       # Configure AWS CloudWatch Logs
-      "ec2_id=$(curl http://169.254.169.254/latest/meta-data/instance-id)",
+      'ec2_id=$(curl -H "X-aws-ec2-metadata-token: $IMDSTOKEN" -v http://169.254.169.254/latest/meta-data/instance-id)',
       'sed -i -e "s/{ec2_id}/$ec2_id/g" /etc/awslogs/awslogs.conf',
       'sed -i -e "s/us-east-1/'+district.region+'/g" /etc/awslogs/awscli.conf',
       "systemctl start awslogsd",

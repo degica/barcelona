@@ -4,9 +4,12 @@ module Barcelona
       LOCAL_LOGGER_PORT = 514
       SYSTEM_PACKAGES = %w[rsyslog-gnutls ca-certificates]
       RUN_COMMANDS = [
+        # imdsv2
+        'IMDSTOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 3600"`',
+
         # set up hostname properly on the host so we don't end up identifying the host differently
         # and pay an extra 23 dollars for each phantom host that posts logs on datadog
-        'sed "s/{{HOSTNAME}}/`curl http://169.254.169.254/latest/meta-data/instance-id`/g" /etc/rsyslog.d/datadog.conf > temp' ,
+        'sed "s/{{HOSTNAME}}/`curl -H "X-aws-ec2-metadata-token: $IMDSTOKEN" -v http://169.254.169.254/latest/meta-data/instance-id`/g" /etc/rsyslog.d/datadog.conf > temp' ,
         'cp temp /etc/rsyslog.d/datadog.conf',
         'rm temp',
         "service rsyslog restart"
