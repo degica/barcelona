@@ -2,26 +2,43 @@ require "rails_helper"
 
 describe ApplicationController do
   describe "#auth_backend" do
-    context "when github auth is enabled" do
-      before do
-        stub_env("VAULT_URL", nil)
-        stub_env("GITHUB_ORGANIZATION", "degica")
-      end
+    it "returns error when nothing is enabled" do
+      stub_env("GITHUB_ORGANIZATION", nil)
+      stub_env("VAULT_URL", nil)
 
-      it "returns github" do
-        expect(controller.auth_backend).to be_a GithubAuth
-      end
+      expect{ controller.auth_backend }.to raise_error ExceptionHandler::InternalServerError
     end
 
-    context "when vault auth is enabled" do
-      before do
-        stub_env("GITHUB_ORGANIZATION", nil)
-        stub_env("VAULT_URL", "https://vault.degica.com")
-      end
+    it "returns github when github auth is enabled" do
+      stub_env("VAULT_URL", nil)
+      stub_env("GITHUB_ORGANIZATION", "degica")
 
-      it "returns vault" do
-        expect(controller.auth_backend).to be_a VaultAuth
-      end
+      expect(controller.auth_backend).to be_a GithubAuth
+    end
+
+    it "returns github when github and vault auth are enabled but no vault header is provided" do
+      stub_env("VAULT_URL", "https://vault.degica.com")
+      stub_env("GITHUB_ORGANIZATION", "degica")
+
+      expect(controller.auth_backend).to be_a GithubAuth
+    end
+
+    it "returns error when vault auth is enabled but no vault header is provided" do
+      stub_env("GITHUB_ORGANIZATION", nil)
+      stub_env("VAULT_URL", "https://vault.degica.com")
+
+      expect{ controller.auth_backend }.to raise_error ExceptionHandler::InternalServerError
+    end
+
+    it "returns vault when vault auth is enabled but vault header is provided" do
+      stub_env("GITHUB_ORGANIZATION", nil)
+      stub_env("VAULT_URL", "https://vault.degica.com")
+
+      request_double = instance_double('request')
+      allow(controller).to receive(:request) { request_double }
+      allow(request_double).to receive(:headers) { { 'HTTP_X_VAULT_TOKEN' => 'abcde' } }
+
+      expect(controller.auth_backend).to be_a VaultAuth
     end
   end
 end
