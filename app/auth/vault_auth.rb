@@ -22,6 +22,8 @@ class VaultAuth < Auth
       user.save!
       @current_user = user
     end
+
+    user.token = vault_token
   end
 
   # Ignore resource based authorization
