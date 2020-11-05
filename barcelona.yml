@@ -13,6 +13,7 @@ environments:
         cpu: 128
         memory: 256
         command: puma -C config/puma.rb
+        web_container_port: 3000
         force_ssl: true
         listeners:
           - endpoint: barcelona-second
@@ -35,6 +36,7 @@ environments:
         cpu: 128
         memory: 256
         command: puma -C config/puma.rb
+        web_container_port: 3000
         force_ssl: true
         listeners:
           - endpoint: barcelona

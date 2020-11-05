@@ -23,7 +23,9 @@ class VaultAuth < Auth
       @current_user = user
     end
 
-    user.token = vault_token
+    # assign the real token for use
+    @current_user.token = vault_token if @current_user
+    @current_user
   end
 
   # Ignore resource based authorization
