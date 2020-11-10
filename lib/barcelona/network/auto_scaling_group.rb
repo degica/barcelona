@@ -20,7 +20,7 @@ module Barcelona
           j.HealthCheckType "EC2"
           j.LaunchConfigurationName ref("ContainerInstanceLaunchConfiguration")
           j.VPCZoneIdentifier [ref("SubnetTrusted1"), ref("SubnetTrusted2")]
-          j.MetadataOption do |m|
+          j.MetadataOptions do |m|
             m.HttpTokens 'required'
           end
           j.Tags [

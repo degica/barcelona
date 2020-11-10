@@ -36,7 +36,7 @@ module Barcelona
           j.SecurityGroups [ref("InstanceSecurityGroup")]
           j.UserData instance_user_data
           j.EbsOptimized ebs_optimized_by_default?
-          j.MetadataOption do |m|
+          j.MetadataOptions do |m|
             m.HttpTokens 'required'
           end
           j.BlockDeviceMappings [
