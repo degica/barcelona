@@ -15,7 +15,7 @@ class VaultAuth < Auth
     @current_user = User.find_by_token(vault_token)
 
     if @current_user.nil?
-      user = User.new(name: "vault-user-#{vault_token.hash.to_s(16)}")
+      user = User.new(name: username)
       user.auth = 'vault'
       user.token = vault_token
       user.roles = []
@@ -36,6 +36,12 @@ class VaultAuth < Auth
     if !cap_probe.authorized?(request.path, request.method)
       raise ExceptionHandler::Forbidden.new("You are not authorized to do that action")
     end
+  end
+
+  def username
+    client = Vault::Client.new(address: VaultAuth.vault_url)
+    reply = client.auth.token vault_token
+    reply.data.fetch(:meta, nil)&.fetch(:username, "vault-user#{vault_token.hash.to_s(16)}")
   end
 
   private
