@@ -36,7 +36,9 @@ module Barcelona
           j.SecurityGroups [ref("InstanceSecurityGroup")]
           j.UserData instance_user_data
           j.EbsOptimized ebs_optimized_by_default?
-          j.DisableIMDSv1 true
+          j.MetadataOption do |m|
+            m.HttpTokens 'required'
+          end
           j.BlockDeviceMappings [
             # Root volume
             # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/al2ami-storage-config.html
