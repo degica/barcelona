@@ -11,7 +11,7 @@ describe VaultAuth do
     allow(auth).to receive(:cap_probe) { cap_probe }
   end
 
-  describe "#authenticate" do
+  describe "#username" do
     let(:request) do
       double(
         headers: {"HTTP_X_VAULT_TOKEN" => "abcd"},
@@ -20,8 +20,34 @@ describe VaultAuth do
       )
     end
 
-    it 'returns a user with the hash saved' do
-      expect(auth.authenticate).to be_persisted
+    let(:reply) { instance_double('whatever_vault_uses') }
+
+    before do
+      client = instance_double(Vault::Client)
+      intermediate = instance_double('whatever_vault_uses')
+      allow(Vault::Client).to receive(:new) { client }
+      allow(client).to receive(:auth) { intermediate }
+      allow(intermediate).to receive(:token) { reply }
+    end
+
+    it 'gives the username' do
+      allow(reply).to receive(:data) { { meta: { username: 'foobar' } } }
+      expect(auth.username).to eq 'foobar'
+    end
+
+    it 'gives the placeholder name if vault does not return a username' do
+      allow(reply).to receive(:data) { { meta: { random: 'stuff' } } }
+      expect(auth.username).to start_with 'vault-user'
+    end
+  end
+
+  describe "#authenticate" do
+    let(:request) do
+      double(
+        headers: {"HTTP_X_VAULT_TOKEN" => "abcd"},
+        method: "PATCH",
+        path: '/v1/something'
+      )
     end
 
     it 'returns the existing user' do
@@ -45,6 +71,18 @@ describe VaultAuth do
       )
 
       expect(auth.authenticate.token).to eq 'abcd'
+    end
+
+    it 'calls vault to get a token' do
+      allow(auth).to receive(:username) { 'foobar' }
+
+      expect(auth.authenticate.name).to eq 'foobar'
+    end
+
+    it 'returns a user' do
+      allow(auth).to receive(:username) { 'foobar' }
+
+      expect(auth.authenticate).to be_persisted
     end
   end
 
