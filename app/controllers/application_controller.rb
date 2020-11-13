@@ -27,13 +27,14 @@ class ApplicationController < ActionController::API
   end
 
   def auth_backend
-    @_auth_backend ||= begin
-      backend_class = if VaultAuth.enabled?
-                        VaultAuth
-                      elsif GithubAuth.enabled?
-                        GithubAuth
-                      end
-      backend_class.new(request)
+    @auth_backend ||= auth_backend_class.new(request)
+  end
+
+  def auth_backend_class
+    if VaultAuth.enabled?
+      VaultAuth
+    elsif GithubAuth.enabled?
+      GithubAuth
     end
   end
 end

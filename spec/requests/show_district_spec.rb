@@ -11,12 +11,14 @@ describe "GET /districts/:district", type: :request do
     end
   end
 
-  it "shows a district" do
-    api_request :get, "/v1/districts/#{district.name}"
-    expect(response.status).to eq 200
-    district = JSON.load(response.body)["district"]
-    expect(district["stack_status"]).to eq "CREATE_COMPLETE"
-    expect(district["plugins"]).to eq([{"name" => plugin.name,
-                                        "attributes" => JSON.load(plugin.plugin_attributes.to_json)}])
+  given_auth(GithubAuth) do
+    it "shows a district" do
+      api_request :get, "/v1/districts/#{district.name}"
+      expect(response.status).to eq 200
+      district = JSON.load(response.body)["district"]
+      expect(district["stack_status"]).to eq "CREATE_COMPLETE"
+      expect(district["plugins"]).to eq([{"name" => plugin.name,
+                                          "attributes" => JSON.load(plugin.plugin_attributes.to_json)}])
+    end
   end
 end

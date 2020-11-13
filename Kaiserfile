@@ -1,39 +1,25 @@
 require 'fileutils'
 
+plugin :database
+
 File.write('.kaiser.dockerfile', File.read('Dockerfile').sub('--without development test', '') + "\nRUN rm /app/bin/spring")
 dockerfile '.kaiser.dockerfile'
 FileUtils.rm '.kaiser.dockerfile'
 
-db 'postgres:alpine',
-   port: 5432,
-   data_dir: '/var/lib/postgresql/data',
-   params: '-e POSTGRES_PASSWORD=example',
-   waitscript_params: "
-     -e PG_HOST=<%= db_container_name %>
-     -e PG_USER=postgres
-     -e PGPASSWORD=example
-     -e PG_DATABASE=postgres",
-   waitscript: <<~SCRIPT
-     #!/bin/sh
-
-     RETRIES=5
-
-     until psql -h $PG_HOST -U $PG_USER -d $PG_DATABASE -c "select 1" > /dev/null 2>&1 || [ $RETRIES -eq 0 ]; do
-       echo "Waiting for postgres server, $((RETRIES--)) remaining attempts..."
-       sleep 1
-     done
-   SCRIPT
+def_db postgres: { version: 'alpine', root_password: 'example' }
 
 vault_app_name = ENV['VAULT_APP_NAME'] || 'vault'
-vault_host = ENV['VAULT_HOST'] || "#{vault_app_name}.localhost.labs.degica.com"
+vault_host = ENV['VAULT_HOST'] || "http://vault-app"
+vault_port = ENV['VAULT_PORT'] || '8211'
 
 app_params "
+  -e RAILS_ENV=development
   -e DATABASE_URL=postgres://postgres:example@<%= db_container_name %>:5432
   -e ENCRYPTION_KEY=abcdefghijklmn
   -e GITHUB_ORGANIZATION='dojiko'
   -e GITHUB_DEVELOPER_TEAM='dev'
   -e GITHUB_ADMIN_TEAM='admin'
-  -e VAULT_URL=https://#{vault_host}
+  -e VAULT_URL=#{vault_host}:#{vault_port}
   -e VAULT_PATH_PREFIX=dojiko
 "
 

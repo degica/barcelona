@@ -2,61 +2,48 @@ require "rails_helper"
 
 describe VaultAuth do
   let(:auth) { VaultAuth.new(request) }
+  let(:cap_probe) { instance_double(Vault::CapProbe) }
+
   before do
-    stub_const('ENV', {
-      'VAULT_URL' => 'https://vault-url',
-      'VAULT_PATH_PREFIX' => ''
-    })
+    allow(VaultAuth).to receive(:vault_url) { 'https://vault-url' }
+    allow(VaultAuth).to receive(:enabled?) { true }
+    allow(auth).to receive(:vault_path_prefix) { 'dejiko' }
+    allow(auth).to receive(:cap_probe) { cap_probe }
   end
 
   describe "#authenticate" do
     let(:request) do
-      double(headers: {"HTTP_X_VAULT_TOKEN" => "vault-token"})
-    end
-    subject { auth.authenticate }
-
-    before do
-      @stub = stub_request(:get, "#{ENV['VAULT_URL']}/v1/auth/token/lookup-self").
-        with(headers: {"X-Vault-Token" => "vault-token"}).
-        to_return(body: {data: {meta: {username: "k2nr"}}}.to_json)
-    end
-
-    its(:name) { is_expected.to eq "k2nr" }
-  end
-
-  describe "#authorize_action" do
-    let(:path) { "/v1/districts/default" }
-    let(:request) do
       double(
-        headers: {"HTTP_X_VAULT_TOKEN" => "vault-token"},
+        headers: {"HTTP_X_VAULT_TOKEN" => "abcd"},
         method: "PATCH",
-        path: path
+        path: '/v1/something'
       )
     end
-    subject { auth.authorize_action }
 
-    context "when the given vault token has access to the Barcelona API" do
-      before do
-        @stub = stub_request(:post, "#{ENV['VAULT_URL']}/v1/sys/capabilities-self").
-          with(headers: {"X-Vault-Token" => "vault-token"},
-               body: {path: "secret/Barcelona/#{ENV['VAULT_PATH_PREFIX']}#{path}"}.to_json
-              ).
-          to_return(body: {capabilities: ["update"]}.to_json)
-      end
+    it 'returns a ghost user that is not persisted' do
+      expect(auth.authenticate).to_not be_persisted
+    end
+  end
 
-      it { expect{subject}.to_not raise_error }
+  describe "#login" do
+    let(:request) { double({}) }
+    it 'calls authenticate' do
+      expect(auth).to receive(:authenticate)
+      auth.login
+    end
+  end
+
+  describe '#authorize_action' do
+    let(:request) { double(path: '/v1/something', method: "TEST") }
+
+    it "does not raise error when the given vault token has access to the Barcelona API" do
+      expect(cap_probe).to receive(:authorized?) { true }
+      expect{ auth.authorize_action }.to_not raise_error
     end
 
-    context "when the given vault token does not have access to the Barcelona API" do
-      before do
-        @stub = stub_request(:post, "#{ENV['VAULT_URL']}/v1/sys/capabilities-self").
-          with(headers: {"X-Vault-Token" => "vault-token"},
-               body: {path: "secret/Barcelona/#{ENV['VAULT_PATH_PREFIX']}#{path}"}.to_json
-              ).
-          to_return(body: {capabilities: ["read"]}.to_json)
-      end
-
-      it { expect{subject}.to raise_error ExceptionHandler::Forbidden }
+    it "raises an error when the given vault token does not have access to the Barcelona API" do
+      expect(cap_probe).to receive(:authorized?) { false }
+      expect{ auth.authorize_action }.to raise_error ExceptionHandler::Forbidden
     end
   end
 end

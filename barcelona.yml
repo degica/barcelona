@@ -21,6 +21,25 @@ environments:
         command: rake jobs:work
         cpu: 128
         memory: 256
-bcnd:
-  mainline_branch: master
-  mainline_environment: production
+  test:
+    name: barcelona
+    image_name: quay.io/degica/barcelona
+    before_deploy: rake db:migrate
+    scheduled_tasks:
+      # 10AM JST every week day
+      - schedule: cron(0 1 ? * MON-FRI *)
+        command: bin/chaos
+    services:
+      - name: web
+        service_type: web
+        cpu: 128
+        memory: 256
+        command: puma -C config/puma.rb
+        force_ssl: true
+        listeners:
+          - endpoint: barcelona
+            health_check_path: /health_check
+      - name: worker
+        command: rake jobs:work
+        cpu: 128
+        memory: 256

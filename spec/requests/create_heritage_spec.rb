@@ -95,13 +95,15 @@ describe "POST /districts/:district/heritages", type: :request do
     end
   end
 
-  context "when version is 1" do
-    let(:version) { 1 }
-    it_behaves_like "create"
-  end
+  given_auth(GithubAuth) do
+    context "when version is 1" do
+      let(:version) { 1 }
+      it_behaves_like "create"
+    end
 
-  context "when version is 2" do
-    let(:version) { 2 }
-    it_behaves_like "create"
+    context "when version is 2" do
+      let(:version) { 2 }
+      it_behaves_like "create"
+    end
   end
 end

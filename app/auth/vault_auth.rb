@@ -1,6 +1,10 @@
 class VaultAuth < Auth
+  def self.vault_url
+    ENV['VAULT_URL']
+  end
+
   def self.enabled?
-    ENV['VAULT_URL'].present?
+    vault_url.present?
   end
 
   def login
@@ -8,9 +12,11 @@ class VaultAuth < Auth
   end
 
   def authenticate
-    res = lookup
-    username = res.dig("data", "meta", "username")
-    @current_user = User.find_or_create_by!(name: username) if username
+    user = User.new(name: "vault-user-#{vault_token.hash.to_s(16)}")
+    user.auth = 'vault'
+    user.token = vault_token
+    user.roles = []
+    @current_user = user
   end
 
   # Ignore resource based authorization
@@ -18,57 +24,26 @@ class VaultAuth < Auth
   end
 
   def authorize_action
-    capabilities = get_capabilities
-    authorized = case request.method
-                 when "POST"
-                   capabilities.include? "create"
-                 when "PATCH", "PUT"
-                   capabilities.include? "update"
-                 when "GET"
-                   capabilities.include? "read"
-                 when "DELETE"
-                   capabilities.include? "delete"
-                 else
-                   raise ExceptionHandler::Unauthorized.new("HTTP method not supported")
-                 end
-
-    unless authorized || capabilities.include?("root")
+    if !cap_probe.authorized?(request.path, request.method)
       raise ExceptionHandler::Forbidden.new("You are not authorized to do that action")
     end
   end
 
   private
 
+  def vault_uri
+    URI(VaultAuth.vault_url)
+  end
+
+  def vault_path_prefix
+    ENV['VAULT_PATH_PREFIX']
+  end
+
   def vault_token
     request.headers['HTTP_X_VAULT_TOKEN']
   end
 
-  def request_vault(req)
-    req['X-Vault-Token'] = vault_token
-    uri = URI(ENV['VAULT_URL'])
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = true if uri.scheme == 'https'
-    res = http.request(req)
-    raise ExceptionHandler::Forbidden.new("Your Vault token does not have a permission for #{req.path}") if res.code.to_i > 299
-
-    JSON.load(res.body)
-  end
-
-  def get_capabilities
-    prefix = if ENV['VAULT_PATH_PREFIX']
-               '/' + ENV['VAULT_PATH_PREFIX']
-             else
-               ''
-             end
-    path = "secret/Barcelona#{prefix}#{request.path}"
-    req = Net::HTTP::Post.new("/v1/sys/capabilities-self")
-    req.body = {path: path}.to_json
-    res = request_vault(req)
-    res["capabilities"]
-  end
-
-  def lookup
-    req = Net::HTTP::Get.new("/v1/auth/token/lookup-self")
-    request_vault(req)
+  def cap_probe
+    @cap_probe ||= Vault::CapProbe.new(vault_uri, vault_token, vault_path_prefix)
   end
 end
