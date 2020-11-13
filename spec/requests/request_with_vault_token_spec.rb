@@ -26,14 +26,11 @@ describe "API request with Vault token", type: :request do
     let(:capabilities) { ["read"] }
 
     it "shows user information" do
-      allow_any_instance_of(VaultAuth).to receive(:username) { 'aname' }
 
       api_request_vault :get, "/v1/user"
       expect(response.status).to eq 200
       body = JSON.load(response.body)["user"]
       expect(body["token"]).to eq('vault-token')
-      expect(body["name"]).to start_with('aname')
-      expect(body["roles"]).to eq []
     end
   end
 
