@@ -16,7 +16,7 @@ module Backend::Ecs::V2
       # via CloudFormation temporalily breaks the auto scaling behaviour
       # Because of the above here we set the current desired count to
       # the CF template
-      desired_count = ecs_service&.desired_count || 1
+      desired_count = service.desired_container_count || ecs_service&.desired_count || 1
       cf_executor(td, desired_count).create_or_update
 
       # For backward-compatibility this method need to return Hash
