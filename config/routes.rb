@@ -31,6 +31,8 @@ Rails.application.routes.draw do
         get "/releases", to: "releases#index"
         get "/releases/:version", to: "releases#show"
         post "/releases/:version/rollback", to: "releases#rollback"
+
+        post "/services/:service_name/count", on: :member, to: "heritages#update_service_scale"
       end
 
       resources :endpoints, except: [:new, :edit]
