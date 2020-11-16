@@ -9,10 +9,10 @@ describe "updating a heritage" do
   end
 
   describe "POST /heritages/:heritage/services/:service_name/count", type: :request do
-    it 'works' do
+    it 'adds the container count' do
       district = create :district
       heritage = create :heritage, district: district
-      service = create :service, name: 'serv', heritage: heritage
+      service = create :service, name: 'serv', heritage: heritage, desired_container_count: nil
 
       params = {
         desired_container_count: 10
@@ -23,6 +23,22 @@ describe "updating a heritage" do
       api_request :post, "/v1/districts/#{district.name}/heritages/#{heritage.name}/services/serv/count", params
 
       expect(Service.last.desired_container_count).to eq 10
+    end
+
+    it 'changes the container count' do
+      district = create :district
+      heritage = create :heritage, district: district
+      service = create :service, name: 'serv', heritage: heritage, desired_container_count: 11
+
+      params = {
+        desired_container_count: 15
+      }
+
+      expect_any_instance_of(Heritage).to receive(:save_and_deploy!).and_call_original
+
+      api_request :post, "/v1/districts/#{district.name}/heritages/#{heritage.name}/services/serv/count", params
+
+      expect(Service.last.desired_container_count).to eq 15
     end
   end
 end
