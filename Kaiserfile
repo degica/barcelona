@@ -24,6 +24,7 @@ app_params "
 "
 
 attach_mount '.rspec', '/app/.rspec'
+attach_mount 'bin', '/app/bin'
 attach_mount 'app', '/app/app'
 attach_mount 'config', '/app/config'
 attach_mount 'db', '/app/db'
