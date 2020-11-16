@@ -12,6 +12,8 @@ require "pathname"
 ENV["BUNDLE_GEMFILE"] ||= File.expand_path("../../Gemfile",
   Pathname.new(__FILE__).realpath)
 
+ENV['RAILS_ENV'] = 'test'
+
 bundle_binstub = File.expand_path("../bundle", __FILE__)
 
 if File.file?(bundle_binstub)
