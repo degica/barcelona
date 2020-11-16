@@ -31,6 +31,8 @@ attach_mount 'db', '/app/db'
 attach_mount 'dockerfiles', '/app/dockerfiles'
 attach_mount 'lib', '/app/lib'
 attach_mount 'spec', '/app/spec'
+attach_mount 'Gemfile', '/app/Gemfile'
+attach_mount 'Gemfile.lock', '/app/Gemfile.lock'
 
 expose '3000'
 db_reset_command 'sh -c "rails db:setup"'

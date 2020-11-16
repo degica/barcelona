@@ -20,8 +20,31 @@ describe VaultAuth do
       )
     end
 
-    it 'returns a ghost user that is not persisted' do
-      expect(auth.authenticate).to_not be_persisted
+    it 'returns a user with the hash saved' do
+      expect(auth.authenticate).to be_persisted
+    end
+
+    it 'returns the existing user' do
+      u = User.create!(
+        name: 'someuniquename',
+        auth: 'vault',
+        token: 'abcd',
+        roles: []
+      )
+
+      expect(auth.authenticate.name).to eq 'someuniquename'
+    end
+
+    it 'returns the user with token filled in' do
+      # This is needed to make vault calls.
+      User.create!(
+        name: 'asdasd',
+        auth: 'vault',
+        token: 'abcd',
+        roles: []
+      )
+
+      expect(auth.authenticate.token).to eq 'abcd'
     end
   end
 

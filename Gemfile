@@ -41,6 +41,7 @@ group :test do
   gem 'rspec-rails'
   gem 'rspec-its'
   gem 'factory_bot_rails'
+  gem 'shoulda-matchers', '~> 4.0'
   gem 'stub_env'
   gem 'webmock'
   gem 'rack-test'

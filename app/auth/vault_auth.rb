@@ -12,11 +12,20 @@ class VaultAuth < Auth
   end
 
   def authenticate
-    user = User.new(name: "vault-user-#{vault_token.hash.to_s(16)}")
-    user.auth = 'vault'
-    user.token = vault_token
-    user.roles = []
-    @current_user = user
+    @current_user = User.find_by_token(vault_token)
+
+    if @current_user.nil?
+      user = User.new(name: "vault-user-#{vault_token.hash.to_s(16)}")
+      user.auth = 'vault'
+      user.token = vault_token
+      user.roles = []
+      user.save!
+      @current_user = user
+    end
+
+    # assign the real token for use
+    @current_user.token = vault_token if @current_user
+    @current_user
   end
 
   # Ignore resource based authorization
