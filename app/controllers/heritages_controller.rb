@@ -68,6 +68,15 @@ class HeritagesController < ApplicationController
     render json: @heritage
   end
 
+  def update_service_scale
+    service.desired_container_count = desired_container_count
+    service.save!
+    @heritage.save_and_deploy!(without_before_deploy: true,
+                               description: "Change service scale #{service.name} to #{desired_container_count}")
+
+    render json: @heritage
+  end
+
   def permitted_params
     params.permit([
       :id,
@@ -136,5 +145,15 @@ class HeritagesController < ApplicationController
 
   def load_district
     @district = District.find_by!(name: params[:district_id])
+  end
+
+  private
+
+  def service
+    @service ||= @heritage.services.find_by!(name: params.require(:service_name))
+  end
+
+  def desired_container_count
+    params.require(:desired_container_count).to_i
   end
 end

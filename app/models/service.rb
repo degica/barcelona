@@ -37,7 +37,11 @@ class Service < ActiveRecord::Base
   after_destroy :delete_service
 
   delegate :district, to: :heritage
-  delegate :status, :desired_count, :running_count, :pending_count, to: :backend
+  delegate :status, :running_count, :pending_count, to: :backend
+
+  def desired_count
+    desired_container_count || backend.desired_count
+  end
 
   def apply
     backend.apply
