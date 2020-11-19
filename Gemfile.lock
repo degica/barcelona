@@ -292,6 +292,8 @@ GEM
     tzinfo (1.2.7)
       thread_safe (~> 0.1)
     unicode-display_width (1.7.0)
+    vault (0.15.0)
+      aws-sigv4
     webmock (3.5.1)
       addressable (>= 2.3.6)
       crack (>= 0.3.2)
@@ -342,6 +344,7 @@ DEPENDENCIES
   sqlite3
   stub_env
   thor
+  vault
   webmock
 
 BUNDLED WITH

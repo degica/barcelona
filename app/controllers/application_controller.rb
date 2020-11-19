@@ -31,9 +31,9 @@ class ApplicationController < ActionController::API
   end
 
   def auth_backend_class
-    if VaultAuth.enabled?
+    if VaultAuth.enabled? && request.headers['HTTP_X_VAULT_TOKEN']
       VaultAuth
-    elsif GithubAuth.enabled?
+    else
       GithubAuth
     end
   end

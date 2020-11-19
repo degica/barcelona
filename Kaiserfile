@@ -16,11 +16,11 @@ app_params "
   -e RAILS_ENV=development
   -e DATABASE_URL=postgres://postgres:example@<%= db_container_name %>:5432
   -e ENCRYPTION_KEY=abcdefghijklmn
-  -e GITHUB_ORGANIZATION='dojiko'
-  -e GITHUB_DEVELOPER_TEAM='dev'
-  -e GITHUB_ADMIN_TEAM='admin'
+  -e GITHUB_ORGANIZATION='degica'
+  -e GITHUB_DEVELOPER_TEAM=''
+  -e GITHUB_ADMIN_TEAM='developers'
   -e VAULT_URL=#{vault_host}:#{vault_port}
-  -e VAULT_PATH_PREFIX=dojiko
+  -e VAULT_PATH_PREFIX=degica
 "
 
 attach_mount '.rspec', '/app/.rspec'

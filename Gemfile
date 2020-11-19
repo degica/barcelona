@@ -23,6 +23,7 @@ gem 'lograge'
 gem 'net-ssh'
 gem 'thor', require: false
 gem 'sqlite3'
+gem 'vault'
 
 group :development, :test do
   gem 'pry-rails'
