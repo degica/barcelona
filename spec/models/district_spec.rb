@@ -147,4 +147,52 @@ describe District do
       district.publish_sns("message")
     end
   end
+
+  describe '#instances_recommended' do
+    it 'gives the maximum from cpu and memory requirements' do
+      allow(district).to receive(:instance_count_demanded).with(:cpu) { 100 }
+      allow(district).to receive(:instance_count_demanded).with(:memory) { 10 }
+
+      expect(district.send(:instances_recommended)).to eq 100
+    end
+  end
+
+  describe '#instance_count_demanded' do
+    before do
+      # set some constants
+      allow(district).to receive(:container_instances) { [1] }
+      allow(district).to receive(:total_registered) { 1000 }
+    end
+
+    it 'gives 1 more server than required if we have only 1 service type with exact occupancy' do
+      allow(district).to receive(:demand_structure) { { 1000 => 3 } }
+
+      expect(district.send(:instance_count_demanded, :something)).to eq 4
+    end
+
+    it 'gives one more server required if we have 1 service type with less than half occupancy' do
+      allow(district).to receive(:demand_structure) { { 400 => 3 } }
+
+      expect(district.send(:instance_count_demanded, :something)).to eq 3
+    end
+
+    it 'gives exactly the number of servers required if we have 1 service type with more than half occupancy' do
+      allow(district).to receive(:demand_structure) { { 600 => 3 } }
+
+      expect(district.send(:instance_count_demanded, :something)).to eq 3
+    end
+
+    it 'gives two more servers than required if we have 1 service type with less than half occupancy and a minor type' do
+      allow(district).to receive(:demand_structure) { { 400 => 3, 100 => 3 } }
+
+      expect(district.send(:instance_count_demanded, :something)).to eq 5
+    end
+
+    it 'gives two more servers than required if we have 1 service type with more than half occupancy and a minor type' do
+      allow(district).to receive(:demand_structure) { { 600 => 3, 100 => 3 } }
+
+      expect(district.send(:instance_count_demanded, :something)).to eq 5
+    end
+
+  end
 end

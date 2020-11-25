@@ -258,9 +258,12 @@ class District < ActiveRecord::Base
   def instance_count_demanded(resource)
     per_instance = total_registered(resource) / container_instances.count
 
-    # naively determine the number of instances needed for each service
+    # naively determine the number of instances needed for each service.
+    # this algo gives at worst n + 2 servers where n is the number of types
+    # of service memory requirements and at best the exact number of instances.
+    # please see tests for details.
     demand_structure(resource).map do |k, v|
-      (k / 1699.to_f * v).ceil
+      (k / per_instance.to_f * v).ceil + 1
     end.sum
   end
 
