@@ -18,6 +18,7 @@ gem 'gibberish'
 gem 'octokit'
 gem 'delayed_job_active_record'
 gem 'pundit'
+gem 'honeybadger', require: false
 gem 'jbuilder'
 gem 'lograge'
 gem 'net-ssh'
