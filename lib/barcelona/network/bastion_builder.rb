@@ -103,6 +103,9 @@ module Barcelona
           j.SecurityGroups [ref("SecurityGroupBastion")]
           j.AssociatePublicIpAddress true
           j.UserData user_data
+          j.MetadataOptions do |m|
+            m.HttpTokens 'required'
+          end
         end
 
         add_resource(BastionAutoScaling, "BastionAutoScaling",
