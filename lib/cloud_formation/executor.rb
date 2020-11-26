@@ -2,9 +2,11 @@ module CloudFormation
   class Executor
     attr_accessor :stack, :client
 
-    def initialize(stack, client)
+    def initialize(stack, client, s3_client, bucket)
       @stack = stack
       @client = client
+      @s3_client = s3_client
+      @bucket = bucket
     end
 
     def describe
@@ -48,11 +50,26 @@ module CloudFormation
       client.create_change_set(options)
     end
 
+    def template_name
+      "stack_templates/#{stack.name}/#{Time.current.strftime("%Y-%m-%d-%H%M%S")}.template"
+    end
+
+    def upload_to_s3!
+      resp = @s3_client.put_object({
+        body: stack.target!,
+        bucket: @bucket,
+        key: template_name,
+      })
+      Rails.logger.info "Uploaded stack template to bucket"
+      Rails.logger.info resp
+    end
+
     def stack_options
+      upload_to_s3!
       {
         stack_name: stack.name,
         capabilities: ["CAPABILITY_IAM"],
-        template_body: stack.target!
+        template_url: "https://#{@bucket}.s3.amazonaws.com/#{template_name}"
       }
     end
 
