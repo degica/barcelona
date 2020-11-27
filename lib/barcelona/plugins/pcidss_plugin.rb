@@ -459,7 +459,7 @@ EOS
 
       def stack_executor
         stack = PcidssStack.new(district, self.model)
-        CloudFormation::Executor.new(stack, district.aws.cloudformation)
+        CloudFormation::Executor.new(stack, district)
       end
     end
   end

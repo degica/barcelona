@@ -2,11 +2,12 @@ module CloudFormation
   class Executor
     attr_accessor :stack, :client
 
-    def initialize(stack, client, s3_client, bucket)
+    def initialize(stack, district)
       @stack = stack
-      @client = client
-      @s3_client = s3_client
-      @bucket = bucket
+      @district = district
+      @client = district.aws.cloudformation
+      @s3_client = district.aws.s3
+      @bucket = district.s3_bucket_name
     end
 
     def describe

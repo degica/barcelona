@@ -312,7 +312,7 @@ class Heritage < ActiveRecord::Base
   def cf_executor
     @cf_executor ||= begin
                        stack = Stack.new(self)
-                       CloudFormation::Executor.new(stack, district.aws.cloudformation, district.aws.s3, district.s3_bucket_name)
+                       CloudFormation::Executor.new(stack, district)
                      end
   end
 

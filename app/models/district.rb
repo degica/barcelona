@@ -190,7 +190,7 @@ class District < ActiveRecord::Base
   end
 
   def stack_executor
-    CloudFormation::Executor.new(network_stack, aws.cloudformation)
+    CloudFormation::Executor.new(network_stack, self)
   end
 
   def get_ca_key
@@ -204,7 +204,7 @@ class District < ActiveRecord::Base
 
   def update_notification_stack
     stack = NotificationStack.new(self)
-    executor = CloudFormation::Executor.new(stack, aws.cloudformation)
+    executor = CloudFormation::Executor.new(stack, self)
     executor.create_or_update
   end
 
@@ -230,7 +230,7 @@ class District < ActiveRecord::Base
 
   def delete_notification_stack
     stack = NotificationStack.new(self)
-    executor = CloudFormation::Executor.new(stack, aws.cloudformation)
+    executor = CloudFormation::Executor.new(stack, self)
     executor.delete
   end
 end
