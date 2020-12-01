@@ -64,7 +64,17 @@ class ReviewAppsController < ApplicationController
                       :cpu,
                       :memory,
                       :command,
-                      :force_ssl
+                      :force_ssl,
+                      listeners: [
+                        :endpoint,
+                        :health_check_interval,
+                        :health_check_path,
+                        :rule_priority,
+                        rule_conditions: [
+                          :type,
+                          :value
+                        ]
+                      ]
                     ]
                   ])
   end
