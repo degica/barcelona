@@ -65,6 +65,17 @@ describe Heritage do
                               {name: "env2", value: "value2"},
                               {name: "env3", value: "value3"}]}
     end
+
+    context "when plain env_var and secret environment exist with the same name" do
+      before do
+        heritage.env_vars.create!(key: "env", value: "value", secret: false)
+        heritage.environments.create!(name: "env", value_from: "path/to/ssm")
+      end
+
+      it "doesn't have env" do
+        expect(subject.map{|h| h[:name]}).to_not include "env"
+      end
+    end
   end
 
   describe "#legacy_secrets" do
@@ -89,6 +100,18 @@ describe Heritage do
       end
 
       it { is_expected.to eq ["env2"] }
+    end
+
+    context "when there are legacy secret env var and plain environment with the same name" do
+      before do
+        heritage.env_vars.create!(key: "env", value: "abc", secret: true)
+        heritage.environments.create!(name: "env", value: "value")
+      end
+
+      it "doesn't have env" do
+        expect(subject).to_not include "env"
+        expect(heritage.environment_set.map{|h| h[:name]}).to include "env"
+      end
     end
   end
 end

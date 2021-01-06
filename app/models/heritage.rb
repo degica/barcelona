@@ -317,14 +317,16 @@ class Heritage < ActiveRecord::Base
   end
 
   def environment_set
-    legacy_env_vars = env_vars.where(secret: false).map { |e| [e.key, e.value] }.to_h
+    legacy_env_vars = env_vars.where(secret: false).
+                               where.not(key: environments.pluck(:name)).
+                               map { |e| [e.key, e.value] }.to_h
     envs = environments.plains.map { |e| [e.name, e.value] }.to_h
     union = legacy_env_vars.merge(envs)
     union.map { |k, v| {name: k, value: v} }
   end
 
   def legacy_secrets
-    env_vars.where(secret: true).where.not(key: environments.secrets.pluck(:name))
+    env_vars.where(secret: true).where.not(key: environments.pluck(:name))
   end
 
   def review?
