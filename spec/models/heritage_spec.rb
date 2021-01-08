@@ -97,16 +97,11 @@ describe Heritage do
       it { is_expected.to eq ["env2"] }
     end
 
-    context "when there are legacy secret env var and plain environment with the same name" do
-      before do
+    it "doesn't have env when there are legacy secret env var and plain environment with the same name" do
         heritage.env_vars.create!(key: "env", value: "abc", secret: true)
         heritage.environments.create!(name: "env", value: "value")
-      end
-
-      it "doesn't have env" do
         expect(subject).to_not include "env"
         expect(heritage.environment_set.map{|h| h[:name]}).to include "env"
-      end
     end
   end
 end
