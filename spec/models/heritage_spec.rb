@@ -66,15 +66,10 @@ describe Heritage do
                               {name: "env3", value: "value3"}]}
     end
 
-    context "when plain env_var and secret environment exist with the same name" do
-      before do
+    it "doesn't have env when plain env_var and secret environment exist with the same name" do
         heritage.env_vars.create!(key: "env", value: "value", secret: false)
         heritage.environments.create!(name: "env", value_from: "path/to/ssm")
-      end
-
-      it "doesn't have env" do
         expect(subject.map{|h| h[:name]}).to_not include "env"
-      end
     end
   end
 
