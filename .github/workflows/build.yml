@@ -20,7 +20,6 @@ jobs:
         echo ${{ github.ref }}
 
     - name: push_images
-      if: github.ref == 'refs/heads/master'
       run: |-
         docker login -u "$QUAY_USERNAME" -p "${{ secrets.QUAY_TOKEN }}" quay.io
         docker push $DOCKER_REPOSITORY:$GITHUB_HEAD_REF || true
@@ -36,10 +35,4 @@ jobs:
     - name: deploy_script
       if: github.ref == 'refs/heads/master'
       run: bcn deploy -q -e production --tag $GITHUB_SHA --heritage-token ${{ secrets.MAINLINE_HERITAGE_TOKEN }}
-'on':
-  push:
-    branches:
-    - master
-  pull_request:
-    branches:
-    - master
+'on': [push]
