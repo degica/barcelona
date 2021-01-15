@@ -119,6 +119,26 @@ describe "updating a heritage" do
         expect(web_service["cpu"]).to be_nil
         expect(Heritage.last.services.find_by(name: 'web').cpu).to be_nil
       end
+
+      it "updates existing environment" do
+        params = {
+          environment: [
+            {name: "ENV_KEY", ssm_path: "path/to/env_key"},
+            {name: "SECRET", value: "raw"}
+          ]
+        }
+
+        expect(DeployRunnerJob).to receive(:perform_later)
+        api_request :patch, "/v1/heritages/nginx", params
+        expect(response).to be_successful
+        heritage = JSON.load(response.body)["heritage"]
+        env_key = heritage["environment"].find { |e| e["name"] == "ENV_KEY"}
+        secret = heritage["environment"].find { |e| e["name"] == "SECRET"}
+        expect(env_key["value"]).to eq nil
+        expect(env_key["value_from"]).to eq "/barcelona/#{district.name}/path/to/env_key"
+        expect(secret["value"]).to eq "raw"
+        expect(secret["value_from"]).to eq nil
+      end
     end
 
     describe "POST /heritages/:heritage/trigger/:token", type: :request do
