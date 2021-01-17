@@ -5,7 +5,7 @@ class User < ActiveRecord::Base
 
   serialize :roles
 
-  validates :name, presence: true, uniqueness: true
+  validates :name, presence: true, uniqueness: { scope: :auth }
 
   before_save :hash_token
 
