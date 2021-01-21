@@ -84,6 +84,21 @@ describe VaultAuth do
 
       expect(auth.authenticate).to be_persisted
     end
+
+    it 'updates the token if the user already exists' do
+      allow(auth).to receive(:username) { 'someuniquename' }
+
+      u = User.create!(
+        name: 'someuniquename',
+        auth: 'vault',
+        token: 'defg', # instead of abcd
+        roles: []
+      )
+
+      expect(auth.authenticate.name).to eq 'someuniquename'
+      expect(auth.authenticate.token).to eq 'abcd'
+    end
+
   end
 
   describe "#login" do
