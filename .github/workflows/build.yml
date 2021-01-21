@@ -36,7 +36,6 @@ jobs:
     - name: deploy_setup
       if: github.ref == 'refs/heads/master'
       run: |-
-        apk add curl
         curl -L -o bcn.zip https://github.com/degica/barcelona-cli/releases/latest/download/bcn_linux_amd64.zip
         unzip ./bcn.zip && mv ./bcn /usr/bin/bcn
 
