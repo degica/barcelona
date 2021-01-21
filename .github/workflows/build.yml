@@ -18,7 +18,6 @@ jobs:
         docker build . -t $DOCKER_REPOSITORY:$GITHUB_HEAD_REF --pull || true
         docker build . -t $DOCKER_REPOSITORY:$GITHUB_SHA --pull
         echo ${{ github.ref }}
-
     - name: push_images
       if: github.ref == 'refs/heads/master'
       run: |-
@@ -26,15 +25,24 @@ jobs:
         docker push $DOCKER_REPOSITORY:$GITHUB_HEAD_REF || true
         docker push $DOCKER_REPOSITORY:$GITHUB_SHA
 
-    - name: deploy_script
+  deploy:
+    container:
+      image: degica/rails-buildpack:2.6.5-stretch
+      env:
+        BARCELONA_ENDPOINT: https://barcelona.degica.com
+    runs-on: ubuntu-18.04
+    needs: [build]
+    steps:
+    - name: deploy_setup
       if: github.ref == 'refs/heads/master'
       run: |-
         apk add curl
         curl -L -o bcn.zip https://github.com/degica/barcelona-cli/releases/latest/download/bcn_linux_amd64.zip
-        unzip ./bcn.zip
-        ls bcn
-        chmod +x bcn
-        ./bcn deploy -q -e production --tag $GITHUB_SHA --heritage-token ${{ secrets.MAINLINE_HERITAGE_TOKEN }}
+        unzip ./bcn.zip && mv ./bcn /usr/bin/bcn
+
+    - name: deploy_script
+      if: github.ref == 'refs/heads/master'
+      run: bcn deploy -q -e production --tag $GITHUB_SHA --heritage-token ${{ secrets.MAINLINE_HERITAGE_TOKEN }}
 'on':
   push:
     branches:
