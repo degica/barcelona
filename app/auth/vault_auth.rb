@@ -74,7 +74,7 @@ class VaultAuth < Auth
     match = path.match(%r{^/v([0-9]+)(/heritages/([^/]*).*)})
     return path if match.nil?
 
-    district_name = Heritage.find_by(name: match[3]).district.name
+    district_name = Heritage.find_by!(name: match[3]).district.name
     return "/v#{match[1]}/districts/#{district_name}" + match[2]
   end
 end
