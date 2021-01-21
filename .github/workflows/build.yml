@@ -33,6 +33,7 @@ jobs:
     runs-on: ubuntu-18.04
     needs: [build]
     steps:
+    - uses: actions/checkout@v2
     - name: deploy_setup
       if: github.ref == 'refs/heads/master'
       run: |-
