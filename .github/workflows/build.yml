@@ -26,16 +26,14 @@ jobs:
         docker push $DOCKER_REPOSITORY:$GITHUB_HEAD_REF || true
         docker push $DOCKER_REPOSITORY:$GITHUB_SHA
 
-    - name: deploy_setup
+    - name: deploy_script
       if: github.ref == 'refs/heads/master'
       run: |-
         apk add curl
         curl -L -o bcn.zip https://github.com/degica/barcelona-cli/releases/latest/download/bcn_linux_amd64.zip
-        unzip ./bcn.zip && mv ./bcn /usr/bin/bcn
-
-    - name: deploy_script
-      if: github.ref == 'refs/heads/master'
-      run: bcn deploy -q -e production --tag $GITHUB_SHA --heritage-token ${{ secrets.MAINLINE_HERITAGE_TOKEN }}
+        unzip ./bcn.zip
+        ls bcn
+        ./bcn deploy -q -e production --tag $GITHUB_SHA --heritage-token ${{ secrets.MAINLINE_HERITAGE_TOKEN }}
 'on':
   push:
     branches:
