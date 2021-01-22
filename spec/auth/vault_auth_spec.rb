@@ -122,4 +122,23 @@ describe VaultAuth do
       expect{ auth.authorize_action }.to raise_error ExceptionHandler::Forbidden
     end
   end
+
+  describe "#non_shallow_path" do
+    let(:request) { double(path: '/v1/something', method: "TEST") }
+    let(:district) { create :district }
+    let(:heritage) { create :heritage, district: district }
+
+    it "returns non-shallow path if it starts with /v1/heritages" do
+      path = auth.send(:non_shallow_path, "/v1/heritages/#{heritage.name}")
+      expect(path).to eq "/v1/districts/#{district.name}/heritages/#{heritage.name}"
+
+      path = auth.send(:non_shallow_path, "/v1/heritages/#{heritage.name}/oneoffs")
+      expect(path).to eq "/v1/districts/#{district.name}/heritages/#{heritage.name}/oneoffs"
+    end
+
+    it "returns path if it doesn't start with /v1/heritages" do
+      path = auth.send(:non_shallow_path, "/v1/districts/#{district.name}")
+      expect(path).to eq "/v1/districts/#{district.name}"
+    end
+  end
 end

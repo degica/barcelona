@@ -33,7 +33,7 @@ class VaultAuth < Auth
   end
 
   def authorize_action
-    if !cap_probe.authorized?(request.path, request.method)
+    if !cap_probe.authorized?(non_shallow_path(request.path), request.method)
       raise ExceptionHandler::Forbidden.new("You are not authorized to do that action")
     end
   end
@@ -60,5 +60,21 @@ class VaultAuth < Auth
 
   def cap_probe
     @cap_probe ||= Vault::CapProbe.new(vault_uri, vault_token, vault_path_prefix)
+  end
+
+  # For heritages paths, bcn cli uses shallow paths e.g. "/v1/heritages/name" instead of "/v1/districts/district/heritages/name"
+  # because when `bcn run -H heritage-name rails c` is executed, the cli does not know what district the heritage belongs to.
+  # But this shallow path doesn't work well with vault auth because often we want to allow developers full access to a certain district.
+  # For example, if we want to allow developers to access all heritages in a staging district, we want to declare below capability
+  #   path "secret/Barcelona/degica/v1/districts/staging*" {
+  #     capabilities = ["create", "update", "read", "delete", "list"]
+  #   }
+  # This method converts shallow heritage paths to non-shallow paths so the above capability definition works.
+  def non_shallow_path(path)
+    match = path.match(%r{^/v([0-9]+)(/heritages/([^/]*).*)})
+    return path if match.nil?
+
+    district_name = Heritage.find_by!(name: match[3]).district.name
+    return "/v#{match[1]}/districts/#{district_name}" + match[2]
   end
 end
