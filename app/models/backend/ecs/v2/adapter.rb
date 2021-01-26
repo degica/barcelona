@@ -43,7 +43,7 @@ module Backend::Ecs::V2
 
     def cf_executor(task_definition = nil, desired_count = nil)
       service_stack = ServiceStack.new(service, task_definition, desired_count)
-      CloudFormation::Executor.new(service_stack, aws.cloudformation)
+      CloudFormation::Executor.new(service_stack, service.district)
     end
 
     def ecs_service

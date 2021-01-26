@@ -41,7 +41,7 @@ namespace :bcn do
                                                engine: :postgresql,
                                                db_user: 'barcelona',
                                                db_name: "barcelona")
-      executor = CloudFormation::Executor.new(stack, district.aws.cloudformation)
+      executor = CloudFormation::Executor.new(stack, district)
       db_password = SecureRandom.hex(16).hex.to_s(36).rjust(25, '0')
       parameters = [
         {
@@ -97,7 +97,7 @@ namespace :bcn do
     end
 
     endpoint_stack = CloudFormation::Stack.new("endpoint-barcelona")
-    dns_name = CloudFormation::Executor.new(endpoint_stack, district.aws.cloudformation).outputs["DNSName"]
+    dns_name = CloudFormation::Executor.new(endpoint_stack, district).outputs["DNSName"]
 
     heritage.destroy!
 
