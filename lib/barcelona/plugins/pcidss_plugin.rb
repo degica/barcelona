@@ -217,6 +217,9 @@ module Barcelona
               }
             },
           ]
+          j.MetadataOptions do |m|
+            m.HttpTokens 'required'
+          end
         end
 
         add_resource("AWS::IAM::Role", "OSSECManagerRole") do |j|

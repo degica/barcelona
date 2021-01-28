@@ -142,6 +142,7 @@ describe Barcelona::Network::NetworkStack do
           "IamInstanceProfile" => {"Ref"=>"ECSInstanceProfile"},
           "ImageId" => kind_of(String),
           "InstanceType" => "t3.small",
+          "MetadataOptions"=>{"HttpTokens"=>"required"},
           "SecurityGroups" => [{"Ref"=>"InstanceSecurityGroup"}],
           "UserData" => instance_of(String),
           "EbsOptimized" => true,
@@ -366,6 +367,7 @@ describe Barcelona::Network::NetworkStack do
         "Type" => "AWS::AutoScaling::LaunchConfiguration",
         "Properties" => {
           "InstanceType" => "t3.micro",
+          "MetadataOptions"=>{"HttpTokens"=>"required"},
           "IamInstanceProfile" => {"Ref" => "BastionProfile"},
           "ImageId" => kind_of(String),
           "UserData" => anything,
