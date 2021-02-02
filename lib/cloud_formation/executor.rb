@@ -56,13 +56,29 @@ module CloudFormation
     end
 
     def upload_to_s3!
-      resp = @s3_client.put_object({
-        body: stack.target!,
+      params = {
         bucket: @bucket,
         key: template_name,
+      }
+
+      resp = @s3_client.put_object({
+        body: stack.target!,
+        **params
       })
-      Rails.logger.info "Uploaded stack template to bucket"
       Rails.logger.info resp
+
+      begin
+        @s3_client.wait_until(:object_exists, params, 
+          before_wait: -> (attempts, response) do
+            Rails.logger.info "Waiting for stack template to be uploaded"
+          end
+        )
+      rescue Aws::Waiters::Errors::WaiterFailed => e
+        Rails.logger.warn "Upload failed: #{e.message}"
+        raise e
+      end
+
+      Rails.logger.info "Uploaded stack template to bucket"
     end
 
     def stack_options
