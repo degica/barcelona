@@ -103,6 +103,9 @@ module Barcelona
           j.SecurityGroups [ref("SecurityGroupBastion")]
           j.AssociatePublicIpAddress true
           j.UserData user_data
+          j.MetadataOptions do |m|
+            m.HttpTokens 'required'
+          end
         end
 
         add_resource(BastionAutoScaling, "BastionAutoScaling",
@@ -140,10 +143,13 @@ module Barcelona
         EOS
 
         ud.run_commands += [
+          # imdsv2
+          'IMDSTOKEN=`curl -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 3600"`',
+
           # awslogs
-          "ec2_id=$(curl http://169.254.169.254/latest/meta-data/instance-id)",
+          'ec2_id=$(curl -H "X-aws-ec2-metadata-token: $IMDSTOKEN" -v http://169.254.169.254/latest/meta-data/instance-id)',
           # There are cases when we must wait for meta-data
-          'while [ "$ec2_id" = "" ]; do sleep 1 ; ec2_id=$(curl http://169.254.169.254/latest/meta-data/instance-id) ; done',
+          'while [ "$ec2_id" = "" ]; do sleep 1 ; ec2_id=$(curl -H "X-aws-ec2-metadata-token: $IMDSTOKEN" -v http://169.254.169.254/latest/meta-data/instance-id) ; done',
           'sed -i -e "s/{ec2_id}/$ec2_id/g" /etc/awslogs/awslogs.conf',
           'sed -i -e "s/us-east-1/'+district.region+'/g" /etc/awslogs/awscli.conf',
           "systemctl start awslogsd",

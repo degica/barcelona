@@ -53,6 +53,9 @@ module Barcelona
                 "GroupSet" => [ref("SecurityGroupNAT")]
               }
             ]
+            j.MetadataOptions do |m|
+              m.HttpTokens 'required'
+            end
             j.Tags [
               tag("barcelona", stack.district.name),
               tag("barcelona-role", "nat"),
