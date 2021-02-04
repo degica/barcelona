@@ -67,6 +67,7 @@ module CloudFormation
       })
       Rails.logger.info resp
 
+      Rails.logger.info "Waiting for stack template to be uploaded"
       sleep(5)
       begin
         @s3_client.wait_until(:object_exists, params, 
