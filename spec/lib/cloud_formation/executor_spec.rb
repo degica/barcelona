@@ -25,7 +25,7 @@ describe CloudFormation::Executor do
       executor.update(change_set: false)
     end
 
-    it "creates a change set if true" do
+    it "passes on any failures from s3 wait" do
       expect(s3).to receive(:put_object)
       expect(s3).to receive(:wait_until).with(:object_exists, anything, anything) do
         raise Aws::Waiters::Errors::WaiterFailed
