@@ -67,6 +67,7 @@ module CloudFormation
       })
       Rails.logger.info resp
 
+      sleep(5)
       begin
         @s3_client.wait_until(:object_exists, params, 
           before_wait: -> (attempts, response) do
