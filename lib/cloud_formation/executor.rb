@@ -8,6 +8,8 @@ module CloudFormation
       @client = district.aws.cloudformation
       @s3_client = district.aws.s3
       @bucket = district.s3_bucket_name
+
+      upload_to_s3!
     end
 
     def describe
@@ -68,7 +70,7 @@ module CloudFormation
       Rails.logger.info resp
 
       Rails.logger.info "Waiting for stack template to be uploaded"
-      sleep(5)
+      sleep(30)
       begin
         @s3_client.wait_until(:object_exists, params, 
           before_wait: -> (attempts, response) do
@@ -84,7 +86,6 @@ module CloudFormation
     end
 
     def stack_options
-      upload_to_s3!
       {
         stack_name: stack.name,
         capabilities: ["CAPABILITY_IAM"],
