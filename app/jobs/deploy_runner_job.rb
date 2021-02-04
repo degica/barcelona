@@ -9,7 +9,7 @@ class DeployRunnerJob < ActiveJob::Base
     @heritage = heritage
     heritage.with_lock do
       if other_deploy_in_progress?(heritage)
-        notify(heritage, level: :error, message: "The other deployment is in progress. Stopped deploying.")
+        notify(level: :error, message: "The other deployment is in progress. Stopped deploying.")
         return
       end
 
