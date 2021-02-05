@@ -34,6 +34,7 @@ RSpec.configure do |config|
   config.use_transactional_fixtures = true
   config.include FactoryBot::Syntax::Methods
   config.include StubEnv::Helpers
+  config.include ActiveSupport::Testing::TimeHelpers
 
   # Shoulda matchers
   config.include(Shoulda::Matchers::ActiveModel, type: :model)

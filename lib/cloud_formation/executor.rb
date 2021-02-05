@@ -51,26 +51,40 @@ module CloudFormation
       client.create_change_set(options)
     end
 
-    def template_name
-      "stack_templates/#{stack.name}/#{Time.current.strftime("%Y-%m-%d-%H%M%S")}.template"
-    end
-
-    def upload_to_s3!
-      resp = @s3_client.put_object({
-        body: stack.target!,
+    def upload_to_s3!(template_name)
+      params = {
         bucket: @bucket,
         key: template_name,
+      }
+
+      resp = @s3_client.put_object({
+        body: stack.target!,
+        **params
       })
-      Rails.logger.info "Uploaded stack template to bucket"
       Rails.logger.info resp
+
+      Rails.logger.info "Waiting for stack template to be uploaded"
+      begin
+        @s3_client.wait_until(:object_exists, params, 
+          before_wait: -> (attempts, response) do
+            Rails.logger.info "Waiting for stack template to be uploaded"
+          end
+        )
+      rescue Aws::Waiters::Errors::WaiterFailed => e
+        Rails.logger.warn "Upload failed: #{e.message}"
+        raise e
+      end
+
+      Rails.logger.info "Uploaded stack template to bucket"
     end
 
     def stack_options
-      upload_to_s3!
+      template_name = "stack_templates/#{stack.name}/#{Time.current.strftime("%Y-%m-%d-%H%M%S")}.template"
+      upload_to_s3!(template_name)
       {
         stack_name: stack.name,
         capabilities: ["CAPABILITY_IAM"],
-        template_url: "https://#{@bucket}.s3.amazonaws.com/#{template_name}"
+        template_url: "https://s3.#{stack.region}.amazonaws.com/#{@bucket}/#{template_name}"
       }
     end
 

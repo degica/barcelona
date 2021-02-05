@@ -29,6 +29,10 @@ module CloudFormation
       end
     end
 
+    def region
+      @options[:region]
+    end
+
     def build_parameters(json)
     end
 
