@@ -35,5 +35,15 @@ describe CloudFormation::Executor do
       expect(Rails.logger).to receive(:warn).with("Upload failed: Aws::Waiters::Errors::WaiterFailed")
       expect { executor.update(change_set: true) }.to raise_error Aws::Waiters::Errors::WaiterFailed
     end
+
+    it "has template name that is not time dependent (regression)" do
+      expect(executor).to receive(:stack) { double(name: 'foobar') }
+      travel_to DateTime.new(2017, 7, 7)
+      expect(executor.template_name).to eq "stack_templates/foobar/2017-07-07-000000.template"
+      travel_back
+      travel_to DateTime.new(2019, 9, 9)
+      expect(executor.template_name).to eq "stack_templates/foobar/2017-07-07-000000.template"
+      travel_back
+    end
   end
 end
