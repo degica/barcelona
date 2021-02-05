@@ -51,11 +51,7 @@ module CloudFormation
       client.create_change_set(options)
     end
 
-    def template_name
-      @template_name ||= "stack_templates/#{stack.name}/#{Time.current.strftime("%Y-%m-%d-%H%M%S")}.template"
-    end
-
-    def upload_to_s3!
+    def upload_to_s3!(template_name)
       params = {
         bucket: @bucket,
         key: template_name,
@@ -83,7 +79,8 @@ module CloudFormation
     end
 
     def stack_options
-      upload_to_s3!
+      template_name = "stack_templates/#{stack.name}/#{Time.current.strftime("%Y-%m-%d-%H%M%S")}.template"
+      upload_to_s3!(template_name)
       {
         stack_name: stack.name,
         capabilities: ["CAPABILITY_IAM"],
