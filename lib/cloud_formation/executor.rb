@@ -84,7 +84,7 @@ module CloudFormation
       {
         stack_name: stack.name,
         capabilities: ["CAPABILITY_IAM"],
-        template_url: "https://s3.#{stack.region}.amazonaws.com/#{@bucket}/#{template_name}"
+        template_url: "https://#{@bucket}.s3.amazonaws.com/#{template_name}"
       }
     end
 
