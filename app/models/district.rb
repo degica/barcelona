@@ -109,14 +109,26 @@ class District < ActiveRecord::Base
     ).subnets
   end
 
+  def container_instance_arns
+    @container_instance_arns ||= aws.ecs.list_container_instances(
+                                   cluster: name
+                                 ).container_instance_arns
+  end
+
+  def cluster_container_instances
+    return [] if container_instance_arns.blank?
+
+    @cluster_container_instances ||= aws.ecs.describe_container_instances(
+                                       cluster: name,
+                                       container_instances: container_instance_arns
+                                     ).container_instances
+  end
+
   def container_instances
-    arns = aws.ecs.list_container_instances(cluster: name).container_instance_arns
-    return [] if arns.blank?
-    container_instances = aws.ecs.
-                          describe_container_instances(cluster: name, container_instances: arns).
-                          container_instances
+    return [] if cluster_container_instances.blank?
+
     instances = {}
-    container_instances.each do |ci|
+    cluster_container_instances.each do |ci|
       instance = {
         status: ci.status,
         container_instance_arn: ci.container_instance_arn,
@@ -129,7 +141,7 @@ class District < ActiveRecord::Base
     end
 
     ec2_instances = aws.ec2.describe_instances(
-      instance_ids: container_instances.map(&:ec2_instance_id)
+      instance_ids: cluster_container_instances.map(&:ec2_instance_id)
     ).reservations.map(&:instances).flatten
 
     ec2_instances.each do |ins|
@@ -209,6 +221,55 @@ class District < ActiveRecord::Base
   end
 
   private
+
+  def total_registered(resource)
+    container_instances.pluck(:registered_resources)
+                       .flatten
+                       .select {|x| x.name == resource.to_s.upcase}
+                       .sum {|x| x.integer_value}
+  end
+
+  def demand_structure(resource)
+    heritages.flat_map(&:services).flat_map do |service|
+      # map all the containers' memory or cpu
+      definition = service.send(:backend).send(:ecs_service).task_definition
+
+      # read the total amount requested by definition
+      total_resource = aws.ecs.describe_task_definition(task_definition: definition)
+                          .task_definition
+                          .container_definitions.sum { |condef| condef.send(resource.to_sym) }
+      {
+        count: service.desired_count,
+        amount: total_resource
+      }
+
+    end.inject({}) do |x, i|
+      # aggregate all particular counts into a map
+      x[i[:amount]] ||= 0
+      x[i[:amount]] += i[:count]
+      x
+    end
+  end
+
+  def total_demanded(resource)
+    demand_structure(resource).sum{|amount, count| count * amount}
+  end 
+
+  def instance_count_demanded(resource)
+    per_instance = total_registered(resource) / container_instances.count
+
+    # naively determine the number of instances needed for each service.
+    # this algo gives at worst n + 2 servers where n is the number of types
+    # of service memory requirements and at best the exact number of instances.
+    # please see tests for details.
+    demand_structure(resource).map do |k, v|
+      (k / per_instance.to_f * v).ceil + 1
+    end.sum
+  end
+
+  def instances_recommended
+    [instance_count_demanded(:cpu), instance_count_demanded(:memory)].max
+  end
 
   def validate_cidr_block
     if IPAddr.new(cidr_block).to_range.count < 65536
