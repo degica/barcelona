@@ -40,6 +40,15 @@ module Barcelona
             ]
           end
 
+          add_resource("AWS::EC2::LaunchTemplate", nat_launch_template_name) do |j|
+            j.LaunchTemplateName nat_launch_template_name
+            j.LaunchTemplateData do |d|
+              d.MetadataOptions do |m|
+                m.HttpTokens 'required'
+              end
+            end
+          end
+
           add_resource("AWS::EC2::Instance", nat_name,
                        depends_on: ["VPCGatewayAttachment"]) do |j|
             j.InstanceType options[:instance_type] || 't3.nano'
@@ -53,8 +62,9 @@ module Barcelona
                 "GroupSet" => [ref("SecurityGroupNAT")]
               }
             ]
-            j.MetadataOptions do |m|
-              m.HttpTokens 'required'
+            j.LaunchTemplate do |t|
+              t.LaunchTemplateName nat_launch_template_name
+              t.Version get_attr(nat_launch_template_name, "LatestVersionNumber")
             end
             j.Tags [
               tag("barcelona", stack.district.name),
@@ -97,6 +107,10 @@ module Barcelona
 
       def nat_name
         "NAT#{options[:type].to_s.classify}#{options[:nat_id]}"
+      end
+
+      def nat_launch_template_name
+        "NAT#{options[:type].to_s.classify}#{options[:nat_id]}LaunchTemplate"
       end
     end
   end

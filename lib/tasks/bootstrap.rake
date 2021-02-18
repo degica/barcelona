@@ -14,6 +14,10 @@ namespace :bcn do
     end
   end
 
+  def secret_key_base
+    ENV["SECRET_KEY_BASE"] || SecureRandom.hex(64)
+  end
+
   desc "Deploy Barcelona to the specified ECS cluster(local)"
   task :bootstrap => ["db:setup", :environment] do
     access_key_id = ENV["AWS_ACCESS_KEY_ID"]
@@ -64,6 +68,7 @@ namespace :bcn do
       image_tag: "master"
     )
     heritage.env_vars.build(key: "DATABASE_URL", value: ENV["BOOTSTRAP_DATABASE_URL"], secret: true)
+    heritage.env_vars.build(key: "SECRET_KEY_BASE", value: secret_key_base, secret: true)
     heritage.env_vars.build(key: "DISABLE_DATABASE_ENVIRONMENT_CHECK", value: "1", secret: false)
     heritage.env_vars.build(key: "AWS_REGION", value: region, secret: false)
     heritage.env_vars.build(key: "AWS_ACCESS_KEY_ID", value: access_key_id, secret: false)
@@ -142,7 +147,7 @@ EOS
           {key: "RAILS_LOG_TO_STDOUT", value: "true", secret: false},
           {key: "GITHUB_ORGANIZATION", value: ENV['GITHUB_ORGANIZATION'], secret: false},
           {key: "DATABASE_URL",  value: ENV["DATABASE_URL"], secret: true},
-          {key: "SECRET_KEY_BASE", value: SecureRandom.hex(64), secret: true},
+          {key: "SECRET_KEY_BASE", value: secret_key_base, secret: true},
           {key: "ENCRYPTION_KEY", value: ENV["ENCRYPTION_KEY"], secret: true}
         ],
         services_attributes: [
