@@ -121,7 +121,7 @@ class Endpoint < ActiveRecord::Base
 
   validates :name,
             presence: true,
-            uniqueness: true,
+            uniqueness: { scope: :district },
             immutable: true,
             format: { with: /\A[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]\z/ }
   validates :public, immutable: true

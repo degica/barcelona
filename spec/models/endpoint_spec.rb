@@ -15,10 +15,20 @@ describe Endpoint do
       endpoint.save!
     end
 
-    it "deltes cloudformation stack" do
+    it "deletes cloudformation stack" do
       endpoint.save!
       expect_any_instance_of(CloudFormation::Executor).to receive(:delete)
       endpoint.destroy!
+    end
+  end
+
+  describe "#validations" do
+    it "name should be unique in district" do
+      endpoint.save!
+      endpoint2 = build(:endpoint, district: endpoint.district, name:endpoint.name)
+
+      expect(endpoint2).to_not be_valid
+      expect(endpoint2.errors.messages[:name]).to eq ['has already been taken']
     end
   end
 
