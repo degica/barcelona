@@ -12,6 +12,10 @@ class HeritagesController < ApplicationController
   end
 
   def create
+    if Heritage.find_by(name: params[:name]).present?
+      raise ExceptionHandler::InternalServerError.new("heritage name is already used ")
+    end
+
     @heritage = BuildHeritage.new(permitted_params, district: @district).execute
     @heritage.save_and_deploy!(without_before_deploy: true, description: "Create")
     render json: @heritage
