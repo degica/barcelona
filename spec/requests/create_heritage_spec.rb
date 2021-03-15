@@ -99,6 +99,15 @@ describe "POST /districts/:district/heritages", type: :request do
     context "when version is 1" do
       let(:version) { 1 }
       it_behaves_like "create"
+
+      it "throw error when heritage name is already used" do
+        api_request(:post, "/v1/districts/#{district.name}/heritages", params)
+
+        # create same name heritage
+        api_request(:post, "/v1/districts/#{district.name}/heritages", params)
+        expect(response.status).to eq 500
+        expect(JSON.parse(response.body)["error"]).to eq "heritage name is already used "
+      end
     end
 
     context "when version is 2" do
