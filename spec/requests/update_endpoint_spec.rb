@@ -43,5 +43,21 @@ describe "PATCH /districts/:district/endpoints/:endpoint", type: :request do
       expect(endpoint.ssl_policy).to eq "old"
       expect(endpoint.name).to eq "#{district.name}-ep1"
     end
+
+    it "throw error if there is a existing same name endpoint" do
+      params = {
+        name: "bar",
+        public: true,
+        ssl_policy: 'modern',
+        certificate_id: 'certificate_id'
+      }
+
+      district = create :district, name: "food"
+      district.endpoints.create(name: "food-bar")
+
+      api_request(:post, "/v1/districts/#{district.name}/endpoints", params)
+
+      expect(response.status).to eq 422
+    end
   end
 end
