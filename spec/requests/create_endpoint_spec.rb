@@ -50,25 +50,5 @@ describe "POST /districts/:district/endpoints", type: :request do
       expect(endpoint["ssl_policy"]).to eq 'modern'
       expect(endpoint["dns_name"]).to eq "dns.name"
     end
-
-    it "it should failed if the endpoint name is same" do
-      allow_any_instance_of(CloudFormation::Executor).to receive(:outputs) {
-        {"DNSName" => "dns.name"}
-      }
-
-      district = create :district, name: "staging"
-      district.endpoints.create(name: "staging-blue-green")
-      district2 = create :district, name: "staging-blue"
-
-      params = {
-        name: "green",
-        public: true,
-        ssl_policy: 'modern',
-        certificate_id: 'certificate_id'
-      }
-
-      api_request(:post, "/v1/districts/#{district2.name}/endpoints", params)
-      expect(response.status).to eq 422
-    end
   end
 end

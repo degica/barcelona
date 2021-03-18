@@ -3,9 +3,9 @@ class BuildHeritage
 
   def initialize(_params, district: nil)
     params = _params.to_h.deep_dup
-    @district = district
     heritage_name = params.delete(:id) || params[:name]
     @heritage = Heritage.find_or_initialize_by(name: heritage_name)
+    @district = district || @heritage.district
     @params = convert_params_for_model params
   end
 
@@ -16,7 +16,16 @@ class BuildHeritage
         service[:port_mappings_attributes] = service.delete(:port_mappings) if service[:port_mappings].present?
 
         unless service[:listeners].nil?
-          listener_map = Hash[Endpoint.where(name: service[:listeners].map { |e| e[:endpoint] }).pluck(:name, :id)]
+          endpoint_names = service[:listeners].map { |e| e[:endpoint] }
+
+          endpoints = if @district.present?
+            Endpoint.where(name: endpoint_names, district: @district).pluck(:name, :id)
+          else
+            Endpoint.where(name: endpoint_names).pluck(:name, :id)
+          end
+
+          listener_map = Hash[endpoints]
+
           service[:listeners_attributes] = service.delete(:listeners).map do |listener|
             {
               endpoint_id: listener_map[listener[:endpoint]],
