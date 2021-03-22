@@ -111,7 +111,7 @@ describe "POST /districts/:district/heritages", type: :request do
       it_behaves_like "create"
     end
 
-    context "when the endpoint is not belonged to heritage" do
+    context "when the endpoint does not belong to a district " do
       let(:version) { 1 }
       let(:endpoint) { create :endpoint }
 
