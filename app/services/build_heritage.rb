@@ -17,15 +17,9 @@ class BuildHeritage
 
         unless service[:listeners].nil?
           endpoint_names = service[:listeners].map { |e| e[:endpoint] }
-
-          endpoints = if @district.present?
-            Endpoint.where(name: endpoint_names, district: @district).pluck(:name, :id)
-          else
-            Endpoint.where(name: endpoint_names).pluck(:name, :id)
-          end
+          endpoints = Endpoint.where(name: endpoint_names, district: @district).pluck(:name, :id)
 
           listener_map = Hash[endpoints]
-
           service[:listeners_attributes] = service.delete(:listeners).map do |listener|
             {
               endpoint_id: listener_map[listener[:endpoint]],

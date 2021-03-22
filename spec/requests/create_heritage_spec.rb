@@ -122,7 +122,7 @@ describe "POST /districts/:district/heritages", type: :request do
       end
     end
 
-    context "when existing endpoint exists" do
+    context "when an existing endpoint exists" do
       let(:version) { 1 }
       let(:district) { create :district}
       let(:district2) { create :district, name: "staging-blue" }
