@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_11_13_090000) do
+ActiveRecord::Schema.define(version: 2021_03_23_091018) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -159,6 +159,41 @@ ActiveRecord::Schema.define(version: 2020_11_13_090000) do
     t.index ["heritage_id"], name: "index_releases_on_heritage_id"
   end
 
+  create_table "resource_class_items", force: :cascade do |t|
+    t.string "name"
+    t.string "type"
+    t.bigint "resource_class_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["resource_class_id"], name: "index_resource_class_items_on_resource_class_id"
+  end
+
+  create_table "resource_classes", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_resource_classes_on_name", unique: true
+  end
+
+  create_table "resource_instance_items", force: :cascade do |t|
+    t.string "value"
+    t.bigint "resource_instance_id", null: false
+    t.bigint "resource_class_item_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["resource_class_item_id"], name: "index_resource_instance_items_on_resource_class_item_id"
+    t.index ["resource_instance_id"], name: "index_resource_instance_items_on_resource_instance_id"
+  end
+
+  create_table "resource_instances", force: :cascade do |t|
+    t.string "name"
+    t.bigint "resource_class_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_resource_instances_on_name", unique: true
+    t.index ["resource_class_id"], name: "index_resource_instances_on_resource_class_id"
+  end
+
   create_table "review_apps", force: :cascade do |t|
     t.bigint "heritage_id", null: false
     t.bigint "review_group_id", null: false
@@ -233,6 +268,10 @@ ActiveRecord::Schema.define(version: 2020_11_13_090000) do
   add_foreign_key "plugins", "districts"
   add_foreign_key "port_mappings", "services"
   add_foreign_key "releases", "heritages"
+  add_foreign_key "resource_class_items", "resource_classes"
+  add_foreign_key "resource_instance_items", "resource_class_items"
+  add_foreign_key "resource_instance_items", "resource_instances"
+  add_foreign_key "resource_instances", "resource_classes"
   add_foreign_key "review_apps", "heritages"
   add_foreign_key "review_apps", "review_groups"
   add_foreign_key "review_groups", "endpoints"
