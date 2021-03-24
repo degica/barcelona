@@ -161,7 +161,8 @@ ActiveRecord::Schema.define(version: 2021_03_23_091018) do
 
   create_table "resource_class_items", force: :cascade do |t|
     t.string "name"
-    t.string "type"
+    t.string "valuetype"
+    t.string "default"
     t.bigint "resource_class_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

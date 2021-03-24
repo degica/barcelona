@@ -40,6 +40,7 @@ group :development do
 end
 
 group :test do
+  gem 'database_cleaner-active_record'
   gem 'rspec-rails'
   gem 'rspec-its'
   gem 'factory_bot_rails'

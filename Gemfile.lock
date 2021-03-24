@@ -105,6 +105,10 @@ GEM
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
     crass (1.0.6)
+    database_cleaner-active_record (2.0.0)
+      activerecord (>= 5.a)
+      database_cleaner-core (~> 2.0.0)
+    database_cleaner-core (2.0.1)
     debase (0.2.4.1)
       debase-ruby_core_source (>= 0.10.2)
     debase-ruby_core_source (0.10.9)
@@ -321,6 +325,7 @@ DEPENDENCIES
   aws-sdk-route53
   aws-sdk-s3
   aws-sdk-sns
+  database_cleaner-active_record
   debase
   delayed_job_active_record
   factory_bot_rails
