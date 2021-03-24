@@ -2,6 +2,7 @@ class CreateResourceInstances < ActiveRecord::Migration[5.2]
   def change
     create_table :resource_instances do |t|
       t.string :name
+      t.references :district, foreign_key: true, null: false
       t.references :resource_class, foreign_key: true, null: false
 
       t.timestamps

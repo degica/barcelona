@@ -187,9 +187,11 @@ ActiveRecord::Schema.define(version: 2021_03_23_091018) do
 
   create_table "resource_instances", force: :cascade do |t|
     t.string "name"
+    t.bigint "district_id", null: false
     t.bigint "resource_class_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["district_id"], name: "index_resource_instances_on_district_id"
     t.index ["name"], name: "index_resource_instances_on_name", unique: true
     t.index ["resource_class_id"], name: "index_resource_instances_on_resource_class_id"
   end
@@ -271,6 +273,7 @@ ActiveRecord::Schema.define(version: 2021_03_23_091018) do
   add_foreign_key "resource_class_items", "resource_classes"
   add_foreign_key "resource_instance_items", "resource_class_items"
   add_foreign_key "resource_instance_items", "resource_instances"
+  add_foreign_key "resource_instances", "districts"
   add_foreign_key "resource_instances", "resource_classes"
   add_foreign_key "review_apps", "heritages"
   add_foreign_key "review_apps", "review_groups"
