@@ -1,6 +1,7 @@
 class HeritagesController < ApplicationController
   before_action :load_district, only:   [:index, :create]
-  before_action :load_heritage, except: [:index, :create, :trigger]
+  before_action :load_heritage, except: [:index, :create, :trigger, :get_district]
+
   skip_before_action :authenticate, only: [:trigger]
 
   def index
@@ -149,6 +150,11 @@ class HeritagesController < ApplicationController
 
   def load_district
     @district = District.find_by!(name: params[:district_id])
+  end
+
+  def get_district
+    heritage = Heritage.find_by!(name: params[:heritage_id])
+    render json: heritage.district
   end
 
   private

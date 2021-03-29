@@ -15,6 +15,7 @@ Rails.application.routes.draw do
 
         post "/trigger/:token", to: "heritages#trigger"
         resources :oneoffs, only: [:show, :create]
+        get :get_district, to: "heritages#get_district"
 
         get "/releases", to: "releases#index"
         get "/releases/:version", to: "releases#show"
