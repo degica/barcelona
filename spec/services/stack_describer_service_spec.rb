@@ -75,6 +75,52 @@ describe StackDescriberService do
     expect { sds.output }.to raise_error InvalidConstantException
   end
 
+  it "skips inputs for resources" do
+    # security
+    script = <<~SCRIPT
+      Name:
+        type: Barcelona::Input::String
+      Something:
+        type: AWS::Foo::Something
+        name: "{{ Name }}"
+    SCRIPT
+
+    sds = StackDescriberService.new(script, {
+      inputs: {
+        "Name" => "hello"
+      }
+    })
+
+    expect(sds.output).to eq({
+      resources: {
+        Something: {
+          Type: "AWS::Foo::Something",
+          Properties: {
+            Name: "hello"
+          }
+        }
+      },
+      outputs: {}
+    })
+  end
+
+  it "lists inputs in inputs" do
+    # security
+    script = <<~SCRIPT
+      Name:
+        type: Barcelona::Input::String
+      Something:
+        type: AWS::Foo::Something
+        name: "{{ Name }}"
+    SCRIPT
+
+    sds = StackDescriberService.new(script, {})
+
+    expect(sds.input_names).to eq(["Name"])
+    expect(sds.input_type("Name")).to eq(String)
+    expect(sds.input_valid?("Name", "hello")).to eq true
+  end
+
   it "does get_attr properly" do
     script = <<~SCRIPT
       Something:

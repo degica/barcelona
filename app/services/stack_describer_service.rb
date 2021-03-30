@@ -109,7 +109,17 @@ class StackDescriberService
     properties(result)
   end
 
+  def parameter_contents(id)
+    @options[:inputs][id]
+  end
+
+  def parameter?(id)
+    @options[:inputs]&.has_key?(id)
+  end
+
   def stack_indirection_property(value)
+    return parameter_contents(value.id) if parameter?(value.id)
+
     { "Ref" => value.id }
   end
 
@@ -143,10 +153,50 @@ class StackDescriberService
     }
   end
 
+  def input?(value)
+    value["type"].start_with?("Barcelona::Input::")
+  end
+
+  def inputs
+    res = {}
+
+    raw_script.each do |key, value|
+      next unless input?(value)
+
+      res[key] = value
+    end
+
+    res
+  end
+
+  def input_names
+    inputs.keys
+  end
+
+  def input_type(input_name)
+    input = inputs[input_name]
+    raise "No such input #{input_name}" if input.nil?
+
+    return String if input["type"] == "Barcelona::Input::String"
+
+    raise "Unknown input type: #{input['type']}"
+  end
+
+  def input_valid?(input_name, input_value)
+    input = inputs[input_name]
+    raise "No such input #{input_name}" if input.nil?
+
+    return true if input["type"] == "Barcelona::Input::String" && input_value.is_a?(String)
+
+    raise "Unknown input type: #{input['type']}"
+  end
+
   def resources
     res = {}
 
     raw_script.each do |key, value|
+      next if input?(value)
+
       res[key.to_sym] = process_resource(value)
     end
 
