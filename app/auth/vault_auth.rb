@@ -12,10 +12,17 @@ class VaultAuth < Auth
   end
 
   def authenticate
+    Rails.logger.info "Using token #{vault_token}"
+
     @current_user = User.find_by_token(vault_token)
 
     if @current_user.nil?
+      Rails.logger.info 'User not found, attempting to log in'
+
       user = User.find_or_create_by(name: username)
+
+      Rails.logger.info "#{username} created"
+
       user.auth = 'vault'
       user.token = vault_token
       user.roles = []
@@ -23,8 +30,13 @@ class VaultAuth < Auth
       @current_user = user
     end
 
-    # assign the real token for use
-    @current_user.token = vault_token if @current_user
+    if @current_user
+      # assign the real token for use
+      @current_user.token = vault_token 
+
+      Rails.logger.info "User #{@current_user.name} assigned vault token"
+    end
+
     @current_user
   end
 
