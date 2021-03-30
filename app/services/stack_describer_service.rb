@@ -1,21 +1,48 @@
+class StackReference
+  attr_reader :id, :member
+  def initialize(id, member)
+    @id = id
+    @member = member
+  end
+end
+
+class StackIndirection
+  attr_reader :id
+  def initialize(id)
+    @id = id
+  end
+
+  def method_missing(name, *args, &block)
+    StackReference.new(@id, name.to_s)
+  end
+end
+
+class StackConstant
+  attr_reader :id
+  def initialize(id)
+    @id = id
+  end
+end
+
 class StackDSL
-  def initialize(describer)
-    @describer = describer
-  end
-
   module Barcelona
-    VPC = :vpc_id
-    DistrictName = :district_name
+    def self.const_missing(id)
+      StackConstant.new(id.to_s.sub(/^Barcelona::/, '').underscore.to_sym)
+    end
   end
 
-  def constant(sym)
-    @describer.options[sym]
+  def self.const_missing(id)
+    StackIndirection.new(id.to_s)
+  end
+end
+
+class InvalidConstantException < StandardError
+  def initialize(m)
+    super("The code '#{m}' is not permitted")
   end
 end
 
 class StackDescriberService
-  attr_reader :options
-
   def initialize(stack_desc, options)
     @stack_desc = stack_desc
     @options = options
@@ -28,7 +55,7 @@ class StackDescriberService
   def hash_property(value)
     res = {}
     value.each do |key, value|
-      res[key.to_sym] = properties(value)
+      res[key.camelize.to_sym] = properties(value)
     end
 
     res
@@ -53,15 +80,45 @@ class StackDescriberService
     value
   end
 
+  def check_evaluable!(value)
+    # This is far from secure, but we shouldn't be inserting code
+    # we have no idea about anyway.
+    regexes = [
+      /[^A-Za-z0-9]+::([A-Za-z][A-Za-z0-9]*)/,
+      /\.ancestor/,
+      /\$/
+    ] + Object.constants.map {|x| /#{x}\./ }
+
+    regexes.each do |r|
+      m = r.match(value)
+      next if m.nil?
+
+      raise InvalidConstantException, m
+    end
+  end
+
   def evaluable?(value)
     value.start_with?("{{") && value.end_with?("}}")
   end
 
   def evaluable_property(value)
     stripped = value[2..-3]
+    check_evaluable!(value)
 
-    result = StackDSL.new(self).instance_eval(stripped)
+    result = StackDSL.new.instance_eval(stripped)
     properties(result)
+  end
+
+  def stack_indirection_property(value)
+    { "Ref" => value.id }
+  end
+
+  def stack_constant_property(value)
+    @options[value.id]
+  end
+
+  def stack_reference_property(value)
+    { "Fn::GetAtt" => [value.id, value.member] }
   end
 
   def properties(value)
@@ -69,18 +126,28 @@ class StackDescriberService
     return array_property(value) if value.is_a? Array
     return number_property(value) if value.is_a? Integer
     return string_property(value) if value.is_a? String
+    return stack_indirection_property(value) if value.is_a? StackIndirection
+    return stack_constant_property(value) if value.is_a? StackConstant
+    return stack_reference_property(value) if value.is_a? StackReference
 
-    raise "Don't know how to do property #{value}"
+    raise "Don't know how to do property #{value.inspect}"
+  end
+
+  def process_resource(value)
+    type = value["type"]
+    props = value.reject {|k,_| k == 'type'}.to_h
+
+    {
+      Type: type,
+      Properties: properties(props)
+    }
   end
 
   def resources
     res = {}
 
     raw_script.each do |key, value|
-      res[key.to_sym] = {
-        Type: value["Type"],
-        Properties: properties(value["Properties"])
-      }
+      res[key.to_sym] = process_resource(value)
     end
 
     res
