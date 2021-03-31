@@ -75,6 +75,44 @@ describe StackDescriberService do
     expect { sds.output }.to raise_error InvalidConstantException
   end
 
+  it "throws error if input specified but not set" do
+    # security
+    script = <<~SCRIPT
+      Name:
+        type: Barcelona::Input::String
+      Something:
+        type: AWS::Foo::Something
+        name: "{{ Name }}"
+    SCRIPT
+
+    sds = StackDescriberService.new(script, {
+      inputs: {
+      }
+    })
+
+    expect { sds.output }.to raise_error "Name not set"
+  end
+
+  it "throws error if input set but not specified" do
+    # security
+    script = <<~SCRIPT
+      Name:
+        type: Barcelona::Input::String
+      Something:
+        type: AWS::Foo::Something
+        name: "{{ Name }}"
+    SCRIPT
+
+    sds = StackDescriberService.new(script, {
+      inputs: {
+        "Name" => "foobar",
+        "Age" => 10
+      }
+    })
+
+    expect { sds.output }.to raise_error "Age not a parameter"
+  end
+
   it "skips inputs for resources" do
     # security
     script = <<~SCRIPT
@@ -102,23 +140,6 @@ describe StackDescriberService do
       },
       outputs: {}
     })
-  end
-
-  it "lists inputs in inputs" do
-    # security
-    script = <<~SCRIPT
-      Name:
-        type: Barcelona::Input::String
-      Something:
-        type: AWS::Foo::Something
-        name: "{{ Name }}"
-    SCRIPT
-
-    sds = StackDescriberService.new(script, {})
-
-    expect(sds.input_names).to eq(["Name"])
-    expect(sds.input_type("Name")).to eq(String)
-    expect(sds.input_valid?("Name", "hello")).to eq true
   end
 
   it "does get_attr properly" do
@@ -227,28 +248,4 @@ describe StackDescriberService do
     })
   end
 
-  it "extracts raw script correctly" do
-    script = <<~SCRIPT
-      SecGroup: 
-        type: AWS::EC2::SecurityGroup
-        group_description: Some Security group
-        security_group_egress:
-          - CidrIp: 127.0.0.1/32
-            IpProtocol: -1
-        vpc_id: "{{ constant(Barcelona::VpcId) }}"
-    SCRIPT
-
-    sds = StackDescriberService.new(script, {})
-
-    expect(sds.raw_script).to eq({
-      "SecGroup"=>{
-        "type"=>"AWS::EC2::SecurityGroup",
-        "group_description"=>"Some Security group",
-        "security_group_egress"=>[
-          {"CidrIp"=>"127.0.0.1/32", "IpProtocol"=>-1}
-        ],
-        "vpc_id"=>"{{ constant(Barcelona::VpcId) }}"
-      }
-    })
-  end
 end
