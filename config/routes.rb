@@ -25,6 +25,8 @@ Rails.application.routes.draw do
         post   :env_vars, on: :member, to: "heritages#set_env_vars"
         delete :env_vars, on: :member, to: "heritages#delete_env_vars"
 
+        post  :update_with_district, on: :member, to: "heritages#update_with_district"
+
         post "/trigger/:token", to: "heritages#trigger"
         resources :oneoffs, only: [:show, :create]
 
