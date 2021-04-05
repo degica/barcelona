@@ -1,6 +1,7 @@
 class HeritagesController < ApplicationController
-  before_action :load_district, only:   [:index, :create, :update_with_district]
+  before_action :load_district, only:   [:index, :create]
   before_action :load_heritage, except: [:index, :create, :trigger]
+  before_action :load_district_by_param, only: [:update, :trigger]
   skip_before_action :authenticate, only: [:trigger]
 
   def index
@@ -22,13 +23,6 @@ class HeritagesController < ApplicationController
   end
 
   def update
-    @heritage = BuildHeritage.new(permitted_params).execute
-    @heritage.save_and_deploy!(without_before_deploy: false,
-                               description: "Update to #{@heritage.image_path}")
-    render json: @heritage
-  end
-
-  def update_with_district
     @heritage = BuildHeritage.new(permitted_params, district: @district).execute
     @heritage.save_and_deploy!(without_before_deploy: false,
                                description: "Update to #{@heritage.image_path}")
@@ -156,6 +150,10 @@ class HeritagesController < ApplicationController
 
   def load_district
     @district = District.find_by!(name: params[:district_id])
+  end
+
+  def load_district_by_param
+    @district = District.find_by(name: params[:district])
   end
 
   private
