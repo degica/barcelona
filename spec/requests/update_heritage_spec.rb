@@ -141,8 +141,7 @@ describe "updating a heritage" do
       end
     end
 
-
-    it "updates a heritage by specifying district name" do
+    it "when district name is given, it should update the heritage" do
       params = {
         district: district.name,
         image_tag: "v3",
@@ -170,6 +169,56 @@ describe "updating a heritage" do
 
       expect(web_service["cpu"]).to be_nil
       expect(Heritage.last.services.find_by(name: 'web').cpu).to be_nil
+    end
+
+    it "when non exist district is given, it should throw an error" do
+      params = {
+        district: "wrong district",
+        image_tag: "v3",
+        before_deploy: nil,
+        services: [
+          {
+            name: "web",
+            command: "true"
+          },
+          {
+            name: "worker",
+            command: "rake jobs:work"
+          }
+        ]
+      }
+
+      expect(Heritage.last.services.find_by(name: 'web').cpu).to eq 128
+
+      api_request :patch, "/v1/heritages/nginx", params
+      expect(response.success?).to eq false
+      expect(response.body).to eq  "{\"error\":\"not_found\"}"
+    end
+
+    it "when wrong existing district is given, throw an error" do
+      district2 = create :district
+
+      params = {
+        district: district2.name,
+        image_tag: "v3",
+        before_deploy: nil,
+        services: [
+          {
+            name: "web",
+            command: "true"
+          },
+          {
+            name: "worker",
+            command: "rake jobs:work"
+          }
+        ]
+      }
+
+      expect(Heritage.last.services.find_by(name: 'web').cpu).to eq 128
+
+      api_request :patch, "/v1/heritages/nginx", params
+      expect(response.success?).to eq false
+      expect(response.body).to eq  "{\"error\":\"Wrong district was passed\"}"
     end
 
     describe "POST /heritages/:heritage/trigger/:token", type: :request do

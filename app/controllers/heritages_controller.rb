@@ -153,7 +153,12 @@ class HeritagesController < ApplicationController
   end
 
   def load_district_by_param
-    @district = District.find_by(name: params[:district])
+    if params[:district].present?
+      @district = District.find_by!(name: params[:district])
+      if @heritage.district.name != @district.name
+        raise ExceptionHandler::InternalServerError.new("Wrong district was passed")
+      end
+    end
   end
 
   private
