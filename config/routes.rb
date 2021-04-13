@@ -14,6 +14,8 @@ Rails.application.routes.draw do
         delete :env_vars, on: :member, to: "heritages#delete_env_vars"
 
         post "/trigger/:token", to: "heritages#trigger"
+        post "/retrieve_manifest", to: "heritages#retrieve_manifest"
+
         resources :oneoffs, only: [:show, :create]
 
         get "/releases", to: "releases#index"

@@ -1,6 +1,6 @@
 class HeritagesController < ApplicationController
   before_action :load_district, only:   [:index, :create]
-  before_action :load_heritage, except: [:index, :create, :trigger]
+  before_action :load_heritage, except: [:index, :create, :trigger, :retrieve_manifest]
   skip_before_action :authenticate, only: [:trigger]
 
   def index
@@ -149,6 +149,20 @@ class HeritagesController < ApplicationController
 
   def load_district
     @district = District.find_by!(name: params[:district_id])
+  end
+
+  def retrieve_manifest
+    heritage = Heritage.find_by!(name: params[:heritage_id])
+    user = params[:user]
+    password = params[:password]
+
+    if heritage.image_name.start_with?("quay.io/")
+      response = RetrieveQuayManifest.new().process(user, password, heritage)
+    else
+      raise ExceptionHandler::InternalServerError.new("Unsupported Registry")
+    end
+
+    render json: response.body
   end
 
   private
