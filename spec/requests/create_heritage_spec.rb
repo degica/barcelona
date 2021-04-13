@@ -3,6 +3,8 @@ require 'rails_helper'
 describe "POST /districts/:district/heritages", type: :request do
   let(:user) { create :user }
   let(:district) { create :district }
+  let(:endpoint) { create :endpoint, district: district }
+
   let(:params) do
     {
       version: version,
@@ -33,6 +35,10 @@ describe "POST /districts/:district/heritages", type: :request do
             protocol: 'tcp',
             port: 1111
           },
+          listeners: [{
+              endpoint: endpoint.name,
+              health_check_path: "/"
+            }],
           hosts: [
             {
               hostname: 'awesome-app.degica.com',
@@ -44,7 +50,6 @@ describe "POST /districts/:district/heritages", type: :request do
       ]
     }
   end
-
 
   shared_examples "create" do
     it "creates a heritage" do
@@ -113,6 +118,32 @@ describe "POST /districts/:district/heritages", type: :request do
     context "when version is 2" do
       let(:version) { 2 }
       it_behaves_like "create"
+    end
+
+    context "when the endpoint does not belong to a district " do
+      let(:version) { 1 }
+      let(:endpoint) { create :endpoint }
+
+      it "it should throw an error" do
+        api_request(:post, "/v1/districts/#{district.name}/heritages", params)
+        expect(response.status).to eq 422
+        expect(JSON.parse(response.body)["error"]).to eq "Validation failed: Services listeners endpoint must exist"
+      end
+    end
+
+    context "when an existing endpoint exists" do
+      let(:version) { 1 }
+      let(:district) { create :district}
+      let(:district2) { create :district, name: "staging-blue" }
+      let(:endpoint) { build :endpoint, name: "green" }
+
+      it "do not pick wrong one" do
+        create :endpoint, name: "staging-blue-green", district: district
+
+        api_request(:post, "/v1/districts/#{district2.name}/heritages", params)
+        expect(response.status).to eq 422
+        expect(JSON.parse(response.body)["error"]).to eq "Validation failed: Services listeners endpoint must exist"
+      end
     end
   end
 end

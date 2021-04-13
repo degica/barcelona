@@ -8,12 +8,12 @@ class EndpointsController < ApplicationController
   end
 
   def create
-    endpoint = @district.endpoints.create!(permitted_params)
+    endpoint = @district.endpoints.create!(create_params)
     render json: endpoint
   end
 
   def update
-    @endpoint.update!(permitted_params)
+    @endpoint.update!(update_params)
     render json: @endpoint
   end
 
@@ -28,7 +28,9 @@ class EndpointsController < ApplicationController
 
   private
 
-  def permitted_params
+  def create_params
+    params[:name] =  name_prefix + params[:name]
+
     params.permit(
       :name,
       :public,
@@ -37,11 +39,26 @@ class EndpointsController < ApplicationController
     )
   end
 
+  def update_params
+    params.permit(
+      :certificate_id,
+      :ssl_policy
+    )
+  end
+
   def load_endpoint
-    @endpoint = @district.endpoints.find_by!(name: params[:id])
+    @endpoint = @district.endpoints.find_by(name: params[:id])
+    unless @endpoint.present?
+      @endpoint = @district.endpoints.find_by!(name: name_prefix + params[:id])
+    end
+    @endpoint
   end
 
   def load_district
     @district = District.find_by!(name: params[:district_id])
+  end
+
+  def name_prefix
+    "#{@district.name}-"
   end
 end
