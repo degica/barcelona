@@ -9,6 +9,9 @@ RUN ln -s -f /app $APP_HOME
 
 RUN apt-get install -y openssh-client --no-install-recommends
 
+RUN curl -L -o bcn.zip https://github.com/degica/barcelona-cli/releases/latest/download/bcn_linux_amd64.zip
+RUN unzip ./bcn.zip && mv ./bcn /usr/bin/bcn
+
 WORKDIR /app
 RUN rm -rf $APP_HOME && ln -s /app $APP_HOME
 ENV PATH=/app/bin:$PATH
