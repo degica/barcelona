@@ -276,5 +276,12 @@ describe BuildHeritage do
         end
       end
     end
+
+    context "when wrong district is passed" do
+      it "it should and throw an error" do
+        district = create(:district)
+        expect { BuildHeritage.new(params, district: district) }.to raise_error("Wrong district is provided")
+      end
+    end
   end
 end
