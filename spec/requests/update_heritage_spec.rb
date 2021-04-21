@@ -218,7 +218,7 @@ describe "updating a heritage" do
 
       api_request :patch, "/v1/heritages/nginx", params
       expect(response.success?).to eq false
-      expect(response.body).to eq '{"error":"The heritage nginx does not belong to district district4"}'
+      expect(response.body).to eq '{"error":"The heritage nginx does not belong to district ' + "#{district2.name}\"" +'}'
     end
 
     describe "POST /heritages/:heritage/trigger/:token", type: :request do
