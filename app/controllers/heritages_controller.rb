@@ -153,11 +153,11 @@ class HeritagesController < ApplicationController
   end
 
   def load_district_by_param
-    return if params[:district].empty?
-    
+    return if params[:district].blank?
+
     @district = District.find_by!(name: params[:district])
     if @heritage.district.name != @district.name
-      raise ExceptionHandler::InternalServerError.new("The heritage #{@heritage.name} does not belong to district #{district.name}")
+      raise ExceptionHandler::InternalServerError.new("The heritage #{@heritage.name} does not belong to district #{@district.name}")
     end
   end
 
