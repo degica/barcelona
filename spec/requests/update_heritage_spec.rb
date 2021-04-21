@@ -218,7 +218,7 @@ describe "updating a heritage" do
 
       api_request :patch, "/v1/heritages/nginx", params
       expect(response.success?).to eq false
-      expect(response.body).to eq  "{\"error\":\"Wrong district was passed\"}"
+      expect(response.body).to eq  '{"error":"Wrong district was passed"}'
     end
 
     describe "POST /heritages/:heritage/trigger/:token", type: :request do
