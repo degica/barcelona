@@ -8,7 +8,7 @@ class BuildHeritage
 
     # we can remove this check once we find heritage by heritage name and district name
     if district && @heritage.district && district.id != @heritage.district.id
-      raise ExceptionHandler::InternalServerError.new("Wrong district is provided")
+      raise ExceptionHandler::InternalServerError.new("#{@heritage.name} does not belong to #{district.name}")
     end
 
     @district = district || @heritage.district
