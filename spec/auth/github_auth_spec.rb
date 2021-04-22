@@ -93,6 +93,27 @@ describe GithubAuth do
 
         it { is_expected.to be_nil }
       end
+
+      context "pick the correct user even if the user already exists in deferent auth" do
+        before do
+          vault_user = User.create!(
+            name: 'someuniquename',
+            auth: 'vault',
+            token: 'defg',
+            roles: []
+          )
+
+          vault_user = User.create!(
+            name: 'someuniquename',
+            auth: 'github',
+            token: 'token',
+            roles: []
+          )
+        end
+
+        its(:auth) { is_expected.to eq nil }
+        its(:token) { is_expected.to be_present }
+      end
     end
   end
 end
