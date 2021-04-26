@@ -15,8 +15,7 @@ class VaultAuth < Auth
     @current_user = User.find_by_token(vault_token)
 
     if @current_user.nil?
-      user = User.find_or_create_by(name: username)
-      user.auth = 'vault'
+      user = User.find_or_create_by(name: username, auth: 'vault')
       user.token = vault_token
       user.roles = []
       user.save!
