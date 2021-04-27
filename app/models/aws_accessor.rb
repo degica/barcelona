@@ -36,6 +36,10 @@ class AwsAccessor
     @autoscaling ||= Aws::AutoScaling::Client.new(client_config)
   end
 
+  def ssm
+    @ssm ||= Aws::SSM::Client.new(client_config)
+  end
+
   private
 
   def client_config
