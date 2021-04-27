@@ -4,6 +4,7 @@ Rails.application.routes.draw do
       member do
         post :apply_stack
         post :sign_public_key
+        get "/get_ssm_parameter/:name", to: "districts#get_ssm_parameter"
       end
 
       resources :plugins, only: [:index, :show, :destroy]

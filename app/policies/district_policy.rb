@@ -30,4 +30,8 @@ class DistrictPolicy < ApplicationPolicy
   def sign_public_key?
     user.admin?
   end
+
+  def get_ssm_parameter?
+    user.admin?
+  end
 end

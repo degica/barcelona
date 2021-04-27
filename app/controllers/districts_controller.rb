@@ -50,6 +50,17 @@ class DistrictsController < ApplicationController
     render json: json
   end
 
+  def get_ssm_parameter
+    process_ssm = ProcessSsm.new(@district, params[:name])
+    response = process_ssm.get_parameter
+
+    render json: response.parameter.to_json
+
+    rescue Aws::SSM::Errors::ParameterNotFound
+      error_message = "The ssm_path #{process_ssm.ssm_path} does not exist in district #{@district.name}"
+      render json: error_message.to_json, status: 400
+  end
+
   def update_params
     permitted = create_params
     permitted.delete :name
