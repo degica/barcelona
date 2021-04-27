@@ -5,6 +5,12 @@ class BuildHeritage
     params = _params.to_h.deep_dup
     heritage_name = params.delete(:id) || params[:name]
     @heritage = Heritage.find_or_initialize_by(name: heritage_name)
+
+    # we can remove this check once we find heritage by heritage name and district name
+    if district && @heritage.district && district.id != @heritage.district.id
+      raise ExceptionHandler::InternalServerError.new("#{@heritage.name} does not belong to #{district.name}")
+    end
+
     @district = district || @heritage.district
     @params = convert_params_for_model params
   end

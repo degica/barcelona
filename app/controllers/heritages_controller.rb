@@ -1,6 +1,7 @@
 class HeritagesController < ApplicationController
   before_action :load_district, only:   [:index, :create]
   before_action :load_heritage, except: [:index, :create, :trigger]
+  before_action :load_district_by_param, only: [:update, :trigger]
   skip_before_action :authenticate, only: [:trigger]
 
   def index
@@ -22,7 +23,7 @@ class HeritagesController < ApplicationController
   end
 
   def update
-    @heritage = BuildHeritage.new(permitted_params).execute
+    @heritage = BuildHeritage.new(permitted_params, district: @district).execute
     @heritage.save_and_deploy!(without_before_deploy: false,
                                description: "Update to #{@heritage.image_path}")
     render json: @heritage
@@ -149,6 +150,15 @@ class HeritagesController < ApplicationController
 
   def load_district
     @district = District.find_by!(name: params[:district_id])
+  end
+
+  def load_district_by_param
+    return if params[:district].blank?
+
+    @district = District.find_by!(name: params[:district])
+    if @heritage.district.name != @district.name
+      raise ExceptionHandler::InternalServerError.new("The heritage #{@heritage.name} does not belong to district #{@district.name}")
+    end
   end
 
   private

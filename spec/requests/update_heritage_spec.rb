@@ -141,6 +141,86 @@ describe "updating a heritage" do
       end
     end
 
+    it "when district name is given, it should update the heritage" do
+      params = {
+        district: district.name,
+        image_tag: "v3",
+        before_deploy: nil,
+        services: [
+          {
+            name: "web",
+            command: "true"
+          },
+          {
+            name: "worker",
+            command: "rake jobs:work"
+          }
+        ]
+      }
+
+      expect(Heritage.last.services.find_by(name: 'web').cpu).to eq 128
+
+      expect(DeployRunnerJob).to receive(:perform_later)
+      api_request :patch, "/v1/heritages/nginx", params
+      expect(response).to be_successful
+      heritage = JSON.load(response.body)["heritage"]
+      token = JSON.load(response.body)["heritage"]["token"]
+      web_service = heritage["services"].find { |s| s["name"] == "web" }
+
+      expect(web_service["cpu"]).to be_nil
+      expect(Heritage.last.services.find_by(name: 'web').cpu).to be_nil
+    end
+
+    it "when non exist district is given, it should throw an error" do
+      params = {
+        district: "wrong district",
+        image_tag: "v3",
+        before_deploy: nil,
+        services: [
+          {
+            name: "web",
+            command: "true"
+          },
+          {
+            name: "worker",
+            command: "rake jobs:work"
+          }
+        ]
+      }
+
+      expect(Heritage.last.services.find_by(name: 'web').cpu).to eq 128
+
+      api_request :patch, "/v1/heritages/nginx", params
+      expect(response.success?).to eq false
+      expect(response.body).to eq  "{\"error\":\"not_found\"}"
+    end
+
+    it "when wrong existing district is given, throw an error" do
+      district2 = create :district
+
+      params = {
+        district: district2.name,
+        image_tag: "v3",
+        before_deploy: nil,
+        services: [
+          {
+            name: "web",
+            command: "true"
+          },
+          {
+            name: "worker",
+            command: "rake jobs:work"
+          }
+        ]
+      }
+
+      expect(Heritage.last.services.find_by(name: 'web').cpu).to eq 128
+
+      api_request :patch, "/v1/heritages/nginx", params
+      expect(response.success?).to eq false
+      expect(response.body).to eq '{"error":"The heritage nginx does not belong to district ' + "#{district2.name}\"" +'}'
+    end
+
     describe "POST /heritages/:heritage/trigger/:token", type: :request do
       let(:district) { create :district }
 
@@ -211,7 +291,6 @@ describe "updating a heritage" do
         expect(web_service["cpu"]).to be_nil
         expect(Heritage.last.services.find_by(name: 'web').cpu).to be_nil
       end
-
     end
 
     describe "with wrong heritage token", type: :request do
