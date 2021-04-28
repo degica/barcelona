@@ -61,6 +61,13 @@ class DistrictsController < ApplicationController
       render json: error_message.to_json, status: 400
   end
 
+  def set_ssm_parameter
+    process_ssm = ProcessSsm.new(@district, params[:name])
+    process_ssm.put_parameter(params[:value], params[:type])
+
+    head 200
+  end
+
   def update_params
     permitted = create_params
     permitted.delete :name
