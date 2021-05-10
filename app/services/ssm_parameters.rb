@@ -1,16 +1,9 @@
-class ProcessSsm
+class SsmParameters
   PARAMETER_TYPES = ["String", "StringList", "SecureString"]
 
   def initialize(district, name)
     @district = district
     @name = name
-  end
-
-  def get_parameter
-    client.get_parameter({
-      name: ssm_path,
-      with_decryption: true,
-    })
   end
 
   def put_parameter(value, type)
@@ -32,6 +25,6 @@ class ProcessSsm
   private
 
   def client
-    client ||= @district.aws.ssm
+    @client ||= @district.aws.ssm
   end
 end

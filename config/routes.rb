@@ -4,8 +4,6 @@ Rails.application.routes.draw do
       member do
         post :apply_stack
         post :sign_public_key
-        get "/get_ssm_parameter/:name", to: "districts#get_ssm_parameter"
-        post "/set_ssm_parameter/:name", to: "districts#set_ssm_parameter"
       end
 
       resources :plugins, only: [:index, :show, :destroy]
@@ -39,6 +37,7 @@ Rails.application.routes.draw do
 
       resources :endpoints, except: [:new, :edit]
       resources :notifications, except: [:new, :edit]
+      resources :ssm_parameters, only: [:create]
     end
 
     resources :users, only: [:index, :show, :update]
