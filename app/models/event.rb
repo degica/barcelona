@@ -12,13 +12,14 @@ class Event
 
   def notify(message:, level: :good)
     return if @district.nil?
+
     Rails.logger.info(message)
     @district.publish_sns(message, level: slack_color(level))
   end
 
   def slack_color(level)
-    { "good"  => "good",
-      "warn"  => "warning",
+    { "good" => "good",
+      "warn" => "warning",
       "error" => "danger" }[level.to_s]
   end
 end

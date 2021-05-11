@@ -1,5 +1,5 @@
 class PortMapping < ActiveRecord::Base
-  RANDOM_HOST_PORT_RANGE = (10000..19999)
+  RANDOM_HOST_PORT_RANGE = (10000..19999).freeze
   belongs_to :service, inverse_of: :port_mappings
 
   validates :service, :lb_port, :container_port, presence: true
@@ -8,7 +8,7 @@ class PortMapping < ActiveRecord::Base
             uniqueness: {scope: :service_id, message: "special protocol must be unique per service"},
             if: :special_protocol?
 
-  validates :protocol, inclusion: { in: %w(tcp udp http https) }
+  validates :protocol, inclusion: { in: %w[tcp udp http https] }
   validate :validate_host_port_uniqueness_on_district, on: :create
   validate :validate_lb_port_and_protocol
 
@@ -50,23 +50,25 @@ class PortMapping < ActiveRecord::Base
   end
 
   def special_protocol?
-    !%w(tcp udp).include?(protocol)
+    !%w[tcp udp].include?(protocol)
   end
 
   def host_protocol
-    (http? || https?) ? "tcp" : protocol
+    http? || https? ? "tcp" : protocol
   end
 
   private
 
   def assign_host_port
     return if host_port.present?
+
     available_ports = RANDOM_HOST_PORT_RANGE.to_a - used_host_ports
     self.host_port = available_ports.sample
   end
 
   def assign_lb_port
     return if lb_port.present?
+
     self.lb_port = 80 if http?
     self.lb_port = 443 if https?
   end

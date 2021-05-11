@@ -1,10 +1,10 @@
 class EndpointsController < ApplicationController
   before_action :load_district
-  before_action :load_endpoint, except: [:index, :create]
+  before_action :load_endpoint, except: %i[index create]
 
   def index
     endpoints = @district.endpoints
-    render json: endpoints, fields: [:name, :public, :ssl_policy, :certificate_id]
+    render json: endpoints, fields: %i[name public ssl_policy certificate_id]
   end
 
   def create
@@ -29,7 +29,7 @@ class EndpointsController < ApplicationController
   private
 
   def create_params
-    params[:name] =  name_prefix + params[:name]
+    params[:name] = name_prefix + params[:name]
 
     params.permit(
       :name,

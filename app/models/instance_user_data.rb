@@ -10,7 +10,7 @@ class InstanceUserData
   end
 
   def self.load(base64)
-    yml = YAML.load(Base64.decode64(base64))
+    yml = YAML.safe_load(Base64.decode64(base64))
     instance = self.new
     instance.files = yml["write_files"] || []
     instance.boot_commands = yml["bootcmd"] || []

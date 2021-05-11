@@ -67,7 +67,7 @@ class ApplyDistrict
 
   def create_s3_bucket
     aws.s3.create_bucket(bucket: s3_bucket_name)
-  rescue => e
+  rescue StandardError => e
     Rails.logger.error e
   end
 
@@ -102,7 +102,7 @@ class ApplyDistrict
 
   def create_district_role(access_key_id, secret_access_key)
     task_role_arn = ecs_task_credentials&.dig("RoleArn")
-    raise RuntimeError.new("Role ARN doesn't exist") if task_role_arn.nil?
+    raise "Role ARN doesn't exist" if task_role_arn.nil?
 
     iam = new_iam_client(access_key_id, secret_access_key)
 
@@ -125,13 +125,11 @@ class ApplyDistrict
                                   uri = URI("http://169.254.170.2#{relative_uri}")
                                   res = Net::HTTP.get_response(uri)
                                   status_code = res.code.to_i
-                                  if 200 <= status_code && status_code <= 299
+                                  if status_code >= 200 && status_code <= 299
                                     JSON.load(res.body)
                                   else
                                     raise RuntimeError
                                   end
-                                else
-                                  nil
                                 end
                               end
   end
@@ -205,21 +203,19 @@ class ApplyDistrict
       #    Returning error immediately is far more important than making Barcelona high performance.
       # 3) I want to ensure that given access key can be removed when "create district" API responded.
       sts = Aws::STS::Client.new(region: district.region)
-      10.times do |i|
-        begin
-          sts.assume_role(
-            role_arn: resp.role.arn,
-            role_session_name: "assume-role-check-#{SecureRandom.hex(4)}",
-            duration_seconds: 900,
-          )
-        rescue Aws::STS::Errors::AccessDenied => e
-          Rails.logger.info "Failed to assume role. Will retry in 1 second"
-          sleep 1
-        else
-          # Calling AssumeRole twice in a very short interval seems to fail sometimes.
-          sleep 1
-          break
-        end
+      10.times do |_i|
+        sts.assume_role(
+          role_arn: resp.role.arn,
+          role_session_name: "assume-role-check-#{SecureRandom.hex(4)}",
+          duration_seconds: 900
+        )
+      rescue Aws::STS::Errors::AccessDenied => e
+        Rails.logger.info "Failed to assume role. Will retry in 1 second"
+        sleep 1
+      else
+        # Calling AssumeRole twice in a very short interval seems to fail sometimes.
+        sleep 1
+        break
       end
     end
 

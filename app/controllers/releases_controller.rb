@@ -1,6 +1,6 @@
 class ReleasesController < ApplicationController
   before_action :load_heritage
-  before_action :load_release, only: [:show, :rollback]
+  before_action :load_release, only: %i[show rollback]
 
   def show
     render json: @release

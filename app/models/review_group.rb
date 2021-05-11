@@ -57,7 +57,7 @@ class ReviewGroup < ApplicationRecord
 
   validates :token, :base_domain, :name, presence: true
   validates :name, format: { with: /\A[a-z0-9_-]+\z/ }
-  validates :base_domain, format: { with: /\A[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?)?\z/ }
+  validates :base_domain, format: { with: /\A[a-z0-9]+([\-.]{1}[a-z0-9]+)*\.[a-z]{2,5}(([0-9]{1,5})?)?\z/ }
 
   before_validation do
     regenerate_token if self.token.blank?

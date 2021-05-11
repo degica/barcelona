@@ -23,7 +23,7 @@ module Backend::Ecs::V1
         hosted_zone_id: district.private_hosted_zone_id,
         start_record_name: service_record_set_name
       ).resource_record_sets.first
-      record.present? && record.name == "#{service_record_set_name}"
+      record.present? && record.name == service_record_set_name.to_s
     end
 
     def change_record_set(action, elb_dns_name)

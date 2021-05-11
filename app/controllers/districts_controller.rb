@@ -1,10 +1,10 @@
 class DistrictsController < ApplicationController
-  before_action :load_district, except: [:index, :create]
+  before_action :load_district, except: %i[index create]
   before_action :authorize_district
 
   def index
     @districts = District.all
-    render json: @districts, fields: [:name, :region, :cluster_size, :cluster_instance_type, :stack_name, :aws_access_key_id, :aws_role]
+    render json: @districts, fields: %i[name region cluster_size cluster_instance_type stack_name aws_access_key_id aws_role]
   end
 
   def show
