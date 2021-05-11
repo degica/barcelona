@@ -1,13 +1,11 @@
 require "rails_helper"
 
 describe SsmParameters do
-  let(:district) { build :district, aws_access_key_id: 'test', aws_secret_access_key: 'test' }
-
-  let(:name) {"PSParameterName"}
+  let(:district) { build :district, name: 'districtname', aws_access_key_id: 'test', aws_secret_access_key: 'test' }
 
   describe "#ssm_path" do
     it "returns expected ssm_path" do
-      expect(described_class.new(district, name).ssm_path).to eq "/barcelona/#{district.name}/#{name}"
+      expect(described_class.new(district, 'app/paramname').ssm_path).to eq "/barcelona/districtname/app/paramname"
     end
   end
 
