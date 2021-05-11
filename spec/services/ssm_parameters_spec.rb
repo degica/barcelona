@@ -1,11 +1,12 @@
 require "rails_helper"
 
 describe SsmParameters do
-  let(:district) { build :district, name: 'districtname', aws_access_key_id: 'test', aws_secret_access_key: 'test' }
+  let(:district) { build :district, name: 'district_name', aws_access_key_id: 'test', aws_secret_access_key: 'test' }
+  let(:name) { district.name }
 
   describe "#ssm_path" do
     it "returns expected ssm_path" do
-      expect(described_class.new(district, 'app/paramname').ssm_path).to eq "/barcelona/districtname/app/paramname"
+      expect(described_class.new(district, 'app/param_name').ssm_path).to eq "/barcelona/district_name/app/param_name"
     end
   end
 
@@ -21,8 +22,8 @@ describe SsmParameters do
     it "put unexpected type parameters" do
       type = "hoge"
 
-      expect { described_class.new(district, name).put_parameter(parameter_value, type) }
-      .to raise_error ExceptionHandler::InternalServerError
+      expect { described_class.new(district, name).put_parameter(parameter_value, type) }.
+        to raise_error ExceptionHandler::InternalServerError
     end
   end
 end

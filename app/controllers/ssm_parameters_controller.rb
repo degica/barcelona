@@ -1,5 +1,5 @@
 class SsmParametersController < ApplicationController
-  before_action :load_heritage, only: [:create]
+  before_action :load_district, only: [:create]
 
   def create
     ssm_parameter = SsmParameters.new(@district, params[:name])
