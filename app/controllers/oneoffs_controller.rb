@@ -1,6 +1,6 @@
 class OneoffsController < ApplicationController
   before_action :load_heritage, only: [:create]
-  before_action :load_oneoff, except: %i[index create]
+  before_action :load_oneoff, except: [:index, :create]
 
   def show
     render json: @oneoff

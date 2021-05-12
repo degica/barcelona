@@ -1,8 +1,8 @@
 class NotificationsController < ApplicationController
   before_action :load_district
-  before_action :load_notification, except: %i[index create]
+  before_action :load_notification, except: [:index, :create]
   before_action :authorize_notification
-  after_action :update_stack, only: %i[create update destroy]
+  after_action :update_stack, only: [:create, :update, :destroy]
 
   def index
     notifications = @district.notifications

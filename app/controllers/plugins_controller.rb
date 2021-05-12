@@ -1,6 +1,6 @@
 class PluginsController < ApplicationController
   before_action :load_district
-  before_action :load_plugin, except: %i[index put]
+  before_action :load_plugin, except: [:index, :put]
 
   def put
     @plugin = @district.plugins.find_or_initialize_by(name: params[:id])

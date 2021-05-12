@@ -7,7 +7,7 @@ class ContainerInstance
 
   def user_data
     user_data = InstanceUserData.new
-    user_data.packages += %w[aws-cli jq aws-cfn-bootstrap awslogs]
+    user_data.packages += ["aws-cli", "jq", "aws-cfn-bootstrap", "awslogs"]
     user_data.run_commands += [
       "set -ex",
       # Embed SHA2 hash dockercfg so that instance replacement happens when dockercfg is updated

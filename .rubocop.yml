@@ -148,6 +148,12 @@ Style/RedundantRegexpEscape:
 Style/SlicingWithRange:
   Enabled: true
 
+Style/SymbolArray:
+  Enabled: false
+
+Style/WordArray:
+  Enabled: false
+
 Lint/StructNewOverride:
   Enabled: true
 

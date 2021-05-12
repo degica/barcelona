@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   skip_before_action :authenticate, :authorize_action, only: [:login]
-  before_action :load_user, except: %i[index login]
+  before_action :load_user, except: [:index, :login]
 
   def login
     user = auth_backend.login

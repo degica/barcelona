@@ -1,7 +1,7 @@
 class HeritagesController < ApplicationController
-  before_action :load_district, only:   %i[index create]
-  before_action :load_heritage, except: %i[index create trigger]
-  before_action :load_district_by_param, only: %i[update trigger]
+  before_action :load_district, only:   [:index, :create]
+  before_action :load_heritage, except: [:index, :create, :trigger]
+  before_action :load_district_by_param, only: [:update, :trigger]
   skip_before_action :authenticate, only: [:trigger]
 
   def index
@@ -101,39 +101,39 @@ class HeritagesController < ApplicationController
                       :force_ssl,
                       :web_container_port,
                       {
-                        port_mappings: %i[
-                          lb_port
-                          host_port
-                          container_port
-                          protocol
-                          enable_proxy_protocol
+                        port_mappings: [
+                          :lb_port,
+                          :host_port,
+                          :container_port,
+                          :protocol,
+                          :enable_proxy_protocol
                         ],
-                        hosts: %i[
-                          hostname
-                          ssl_cert_path
-                          ssl_key_path
+                        hosts: [
+                          :hostname,
+                          :ssl_cert_path,
+                          :ssl_key_path
                         ],
                         listeners: [
                           :endpoint,
                           :health_check_interval,
                           :health_check_path,
                           :rule_priority,
-                          rule_conditions: %i[
-                            type
-                            value
+                          rule_conditions: [
+                            :type,
+                            :value
                           ]
                         ]
                       }
                     ],
-                    scheduled_tasks: %i[
-                      schedule
-                      command
+                    scheduled_tasks: [
+                      :schedule,
+                      :command
                     ],
-                    environment: %i[
-                      name
-                      value
-                      value_from
-                      ssm_path
+                    environment: [
+                      :name,
+                      :value,
+                      :value_from,
+                      :ssm_path
                     ]
                   ]).tap do |whitelisted|
       if params[:services].present?

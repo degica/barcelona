@@ -49,7 +49,7 @@ class HeritageTaskDefinition
     ret = ret.merge(task_role_arn: heritage.task_role_id, execution_role_arn: heritage.task_execution_role_id) unless without_task_role
     if camelize
       ret = deep_transform_keys_with_parent_keys(ret) do |k, parents|
-        if parents.last(2) != %i[log_configuration options] &&
+        if parents.last(2) != [:log_configuration, :options] &&
            parents.last != [:docker_labels]
 
           k.to_s.camelize

@@ -1,5 +1,5 @@
 class ReviewAppsController < ApplicationController
-  skip_before_action :authenticate, only: %i[ci_create ci_delete]
+  skip_before_action :authenticate, only: [:ci_create, :ci_delete]
   before_action :load_review_group
 
   def create
@@ -52,11 +52,11 @@ class ReviewAppsController < ApplicationController
                     :image_name,
                     :image_tag,
                     :before_deploy,
-                    environment: %i[
-                      name
-                      value
-                      ssm_path
-                      value_from
+                    environment: [
+                      :name,
+                      :value,
+                      :ssm_path,
+                      :value_from
                     ],
                     services: [
                       :name,
@@ -70,9 +70,9 @@ class ReviewAppsController < ApplicationController
                         :health_check_interval,
                         :health_check_path,
                         :rule_priority,
-                        rule_conditions: %i[
-                          type
-                          value
+                        rule_conditions: [
+                          :type,
+                          :value
                         ]
                       ]
                     ]
