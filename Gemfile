@@ -35,7 +35,7 @@ group :development, :test do
 end
 
 group :development do
-  gem 'rubocop'
+  gem 'rubocop', '~> 0.86.0'
   gem 'spring'
   gem 'spring-commands-rspec'
 end
