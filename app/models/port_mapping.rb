@@ -54,7 +54,7 @@ class PortMapping < ActiveRecord::Base
   end
 
   def host_protocol
-    http? || https? ? "tcp" : protocol
+    (http? || https?) ? "tcp" : protocol
   end
 
   private

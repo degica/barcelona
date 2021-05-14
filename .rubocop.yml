@@ -154,6 +154,9 @@ Style/SymbolArray:
 Style/WordArray:
   Enabled: false
 
+Style/TernaryParentheses:
+  EnforcedStyle: require_parentheses
+
 Lint/StructNewOverride:
   Enabled: true
 
