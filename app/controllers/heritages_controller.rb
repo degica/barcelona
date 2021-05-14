@@ -82,60 +82,64 @@ class HeritagesController < ApplicationController
     render json: @heritage
   end
 
+  PERMITTED_PARAMS = [
+    [
+      :id,
+      :version,
+      :name,
+      :image_name,
+      :image_tag,
+      :before_deploy,
+      services: [
+        :name,
+        :cpu,
+        :memory,
+        :command,
+        :reverse_proxy_image,
+        :public,
+        :service_type,
+        :force_ssl,
+        :web_container_port,
+        {
+          port_mappings: [
+            :lb_port,
+            :host_port,
+            :container_port,
+            :protocol,
+            :enable_proxy_protocol
+          ],
+          hosts: [
+            :hostname,
+            :ssl_cert_path,
+            :ssl_key_path
+          ],
+          listeners: [
+            :endpoint,
+            :health_check_interval,
+            :health_check_path,
+            :rule_priority,
+            rule_conditions: [
+              :type,
+              :value
+            ]
+          ]
+        }
+      ],
+      scheduled_tasks: [
+        :schedule,
+        :command
+      ],
+      environment: [
+        :name,
+        :value,
+        :value_from,
+        :ssm_path
+      ]
+    ]
+  ].freeze
+
   def permitted_params
-    params.permit([
-                    :id,
-                    :version,
-                    :name,
-                    :image_name,
-                    :image_tag,
-                    :before_deploy,
-                    services: [
-                      :name,
-                      :cpu,
-                      :memory,
-                      :command,
-                      :reverse_proxy_image,
-                      :public,
-                      :service_type,
-                      :force_ssl,
-                      :web_container_port,
-                      {
-                        port_mappings: [
-                          :lb_port,
-                          :host_port,
-                          :container_port,
-                          :protocol,
-                          :enable_proxy_protocol
-                        ],
-                        hosts: [
-                          :hostname,
-                          :ssl_cert_path,
-                          :ssl_key_path
-                        ],
-                        listeners: [
-                          :endpoint,
-                          :health_check_interval,
-                          :health_check_path,
-                          :rule_priority,
-                          rule_conditions: [
-                            :type,
-                            :value
-                          ]
-                        ]
-                      }
-                    ],
-                    scheduled_tasks: [
-                      :schedule,
-                      :command
-                    ],
-                    environment: [
-                      :name,
-                      :value,
-                      :value_from,
-                      :ssm_path
-                    ]
-                  ]).tap do |whitelisted|
+    params.permit(PERMITTED_PARAMS).tap do |whitelisted|
       if params[:services].present?
         params[:services].each_with_index do |s, i|
           whitelisted[:services][i][:health_check] = s[:health_check].permit(:protocol, :port) if s.key?(:health_check)
