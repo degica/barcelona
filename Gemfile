@@ -21,7 +21,7 @@ gem 'octokit'
 gem 'pg'
 gem 'puma'
 gem 'pundit'
-gem 'rails', '~> 5.2.4.3'
+gem 'rails', '~> 5.2.4.6'
 gem 'sqlite3'
 gem 'thor', require: false
 gem 'vault'
