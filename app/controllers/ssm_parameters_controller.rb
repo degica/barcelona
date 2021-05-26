@@ -3,7 +3,7 @@ class SsmParametersController < ApplicationController
 
   def create
     ssm_parameter = SsmParameters.new(@district, params[:name])
-    ssm_parameter.put_parameter(params[:value], params[:type])
+    ssm_parameter.put_parameter(params[:value])
 
     head 200
   end
