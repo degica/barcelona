@@ -41,34 +41,34 @@ class ExceptionHandler
     end
   end
 
-  class InternalServerError < Exception
+  class InternalServerError < ExceptionHandler::Exception
   end
 
-  class Unauthorized < Exception
+  class Unauthorized < ExceptionHandler::Exception
     def status_code
       401
     end
   end
 
-  class Forbidden < Exception
+  class Forbidden < ExceptionHandler::Exception
     def status_code
       403
     end
   end
 
-  class UnprocessableEntity < Exception
+  class UnprocessableEntity < ExceptionHandler::Exception
     def status_code
       422
     end
   end
 
-  class NotFound < Exception
+  class NotFound < ExceptionHandler::Exception
     def status_code
       404
     end
   end
 
-  class BadRequest < Exception
+  class BadRequest < ExceptionHandler::Exception
     def status_code
       400
     end
@@ -93,8 +93,6 @@ class ExceptionHandler
       raise UnprocessableEntity.new(e.message)
     rescue Octokit::ClientError => e
       raise BadRequest.new(e.message)
-    rescue
-      raise InternalServerError
     end
   rescue ExceptionHandler::Exception => e
     debug = Rails.env.development? || query_parameters(env)["debug"] == "true"

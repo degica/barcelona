@@ -12,6 +12,7 @@ class Plugin < ActiveRecord::Base
 
   def hook(trigger, origin, arg = nil)
     return arg if plugin.nil?
+
     plugin.hook(trigger, origin, arg)
   end
 

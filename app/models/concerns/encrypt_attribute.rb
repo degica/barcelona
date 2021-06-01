@@ -29,7 +29,7 @@ module EncryptAttribute
   end
 
   def self.deserialize(s)
-    YAML.load(s)
+    YAML.safe_load(s)
   end
 
   def self.encode(s)

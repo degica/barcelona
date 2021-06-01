@@ -59,7 +59,7 @@ class ReviewApp < ApplicationRecord
     sanitized_subject
   end
 
-  def expired?(now=Time.current)
+  def expired?(now = Time.current)
     updated_at < (now - retention.seconds)
   end
 

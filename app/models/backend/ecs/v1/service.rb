@@ -17,12 +17,14 @@ module Backend::Ecs::V1
 
     def delete
       return unless applied?
+
       scale(0)
       aws.ecs.delete_service(cluster: cluster_name, service: service.service_name)
     end
 
     def status
       return :not_created if ecs_service.nil?
+
       deployment_statuses = ecs_service.deployments.map(&:status)
       if ecs_service.status != "ACTIVE"
         :inactive
@@ -49,6 +51,7 @@ module Backend::Ecs::V1
 
     def deployment(id)
       return nil if deployments.nil?
+
       deployments.find { |d| d.id == id }
     end
 

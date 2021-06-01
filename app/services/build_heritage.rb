@@ -21,20 +21,20 @@ class BuildHeritage
       new_params[:services_attributes].each do |service|
         service[:port_mappings_attributes] = service.delete(:port_mappings) if service[:port_mappings].present?
 
-        unless service[:listeners].nil?
-          endpoint_names = service[:listeners].map { |e| e[:endpoint] }
-          endpoints = Endpoint.where(name: endpoint_names, district: @district).pluck(:name, :id)
+        next if service[:listeners].nil?
 
-          listener_map = Hash[endpoints]
-          service[:listeners_attributes] = service.delete(:listeners).map do |listener|
-            {
-              endpoint_id: listener_map[listener[:endpoint]],
-              health_check_interval: listener[:health_check_interval],
-              health_check_path: listener[:health_check_path],
-              rule_priority: listener[:rule_priority],
-              rule_conditions: listener[:rule_conditions]
-            }
-          end
+        endpoint_names = service[:listeners].map { |e| e[:endpoint] }
+        endpoints = Endpoint.where(name: endpoint_names, district: @district).pluck(:name, :id)
+
+        listener_map = Hash[endpoints]
+        service[:listeners_attributes] = service.delete(:listeners).map do |listener|
+          {
+            endpoint_id: listener_map[listener[:endpoint]],
+            health_check_interval: listener[:health_check_interval],
+            health_check_path: listener[:health_check_path],
+            rule_priority: listener[:rule_priority],
+            rule_conditions: listener[:rule_conditions]
+          }
         end
       end
     end
@@ -55,6 +55,7 @@ class BuildHeritage
         new_params[:services_attributes] = sync_resources(new_params[:services_attributes], @heritage.services, :name)
         new_params[:services_attributes].each do |service|
           next if service[:_destroy].present? || service[:id].blank?
+
           service.delete :port_mappings_attributes
 
           service[:listeners_attributes] = sync_resources(service[:listeners_attributes],

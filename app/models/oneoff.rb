@@ -58,6 +58,7 @@ class Oneoff < ActiveRecord::Base
     if sync
       3000.times do
         break if stopped?
+
         sleep 3
       end
     end
@@ -69,6 +70,7 @@ class Oneoff < ActiveRecord::Base
 
   def interactive_run_command
     return nil if self.session_token.nil?
+
     real_command = run_command.join(' ')
     [self.session_token, real_command].join(' ')
   end
@@ -79,7 +81,7 @@ class Oneoff < ActiveRecord::Base
 
   def stopped?
     fetch_task
-    %w(STOPPED MISSING).include?(status)
+    %w[STOPPED MISSING].include?(status)
   end
 
   def run!(*args)
@@ -124,6 +126,7 @@ class Oneoff < ActiveRecord::Base
 
   def task
     return @task if @task.present?
+
     fetch_task
   end
 

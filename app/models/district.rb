@@ -14,8 +14,8 @@ class District < ActiveRecord::Base
 
   validates :name, presence: true, uniqueness: true, immutable: true
   validates :region, :s3_bucket_name, :stack_name, :cidr_block, presence: true, immutable: true
-  validates :nat_type, inclusion: {in: %w(instance managed_gateway managed_gateway_multi_az)}, allow_nil: true
-  validates :cluster_backend, inclusion: {in: %w(autoscaling)}
+  validates :nat_type, inclusion: {in: %w[instance managed_gateway managed_gateway_multi_az]}, allow_nil: true
+  validates :cluster_backend, inclusion: {in: %w[autoscaling]}
   validates :cluster_size, numericality: {greater_than_or_equal_to: 0}
 
   ECS_REGIONS = Aws.
@@ -76,6 +76,7 @@ class District < ActiveRecord::Base
   def publish_sns(text, level: "good", data: {}, subject: nil)
     topic_arn = notification_topic
     return if topic_arn.nil?
+
     message = {
       text: text,
       level: level,
@@ -112,6 +113,7 @@ class District < ActiveRecord::Base
   def container_instances
     arns = aws.ecs.list_container_instances(cluster: name).container_instance_arns
     return [] if arns.blank?
+
     container_instances = aws.ecs.
                           describe_container_instances(cluster: name, container_instances: arns).
                           container_instances
@@ -151,7 +153,7 @@ class District < ActiveRecord::Base
 
   def base_task_definition
     base = {
-      environment: [],
+      environment: []
     }
     hook_plugins(:district_task_definition, self, base)
   end
@@ -166,6 +168,7 @@ class District < ActiveRecord::Base
 
   def ssh_format_ca_public_key
     return nil if ssh_ca_public_key.nil?
+
     key = OpenSSL::PKey::RSA.new(ssh_ca_public_key)
     "#{key.ssh_type} #{[key.to_blob].pack('m0')}"
   end
@@ -180,8 +183,8 @@ class District < ActiveRecord::Base
     self.cidr_block     ||= "10.#{Random.rand(256)}.0.0/16"
     self.stack_name     ||= "barcelona-#{name}"
     self.nat_type       ||= "instance"
-    self.cluster_backend  ||= 'autoscaling'
-    self.cluster_size     ||= 1
+    self.cluster_backend ||= 'autoscaling'
+    self.cluster_size ||= 1
     self.cluster_instance_type ||= "t3.small"
   end
 
