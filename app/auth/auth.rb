@@ -5,10 +5,11 @@ class Auth
     unless self.class.enabled?
       raise ExceptionHandler::InternalServerError.new("Auth backend is disabled")
     end
+
     @request = request
   end
 
-  def authorize_resource(*args)
+  def authorize_resource(*_args)
     raise ExceptionHandler::Unauthorized
   end
 end

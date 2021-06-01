@@ -26,7 +26,7 @@ class NotificationStack < CloudFormation::Stack
                   "Action" => [
                     "logs:CreateLogGroup",
                     "logs:CreateLogStream",
-                    "logs:PutLogEvents",
+                    "logs:PutLogEvents"
                   ],
                   "Resource" => ["*"]
                 }

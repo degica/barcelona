@@ -1,5 +1,5 @@
 class Service < ActiveRecord::Base
-  DEFAULT_REVERSE_PROXY = 'quay.io/degica/barcelona-reverse-proxy:latest'
+  DEFAULT_REVERSE_PROXY = 'quay.io/degica/barcelona-reverse-proxy:latest'.freeze
   WEB_CONTAINER_PORT_DEFAULT = 3000
 
   belongs_to :heritage, inverse_of: :services
@@ -15,7 +15,7 @@ class Service < ActiveRecord::Base
             format: { with: /\A[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]\z/ }
   validates :cpu, numericality: {greater_than: 0}, allow_nil: true
   validates :memory, numericality: {greater_than: 0}
-  validates :service_type, inclusion: { in: %w(default web) }
+  validates :service_type, inclusion: { in: %w[default web] }
   validates :name, :service_type, :public, immutable: true
   validates :command, presence: true
   validate :validate_health_check
@@ -108,12 +108,11 @@ class Service < ActiveRecord::Base
     self.port_mappings.where(protocol: 'https').update_all(container_port: self.web_container_port)
   end
 
-
   def backend
     @backend ||= case heritage.version
-                 when 1 then
+                 when 1
                    Backend::Ecs::V1::Adapter.new(self)
-                 when 2 then
+                 when 2
                    Backend::Ecs::V2::Adapter.new(self)
                  else
                    raise NotImplementedError

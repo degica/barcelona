@@ -10,11 +10,11 @@ module Backend::Ecs::V1
     end
 
     def fetch_load_balancer
-      return @fetched_load_balancer ||= aws.elb.describe_load_balancers(
+      @fetched_load_balancer ||= aws.elb.describe_load_balancers(
         load_balancer_names: [service_name]
       ).load_balancer_descriptions.first
     rescue Aws::ElasticLoadBalancing::Errors::LoadBalancerNotFound
-      return nil
+      nil
     end
 
     def create
@@ -115,7 +115,7 @@ module Backend::Ecs::V1
 
     def configure_proxy_protocol
       # Enable ProxyProtocol for http/https host ports
-      ports = port_mappings.where(protocol: %w(http https)).pluck(:host_port)
+      ports = port_mappings.where(protocol: %w[http https]).pluck(:host_port)
       ports += port_mappings.where(enable_proxy_protocol: true).pluck(:host_port)
       if ports.present?
         aws.elb.create_load_balancer_policy(

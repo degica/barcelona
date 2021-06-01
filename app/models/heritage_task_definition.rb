@@ -13,9 +13,8 @@ class HeritageTaskDefinition
         force_ssl: service.force_ssl,
         hosts: service.hosts,
         reverse_proxy_image: service.reverse_proxy_image,
-        mode: (service.listeners.present?) ? :alb : :tcp,
-        web_container_port: service.web_container_port
-       )
+        mode: service.listeners.present? ? :alb : :tcp,
+        web_container_port: service.web_container_port)
   end
 
   def self.oneoff_definition(oneoff)
@@ -26,8 +25,7 @@ class HeritageTaskDefinition
         }.compact,
         cpu: 128,
         memory: oneoff.memory,
-        user: oneoff.user
-       )
+        user: oneoff.user)
   end
 
   def self.schedule_definition(heritage)
@@ -51,9 +49,13 @@ class HeritageTaskDefinition
     ret = ret.merge(task_role_arn: heritage.task_role_id, execution_role_arn: heritage.task_execution_role_id) unless without_task_role
     if camelize
       ret = deep_transform_keys_with_parent_keys(ret) do |k, parents|
-        (parents.last(2) != [:log_configuration, :options] &&
-         parents.last != [:docker_labels]
-        ) ? k.to_s.camelize : k
+        if parents.last(2) != [:log_configuration, :options] &&
+           parents.last != [:docker_labels]
+
+          k.to_s.camelize
+        else
+          k
+        end
       end
     end
     ret
@@ -61,7 +63,7 @@ class HeritageTaskDefinition
 
   private
 
-  def deep_transform_keys_with_parent_keys(object, parents=[], &block)
+  def deep_transform_keys_with_parent_keys(object, parents = [], &block)
     case object
     when Hash
       object.each_with_object({}) do |(key, value), result|
@@ -95,9 +97,7 @@ class HeritageTaskDefinition
     @is_web_service
   end
 
-  def web_container_port
-    @web_container_port
-  end
+  attr_reader :web_container_port
 
   def container_definition
     base = heritage.base_task_definition(family_name)

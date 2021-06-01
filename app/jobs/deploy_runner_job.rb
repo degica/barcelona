@@ -1,7 +1,7 @@
 class DeployRunnerJob < ActiveJob::Base
   queue_as :default
 
-  retry_on(StandardError, attempts: 1) do |job, e|
+  retry_on(StandardError, attempts: 1) do |job, _e|
     job.notify(level: :error, message: "Deploy failed. Check logs to see what happened.")
   end
 
@@ -15,6 +15,7 @@ class DeployRunnerJob < ActiveJob::Base
 
       loop do
         break unless heritage.cf_executor.in_progress?
+
         puts "Waiting for heritage stack to be complete"
         sleep 5
       end
@@ -41,6 +42,7 @@ class DeployRunnerJob < ActiveJob::Base
 
   def other_deploy_in_progress?(heritage)
     return false if heritage.version == 1
+
     heritage.services.map { |s| !s.deployment_finished?(nil) }.any?
   end
 

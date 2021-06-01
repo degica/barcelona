@@ -43,10 +43,10 @@ class OneoffsController < ApplicationController
     raise ExceptionHandler::BadRequest.new("env_vars should be a hash") unless params[:env_vars].is_a? ActionController::Parameters
 
     params[:env_vars].each do |key, value|
-      if !key.is_a? String
+      unless key.is_a? String
         raise ExceptionHandler::BadRequest.new("Keys in env_vars should be strings")
       end
-      if !value.is_a? String
+      unless value.is_a? String
         raise ExceptionHandler::BadRequest.new("Values in env_vars should be strings")
       end
     end
