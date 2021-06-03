@@ -33,7 +33,7 @@ module Barcelona
         ci = ContainerInstance.new(district)
         user_data = YAML.load(Base64.decode64(ci.user_data.build))
 
-        conf_file = user_data["write_files"].find{ |f| f["path"] ==  "/etc/rsyslog.d/barcelona-logger.conf" }
+        conf_file = user_data["write_files"].find{ |f| f["path"] == "/etc/rsyslog.d/barcelona-logger.conf" }
         expect(conf_file["path"]).to eq "/etc/rsyslog.d/barcelona-logger.conf"
         expect(conf_file["owner"]).to eq "root:root"
         expect(conf_file["permissions"]).to eq "644"

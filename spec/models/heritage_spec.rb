@@ -63,7 +63,8 @@ describe Heritage do
 
       it { is_expected.to eq [{name: "env", value: "value_new"},
                               {name: "env2", value: "value2"},
-                              {name: "env3", value: "value3"}]}
+                              {name: "env3", value: "value3"}]
+      }
     end
 
     it "doesn't have env when plain env_var and secret environment exist with the same name" do
@@ -120,7 +121,8 @@ describe Heritage::Stack do
     context "when a heritage has scheduled tasks" do
       let(:heritage) { build :heritage,
                              scheduled_tasks: [{schedule: 'rate(1 minute)',
-                                                command: 'rails runner "p :hello"'}] }
+                                                command: 'rails runner "p :hello"'}]
+      }
       it "generates a correct stack template" do
         generated = JSON.load stack.target!
         expect(generated["Resources"]["ScheduleTaskDefinition"]).to be_present
