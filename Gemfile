@@ -11,6 +11,7 @@ gem 'aws-sdk-iam'
 gem 'aws-sdk-route53'
 gem 'aws-sdk-s3'
 gem 'aws-sdk-sns'
+gem 'aws-sdk-ssm'
 gem 'delayed_job_active_record'
 gem 'gibberish'
 gem 'honeybadger', require: false

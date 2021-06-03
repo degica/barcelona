@@ -37,6 +37,7 @@ Rails.application.routes.draw do
 
       resources :endpoints, except: [:new, :edit]
       resources :notifications, except: [:new, :edit]
+      resources :ssm_parameters, only: [:create]
     end
 
     resources :users, only: [:index, :show, :update]
