@@ -34,7 +34,7 @@ class CLI < Thor
     ENV["AWS_REGION"] = options[:region].presence ||
                         ask_with_description("AWS Region", <<-EOS, default: 'us-east-1')
 Choose AWS region you want to deploy Barcelona to.
-EOS
+                        EOS
 
     ENV["ACM_CERT_ARN"] = options[:acm_cert_arn].presence ||
                           ask_with_description("ACM Certificate ARN", <<-EOS, required: false)
@@ -42,20 +42,20 @@ Create a new certificate on Amazon Certificate Manager in the region you chose a
 This is optional but we highly recommend setting up an ACM certificate.
 
 Without this certificate your commands will be transmitted to Barcelona using plaintext.
-EOS
+                          EOS
 
     ENV["GITHUB_ORGANIZATION"] = options[:github_organization].presence ||
                                  ask_with_description("GitHub Organization", <<-EOS, required: true)
 Provide your GitHub organization. Users who belong to this organization
 will have access to Barcelona API.
-EOS
+                                 EOS
 
     say <<-EOS, :green
 Provide your AWS access key ID and secret access key.
 This access key will be used to bootstrap your Barcelona environment.
 The best practice is to create a new access key with admin previleges and
 delete it after the bootstrap is complete.
-EOS
+    EOS
 
     ENV["AWS_ACCESS_KEY_ID"] = ask("AWS Access Key ID:")
     ENV["AWS_SECRET_ACCESS_KEY"] = ask("AWS Secret Access Key:", echo: false)

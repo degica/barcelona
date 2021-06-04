@@ -81,7 +81,8 @@ describe ReviewApp do
               health_check_path: "/healthcheck",
               health_check_interval: 300
             }]
-          }])}
+          }])
+      }
 
       it "preserves configurations" do
         expect{review_app.save!}.to_not raise_error

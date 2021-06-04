@@ -66,9 +66,9 @@ module CloudFormation
       Rails.logger.info "Waiting for stack template to be uploaded"
       begin
         @s3_client.wait_until(:object_exists, params, 
-          before_wait: -> (attempts, response) do
-            Rails.logger.info "Waiting for stack template to be uploaded"
-          end
+                              before_wait: -> (attempts, response) do
+                                Rails.logger.info "Waiting for stack template to be uploaded"
+                              end
         )
       rescue Aws::Waiters::Errors::WaiterFailed => e
         Rails.logger.warn "Upload failed: #{e.message}"

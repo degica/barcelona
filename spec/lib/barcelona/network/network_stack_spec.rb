@@ -1038,7 +1038,7 @@ describe Barcelona::Network::NetworkStack do
 
   context "when nat_type is managed_gateway_multi_az" do
     it "includes NAT resources" do
-      district.nat_type =  "managed_gateway_multi_az"
+      district.nat_type = "managed_gateway_multi_az"
       stack = described_class.new(district)
       generated = JSON.load(stack.target!)
       expect(generated["Resources"]["EIPForNATManagedGateway1"]).to be_present

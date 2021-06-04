@@ -84,9 +84,9 @@ def log_format
 end
 
 render_template('/templates/nginx.conf.erb', '/etc/nginx/nginx.conf',
-  upstream_name: ENV['UPSTREAM_NAME'],
-  upstream_port: ENV['UPSTREAM_PORT'],
-  log_format: log_format,
+                upstream_name: ENV['UPSTREAM_NAME'],
+                upstream_port: ENV['UPSTREAM_PORT'],
+                log_format: log_format,
 )
 
 hosts = (ENV['HTTP_HOSTS'] || "").split(',')

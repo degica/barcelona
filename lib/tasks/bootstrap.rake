@@ -113,7 +113,7 @@ Endpoint: #{dns_name}
 
 Set your DNS record to point to the above endpoint and run the following Barcelona client command
 $ bcn login https://<your barcelona domain> <GitHub Token>
-EOS
+    EOS
   end
 
   namespace :bootstrap do
@@ -146,7 +146,7 @@ EOS
           {key: "RAILS_ENV", value: "production", secret: false},
           {key: "RAILS_LOG_TO_STDOUT", value: "true", secret: false},
           {key: "GITHUB_ORGANIZATION", value: ENV['GITHUB_ORGANIZATION'], secret: false},
-          {key: "DATABASE_URL",  value: ENV["DATABASE_URL"], secret: true},
+          {key: "DATABASE_URL", value: ENV["DATABASE_URL"], secret: true},
           {key: "SECRET_KEY_BASE", value: secret_key_base, secret: true},
           {key: "ENCRYPTION_KEY", value: ENV["ENCRYPTION_KEY"], secret: true}
         ],
