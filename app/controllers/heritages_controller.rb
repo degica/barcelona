@@ -82,8 +82,8 @@ class HeritagesController < ApplicationController
     render json: @heritage
   end
 
-  def permitted_params
-    params.permit([
+  PERMITTED_PARAMS = [
+    [
       :id,
       :version,
       :name,
@@ -135,7 +135,11 @@ class HeritagesController < ApplicationController
         :value_from,
         :ssm_path
       ]
-    ]).tap do |whitelisted|
+    ]
+  ].freeze
+
+  def permitted_params
+    params.permit(PERMITTED_PARAMS).tap do |whitelisted|
       if params[:services].present?
         params[:services].each_with_index do |s, i|
           whitelisted[:services][i][:health_check] = s[:health_check].permit(:protocol, :port) if s.key?(:health_check)

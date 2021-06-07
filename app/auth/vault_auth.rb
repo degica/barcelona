@@ -28,11 +28,10 @@ class VaultAuth < Auth
   end
 
   # Ignore resource based authorization
-  def authorize_resource(*args)
-  end
+  def authorize_resource(*args); end
 
   def authorize_action
-    if !cap_probe.authorized?(non_shallow_path(request.path), request.method)
+    unless cap_probe.authorized?(non_shallow_path(request.path), request.method)
       raise ExceptionHandler::Forbidden.new("You are not authorized to do that action")
     end
   end
@@ -74,6 +73,6 @@ class VaultAuth < Auth
     return path if match.nil?
 
     district_name = Heritage.find_by!(name: match[3]).district.name
-    return "/v#{match[1]}/districts/#{district_name}" + match[2]
+    "/v#{match[1]}/districts/#{district_name}" + match[2]
   end
 end

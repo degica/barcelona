@@ -8,7 +8,7 @@ class Heritage < ActiveRecord::Base
 
       if heritage.scheduled_tasks.present?
         definition = HeritageTaskDefinition.schedule_definition(heritage).
-                       to_task_definition(without_task_role: true, camelize: true)
+                     to_task_definition(without_task_role: true, camelize: true)
         add_resource("AWS::ECS::TaskDefinition", "ScheduleTaskDefinition", retain: true) do |j|
           j.ContainerDefinitions definition["ContainerDefinitions"]
           j.Family definition["Family"]
@@ -17,7 +17,7 @@ class Heritage < ActiveRecord::Base
         end
 
         heritage.scheduled_tasks.each_with_index do |s, i|
-          event_name =  "ScheduledEvent#{i}"
+          event_name = "ScheduledEvent#{i}"
           command = s["command"]
           command = Shellwords.split(command) if s["command"].is_a?(String)
           run_command = LaunchCommand.new(heritage, command,
@@ -83,7 +83,7 @@ class Heritage < ActiveRecord::Base
                       "ecs:RunTask",
                       "logs:CreateLogGroup",
                       "logs:CreateLogStream",
-                      "logs:PutLogEvents",
+                      "logs:PutLogEvents"
                     ],
                     "Resource" => ["*"]
                   },
@@ -126,11 +126,11 @@ class Heritage < ActiveRecord::Base
                   "Effect" => "Allow",
                   "Action" => [
                     "ssm:GetParameters",
-                    "secretsmanager:GetSecretValue",
+                    "secretsmanager:GetSecretValue"
                   ],
                   "Resource" => [
                     sub("arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/barcelona/#{heritage.district.name}/*"),
-                    sub("arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:barcelona/#{heritage.district.name}/*"),
+                    sub("arn:aws:secretsmanager:${AWS::Region}:${AWS::AccountId}:secret:barcelona/#{heritage.district.name}/*")
                   ]
                 }
               ]
@@ -171,7 +171,7 @@ class Heritage < ActiveRecord::Base
                     "Action" => ["s3:GetObject"],
                     "Resource" => [
                       "arn:aws:s3:::#{heritage.district.s3_bucket_name}/heritages/#{heritage.name}/*",
-                      "arn:aws:s3:::#{heritage.district.s3_bucket_name}/certs/*",
+                      "arn:aws:s3:::#{heritage.district.s3_bucket_name}/certs/*"
                     ]
                   }
                 ]
@@ -249,6 +249,7 @@ class Heritage < ActiveRecord::Base
 
   def image_path
     return nil if image_name.blank?
+
     tag = image_tag || 'latest'
     "#{image_name}:#{tag}"
   end
@@ -318,8 +319,8 @@ class Heritage < ActiveRecord::Base
 
   def environment_set
     legacy_env_vars = env_vars.where(secret: false).
-                               where.not(key: environments.pluck(:name)).
-                               map { |e| [e.key, e.value] }.to_h
+                      where.not(key: environments.pluck(:name)).
+                      map { |e| [e.key, e.value] }.to_h
     envs = environments.plains.map { |e| [e.name, e.value] }.to_h
     union = legacy_env_vars.merge(envs)
     union.map { |k, v| {name: k, value: v} }
@@ -337,6 +338,7 @@ class Heritage < ActiveRecord::Base
 
   def update_services(release, without_before_deploy)
     return if image_path.nil?
+
     DeployRunnerJob.perform_later(
       self,
       without_before_deploy: without_before_deploy,

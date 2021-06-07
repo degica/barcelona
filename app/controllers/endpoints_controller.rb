@@ -29,7 +29,7 @@ class EndpointsController < ApplicationController
   private
 
   def create_params
-    params[:name] =  name_prefix + params[:name]
+    params[:name] = name_prefix + params[:name]
 
     params.permit(
       :name,

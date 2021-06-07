@@ -27,8 +27,7 @@ class GithubAuth < Auth
   end
 
   # Ignore action based authorization
-  def authorize_action(*args)
-  end
+  def authorize_action(*args); end
 
   private
 
@@ -38,7 +37,7 @@ class GithubAuth < Auth
 
   def roles_for(team:, org:)
     allowed_teams.select { |t|
-      (t[:team] == team || t[:team] == nil) && t[:org] == org
+      (t[:team] == team || t[:team].nil?) && t[:org] == org
     }.map { |t| t[:role] }
   end
 

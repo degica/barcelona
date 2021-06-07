@@ -1,6 +1,5 @@
 module Vault
   class CapProbe
-
     # Maps HTTP methods to vault actions
     METHOD_MAP = {
       'POST' => 'create',
@@ -8,7 +7,7 @@ module Vault
       'PUT' => 'update',
       'GET' => 'read',
       'DELETE' => 'delete'
-    }
+    }.freeze
 
     def initialize(vault_uri, vault_token, vault_path_prefix)
       @vault_uri = vault_uri

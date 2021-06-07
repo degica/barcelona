@@ -122,14 +122,14 @@ module Backend::Ecs::V2
             tag("barcelona", district.name),
             tag("barcelona-heritage", service.heritage.name)
           ]
-          j.Listeners(service.port_mappings.lb_registerable.map { |pm|
+          j.Listeners(service.port_mappings.lb_registerable.map do |pm|
             {
               "Protocol" => "TCP",
               "LoadBalancerPort" => pm.lb_port,
               "InstanceProtocol" => "TCP",
               "InstancePort" => pm.host_port
             }
-          })
+          end)
           j.ConnectionDrainingPolicy do |j|
             j.Enabled true
             j.Timeout 60
@@ -143,7 +143,7 @@ module Backend::Ecs::V2
           end
 
           # Enable ProxyProtocol for http/https host ports
-          ports = service.port_mappings.where(protocol: %w(http https)).pluck(:host_port)
+          ports = service.port_mappings.where(protocol: %w[http https]).pluck(:host_port)
           ports += service.port_mappings.where(enable_proxy_protocol: true).pluck(:host_port)
           if ports.present?
             policy = {

@@ -1,5 +1,7 @@
+inherit_from: .rubocop_todo.yml
+
 AllCops:
-  TargetRubyVersion: 2.3
+  TargetRubyVersion: 2.5.3
   Exclude:
     - "vendor/**/*"
     - "db/schema.rb"
@@ -7,6 +9,7 @@ AllCops:
     - "bin/spring"
     - "bin/bundle"
     - "bin/rake"
+
   DisplayCopNames: true
 
 Style/AndOr:
@@ -18,16 +21,13 @@ Style/BlockDelimiters:
     - "spec/**/*"
 
 # Prefer compact style
-Style/SpaceInsideHashLiteralBraces:
+Layout/SpaceInsideHashLiteralBraces:
   Enabled: false
 
-Style/SpaceInsideBlockBraces:
+Layout/SpaceInsideBlockBraces:
   Enabled: false
 
-Style/SpaceBeforeBlockBraces:
-  Enabled: false
-
-Style/BracesAroundHashParameters:
+Layout/SpaceBeforeBlockBraces:
   Enabled: false
 
 Style/Documentation:
@@ -36,10 +36,10 @@ Style/Documentation:
 Style/DoubleNegation:
   Enabled: false
 
-Style/DotPosition:
+Layout/DotPosition:
   EnforcedStyle: trailing
 
-Style/ExtraSpacing:
+Layout/ExtraSpacing:
   Exclude:
     - "db/migrate/*.rb"
 
@@ -59,9 +59,6 @@ Style/HashSyntax:
 Style/IfUnlessModifier:
   Enabled: false
 
-Style/IndentHash:
-  EnforcedStyle: consistent
-
 Style/Lambda:
   Enabled: false
 
@@ -71,8 +68,8 @@ Style/NumericLiterals:
 Style/PerlBackrefs:
   AutoCorrect: false
 
-Style/PredicateName:
-  NamePrefixBlacklist:
+Naming/PredicateName:
+  ForbiddenPrefixes:
     - "is_"
     - "have_"
   NamePrefix:
@@ -92,7 +89,7 @@ Style/Semicolon:
 Style/SignalException:
   EnforcedStyle: only_raise
 
-Style/SpaceAroundOperators:
+Layout/SpaceAroundOperators:
   AllowForAlignment:
     - "="
     - "=>"
@@ -110,6 +107,61 @@ Style/SingleLineBlockParams:
 Lint/UnderscorePrefixedVariableName:
   Enabled: false
 
+# TODO remove this
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Layout/EmptyLinesAroundAttributeAccessor: # (new in 0.83)
+  Enabled: false
+
+Layout/SpaceAroundMethodCallOperator:
+  Enabled: true
+
+Lint/DeprecatedOpenSSLConstant:
+  Enabled: true
+
+Lint/MixedRegexpCaptureTypes:
+  Enabled: true
+
+Lint/RaiseException:
+  Enabled: true
+
+Style/ExponentialNotation:
+  Enabled: true
+
+Style/HashEachMethods:
+  Enabled: true
+
+Style/HashTransformKeys:
+  Enabled: true
+
+Style/HashTransformValues:
+  Enabled: true
+
+Style/RedundantFetchBlock:
+  Enabled: true
+
+Style/RedundantRegexpCharacterClass:
+  Enabled: true
+
+Style/RedundantRegexpEscape:
+  Enabled: true
+
+Style/SlicingWithRange:
+  Enabled: true
+
+Style/SymbolArray:
+  Enabled: false
+
+Style/WordArray:
+  Enabled: false
+
+Style/TernaryParentheses:
+  EnforcedStyle: require_parentheses
+
+Lint/StructNewOverride:
+  Enabled: true
+
 ##################### Metrics ##################################
 
 Metrics/AbcSize:
@@ -118,7 +170,7 @@ Metrics/AbcSize:
 Metrics/CyclomaticComplexity:
   Max: 10
 
-Metrics/LineLength:
+Layout/LineLength:
   Max: 160
   Exclude:
     - "db/migrate/*.rb"

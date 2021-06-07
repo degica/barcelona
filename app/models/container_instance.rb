@@ -41,7 +41,7 @@ class ContainerInstance
       # Configure AWS CloudWatch Logs
       'ec2_id=$(curl -H "X-aws-ec2-metadata-token: $IMDSTOKEN" -v http://169.254.169.254/latest/meta-data/instance-id)',
       'sed -i -e "s/{ec2_id}/$ec2_id/g" /etc/awslogs/awslogs.conf',
-      'sed -i -e "s/us-east-1/'+district.region+'/g" /etc/awslogs/awscli.conf',
+      'sed -i -e "s/us-east-1/' + district.region + '/g" /etc/awslogs/awscli.conf',
       "systemctl start awslogsd",
 
       # Install AWS Inspector agent

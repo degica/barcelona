@@ -14,16 +14,8 @@ describe SsmParameters do
     let(:parameter_value) { "test123"}
 
     it "put ssm parameters" do
-      type = "SecureString"
-      response = described_class.new(district, name).put_parameter(parameter_value, type)
+      response = described_class.new(district, name).put_parameter(parameter_value)
       expect(response.version).to eq 0
-    end
-
-    it "put unexpected type parameters" do
-      type = "hoge"
-
-      expect { described_class.new(district, name).put_parameter(parameter_value, type) }.
-        to raise_error ExceptionHandler::InternalServerError
     end
   end
 

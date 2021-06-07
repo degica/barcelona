@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe "POST /v1/districts/:district_name/ssm_parameters", type: :request do
+describe "DELETE /v1/districts/:district_name/ssm_parameters", type: :request do
   let(:district) { create(:district) }
   let(:user) { create :user }
 
