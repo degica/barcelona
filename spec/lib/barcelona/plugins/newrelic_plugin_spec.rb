@@ -6,13 +6,13 @@ module Barcelona
       let(:license_key) { SecureRandom.hex }
       let!(:district) do
         create :district, plugins_attributes: [
-                 {
-                   name: 'newrelic',
-                   plugin_attributes: {
-                     "license_key" => license_key
-                   }
-                 }
-               ]
+          {
+            name: 'newrelic',
+            plugin_attributes: {
+              "license_key" => license_key
+            }
+          }
+        ]
       end
 
       it "gets hooked with container_instance_user_data trigger" do

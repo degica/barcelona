@@ -29,7 +29,6 @@ module Barcelona
       def build_resources
         add_resource("AWS::AutoScaling::LaunchConfiguration",
                      "ContainerInstanceLaunchConfiguration") do |j|
-
           j.IamInstanceProfile ref("ECSInstanceProfile")
           j.ImageId ECS_OPTIMIZED_AMI_IDS[stack.district.region]
           j.InstanceType instance_type

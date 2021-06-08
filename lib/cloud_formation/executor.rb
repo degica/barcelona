@@ -45,9 +45,9 @@ module CloudFormation
     def create_change_set(type: "UPDATE")
       dt = Time.current.strftime("%Y-%m-%d-%H%M%S")
       options = stack_options.merge({
-        change_set_name: "changeset-#{dt}",
-        change_set_type: type,
-      })
+                                      change_set_name: "changeset-#{dt}",
+                                      change_set_type: type,
+                                    })
       client.create_change_set(options)
     end
 
@@ -58,9 +58,9 @@ module CloudFormation
       }
 
       resp = @s3_client.put_object({
-        body: stack.target!,
-        **params
-      })
+                                     body: stack.target!,
+                                     **params
+                                   })
       Rails.logger.info resp
 
       Rails.logger.info "Waiting for stack template to be uploaded"
@@ -106,12 +106,14 @@ module CloudFormation
     def in_progress?
       status = stack_status
       return false if status.nil?
+
       !!(status =~ /_IN_PROGRESS/)
     end
 
     # Returns CF ID => Real ID hash
     def resource_ids
       return @resource_ids if @resource_ids
+
       resp = client.describe_stack_resources(stack_name: stack.name).stack_resources
       @resource_ids = Hash[*resp.map { |r| [r.logical_resource_id, r.physical_resource_id] }.flatten]
     end

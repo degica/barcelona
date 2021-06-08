@@ -147,6 +147,7 @@ module Barcelona
 
       def nat_type
         return nil if public?
+
         options[:nat_type] # 'instance' or 'gateway'
       end
 

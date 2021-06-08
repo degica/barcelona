@@ -5,7 +5,9 @@ FactoryBot.define do
     end
     cpu { 128 }
     memory { 128 }
+
     public { true }
+
     command { "rails s" }
     association :heritage, factory: :heritage
   end
@@ -17,7 +19,9 @@ FactoryBot.define do
     service_type { "web" }
     cpu { 128 }
     memory { 128 }
+
     public { true }
+
     command { "rails s" }
     association :heritage, factory: :heritage
   end

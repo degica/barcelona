@@ -23,6 +23,7 @@ module Barcelona
       end
 
       private
+
       def install_itamae(user_data)
         user_data.packages += %w(
           gcc-c++

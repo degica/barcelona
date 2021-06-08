@@ -61,7 +61,6 @@ describe ReviewApp do
         expect(review_app.to_param).to eq('subject-with-underscores')
         expect(review_app.slug).to eq('review---subject-with-underscores')
       end
-
     end
 
     context "when a service def has listeners" do

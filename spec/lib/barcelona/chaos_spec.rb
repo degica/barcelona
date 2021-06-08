@@ -22,13 +22,13 @@ describe Barcelona::Chaos do
 
       it "makes a terminate request for the instance" do
         expect(asg_mock).to receive(:terminate_instance_in_auto_scaling_group).with(
-                              instance_id: 'i-22222222',
-                              should_decrement_desired_capacity: false
-                            )
+          instance_id: 'i-22222222',
+          should_decrement_desired_capacity: false
+        )
         expect(asg_mock).to_not receive(:terminate_instance_in_auto_scaling_group).with(
-                              instance_id: 'i-11111111',
-                              should_decrement_desired_capacity: false
-                            )
+          instance_id: 'i-11111111',
+          should_decrement_desired_capacity: false
+        )
         chaos.run
       end
     end

@@ -3,17 +3,16 @@ require 'barcelona/plugins/ossec_client_plugin'
 
 module Barcelona
   module Plugins
-
     describe OssecClientPlugin do
       let!(:district) do
         build :district, bastion_key_pair: "bastion", plugins_attributes: [
-                 {
-                   name: 'ossec_client',
-                   plugin_attributes: {
-                     "server_hostname": 'ossec-manager.test.local'
-                   }
-                 }
-               ]
+          {
+            name: 'ossec_client',
+            plugin_attributes: {
+              "server_hostname": 'ossec-manager.test.local'
+            }
+          }
+        ]
       end
 
       shared_examples_for('ossec client') do

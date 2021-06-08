@@ -23,8 +23,8 @@ describe Vault::CapProbe do
 
     it 'looks up method' do
       stub_const("Vault::CapProbe::METHOD_MAP", {
-        'PUSH' => 'push'
-      })
+                   'PUSH' => 'push'
+                 })
 
       allow(cp).to receive(:retrieve_capabilites) { ['push'] }
       expect(cp.authorized?('/abcd', 'PUSH')).to eq true
@@ -32,8 +32,8 @@ describe Vault::CapProbe do
 
     it 'false if not authorized' do
       stub_const("Vault::CapProbe::METHOD_MAP", {
-        'PULL' => 'pull'
-      })
+                   'PULL' => 'pull'
+                 })
 
       allow(cp).to receive(:retrieve_capabilites) { ['push'] }
       expect(cp.authorized?('/abcd', 'PULL')).to eq false
@@ -41,8 +41,8 @@ describe Vault::CapProbe do
 
     it 'throws on if method not found' do
       stub_const("Vault::CapProbe::METHOD_MAP", {
-        'PUSH' => 'push'
-      })
+                   'PUSH' => 'push'
+                 })
 
       allow(cp).to receive(:retrieve_capabilites) { ['poke'] }
       expect { cp.authorized?('/abcd', 'POKE') }.to raise_error ExceptionHandler::Unauthorized

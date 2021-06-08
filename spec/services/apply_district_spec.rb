@@ -31,7 +31,6 @@ describe ApplyDistrict do
   end
 
   context "When running as ECS task" do
-
     describe "#create!" do
       context "when district role does not exist" do
         mock_ecs_task_environment
