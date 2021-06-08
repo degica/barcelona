@@ -61,16 +61,17 @@ describe Heritage do
         heritage.environments.create!(name: "env3", value: "value3")
       end
 
-      it { is_expected.to eq [{name: "env", value: "value_new"},
-                              {name: "env2", value: "value2"},
-                              {name: "env3", value: "value3"}]
+      it {
+        is_expected.to eq [{name: "env", value: "value_new"},
+                           {name: "env2", value: "value2"},
+                           {name: "env3", value: "value3"}]
       }
     end
 
     it "doesn't have env when plain env_var and secret environment exist with the same name" do
-        heritage.env_vars.create!(key: "env", value: "value", secret: false)
-        heritage.environments.create!(name: "env", value_from: "path/to/ssm")
-        expect(subject.map{|h| h[:name]}).to_not include "env"
+      heritage.env_vars.create!(key: "env", value: "value", secret: false)
+      heritage.environments.create!(name: "env", value_from: "path/to/ssm")
+      expect(subject.map{|h| h[:name]}).to_not include "env"
     end
   end
 
@@ -99,10 +100,10 @@ describe Heritage do
     end
 
     it "doesn't have env when there are legacy secret env var and plain environment with the same name" do
-        heritage.env_vars.create!(key: "env", value: "abc", secret: true)
-        heritage.environments.create!(name: "env", value: "value")
-        expect(subject).to_not include "env"
-        expect(heritage.environment_set.map{|h| h[:name]}).to include "env"
+      heritage.env_vars.create!(key: "env", value: "abc", secret: true)
+      heritage.environments.create!(name: "env", value: "value")
+      expect(subject).to_not include "env"
+      expect(heritage.environment_set.map{|h| h[:name]}).to include "env"
     end
   end
 end
@@ -119,9 +120,10 @@ describe Heritage::Stack do
     end
 
     context "when a heritage has scheduled tasks" do
-      let(:heritage) { build :heritage,
-                             scheduled_tasks: [{schedule: 'rate(1 minute)',
-                                                command: 'rails runner "p :hello"'}]
+      let(:heritage) {
+        build :heritage,
+              scheduled_tasks: [{schedule: 'rate(1 minute)',
+                                 command: 'rails runner "p :hello"'}]
       }
       it "generates a correct stack template" do
         generated = JSON.load stack.target!

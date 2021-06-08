@@ -418,15 +418,15 @@ module Barcelona
       def on_container_instance_user_data(_instance, user_data)
         user_data.run_commands += run_commands
 
-        user_data.add_file("/etc/yum.repos.d/wazuh.repo", "root:root", "644", <<EOS)
-[wazuh_repo]
-gpgcheck=1
-gpgkey=https://packages.wazuh.com/key/GPG-KEY-WAZUH
-enabled=1
-name=Wazuh
-baseurl=https://packages.wazuh.com/yum/el/7/x86_64
-protect=1
-EOS
+        user_data.add_file("/etc/yum.repos.d/wazuh.repo", "root:root", "644", <<~EOS)
+          [wazuh_repo]
+          gpgcheck=1
+          gpgkey=https://packages.wazuh.com/key/GPG-KEY-WAZUH
+          enabled=1
+          name=Wazuh
+          baseurl=https://packages.wazuh.com/yum/el/7/x86_64
+          protect=1
+        EOS
         user_data
       end
 
@@ -436,15 +436,15 @@ EOS
 
         user_data = InstanceUserData.load_or_initialize(bastion_lc["Properties"]["UserData"])
         user_data.run_commands += run_commands
-        user_data.add_file("/etc/yum.repos.d/wazuh.repo", "root:root", "644", <<EOS)
-[wazuh_repo]
-gpgcheck=1
-gpgkey=https://packages.wazuh.com/key/GPG-KEY-WAZUH
-enabled=1
-name=Wazuh
-baseurl=https://packages.wazuh.com/yum/el/7/x86_64
-protect=1
-EOS
+        user_data.add_file("/etc/yum.repos.d/wazuh.repo", "root:root", "644", <<~EOS)
+          [wazuh_repo]
+          gpgcheck=1
+          gpgkey=https://packages.wazuh.com/key/GPG-KEY-WAZUH
+          enabled=1
+          name=Wazuh
+          baseurl=https://packages.wazuh.com/yum/el/7/x86_64
+          protect=1
+        EOS
         bastion_lc["Properties"]["UserData"] = user_data.build
         template
       end

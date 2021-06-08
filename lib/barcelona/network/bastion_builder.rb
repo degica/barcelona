@@ -6,21 +6,21 @@ module Barcelona
       # You can see the latest version stored in public SSM parameter store
       # https://ap-northeast-1.console.aws.amazon.com/systems-manager/parameters/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2/description?region=ap-northeast-1
       AMI_IDS = {
-        "us-east-1"      => "ami-0d5eff06f840b45e9",
-        "us-east-2"      => "ami-077e31c4939f6a2f3",
-        "us-west-1"      => "ami-04468e03c37242e1e",
-        "us-west-2"      => "ami-0cf6f5c8a62fa5da6",
-        "eu-west-1"      => "ami-063d4ab14480ac177",
-        "eu-west-2"      => "ami-06dc09bb8854cbde3",
-        "eu-west-3"      => "ami-0b3e57ee3b63dd76b",
-        "eu-central-1"      => "ami-043097594a7df80ec",
-        "ap-northeast-1"      => "ami-0ca38c7440de1749a",
-        "ap-northeast-2"      => "ami-0f2c95e9fe3f8f80e",
-        "ap-southeast-1"      => "ami-02f26adf094f51167",
-        "ap-southeast-2"      => "ami-0186908e2fdeea8f3",
-        "ca-central-1"      => "ami-0101734ab73bd9e15",
-        "ap-south-1"      => "ami-010aff33ed5991201",
-        "sa-east-1"      => "ami-05373777d08895384",
+        "us-east-1" => "ami-0d5eff06f840b45e9",
+        "us-east-2" => "ami-077e31c4939f6a2f3",
+        "us-west-1" => "ami-04468e03c37242e1e",
+        "us-west-2" => "ami-0cf6f5c8a62fa5da6",
+        "eu-west-1" => "ami-063d4ab14480ac177",
+        "eu-west-2" => "ami-06dc09bb8854cbde3",
+        "eu-west-3" => "ami-0b3e57ee3b63dd76b",
+        "eu-central-1" => "ami-043097594a7df80ec",
+        "ap-northeast-1" => "ami-0ca38c7440de1749a",
+        "ap-northeast-2" => "ami-0f2c95e9fe3f8f80e",
+        "ap-southeast-1" => "ami-02f26adf094f51167",
+        "ap-southeast-2" => "ami-0186908e2fdeea8f3",
+        "ca-central-1" => "ami-0101734ab73bd9e15",
+        "ap-south-1" => "ami-010aff33ed5991201",
+        "sa-east-1" => "ami-05373777d08895384",
       }
 
       def build_resources
