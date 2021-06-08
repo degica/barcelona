@@ -6,7 +6,6 @@ module Barcelona
   module Plugins
    
     class SecureInstancePlugin < Base
-
       def on_container_instance_user_data(_instance, user_data)
         user_data.extend SecureUserData
         user_data.install_tools_for_pcidss

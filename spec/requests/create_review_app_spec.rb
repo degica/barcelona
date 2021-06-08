@@ -52,18 +52,18 @@ describe "POST /v1/:review_group/apps", type: :request do
       
       it "accepts health check path" do
         theparams = params.merge(services: [{
-          name: "web",
-          service_type: "web",
-          cpu: 128,
-          memory: 256,
-          command: "nginx",
-          listeners: [
-            {
-              endpoint: "kstuff",
-              health_check_path: "/examplehealthcheck"
-            }
-          ]
-        }])
+                                   name: "web",
+                                   service_type: "web",
+                                   cpu: 128,
+                                   memory: 256,
+                                   command: "nginx",
+                                   listeners: [
+                                     {
+                                       endpoint: "kstuff",
+                                       health_check_path: "/examplehealthcheck"
+                                     }
+                                   ]
+                                 }])
 
         allow(DeployRunnerJob).to receive(:perform_later)
         api_request(:post, "/v1/review_groups/#{review_group.name}/ci/apps/#{review_group.token}", theparams, {"X-Barcelona-Token" => nil})

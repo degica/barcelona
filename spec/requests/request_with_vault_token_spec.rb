@@ -26,7 +26,6 @@ describe "API request with Vault token", type: :request do
     let(:capabilities) { ["read"] }
 
     it "shows user information" do
-
       api_request_vault :get, "/v1/user"
       expect(response.status).to eq 200
       body = JSON.load(response.body)["user"]

@@ -36,9 +36,9 @@ describe "POST /districts/:district/heritages", type: :request do
             port: 1111
           },
           listeners: [{
-              endpoint: endpoint.name,
-              health_check_path: "/"
-            }],
+            endpoint: endpoint.name,
+            health_check_path: "/"
+          }],
           hosts: [
             {
               hostname: 'awesome-app.degica.com',

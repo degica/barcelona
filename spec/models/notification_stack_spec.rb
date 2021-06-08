@@ -5,9 +5,9 @@ describe NotificationStack do
 
   it "generates notification stack" do
     district.notifications.create(
-        target: "slack",
-        endpoint: "https://hooks.slack.com/services/webhook/endpoint"
-      )
+      target: "slack",
+      endpoint: "https://hooks.slack.com/services/webhook/endpoint"
+    )
     stack = described_class.new(district)
     generated = JSON.load(stack.target!)
     expect(generated["Resources"]["NotificationRole"]).to be_present

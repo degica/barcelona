@@ -19,10 +19,10 @@ describe EnvVar do
 
     it "doesn't save value in DB" do
       expect(env_var.district.aws.s3).to receive(:put_object).with(
-                                           bucket: env_var.district.s3_bucket_name,
-                                           key: env_var.s3_path,
-                                           body: "VALUE",
-                                           server_side_encryption: "aws:kms")
+        bucket: env_var.district.s3_bucket_name,
+        key: env_var.s3_path,
+        body: "VALUE",
+        server_side_encryption: "aws:kms")
       env_var.save!
       expect(env_var.encrypted_value).to be_nil
       expect(env_var.value).to be_blank

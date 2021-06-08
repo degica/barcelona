@@ -6,11 +6,11 @@ module Barcelona
     describe PcidssStack do
       let(:district) do
         create :district, bastion_key_pair: "bastion", plugins_attributes: [
-                 {
-                   name: 'pcidss',
-                   plugin_attributes: {}
-                 }
-               ]
+          {
+            name: 'pcidss',
+            plugin_attributes: {}
+          }
+        ]
       end
       let(:stack) { described_class.new(district, Plugin.find_by(name: 'pcidss')) }
 
@@ -32,11 +32,11 @@ module Barcelona
     describe PcidssPlugin do
       let!(:district) do
         build :district, bastion_key_pair: "bastion", plugins_attributes: [
-                 {
-                   name: 'pcidss',
-                   plugin_attributes: {}
-                 }
-               ]
+          {
+            name: 'pcidss',
+            plugin_attributes: {}
+          }
+        ]
       end
 
       before do

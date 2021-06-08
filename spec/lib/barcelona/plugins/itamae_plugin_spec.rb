@@ -3,17 +3,16 @@ require 'barcelona/plugins/ossec_client_plugin'
 
 module Barcelona
   module Plugins
-
     describe ItamaePlugin do
       let!(:district) do
         build :district, bastion_key_pair: "bastion", plugins_attributes: [
-                 {
-                   name: 'itamae',
-                   plugin_attributes: {
-                     "recipe_url": "s3://barcelona-district1-12345/itamae_recipes/recipe.tar.gz"
-                   }
-                 }
-               ]
+          {
+            name: 'itamae',
+            plugin_attributes: {
+              "recipe_url": "s3://barcelona-district1-12345/itamae_recipes/recipe.tar.gz"
+            }
+          }
+        ]
       end
 
       shared_examples_for('itamae') do

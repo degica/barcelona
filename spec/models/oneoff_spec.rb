@@ -97,12 +97,12 @@ describe Oneoff do
     it 'uses env_var_arrayize to define environment' do
       allow(oneoff).to receive(:env_var_arrayize) { [{name: 'BAR', value: 'foo' }] }
       expect(ecs_mock).to receive(:run_task).with(hash_including(
-        overrides: hash_including(
-          container_overrides: [
-            hash_including(environment: [{name: 'BAR', value: 'foo' }])
-          ]
-        )
-      )).and_return(describe_tasks_response_mock)
+                                                    overrides: hash_including(
+                                                      container_overrides: [
+                                                        hash_including(environment: [{name: 'BAR', value: 'foo' }])
+                                                      ]
+                                                    )
+                                                  )).and_return(describe_tasks_response_mock)
       oneoff.run
     end
   end

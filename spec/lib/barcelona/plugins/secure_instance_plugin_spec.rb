@@ -3,16 +3,15 @@ require 'barcelona/plugins/secure_instance_plugin'
 
 module Barcelona
   module Plugins
-
     describe SecureInstancePlugin do
       let!(:district) do
         build :district, bastion_key_pair: "bastion", plugins_attributes: [
-                 {
-                   name: 'secure_instance',
-                   plugin_attributes: {
-                   }
-                 }
-               ]
+          {
+            name: 'secure_instance',
+            plugin_attributes: {
+            }
+          }
+        ]
       end
 
       shared_examples_for('pcidss tools') do

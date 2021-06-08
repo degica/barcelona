@@ -55,7 +55,7 @@ describe HeritageTaskDefinition do
                                   log_configuration: expected_log_configuration
                                 }
                               ]
-                           })
+                            })
     end
 
     context "when a service is web service" do
@@ -286,7 +286,7 @@ describe HeritageTaskDefinition do
                                   log_configuration: expected_log_configuration
                                 }
                               ]
-                           })
+                            })
     end
 
     context "when session_token is not nil" do
@@ -355,7 +355,7 @@ describe HeritageTaskDefinition do
                                   "LogConfiguration" => expected_log_configuration
                                 }
                               ]
-                           })
+                            })
     end
   end
 end
