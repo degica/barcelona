@@ -13,9 +13,20 @@ describe SsmParameters do
   describe "#put_parameter" do
     let(:parameter_value) { "test123"}
 
-    it "put ssm parameteRs" do
+    it "put ssm parameters" do
+      expect_any_instance_of(Aws::SSM::Client).to receive(:put_parameter).and_call_original
+
       response = described_class.new(district, name).put_parameter(parameter_value)
       expect(response.version).to eq 0
+    end
+  end
+
+  describe "#delete_parameter" do
+    it "delete ssm parameter" do
+      expect_any_instance_of(Aws::SSM::Client).to receive(:delete_parameters).and_call_original
+      response = described_class.new(district, name).delete_parameter
+      expect(response.deleted_parameters).to eq []
+      expect(response.invalid_parameters).to eq []
     end
   end
 end

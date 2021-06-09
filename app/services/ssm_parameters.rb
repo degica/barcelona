@@ -12,6 +12,12 @@ class SsmParameters
                          })
   end
 
+  def delete_parameter
+    client.delete_parameters({
+                               names: [@name]
+                             })
+  end
+
   def ssm_path
     "/barcelona/#{@district.name}/#{@name}"
   end
