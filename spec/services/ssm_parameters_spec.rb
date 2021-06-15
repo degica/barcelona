@@ -23,8 +23,11 @@ describe SsmParameters do
 
   describe "#delete_parameter" do
     it "delete ssm parameter" do
-      expect_any_instance_of(Aws::SSM::Client).to receive(:delete_parameters).and_call_original
-      response = described_class.new(district, name).delete_parameter
+      ssm_parameters = described_class.new(district, name)
+      expect_any_instance_of(Aws::SSM::Client).to receive(:delete_parameters).
+        with(names: [ssm_parameters.ssm_path]).and_call_original
+
+      response = ssm_parameters.delete_parameter
       expect(response.deleted_parameters).to eq []
       expect(response.invalid_parameters).to eq []
     end

@@ -14,7 +14,7 @@ class SsmParameters
 
   def delete_parameter
     client.delete_parameters({
-                               names: [@name]
+                               names: [ssm_path]
                              })
   end
 
