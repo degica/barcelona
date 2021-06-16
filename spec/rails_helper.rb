@@ -63,8 +63,8 @@ RSpec.configure do |config|
 
   config.before :each do
     stub_const("Gibberish::AES::SJCL::DEFAULTS", {
-                 v:1, iter:1, ks:256, ts:96,
-                 mode:"gcm", adata:"", cipher:"aes", max_iter: 1
+                 v: 1, iter:1, ks:256, ts:96,
+                 mode: "gcm", adata:"", cipher:"aes", max_iter: 1
                })
     allow_any_instance_of(Aws::CloudFormation::Client).to receive(:describe_stack_resources) {
       double(stack_resources: [

@@ -6,69 +6,6 @@
 # Note that changes in the inspected code, or installation of new
 # versions of RuboCop, may require this file to be generated again.
 
-# Offense count: 93
-# Cop supports --auto-correct.
-# Configuration parameters: AllowMultipleStyles, EnforcedHashRocketStyle, EnforcedColonStyle, EnforcedLastArgumentHashStyle.
-# SupportedHashRocketStyles: key, separator, table
-# SupportedColonStyles: key, separator, table
-# SupportedLastArgumentHashStyles: always_inspect, always_ignore, ignore_implicit, ignore_explicit
-Layout/HashAlignment:
-  Exclude:
-    - 'dockerfiles/reverse-proxy/render_template.rb'
-    - 'lib/barcelona/network/autoscaling_builder.rb'
-    - 'lib/barcelona/network/bastion_builder.rb'
-    - 'lib/barcelona/network/nat_builder.rb'
-    - 'lib/barcelona/network/vpc_builder.rb'
-    - 'spec/lib/barcelona/network/network_stack_spec.rb'
-    - 'spec/models/heritage_task_definition_spec.rb'
-    - 'spec/rails_helper.rb'
-
-# Offense count: 7
-# Cop supports --auto-correct.
-Layout/HeredocIndentation:
-  Exclude:
-    - 'bin/bootstrap'
-    - 'lib/barcelona/plugins/pcidss_plugin.rb'
-    - 'lib/tasks/bootstrap.rake'
-
-# Offense count: 2
-# Cop supports --auto-correct.
-# Configuration parameters: Width, IgnoredPatterns.
-Layout/IndentationWidth:
-  Exclude:
-    - 'spec/models/heritage_spec.rb'
-
-# Offense count: 7
-# Cop supports --auto-correct.
-# Configuration parameters: AutoCorrect, AllowHeredoc, AllowURI, URISchemes, IgnoreCopDirectives, IgnoredPatterns.
-# URISchemes: http, https
-Layout/LineLength:
-  Max: 317
-
-# Offense count: 19
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: symmetrical, new_line, same_line
-Layout/MultilineArrayBraceLayout:
-  Exclude:
-    - 'spec/lib/barcelona/network/network_stack_spec.rb'
-    - 'spec/models/release_spec.rb'
-
-# Offense count: 3
-# Cop supports --auto-correct.
-Layout/MultilineBlockLayout:
-  Exclude:
-    - 'spec/models/district_spec.rb'
-    - 'spec/models/heritage_spec.rb'
-
-# Offense count: 124
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: symmetrical, new_line, same_line
-Layout/MultilineHashBraceLayout:
-  Exclude:
-    - 'spec/lib/barcelona/network/network_stack_spec.rb'
-
 # Offense count: 12
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle.

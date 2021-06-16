@@ -4,21 +4,21 @@ module Barcelona
       # https://aws.amazon.com/jp/amazon-linux-ami/
       # amzn-ami-vpc-nat-hvm
       VPC_NAT_AMI_IDS = {
-        "us-east-1"      => "ami-00a9d4a05375b2763",
-        "us-east-2"      => "ami-00d1f8201864cc10c",
-        "us-west-1"      => "ami-097ad469381034fa2",
-        "us-west-2"      => "ami-0b840e8a1ce4cdf15",
-        "eu-west-1"      => "ami-024107e3e3217a248",
-        "eu-west-2"      => "ami-0ca65a55561666293",
-        "eu-west-3"      => "ami-0641e4dfc1427f114",
-        "eu-central-1"      => "ami-06a5303d47fbd8c60",
-        "ap-northeast-1"      => "ami-00d29e4cb217ae06b",
-        "ap-northeast-2"      => "ami-0d98591cbf9ef1ffd",
-        "ap-southeast-1"      => "ami-01514bb1776d5c018",
-        "ap-southeast-2"      => "ami-062c04ec46aecd204",
-        "ca-central-1"      => "ami-0b32354309da5bba5",
-        "ap-south-1"      => "ami-00b3aa8a93dd09c13",
-        "sa-east-1"      => "ami-057f5d52ff7ae75ae",
+        "us-east-1" => "ami-00a9d4a05375b2763",
+        "us-east-2" => "ami-00d1f8201864cc10c",
+        "us-west-1" => "ami-097ad469381034fa2",
+        "us-west-2" => "ami-0b840e8a1ce4cdf15",
+        "eu-west-1" => "ami-024107e3e3217a248",
+        "eu-west-2" => "ami-0ca65a55561666293",
+        "eu-west-3" => "ami-0641e4dfc1427f114",
+        "eu-central-1" => "ami-06a5303d47fbd8c60",
+        "ap-northeast-1" => "ami-00d29e4cb217ae06b",
+        "ap-northeast-2" => "ami-0d98591cbf9ef1ffd",
+        "ap-southeast-1" => "ami-01514bb1776d5c018",
+        "ap-southeast-2" => "ami-062c04ec46aecd204",
+        "ca-central-1" => "ami-0b32354309da5bba5",
+        "ap-south-1" => "ami-00b3aa8a93dd09c13",
+        "sa-east-1" => "ami-057f5d52ff7ae75ae",
       }
 
       def build_resources

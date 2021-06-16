@@ -108,7 +108,7 @@ hosts.each do |host|
     hostname: host,
     proxy_protocol: !(ENV['DISABLE_PROXY_PROTOCOL'] == 'true'),
     ssl_cert_path: ssl_cert_path,
-    ssl_key_path:  ssl_key_path,
+    ssl_key_path: ssl_key_path,
     force_ssl: ENV['FORCE_SSL'] == 'true',
     upstream_name: ENV['UPSTREAM_NAME'],
     upstream_port: ENV['UPSTREAM_PORT']

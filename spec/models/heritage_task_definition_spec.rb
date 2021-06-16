@@ -262,7 +262,7 @@ describe HeritageTaskDefinition do
                               execution_role_arn: "task-execution-role",
                               container_definitions: [
                                 {
-                                  name:  "#{heritage.name}-oneoff",
+                                  name: "#{heritage.name}-oneoff",
                                   cpu: 128,
                                   memory: 512,
                                   essential: true,
@@ -331,7 +331,7 @@ describe HeritageTaskDefinition do
                               "ExecutionRoleArn" => "task-execution-role",
                               "ContainerDefinitions" => [
                                 {
-                                  "Name" =>  "#{heritage.name}-schedule",
+                                  "Name" => "#{heritage.name}-schedule",
                                   "Cpu" => 128,
                                   "Memory" => 512,
                                   "Essential" => true,

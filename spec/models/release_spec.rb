@@ -26,7 +26,8 @@ describe Release do
                                  "hosts",
                                  "service_type",
                                  "force_ssl",
-                                 "health_check")]})
+                                 "health_check")
+                         ]})
     }
   end
 
