@@ -32,4 +32,21 @@ describe SsmParameters do
       expect(response.invalid_parameters).to eq []
     end
   end
+
+  describe "#get_parameters" do
+    it "get ssm parameter" do
+      ssm_parameters = described_class.new(district, "")
+      ssm_paths = [
+        "/barcelona/test/path/to/secret-1",
+        "/barcelona/test/path/to/secret-2"
+      ]
+
+      expect_any_instance_of(Aws::SSM::Client).to receive(:get_parameters).
+        with(names: ssm_paths).and_call_original
+
+      response = ssm_parameters.get_parameters(ssm_paths)
+      expect(response.parameters).to eq []
+      expect(response.invalid_parameters).to eq []
+    end
+  end
 end

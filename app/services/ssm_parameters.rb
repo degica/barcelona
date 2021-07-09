@@ -18,6 +18,12 @@ class SsmParameters
                              })
   end
 
+  def get_parameters(ssm_paths)
+    client.get_parameters({
+                            names: ssm_paths
+                          })
+  end
+
   def ssm_path
     "/barcelona/#{@district.name}/#{@name}"
   end
