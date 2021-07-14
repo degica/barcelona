@@ -255,7 +255,7 @@ class Heritage < ActiveRecord::Base
   end
 
   def deploy!(without_before_deploy: false, description: "")
-    validate_ssm_parameters
+    validate_ssm_parameters!
     release = releases.create!(description: description)
     update_services(release, without_before_deploy)
     release
