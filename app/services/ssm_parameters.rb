@@ -18,10 +18,11 @@ class SsmParameters
                              })
   end
 
-  def get_parameters(ssm_paths)
-    client.get_parameters({
-                            names: ssm_paths
-                          })
+  def get_invalid_parameters(ssm_paths)
+    response = client.get_parameters({
+                                       names: ssm_paths
+                                     })
+    response.invalid_parameters
   end
 
   def ssm_path

@@ -355,16 +355,16 @@ class Heritage < ActiveRecord::Base
     cf_executor.delete
   end
 
-  def validate_ssm_parameters
+  def validate_ssm_parameters!
     ssm_paths = environments.secrets.select{ |key|
       key.value_from.start_with?("/barcelona/#{district.name}")
     }.map(&:value_from)
 
     ssm_parameter = SsmParameters.new(self.district, "")
-    response = ssm_parameter.get_parameters(ssm_paths)
+    invalid_parameters = ssm_parameter.get_invalid_parameters(ssm_paths)
 
-    if response.invalid_parameters.present?
-      raise ExceptionHandler::BadRequest.new("These ssm keys do not exist: #{response.invalid_parameters}")
+    if invalid_parameters.present?
+      raise ExceptionHandler::BadRequest.new("These ssm keys do not exist: #{invalid_parameters}")
     end
   end
 end
