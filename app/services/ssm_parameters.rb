@@ -19,6 +19,8 @@ class SsmParameters
   end
 
   def get_invalid_parameters(ssm_paths)
+    return [] if ssm_paths.empty?
+
     response = client.get_parameters({
                                        names: ssm_paths
                                      })

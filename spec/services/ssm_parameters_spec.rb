@@ -47,5 +47,16 @@ describe SsmParameters do
       invalid_parameters = ssm_parameters.get_invalid_parameters(ssm_paths)
       expect(invalid_parameters).to eq []
     end
+
+    it "return empty when ssm path is empty" do
+      ssm_parameters = described_class.new(district, "")
+      ssm_paths = []
+
+      expect_any_instance_of(Aws::SSM::Client).not_to receive(:get_parameters).
+        with(names: ssm_paths)
+
+      invalid_parameters = ssm_parameters.get_invalid_parameters(ssm_paths)
+      expect(invalid_parameters).to eq []
+    end
   end
 end

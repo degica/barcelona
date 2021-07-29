@@ -150,7 +150,7 @@ describe "POST /districts/:district/heritages", type: :request do
       end
     end
 
-    context "when ssm_path doest not exist exists" do
+    context "when ssm_path doest not exist" do
       let(:version) { 1 }
 
       it "throw an error" do
@@ -164,6 +164,20 @@ describe "POST /districts/:district/heritages", type: :request do
         api_request(:post, "/v1/districts/#{district.name}/heritages", params)
         expect(response.status).to eq 400
         expect(JSON.parse(response.body)["error"]).to eq "These ssm keys do not exist: [\"/barcelona/#{district.name}/path/to/env_key\"]"
+      end
+    end
+
+    context "when ssm_path is empty" do
+      let(:version) { 1 }
+
+      it "do not throw an error" do
+        params.delete(:environment)
+        ssm_paths = ["/barcelona/#{district.name}/path/to/env_key"]
+        mock_response = Struct.new(:parameters, :invalid_parameters, keyword_init: true)
+        expect_any_instance_of(Aws::SSM::Client).not_to receive(:get_parameters)
+
+        api_request(:post, "/v1/districts/#{district.name}/heritages", params)
+        expect(response.status).to eq 200
       end
     end
   end
