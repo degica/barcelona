@@ -25,6 +25,8 @@ class SsmParameters
                                        names: ssm_paths
                                      })
     response.invalid_parameters
+  rescue StandardError => e
+    Rails.logger.error("Unexpected error #{e}")
   end
 
   def ssm_path
