@@ -58,5 +58,15 @@ describe SsmParameters do
       invalid_parameters = ssm_parameters.get_invalid_parameters(ssm_paths)
       expect(invalid_parameters).to eq []
     end
+
+    it "throw UnprocessableEntity error" do
+      ssm_parameters = described_class.new(district, "")
+      ssm_paths = [
+        "/barcelona/test/path/to/secret-1",
+      ]
+
+      allow_any_instance_of(Aws::SSM::Client).to receive(:get_parameters).and_raise(StandardError)
+      expect { ssm_parameters.get_invalid_parameters(ssm_paths) }.to raise_error(ExceptionHandler::UnprocessableEntity)
+    end
   end
 end

@@ -26,7 +26,7 @@ class SsmParameters
                                      })
     response.invalid_parameters
   rescue StandardError => e
-    Rails.logger.error("Unexpected error #{e}")
+    raise ExceptionHandler::UnprocessableEntity.new("Failed to get ssm parameters: #{e}")
   end
 
   def ssm_path
