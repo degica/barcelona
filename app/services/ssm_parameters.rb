@@ -18,6 +18,17 @@ class SsmParameters
                              })
   end
 
+  def get_invalid_parameters(ssm_paths)
+    return [] if ssm_paths.empty?
+
+    response = client.get_parameters({
+                                       names: ssm_paths
+                                     })
+    response.invalid_parameters
+  rescue StandardError => e
+    raise ExceptionHandler::UnprocessableEntity.new("Failed to get ssm parameters: #{e}")
+  end
+
   def ssm_path
     "/barcelona/#{@district.name}/#{@name}"
   end
