@@ -255,6 +255,8 @@ class Heritage < ActiveRecord::Base
   end
 
   def deploy!(without_before_deploy: false, description: "")
+    validate_ssm_parameters!
+
     release = releases.create!(description: description)
     update_services(release, without_before_deploy)
     release
@@ -352,5 +354,20 @@ class Heritage < ActiveRecord::Base
 
   def delete_stack
     cf_executor.delete
+  end
+
+  def validate_ssm_parameters!
+    ssm_path_array = environments.secrets.select{ |key|
+      key.value_from.start_with?("/barcelona/#{district.name}")
+    }.map(&:value_from).each_slice(10).to_a
+
+    for ssm_paths in ssm_path_array do
+      ssm_parameter = SsmParameters.new(self.district, "")
+      invalid_parameters = ssm_parameter.get_invalid_parameters(ssm_paths)
+
+      if invalid_parameters.present?
+        raise ExceptionHandler::BadRequest.new("These ssm keys do not exist: #{invalid_parameters}")
+      end
+    end
   end
 end
