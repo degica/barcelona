@@ -18,6 +18,21 @@ class SsmParameters
                              })
   end
 
+  def get_invalid_parameters(ssm_paths)
+    return [] if ssm_paths.empty?
+
+    if ssm_paths.length > 10
+      raise ExceptionHandler::UnprocessableEntity.new("Failed to get ssm parameters: length should be less than 10 #{ssm_paths}")
+    end
+
+    response = client.get_parameters({
+                                       names: ssm_paths
+                                     })
+    response.invalid_parameters
+  rescue StandardError => e
+    raise ExceptionHandler::UnprocessableEntity.new("Failed to get ssm parameters: #{e}")
+  end
+
   def ssm_path
     "/barcelona/#{@district.name}/#{@name}"
   end
