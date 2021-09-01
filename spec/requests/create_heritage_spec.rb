@@ -124,32 +124,6 @@ describe "POST /districts/:district/heritages", type: :request do
       it_behaves_like "create"
     end
 
-    context "when the endpoint does not belong to a district " do
-      let(:version) { 1 }
-      let(:endpoint) { create :endpoint }
-
-      it "it should throw an error" do
-        api_request(:post, "/v1/districts/#{district.name}/heritages", params)
-        expect(response.status).to eq 422
-        expect(JSON.parse(response.body)["error"]).to eq "Validation failed: Services listeners endpoint must exist"
-      end
-    end
-
-    context "when an existing endpoint exists" do
-      let(:version) { 1 }
-      let(:district) { create :district}
-      let(:district2) { create :district, name: "staging-blue" }
-      let(:endpoint) { build :endpoint, name: "green" }
-
-      it "do not pick wrong one" do
-        create :endpoint, name: "staging-blue-green", district: district
-
-        api_request(:post, "/v1/districts/#{district2.name}/heritages", params)
-        expect(response.status).to eq 422
-        expect(JSON.parse(response.body)["error"]).to eq "Validation failed: Services listeners endpoint must exist"
-      end
-    end
-
     context "when ssm_path doest not exist" do
       let(:version) { 1 }
 
