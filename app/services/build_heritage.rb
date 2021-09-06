@@ -5,13 +5,13 @@ class BuildHeritage
     params = _params.to_h.deep_dup
     heritage_name = params.delete(:id) || params[:name]
     @heritage = Heritage.find_or_initialize_by(name: heritage_name)
+    @district = district
 
     # we can remove this check once we find heritage by heritage name and district name
     if district && @heritage.district && district.id != @heritage.district.id
       raise ExceptionHandler::InternalServerError.new("#{@heritage.name} does not belong to #{district.name}")
     end
 
-    @district = district || @heritage.district
     @params = convert_params_for_model params
   end
 
@@ -23,10 +23,8 @@ class BuildHeritage
 
         next if service[:listeners].nil?
 
-        endpoint_names = service[:listeners].map { |e| e[:endpoint] }
-        endpoints = Endpoint.where(name: endpoint_names, district: @district).pluck(:name, :id)
+        listener_map = Hash[Endpoint.where(name: service[:listeners].map { |e| e[:endpoint] }).pluck(:name, :id)]
 
-        listener_map = Hash[endpoints]
         service[:listeners_attributes] = service.delete(:listeners).map do |listener|
           {
             endpoint_id: listener_map[listener[:endpoint]],
