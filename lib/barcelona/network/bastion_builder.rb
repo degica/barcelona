@@ -6,7 +6,7 @@ module Barcelona
       # You can see the latest version stored in public SSM parameter store
       # https://ap-northeast-1.console.aws.amazon.com/systems-manager/parameters/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2/description?region=ap-northeast-1
       AMI_IDS = {
-                "us-east-1"      => "ami-087c17d1fe0178315",
+        "us-east-1"      => "ami-087c17d1fe0178315",
         "us-east-2"      => "ami-00dfe2c7ce89a450b",
         "us-west-1"      => "ami-011996ff98de391d1",
         "us-west-2"      => "ami-0c2d06d50ce30b442",
