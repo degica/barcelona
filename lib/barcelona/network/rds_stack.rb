@@ -48,8 +48,8 @@ module Barcelona::Network
                    db_user: 'default',
                    multi_az: false,
                    encoding: :utf8,
-                   allocated_storage: 5,
-                   instance_class: "db.t2.micro")
+                   allocated_storage: 10,
+                   instance_class: "db.t4g.micro")
       @engine = engine
       @district = district
       @db_user = db_user

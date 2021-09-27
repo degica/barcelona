@@ -9,7 +9,7 @@ namespace :bcn do
       when /_IN_PROGRESS/
         print "."
       else
-        raise "Unexpected CF stack status"
+        raise "Unexpected CF stack status #{executor.stack_status}"
       end
     end
   end
@@ -107,12 +107,12 @@ namespace :bcn do
     heritage.destroy!
 
     puts
-    puts <<-EOS
-Barcelona Bootstrap Completed!
-Endpoint: #{dns_name}
+    puts <<~EOS
+      Barcelona Bootstrap Completed!
+      Endpoint: #{dns_name}
 
-Set your DNS record to point to the above endpoint and run the following Barcelona client command
-$ bcn login https://<your barcelona domain> <GitHub Token>
+      Set your DNS record to point to the above endpoint and run the following Barcelona client command
+      $ bcn login https://<your barcelona domain> <GitHub Token>
     EOS
   end
 
