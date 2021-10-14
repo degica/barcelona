@@ -1,7 +1,7 @@
 environments:
   production:
     name: wazuh-kibana-proxy
-    image_name: quay.io/degica/barcelona-wazuh-kibana-proxy
+    image_name: public.ecr.aws/degica/barcelona-wazuh-kibana-proxy
     services:
       - name: web
         service_type: web

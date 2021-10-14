@@ -50,7 +50,7 @@ describe HeritageTaskDefinition do
                                   cpu: 1,
                                   memory: 16,
                                   essential: false,
-                                  image: "quay.io/degica/barcelona-run-pack",
+                                  image: "public.ecr.aws/degica/barcelona-run-pack",
                                   environment: [],
                                   log_configuration: expected_log_configuration
                                 }
@@ -103,7 +103,7 @@ describe HeritageTaskDefinition do
                                     cpu: 1,
                                     memory: 16,
                                     essential: false,
-                                    image: "quay.io/degica/barcelona-run-pack",
+                                    image: "public.ecr.aws/degica/barcelona-run-pack",
                                     environment: [],
                                     log_configuration: expected_log_configuration
                                   },
@@ -195,7 +195,7 @@ describe HeritageTaskDefinition do
                                     cpu: 1,
                                     memory: 16,
                                     essential: false,
-                                    image: "quay.io/degica/barcelona-run-pack",
+                                    image: "public.ecr.aws/degica/barcelona-run-pack",
                                     environment: [],
                                     log_configuration: expected_log_configuration
                                   },
@@ -281,7 +281,7 @@ describe HeritageTaskDefinition do
                                   cpu: 1,
                                   memory: 16,
                                   essential: false,
-                                  image: "quay.io/degica/barcelona-run-pack",
+                                  image: "public.ecr.aws/degica/barcelona-run-pack",
                                   environment: [],
                                   log_configuration: expected_log_configuration
                                 }
@@ -350,7 +350,7 @@ describe HeritageTaskDefinition do
                                   "Cpu" => 1,
                                   "Memory" => 16,
                                   "Essential" => false,
-                                  "Image" => "quay.io/degica/barcelona-run-pack",
+                                  "Image" => "public.ecr.aws/degica/barcelona-run-pack",
                                   "Environment" => [],
                                   "LogConfiguration" => expected_log_configuration
                                 }
