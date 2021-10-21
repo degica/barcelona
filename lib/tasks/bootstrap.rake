@@ -11,10 +11,7 @@ class CloudwatchCat
   end
 
   def cloudwatch
-    @cloudwatch ||= Aws::CloudWatchLogs::Client.new(
-      region: 'ap-northeast-1',
-      profile: 'sre-sandbox'
-    )
+    @cloudwatch ||= Aws::CloudWatchLogs::Client.new
   end
 
   def connect!
