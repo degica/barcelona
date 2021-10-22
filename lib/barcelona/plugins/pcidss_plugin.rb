@@ -134,7 +134,7 @@ module Barcelona
           version: '2'
           services:
             wazuh:
-              image: quay.io/degica/barcelona-wazuh
+              image: public.ecr.aws/degica/barcelona-wazuh
               restart: always
               ports:
                 - "1514:1514/udp"

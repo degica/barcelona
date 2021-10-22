@@ -64,7 +64,7 @@ namespace :bcn do
     # Run oneoff task that runs inside the VPC and creates barcelona service and endpoint
     heritage = district.heritages.new(
       name: "barcelona-bootstrap",
-      image_name: "quay.io/degica/barcelona",
+      image_name: "public.ecr.aws/degica/barcelona",
       image_tag: "master"
     )
     heritage.env_vars.build(key: "DATABASE_URL", value: ENV["BOOTSTRAP_DATABASE_URL"], secret: true)
@@ -139,7 +139,7 @@ namespace :bcn do
 
       heritage = district.heritages.new(
         name: "barcelona",
-        image_name: "quay.io/degica/barcelona",
+        image_name: "public.ecr.aws/degica/barcelona",
         image_tag: "master",
         before_deploy: "rake db:migrate",
         env_vars_attributes: [

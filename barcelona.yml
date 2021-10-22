@@ -1,7 +1,7 @@
 environments:
   production:
     name: barcelona2
-    image_name: quay.io/degica/barcelona
+    image_name: public.ecr.aws/degica/barcelona
     before_deploy: rake db:migrate
     scheduled_tasks:
       # 10AM JST every week day
@@ -24,7 +24,7 @@ environments:
         memory: 256
   test:
     name: barcelona
-    image_name: quay.io/degica/barcelona
+    image_name: public.ecr.aws/degica/barcelona
     before_deploy: rake db:migrate
     scheduled_tasks:
       # 10AM JST every week day

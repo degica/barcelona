@@ -30,7 +30,7 @@ All heritage configurations are declared in a barcelona configuration file `barc
 environments:
   production:
     name: barcelona
-    image_name: quay.io/degica/barcelona
+    image_name: public.ecr.aws/degica/barcelona
     services:
       - name: web
         service_type: web

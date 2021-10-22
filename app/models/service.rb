@@ -1,5 +1,5 @@
 class Service < ActiveRecord::Base
-  DEFAULT_REVERSE_PROXY = 'quay.io/degica/barcelona-reverse-proxy:latest'.freeze
+  DEFAULT_REVERSE_PROXY = 'public.ecr.aws/degica/barcelona-reverse-proxy:latest'.freeze
   WEB_CONTAINER_PORT_DEFAULT = 3000
 
   belongs_to :heritage, inverse_of: :services

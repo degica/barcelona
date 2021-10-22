@@ -33,8 +33,4 @@ jobs:
           --health-retries 5
 'on':
   push:
-    branches:
-    - master
-  pull_request:
-    branches:
-    - master
+    branches: '*'
