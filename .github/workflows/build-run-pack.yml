@@ -1,6 +1,25 @@
 name: build-run-pack
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: startup
+      run: |
+        cd dockerfiles/run-pack
+        make build
+        docker run --name runpack public.ecr.aws/degica/barcelona-run-pack
+        
+    - name: test
+      run: |
+        docker run --volumes-from runpack debian:jessie /barcelona/barcelona-run load-env-and-run \
+            --region ap-northeast-1 \
+            --bucket-name your-s3-bucket-name \
+            -e ENV_NAME=s3/path \
+            env
+
   build:
+    needs: test
     container:
       image: docker:git
       env:

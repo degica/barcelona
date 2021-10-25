@@ -3,14 +3,17 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v2
     - name: startup
       run: |
+        cd dockerfiles/reverse-proxy
         docker-compose -f docker-compose.test.yml up --build -d
     - name: test
       run: |
         curl http://localhost:50132
 
   build:
+    needs: test
     container:
       image: docker:git
       env:
