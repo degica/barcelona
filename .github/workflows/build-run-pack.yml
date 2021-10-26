@@ -1,7 +1,6 @@
 name: build-run-pack
 jobs:
   build:
-    needs: test
     container:
       image: docker:git
       env:

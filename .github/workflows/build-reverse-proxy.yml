@@ -10,6 +10,7 @@ jobs:
         docker-compose -f docker-compose.test.yml up --build -d
     - name: test
       run: |
+        sleep 10
         curl http://localhost:50132
 
   build:
