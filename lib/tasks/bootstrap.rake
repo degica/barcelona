@@ -1,3 +1,76 @@
+require 'aws-sdk-cloudwatchlogs'
+require 'date'
+
+
+class CloudwatchCat
+  def initialize(groupnameprefix, streamname)
+    @groupname = groupnameprefix
+    @streamname = streamname
+    @stream = nil
+    @next_token = nil
+  end
+
+  def cloudwatch
+    @cloudwatch ||= Aws::CloudWatchLogs::Client.new
+  end
+
+  def connect!
+    return if @stream
+
+    resp = cloudwatch.describe_log_groups(
+      log_group_name_prefix: @groupname,
+      next_token: nil
+    );
+
+    @group = resp.log_groups.first
+
+    if @group.nil?
+      puts "Cannot find log group #{@groupname}"
+      return
+    end
+
+    resp = cloudwatch.describe_log_streams(
+      log_group_name: @group.log_group_name,
+      log_stream_name_prefix: "#{@streamname}",
+      next_token: nil,
+    );
+
+    @stream = resp.log_streams.first
+
+    if @stream.nil?
+      puts "Cannot find stream #{@streamname}"
+      return
+    end
+  end
+
+  def retrieve_next_message_group
+    connect!
+
+    return [] if @stream.nil?
+
+    resp = cloudwatch.get_log_events({
+      log_group_name: @group.log_group_name, # required
+      log_stream_name: @stream.log_stream_name, # required
+      next_token: @next_token,
+      start_from_head: true,
+    })
+
+    return [] if @next_token == resp.next_forward_token
+
+    result = []
+
+    resp.events.each do |event|
+      stamp = DateTime.strptime("#{event.timestamp}",'%Q').to_s
+      result << [stamp, event.message]
+    end
+
+    @next_token = resp.next_forward_token
+
+    result
+  end
+end
+
+
 namespace :bcn do
   def wait_cf_stack(executor)
     while true
@@ -91,9 +164,22 @@ namespace :bcn do
     oneoff = heritage.oneoffs.create!(command: "rake bcn:bootstrap:remote")
     oneoff.run
 
+    groupname = "Barcelona/#{district_name}/#{heritage.name}"
+    streamname = "#{heritage.name}/#{heritage.name}-oneoff"
+
+    cat = CloudwatchCat.new(groupname, streamname)
+
     while !oneoff.stopped?
-      sleep 10
-      print "."
+      loop do
+        bundle = cat.retrieve_next_message_group
+        break if bundle.length == 0
+
+        bundle.each do |timestamp, message|
+          puts "[#{timestamp}] #{message}"
+        end
+      end
+
+      sleep 5
     end
     puts
 
