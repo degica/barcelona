@@ -1,0 +1,48 @@
+name: build-rails-buildpack
+jobs:
+  build:
+    strategy:
+      matrix:
+        tag:
+          - '2.6'
+          - '2.6.5-stretch'
+          - '2.7'
+          - '2.7.3'
+    container:
+      image: docker:git
+      env:
+        DOCKER_REPOSITORY: public.ecr.aws/degica/rails-buildpack
+        DOCKER_BUILDKIT: '1'
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+    runs-on: ubuntu-18.04
+    steps:
+    - name: prepare
+      run: |-
+        apk add --no-cache python3 py3-pip
+        pip3 install --upgrade pip
+        pip3 install awscli
+    - uses: actions/checkout@v2
+    - name: setup
+      run: git submodule update --init
+    - name: build_and_push
+      run: |-
+        cd dockerfiles/rails-buildpack/${{ matrix.tag }}
+        if [[ ${GITHUB_REF##*/} == 'master' ]]; then
+            IMAGE_TAG=${{ matrix.tag }}
+        else
+            IMAGE_TAG=test-${GITHUB_REF##*/}-${{ matrix.tag }} # branch name for dev usecases
+        fi
+
+        aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/degica
+
+        docker build . -t $DOCKER_REPOSITORY:$IMAGE_TAG --build-arg git_revision=$IMAGE_TAG --pull
+        docker images
+        docker push $DOCKER_REPOSITORY:$IMAGE_TAG
+        docker tag $DOCKER_REPOSITORY:$IMAGE_TAG $DOCKER_REPOSITORY:latest
+        docker push $DOCKER_REPOSITORY:latest
+'on':
+  push:
+    branches:
+    - '*'

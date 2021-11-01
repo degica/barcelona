@@ -1,0 +1,43 @@
+version: '2.1'
+services:
+  web: &app_base
+    depends_on:
+      - db
+    build:
+      context: .
+      dockerfile: Dockerfile.development
+      args:
+        - UID=${UID-1000} # ${UID} should be set to host's UID
+        - APP_HOME=${PWD}
+        # Option to skip bundle install.
+        # In development, bundle should be done after image creation to store bundled assets to bundle volume
+        - SKIP_BUNDLE=yes 
+    ports:
+     - "3333:3333"
+    command: rails s -p 3333 -b 0.0.0.0
+    stdin_open: true
+    tty: true
+    links:
+     - db
+    volumes:
+      - bundle:/usr/local/bundle
+      - .:${PWD}
+    environment: &env_base
+      RAILS_ENV: development
+      DATABASE_URL: postgres://postgres:@db:5432
+  spring:
+    <<: *app_base
+    ports: []
+    command: spring server
+    volumes:
+      - bundle:/usr/local/bundle
+      - .:${PWD}
+  db:
+    image: postgres:9.5
+    environment:
+      PGDATA: /data
+    volumes:
+      - pgdata:/data
+volumes:
+  pgdata:
+  bundle:

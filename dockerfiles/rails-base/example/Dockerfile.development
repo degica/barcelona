@@ -1,0 +1,6 @@
+FROM degica/rails-base:debian
+
+RUN apt-get install -y openssh-client --no-install-recommends
+
+RUN chown -R app:app $APP_HOME
+USER app
