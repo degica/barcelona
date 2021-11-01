@@ -40,6 +40,14 @@ class AwsAccessor
     @ssm ||= Aws::SSM::Client.new(client_config)
   end
 
+  def ecr
+    @ecr ||= Aws::ECR::Client.new(client_config)
+  end
+
+  def public_ecr
+    @public_ecr ||= Aws::ECRPublic::Client.new({region: "us-east-1", credentials: credentials})
+  end
+
   private
 
   def client_config

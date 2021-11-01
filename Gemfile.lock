@@ -67,6 +67,12 @@ GEM
     aws-sdk-ec2 (1.78.0)
       aws-sdk-core (~> 3, >= 3.48.2)
       aws-sigv4 (~> 1.1)
+    aws-sdk-ecr (1.42.0)
+      aws-sdk-core (~> 3, >= 3.112.0)
+      aws-sigv4 (~> 1.1)
+    aws-sdk-ecrpublic (1.3.0)
+      aws-sdk-core (~> 3, >= 3.112.0)
+      aws-sigv4 (~> 1.1)
     aws-sdk-ecs (1.36.0)
       aws-sdk-core (~> 3, >= 3.48.2)
       aws-sigv4 (~> 1.1)
@@ -339,6 +345,8 @@ DEPENDENCIES
   aws-sdk-autoscaling
   aws-sdk-cloudformation
   aws-sdk-ec2
+  aws-sdk-ecr
+  aws-sdk-ecrpublic
   aws-sdk-ecs
   aws-sdk-elasticloadbalancing
   aws-sdk-elasticloadbalancingv2

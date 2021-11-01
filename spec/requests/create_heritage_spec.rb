@@ -4,13 +4,16 @@ describe "POST /districts/:district/heritages", type: :request do
   let(:user) { create :user }
   let(:district) { create :district }
   let(:endpoint) { create :endpoint, district: district }
+  let(:image_name) { "nginx" }
+  let(:image_tag) { "latest" }
+  let(:endpoint) { create :endpoint, district: district }
 
   let(:params) do
     {
       version: version,
       name: "nginx",
-      image_name: "nginx",
-      image_tag: "latest",
+      image_name: image_name,
+      image_tag: image_tag,
       before_deploy: "echo hello",
       scheduled_tasks: [
         {
@@ -124,7 +127,37 @@ describe "POST /districts/:district/heritages", type: :request do
       it_behaves_like "create"
     end
 
-    context "when ssm_path doest not exist" do
+    context 'when image path is ECR' do
+      let(:version) { 1 }
+      let(:image_tag) { "latest" }
+
+      context 'when public image' do
+        let(:image_name) { "public.ecr.aws/degica/barcelona" }
+        it 'check if the public image exits' do
+          expect_any_instance_of(EcrService).to receive(:validate_image!)
+          api_request(:post, "/v1/districts/#{district.name}/heritages", params)
+        end
+      end
+
+      context 'when private image' do
+        let(:image_name) { "111111111111.dkr.ecr.ap-northeast-1.amazonaws.com/barcelona" }
+        it 'check if the public image exits' do
+          expect_any_instance_of(EcrService).to receive(:validate_image!)
+          api_request(:post, "/v1/districts/#{district.name}/heritages", params)
+        end
+      end
+    end
+
+    context 'when image path is not ECR' do
+      let(:version) { 1 }
+
+      it 'do not call EcrService' do
+        expect_any_instance_of(EcrService).not_to receive(:validate_image!)
+        api_request(:post, "/v1/districts/#{district.name}/heritages", params)
+      end
+    end
+
+    context "when ssm_path does not exist" do
       let(:version) { 1 }
 
       it "throw an error" do
@@ -160,7 +193,7 @@ describe "POST /districts/:district/heritages", type: :request do
       it "do not throw an error" do
         ssm_paths = []
 
-        for i in 0..11
+        (0..11).each do |i|
           ssm_paths << {name: "ENV_KEY", ssm_path: "path/to/env_key#{i}"}
         end
         params[:environment] = ssm_paths

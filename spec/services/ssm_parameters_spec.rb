@@ -62,7 +62,7 @@ describe SsmParameters do
     it "throw UnprocessableEntity error" do
       ssm_parameters = described_class.new(district, "")
       ssm_paths = [
-        "/barcelona/test/path/to/secret-1",
+        "/barcelona/test/path/to/secret-1"
       ]
 
       allow_any_instance_of(Aws::SSM::Client).to receive(:get_parameters).and_raise(StandardError)
@@ -74,8 +74,8 @@ describe SsmParameters do
 
       ssm_paths = []
 
-      for i in 0..10
-        ssm_paths <<  "/barcelona/test/path/to/secret-#{i}"
+      (0..10).each do |i|
+        ssm_paths << "/barcelona/test/path/to/secret-#{i}"
       end
 
       expect_any_instance_of(Aws::SSM::Client).not_to receive(:get_parameters)

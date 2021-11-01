@@ -250,12 +250,19 @@ class Heritage < ActiveRecord::Base
   def image_path
     return nil if image_name.blank?
 
-    tag = image_tag || 'latest'
     "#{image_name}:#{tag}"
+  end
+
+  def tag
+    image_tag || 'latest'
   end
 
   def deploy!(without_before_deploy: false, description: "")
     validate_ssm_parameters!
+
+    if image_name.include?("ecr")
+      EcrService.new.validate_image!(self)
+    end
 
     release = releases.create!(description: description)
     update_services(release, without_before_deploy)
@@ -361,7 +368,7 @@ class Heritage < ActiveRecord::Base
       key.value_from.start_with?("/barcelona/#{district.name}")
     }.map(&:value_from).each_slice(10).to_a
 
-    for ssm_paths in ssm_path_array do
+    ssm_path_array.each do |ssm_paths|
       ssm_parameter = SsmParameters.new(self.district, "")
       invalid_parameters = ssm_parameter.get_invalid_parameters(ssm_paths)
 
