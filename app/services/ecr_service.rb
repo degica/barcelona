@@ -40,6 +40,6 @@ class EcrService
   end
 
   def public_ecr?
-    @heritage.image_name.match(/^(public.ecr.aws)/)
+    @heritage.image_name.match(/^public\.ecr\.aws/)
   end
 end
