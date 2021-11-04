@@ -1,6 +1,10 @@
 class EcrService
   def validate_image!(heritage)
     @heritage = heritage
+
+    # The string after the last / will be matched.
+    # For example, when the Image name is public.ecr.aws/degica/barcelona,
+    # it will return barcelona.
     repository_name = @heritage.image_name[%r{/([^/]*?)$}, 1]
 
     begin
