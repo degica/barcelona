@@ -261,7 +261,7 @@ class Heritage < ActiveRecord::Base
     validate_ssm_parameters!
 
     if image_name.include?("ecr")
-      EcrService.new.validate_image!(self)
+      EcrService.new(self).validate_image!
     end
 
     release = releases.create!(description: description)

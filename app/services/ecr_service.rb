@@ -1,12 +1,9 @@
 class EcrService
-  def validate_image!(heritage)
+  def initialize(heritage)
     @heritage = heritage
+  end
 
-    # The string after the last / will be matched.
-    # For example, when the Image name is public.ecr.aws/degica/barcelona,
-    # it will return barcelona.
-    repository_name = @heritage.image_name[%r{/([^/]*?)$}, 1]
-
+  def validate_image!
     begin
       response = ecr.describe_images({
                                        image_ids: [
@@ -45,5 +42,12 @@ class EcrService
 
   def public_ecr?
     @heritage.image_name.match(/^public\.ecr\.aws/)
+  end
+
+  # The string after the last / will be matched.
+  # For example, when the Image name is public.ecr.aws/degica/barcelona,
+  # it will return barcelona.
+  def repository_name
+    @heritage.image_name[%r{/([^/]*?)$}, 1]
   end
 end
