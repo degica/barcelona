@@ -25,23 +25,7 @@ class EcrService
   private
 
   def ecr
-    @ecr ||= if public_ecr?
-               ecr_public
-             else
-               ecr_private
-             end
-  end
-
-  def ecr_public
-    @heritage.district.aws.public_ecr
-  end
-
-  def ecr_private
-    @heritage.district.aws.ecr
-  end
-
-  def public_ecr?
-    @heritage.image_name.match(/^public\.ecr\.aws/)
+    @ecr ||= @heritage.district.aws.ecr(@heritage.image_name)
   end
 
   # The string after the last / will be matched.

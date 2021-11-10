@@ -23,7 +23,7 @@ describe EcrService do
       it "when image does not exist in ECR, throw an Bad Request Error" do
         ecr_public = Aws::ECRPublic::Client.new(stub_responses: true)
         ecr_public.stub_responses(:describe_images, Aws::ECRPublic::Errors::RepositoryNotFoundException.new(nil, nil))
-        allow_any_instance_of(EcrService).to receive(:ecr_public).and_return(ecr_public)
+        allow_any_instance_of(AwsAccessor).to receive(:public_ecr).and_return(ecr_public)
 
         expect { described_class.new(heritage).validate_image! }.to raise_error(ExceptionHandler::BadRequest)
       end
@@ -31,7 +31,7 @@ describe EcrService do
       it "when image tag does not exist in ECR, throw an Bad Request Error" do
         ecr_public = Aws::ECRPublic::Client.new(stub_responses: true)
         ecr_public.stub_responses(:describe_images, Aws::ECRPublic::Errors::ImageNotFoundException.new(nil, nil))
-        allow_any_instance_of(EcrService).to receive(:ecr_public).and_return(ecr_public)
+        allow_any_instance_of(AwsAccessor).to receive(:public_ecr).and_return(ecr_public)
 
         expect { described_class.new(heritage).validate_image! }.to raise_error(ExceptionHandler::BadRequest)
       end
@@ -54,7 +54,7 @@ describe EcrService do
       it "when image does not exist in ECR, throw an Bad Request Error" do
         ecr_private = Aws::ECR::Client.new(stub_responses: true)
         ecr_private.stub_responses(:describe_images, Aws::ECR::Errors::RepositoryNotFoundException.new(nil, nil))
-        allow_any_instance_of(EcrService).to receive(:ecr_private).and_return(ecr_private)
+        allow_any_instance_of(AwsAccessor).to receive(:private_ecr).and_return(ecr_private)
 
         expect { described_class.new(heritage).validate_image! }.to raise_error(ExceptionHandler::BadRequest)
       end
@@ -62,7 +62,7 @@ describe EcrService do
       it "when image tag does not exist in ECR, throw an Bad Request Error" do
         ecr_private = Aws::ECR::Client.new(stub_responses: true)
         ecr_private.stub_responses(:describe_images, Aws::ECR::Errors::ImageNotFoundException.new(nil, nil))
-        allow_any_instance_of(EcrService).to receive(:ecr_private).and_return(ecr_private)
+        allow_any_instance_of(AwsAccessor).to receive(:private_ecr).and_return(ecr_private)
 
         expect { described_class.new(heritage).validate_image! }.to raise_error(ExceptionHandler::BadRequest)
       end

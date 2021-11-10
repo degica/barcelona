@@ -40,12 +40,12 @@ class AwsAccessor
     @ssm ||= Aws::SSM::Client.new(client_config)
   end
 
-  def ecr
-    @ecr ||= Aws::ECR::Client.new(client_config)
-  end
-
-  def public_ecr
-    @public_ecr ||= Aws::ECRPublic::Client.new({region: "us-east-1", credentials: credentials})
+  def ecr(image_name)
+    if public_ecr?(image_name)
+      public_ecr
+    else
+      private_ecr
+    end
   end
 
   private
@@ -65,5 +65,17 @@ class AwsAccessor
     else
       Aws::Credentials.new(district.aws_access_key_id, district.aws_secret_access_key)
     end
+  end
+
+  def private_ecr
+    @private_ecr ||= Aws::ECR::Client.new(client_config)
+  end
+
+  def public_ecr
+    @public_ecr ||= Aws::ECRPublic::Client.new({region: "us-east-1", credentials: credentials})
+  end
+
+  def public_ecr?(image_name)
+    image_name.match(/^public\.ecr\.aws/)
   end
 end
