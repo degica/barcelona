@@ -4,22 +4,16 @@ class EcrService
   end
 
   def validate_image!
-    begin
-      response = ecr.describe_images({
-                                       image_ids: [
-                                         {
-                                           image_tag: @heritage.tag
-                                         }
-                                       ],
-                                       repository_name: repository_name
-                                     })
-    rescue Aws::ECR::Errors::RepositoryNotFoundException,
-           Aws::ECRPublic::Errors::RepositoryNotFoundException
-      raise ExceptionHandler::BadRequest.new("Image not found in ECR: #{@heritage.image_path}")
-    rescue Aws::ECR::Errors::ImageNotFoundException,
-           Aws::ECRPublic::Errors::ImageNotFoundException
-      raise ExceptionHandler::BadRequest.new("Image tag not found in ECR: #{@heritage.image_path}")
-    end
+    ecr.describe_images({
+                          image_ids: [
+                            {
+                              image_tag: @heritage.tag
+                            }
+                          ],
+                          repository_name: repository_name
+                        })
+  rescue => e
+    raise ExceptionHandler::BadRequest.new("Validation failed in ECR: error #{e} image_path: #{@heritage.image_path}")
   end
 
   private
