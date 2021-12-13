@@ -14,7 +14,10 @@ describe SsmParameters do
     let(:parameter_value) { "test123"}
 
     it "put ssm parameters" do
-      expect_any_instance_of(Aws::SSM::Client).to receive(:put_parameter).and_call_original
+      expect_any_instance_of(Aws::SSM::Client).to receive(:put_parameter).with(name: "/barcelona/district_name/district_name", # required
+                                                                               value: "test123",
+                                                                               type: "SecureString",
+                                                                               overwrite: true).and_call_original
 
       response = described_class.new(district, name).put_parameter(parameter_value)
       expect(response.version).to eq 0
@@ -62,7 +65,7 @@ describe SsmParameters do
     it "throw UnprocessableEntity error" do
       ssm_parameters = described_class.new(district, "")
       ssm_paths = [
-        "/barcelona/test/path/to/secret-1",
+        "/barcelona/test/path/to/secret-1"
       ]
 
       allow_any_instance_of(Aws::SSM::Client).to receive(:get_parameters).and_raise(StandardError)
@@ -74,8 +77,8 @@ describe SsmParameters do
 
       ssm_paths = []
 
-      for i in 0..10
-        ssm_paths <<  "/barcelona/test/path/to/secret-#{i}"
+      (0..10).each do |i|
+        ssm_paths << "/barcelona/test/path/to/secret-#{i}"
       end
 
       expect_any_instance_of(Aws::SSM::Client).not_to receive(:get_parameters)

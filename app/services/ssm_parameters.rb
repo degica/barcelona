@@ -8,7 +8,8 @@ class SsmParameters
     client.put_parameter({
                            name: ssm_path, # required
                            value: value, # required
-                           type: "SecureString"
+                           type: "SecureString",
+                           overwrite: true
                          })
   end
 
