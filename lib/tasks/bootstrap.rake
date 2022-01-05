@@ -170,6 +170,8 @@ namespace :bcn do
     cat = CloudwatchCat.new(groupname, streamname)
 
     while !oneoff.stopped?
+      sleep 2
+
       loop do
         bundle = cat.retrieve_next_message_group
         break if bundle.length == 0
@@ -178,8 +180,6 @@ namespace :bcn do
           puts "[#{timestamp}] #{message}"
         end
       end
-
-      sleep 5
     end
     puts
 
