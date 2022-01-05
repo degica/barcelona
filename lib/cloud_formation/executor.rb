@@ -1,4 +1,16 @@
 module CloudFormation
+  class UpdateInProgressException < Exception
+    def initialize(msg="Applying stack template in progress")
+      super
+    end
+  end
+
+  class CannotUpdateRolledbackStackException < Exception
+    def initialize(msg="Can't update creation-rollbacked stack")
+      super
+    end
+  end
+
   class Executor
     attr_accessor :stack, :client
 
@@ -97,9 +109,9 @@ module CloudFormation
       when "ROLLBACK_COMPLETE"
         # ROLLBACK_COMPLETE only happens when creating stack failed
         # The only way to solve is to delete and re-create the stack
-        raise "Can't update creation-rollbacked stack"
+        raise CannotUpdateRolledbackStackException
       else
-        raise "Applying stack template in progress"
+        raise UpdateInProgressException
       end
     end
 

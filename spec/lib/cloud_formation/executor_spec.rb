@@ -36,4 +36,16 @@ describe CloudFormation::Executor do
       expect { executor.update(change_set: true) }.to raise_error Aws::Waiters::Errors::WaiterFailed
     end
   end
+
+  describe '#create_or_update' do
+    it 'raises an error if the stack was rolled back' do
+      allow(executor).to receive(:stack_status) { 'ROLLBACK_COMPLETE' }
+      expect { executor.create_or_update }.to raise_error CloudFormation::CannotUpdateRolledbackStackException
+    end
+
+    it 'raises an error if the stack is still being updated' do
+      allow(executor).to receive(:stack_status) { 'UPDATE_IN_PROGRESS' }
+      expect { executor.create_or_update }.to raise_error CloudFormation::UpdateInProgressException
+    end
+  end
 end
