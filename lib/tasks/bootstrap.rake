@@ -261,8 +261,7 @@ namespace :bcn do
       )
       heritage.save!
 
-      # Sleep 30 seconds to wait for heritage stack to be created
-      sleep 30
+      sleep(10)
 
       iam = Aws::IAM::Client.new(region: ENV["AWS_REGION"])
       iam.put_role_policy(
@@ -271,7 +270,14 @@ namespace :bcn do
         policy_document: {"Version" => "2012-10-17", "Statement" => [{"Effect" => "Allow", "Action" => ["sts:AssumeRole"], "Resource" => ["*"]}]}.to_json
       )
 
-      heritage.save_and_deploy!(without_before_deploy: true, description: "Create")
+      loop do
+        heritage.save_and_deploy!(without_before_deploy: true, description: "Create")
+
+      rescue CloudFormation::UpdateInProgressException => e
+        puts 'Update still in progress. Waiting...'
+        sleep(5)
+      end
+
       finalizer = heritage.oneoffs.create!(command: "rake bcn:bootstrap:finalize")
       finalizer.run!
     end
