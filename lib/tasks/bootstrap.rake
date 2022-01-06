@@ -138,7 +138,7 @@ namespace :bcn do
     heritage = district.heritages.new(
       name: "barcelona-bootstrap",
       image_name: "public.ecr.aws/degica/barcelona",
-      image_tag: "master"
+      image_tag: "test"
     )
     heritage.env_vars.build(key: "DATABASE_URL", value: ENV["BOOTSTRAP_DATABASE_URL"], secret: true)
     heritage.env_vars.build(key: "SECRET_KEY_BASE", value: secret_key_base, secret: true)
@@ -226,7 +226,7 @@ namespace :bcn do
       heritage = district.heritages.new(
         name: "barcelona",
         image_name: "public.ecr.aws/degica/barcelona",
-        image_tag: "master",
+        image_tag: "test",
         before_deploy: "rake db:migrate",
         env_vars_attributes: [
           {key: "RAILS_ENV", value: "production", secret: false},
