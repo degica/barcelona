@@ -12,7 +12,7 @@ vault_app_name = ENV['VAULT_APP_NAME'] || 'vault'
 vault_host = ENV['VAULT_HOST'] || "http://vault-app"
 vault_port = ENV['VAULT_PORT'] || '8211'
 
-app_params "
+params = "
   -e RAILS_ENV=development
   -e DATABASE_URL=postgres://postgres:example@<%= db_container_name %>:5432
   -e ENCRYPTION_KEY=abcdefghijklmn
@@ -22,6 +22,16 @@ app_params "
   -e VAULT_URL=#{vault_host}:#{vault_port}
   -e VAULT_PATH_PREFIX=degica
 "
+
+params += "
+  -e BOOTSTRAP_IMAGE_NAME=#{ENV['BOOTSTRAP_IMAGE_NAME']}
+" if ENV['BOOTSTRAP_IMAGE_NAME']
+
+params += "
+  -e BOOTSTRAP_IMAGE_TAG=#{ENV['BOOTSTRAP_IMAGE_TAG']}
+" if ENV['BOOTSTRAP_IMAGE_TAG']
+
+app_params params
 
 attach_mount '.rspec', '/app/.rspec'
 attach_mount 'bin', '/app/bin'
