@@ -1,7 +1,6 @@
 require 'aws-sdk-cloudwatchlogs'
 require 'date'
 
-
 class CloudwatchCat
   def initialize(groupnameprefix, streamname)
     @groupname = groupnameprefix
@@ -137,8 +136,8 @@ namespace :bcn do
     # Run oneoff task that runs inside the VPC and creates barcelona service and endpoint
     heritage = district.heritages.new(
       name: "barcelona-bootstrap",
-      image_name: "public.ecr.aws/degica/barcelona",
-      image_tag: "test"
+      image_name: ENV['BOOTSTRAP_IMAGE_NAME'] || "public.ecr.aws/degica/barcelona",
+      image_tag: ENV['BOOTSTRAP_IMAGE_TAG'] || "master"
     )
     heritage.env_vars.build(key: "DATABASE_URL", value: ENV["BOOTSTRAP_DATABASE_URL"], secret: true)
     heritage.env_vars.build(key: "SECRET_KEY_BASE", value: secret_key_base, secret: true)
@@ -225,8 +224,8 @@ namespace :bcn do
 
       heritage = district.heritages.new(
         name: "barcelona",
-        image_name: "public.ecr.aws/degica/barcelona",
-        image_tag: "test",
+        image_name: ENV['BOOTSTRAP_IMAGE_NAME'] || "public.ecr.aws/degica/barcelona",
+        image_tag: ENV['BOOTSTRAP_IMAGE_TAG'] || "master",
         before_deploy: "rake db:migrate",
         env_vars_attributes: [
           {key: "RAILS_ENV", value: "production", secret: false},
