@@ -17,7 +17,7 @@ class DeployRunnerJob < ActiveJob::Base
         break unless heritage.cf_executor.in_progress?
 
         puts "Waiting for heritage stack to be complete"
-        sleep 5
+        sleep 30
       end
 
       notify(message: "Deploying to #{heritage.district.name} district: #{description}")
