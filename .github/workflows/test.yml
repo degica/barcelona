@@ -3,7 +3,7 @@ name: test
 jobs:
   test:
     container:
-      image: ruby:2.5.3
+      image: ruby:2.6.5
       env:
         DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres
         ENCRYPTION_KEY: abcdefghijklmn
