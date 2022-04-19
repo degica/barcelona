@@ -10,14 +10,14 @@ module Backend::Ecs::V2
     def apply
       std = HeritageTaskDefinition.service_definition(service).to_task_definition
       resp = aws.ecs.register_task_definition(std).task_definition
-      td = "#{resp.family}:#{resp.revision}"
       # CloudFormation updates service's desired_count to the declarated value
       # even if application auto scaling is enabled so updating desired count
       # via CloudFormation temporalily breaks the auto scaling behaviour
       # Because of the above here we set the current desired count to
       # the CF template
-      desired_count = service.desired_container_count || ecs_service&.desired_count || 1
-      cf_executor(td, desired_count).create_or_update
+      service_stack.task_definition = "#{resp.family}:#{resp.revision}"
+      service_stack.desired_count = service.desired_container_count || ecs_service&.desired_count || 1
+      cf_executor.create_or_update
 
       # For backward-compatibility this method need to return Hash
       {}
@@ -41,9 +41,12 @@ module Backend::Ecs::V2
       @aws ||= service.district.aws
     end
 
-    def cf_executor(task_definition = nil, desired_count = nil)
-      service_stack = ServiceStack.new(service, task_definition, desired_count)
-      CloudFormation::Executor.new(service_stack, service.district)
+    def service_stack
+      @service_stack ||= ServiceStack.new(service)
+    end
+
+    def cf_executor
+      @cf_executor ||= CloudFormation::Executor.new(service_stack, service.district)
     end
 
     def ecs_service

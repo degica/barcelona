@@ -5,7 +5,9 @@ describe Backend::Ecs::V2::Adapter do
     it "sets desired count to 1" do
       service = create :service, desired_container_count: 1
       adapter = described_class.new(service)
-      expect(adapter).to receive(:cf_executor).with(anything, 1).and_call_original
+      service_stack = adapter.send(:service_stack)
+      expect(service_stack).to receive(:desired_count=).with(1)
+      expect(adapter).to receive(:cf_executor).and_call_original
 
       adapter.apply
     end
@@ -15,9 +17,11 @@ describe Backend::Ecs::V2::Adapter do
 
       adapter = described_class.new(service)
       ecs_service = instance_double('something')
+      service_stack = adapter.send(:service_stack)
       allow(ecs_service).to receive(:desired_count) { 5 }
       allow(adapter).to receive(:ecs_service) { ecs_service }
-      expect(adapter).to receive(:cf_executor).with(anything, 5).and_call_original
+      expect(service_stack).to receive(:desired_count=).with(5)
+      expect(adapter).to receive(:cf_executor).and_call_original
 
       adapter.apply
     end
@@ -27,9 +31,11 @@ describe Backend::Ecs::V2::Adapter do
 
       adapter = described_class.new(service)
       ecs_service = instance_double('something')
+      service_stack = adapter.send(:service_stack)
       allow(ecs_service).to receive(:desired_count) { 5 }
       allow(adapter).to receive(:ecs_service) { ecs_service }
-      expect(adapter).to receive(:cf_executor).with(anything, 2).and_call_original
+      expect(service_stack).to receive(:desired_count=).with(2)
+      expect(adapter).to receive(:cf_executor).and_call_original
 
       adapter.apply
     end

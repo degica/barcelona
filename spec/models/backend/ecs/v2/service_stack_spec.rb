@@ -3,7 +3,12 @@ require 'rails_helper'
 describe Backend::Ecs::V2::ServiceStack do
   let(:service) { create :service }
   let(:task_definition) { HeritageTaskDefinition.service_definition(service).to_task_definition }
-  let(:stack) { described_class.new(service, task_definition, 1) }
+  let(:stack) { described_class.new(service) }
+
+  before do
+    stack.task_definition = task_definition
+    stack.desired_count = 1
+  end
 
   it "generates resources" do
     generated = JSON.load stack.target!
