@@ -128,9 +128,9 @@ module CloudFormation
 
     # Returns CF ID => Real ID hash
     def resource_ids
-      @resource_ids ||= begin
-        @resource_ids = Hash[*stack_resources.map { |r| [r.logical_resource_id, r.physical_resource_id] }.flatten]
-      end
+      @resource_ids ||= stack_resources.map do |r|
+        [r.logical_resource_id, r.physical_resource_id]
+      end.to_h
     end
 
     def outputs
