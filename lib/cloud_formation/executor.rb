@@ -122,12 +122,15 @@ module CloudFormation
       !!(status =~ /_IN_PROGRESS/)
     end
 
+    def stack_resources
+      client.describe_stack_resources(stack_name: stack.name).stack_resources
+    end
+
     # Returns CF ID => Real ID hash
     def resource_ids
-      return @resource_ids if @resource_ids
-
-      resp = client.describe_stack_resources(stack_name: stack.name).stack_resources
-      @resource_ids = Hash[*resp.map { |r| [r.logical_resource_id, r.physical_resource_id] }.flatten]
+      @resource_ids ||= stack_resources.map do |r|
+        [r.logical_resource_id, r.physical_resource_id]
+      end.to_h
     end
 
     def outputs

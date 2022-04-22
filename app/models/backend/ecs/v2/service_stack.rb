@@ -231,19 +231,21 @@ module Backend::Ecs::V2
       end
     end
 
-    def initialize(service, task_definition, desired_count)
+    attr_accessor :task_definition, :desired_count
+
+    def initialize(service)
       stack_name = "#{service.district.name}-#{service.service_name}"
-      options = {
-        service: service,
-        task_definition: task_definition,
-        desired_count: desired_count
-      }
-      super(stack_name, options)
+      @service = service
+      super(stack_name)
     end
 
     def build
       super do |builder|
-        builder.add_builder Builder.new(self, options)
+        builder.add_builder Builder.new(self, {
+          service: @service,
+          task_definition: task_definition,
+          desired_count: desired_count
+        })
       end
     end
   end
