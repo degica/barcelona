@@ -9,6 +9,8 @@ jobs:
         ENCRYPTION_KEY: abcdefghijklmn
     runs-on: ubuntu-18.04
     steps:
+    - name: workaround
+      run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
     - uses: actions/checkout@v2
     - name: before_install
       run: bundle install

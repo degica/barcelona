@@ -9,6 +9,8 @@ jobs:
         DOCKER_BUILDKIT: '1'
     runs-on: ubuntu-18.04
     steps:
+    - name: workaround
+      run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
     - name: prepare
       run: |-
         apk add --no-cache python3 py3-pip

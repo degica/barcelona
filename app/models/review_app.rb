@@ -4,7 +4,11 @@ class ReviewApp < ApplicationRecord
 
   attr_accessor :image_name, :image_tag, :services, :before_deploy, :environment
   validates :subject, :image_name, :image_tag, :retention, :services, presence: true
-  validates :subject, format: {with: /\A[a-z0-9][a-z0-9(-|_)]*[a-z0-9]\z/}
+  validates :subject, format: {
+    with: /\A[a-z0-9][a-z0-9(-|_)]*[a-z0-9]\z/,
+    message: 'branch name must only contain lowercase characters, numbers and hyphens, and can only start and end with a letter or a number'
+  }
+
   validates :retention, numericality: {greater_than: 0, less_than: 24 * 3600 * 30}
 
   before_validation :build_heritage

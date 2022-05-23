@@ -96,5 +96,31 @@ describe ReviewApp do
         expect(review_app.heritage.services[0].listeners[0].health_check_path).to eq "/healthcheck"
       end
     end
+
+    context "when a service has capital letters" do
+      let(:review_app) {
+        group.review_apps.new(
+          subject: "SUBJECT",
+          image_name: "image",
+          image_tag: "tag",
+          retention: 12 * 3600,
+          before_deploy: "true",
+          environment: [],
+          services: [{
+            name: "review",
+            command: "true",
+            service_type: "web",
+            listeners: [{
+              health_check_path: "/healthcheck",
+              health_check_interval: 300
+            }]
+          }])
+      }
+
+      it "preserves configurations" do
+        expect(review_app).to_not be_valid
+        expect(review_app.errors[:subject]).to eq(["branch name must only contain lowercase characters, numbers and hyphens, and can only start and end with a letter or a number"])
+      end
+    end
   end
 end
