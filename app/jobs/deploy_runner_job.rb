@@ -35,7 +35,7 @@ class DeployRunnerJob < ActiveJob::Base
 
       heritage.services.each do |service|
         result = service.apply
-        MonitorDeploymentJob.perform_later(service, deployment_id: result[:deployment_id])
+        MonitorDeploymentJob.set(wait: 60.seconds).perform_later(service, deployment_id: result[:deployment_id])
       end
     end
   end
