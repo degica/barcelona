@@ -36,6 +36,10 @@ class DeployRunnerJob < ActiveJob::Base
       heritage.services.each do |service|
         result = service.apply
         MonitorDeploymentJob.set(wait: 60.seconds).perform_later(service, deployment_id: result[:deployment_id])
+        # CloudFormation's DescribeStacks has very low rate limit (per second).
+        # To avoid updating all services in a second, here we sleep for 3 second.
+        # (`service.apply` calls `DescribeStacks` API)
+        sleep 3
       end
     end
   end
