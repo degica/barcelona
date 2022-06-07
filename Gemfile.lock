@@ -157,7 +157,7 @@ GEM
     jbuilder (2.8.0)
       activesupport (>= 4.2.0)
       multi_json (>= 1.2)
-    jmespath (1.4.0)
+    jmespath (1.6.1)
     jsonapi-renderer (0.2.0)
     lograge (0.10.0)
       actionpack (>= 4)
