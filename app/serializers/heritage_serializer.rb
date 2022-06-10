@@ -1,6 +1,6 @@
 class HeritageSerializer < ActiveModel::Serializer
   attributes :name, :image_name, :image_tag, :env_vars, :before_deploy,
-             :token, :version, :scheduled_tasks, :environment, :deployed
+             :token, :version, :scheduled_tasks, :environment
 
   has_many :services
   belongs_to :district
@@ -15,9 +15,5 @@ class HeritageSerializer < ActiveModel::Serializer
     object.environments.
       map { |e| e.slice(:name, :value, :value_from) }.
       sort_by { |e| e[:name] }
-  end
-
-  def deployed
-    object.services.map { |s| s.deployment_finished?(nil) }.all?
   end
 end

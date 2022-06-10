@@ -37,10 +37,8 @@ describe "GET /heritages/:heritage", type: :request do
       expect(heritage["name"]).to eq "nginx"
       expect(heritage["image_name"]).to eq "nginx"
       expect(heritage["image_tag"]).to eq "latest"
-      expect(heritage["deployed"]).to eq true
       expect(heritage["before_deploy"]).to eq "echo hello"
       expect(heritage["services"][0]["name"]).to eq "web"
-      expect(heritage["services"][0]["deployed"]).to eq true
       expect(heritage["services"][0]["public"]).to eq true
       expect(heritage["services"][0]["cpu"]).to eq 128
       expect(heritage["services"][0]["memory"]).to eq 256
