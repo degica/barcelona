@@ -173,7 +173,15 @@ module Backend::Ecs::V2
 
       def build_alb_listener
         add_resource("AWS::ElasticLoadBalancingV2::ListenerRule", "LBListenerRuleHTTP") do |j|
-          j.Actions [{"TargetGroupArn" => ref("LBTargetGroup1"), "Type" => "forward"}]
+          j.Actions [
+              {
+                "RedirectConfig" => {
+                  "Protocol" => "HTTPS",
+                  "StatusCode" => "HTTP_302"
+                },
+                "Type" => "redirect"
+              }
+            ]
           j.Conditions(listener.rule_conditions.map { |c| {"Field" => c["type"], "Values" => [c["value"]]} })
           j.ListenerArn listener.endpoint.http_listener_id
           j.Priority listener.rule_priority
