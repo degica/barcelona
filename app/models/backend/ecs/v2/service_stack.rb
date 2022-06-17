@@ -198,6 +198,7 @@ module Backend::Ecs::V2
           end
           j.Port 80
           j.Protocol "HTTP"
+          j.ProtocolVersion "HTTP2"
           j.TargetGroupAttributes [
             {"Key" => "deregistration_delay.timeout_seconds", "Value" => "60"}
           ]
