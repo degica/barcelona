@@ -2,7 +2,11 @@ module Backend::Ecs::V2
   class ServiceStack < CloudFormation::Stack
     class Builder < CloudFormation::Builder
       def build_resources
-        add_resource("AWS::ECS::Service", "ECSService") do |j|
+        dependencies = {
+          depends_on: listener
+        }
+
+        add_resource("AWS::ECS::Service", "ECSService", options: {**dependencies}) do |j|
           j.Cluster district.name
           j.TaskDefinition options[:task_definition]
           j.DesiredCount options[:desired_count]
@@ -169,6 +173,8 @@ module Backend::Ecs::V2
           j.Type "CNAME"
           j.ResourceRecords [get_attr("ClassicLoadBalancer", "DNSName")]
         end
+
+        ref("LBTargetGroup1")
       end
 
       def build_alb_listener
@@ -177,7 +183,7 @@ module Backend::Ecs::V2
               {
                 "RedirectConfig" => {
                   "Protocol" => "HTTPS",
-                  "StatusCode" => "HTTP_302"
+                  "StatusCode" => "HTTP_301"
                 },
                 "Type" => "redirect"
               }
