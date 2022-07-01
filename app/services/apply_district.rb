@@ -31,10 +31,10 @@ class ApplyDistrict
     district.save!
   end
 
-  def apply
+  def apply(immediate: false)
     district.save!
     update_ecs_config
-    district.stack_executor.update(change_set: true)
+    district.stack_executor.update(change_set: !immediate)
   end
 
   def destroy!

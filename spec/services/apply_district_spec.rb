@@ -30,6 +30,41 @@ describe ApplyDistrict do
     end
   end
 
+  describe "#apply" do
+    # we can't detect a call to this class unless we
+    # replace it with a double. rspec does not automatically
+    # do this for us.
+    let(:stack_executor) { double('Executor') }
+
+    before do
+      allow(district).to receive(:stack_executor) { stack_executor }
+    end
+
+    it 'called without args' do
+      thing = described_class.new(district)
+      expect(thing).to receive(:update_ecs_config)
+      expect(district.stack_executor).to receive(:update).with(change_set: true)
+
+      thing.apply
+    end
+
+    it 'called with true' do
+      thing = described_class.new(district)
+      expect(thing).to receive(:update_ecs_config)
+      expect(district.stack_executor).to receive(:update).with(change_set: false)
+
+      thing.apply(immediate: true)
+    end
+
+    it 'called with false' do
+      thing = described_class.new(district)
+      expect(thing).to receive(:update_ecs_config)
+      expect(district.stack_executor).to receive(:update).with(change_set: true)
+
+      thing.apply(immediate: false)
+    end
+  end
+
   context "When running as ECS task" do
     describe "#create!" do
       context "when district role does not exist" do

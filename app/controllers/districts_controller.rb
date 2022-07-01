@@ -35,7 +35,7 @@ class DistrictsController < ApplicationController
   def apply_stack
     # Make sure the related resources are in-sync
     @district.save!
-    ApplyDistrict.new(@district).apply
+    ApplyDistrict.new(@district).apply(immediate: apply_params['immediate'])
     head 202
   end
 
@@ -54,6 +54,10 @@ class DistrictsController < ApplicationController
     permitted = create_params
     permitted.delete :name
     permitted
+  end
+
+  def apply_params
+    params.permit(:immediate)
   end
 
   def create_params
