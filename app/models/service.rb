@@ -123,7 +123,7 @@ class Service < ActiveRecord::Base
   private
 
   def ecs
-    ecs = district.aws.ecs
+    @ecs ||= district.aws.ecs
   end
 
   def validate_listener_count
