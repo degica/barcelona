@@ -36,6 +36,12 @@ describe Service do
 
       expect(service.logical_name).to eq 'testdistrict-testserv-abcdef'
     end
+
+    it 'throws an error is arn is nil' do
+      allow(service).to receive(:arn) { nil }
+
+      expect{service.logical_name}.to raise_error Service::ServiceNotFoundException
+    end
   end
 
   describe '#arn' do
@@ -44,6 +50,13 @@ describe Service do
       allow(service).to receive(:arn_prefix) { 'arn:' }
 
       expect(service.arn).to eq 'arn:hello'
+    end
+
+    it 'returns nil if no ARN' do
+      allow(service).to receive(:service_arns) { ['kkk:hello', 'ggg:hello'] }
+      allow(service).to receive(:arn_prefix) { 'arn:' }
+
+      expect(service.arn).to be_nil
     end
   end
 

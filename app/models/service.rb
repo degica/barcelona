@@ -96,7 +96,16 @@ class Service < ActiveRecord::Base
     })
   end
 
+  def service_exists
+    !arn.nil?
+  end
+
+  class ServiceNotFoundException < StandardError
+  end
+
   def logical_name
+    raise ServiceNotFoundException, arn_prefix unless service_exists
+
     arn.split('/').last
   end
 

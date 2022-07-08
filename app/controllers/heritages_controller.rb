@@ -77,6 +77,9 @@ class HeritagesController < ApplicationController
     service.save_and_update_container_count!(desired_container_count)
 
     render json: @heritage
+
+  rescue Service::ServiceNotFoundException => e
+    raise ExceptionHandler::NotFound, e.message
   end
 
   PERMITTED_PARAMS = [
