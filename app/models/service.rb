@@ -85,7 +85,55 @@ class Service < ActiveRecord::Base
     backend.deployment_finished?(deployment_id)
   end
 
+  def save_and_update_container_count!(desired_container_count)
+    self.desired_container_count = desired_container_count
+    self.save!
+
+    ecs.update_service({
+      desired_count: desired_container_count,
+      cluster: district.name,
+      service: logical_name
+    })
+  end
+
+  def service_exists
+    !arn.nil?
+  end
+
+  class ServiceNotFoundException < StandardError
+  end
+
+  def logical_name
+    raise ServiceNotFoundException, arn_prefix unless service_exists
+
+    arn.split('/').last
+  end
+
+  def arn
+    service_arns.find { |x| x.start_with? arn_prefix }
+  end
+
+  def service_arns
+    s = ecs.list_services({
+      cluster: district.name
+    })
+    s.service_arns
+  end
+
+  def arn_prefix
+    [
+      'arn:aws:ecs',
+      district.region,
+      district.aws.sts.get_caller_identity[:account],
+      "service/#{district.name}/#{district.name}-#{service_name}"
+    ].join(':')
+  end
+
   private
+
+  def ecs
+    @ecs ||= district.aws.ecs
+  end
 
   def validate_listener_count
     # Currently ECS doesn't allow multiple target groups
@@ -107,7 +155,7 @@ class Service < ActiveRecord::Base
     self.port_mappings.where(protocol: 'http').update_all(container_port: self.web_container_port)
     self.port_mappings.where(protocol: 'https').update_all(container_port: self.web_container_port)
   end
-
+    
   def backend
     @backend ||= case heritage.version
                  when 1

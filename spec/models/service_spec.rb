@@ -6,6 +6,95 @@ describe Service do
 
   it { expect{service.save}.to_not raise_error }
 
+  describe '#save_and_update_container_count!' do
+    it 'saves and sets the container count' do
+      expect(service.desired_container_count).to eq nil
+
+      district = double('District')
+      allow(service).to receive(:district) { district }
+      allow(district).to receive(:name) { 'districtest' }
+
+      ecs = double('ECS')
+      allow(service).to receive(:ecs) { ecs }
+      allow(service).to receive(:logical_name) { 'abc' }
+
+      expect(ecs).to receive(:update_service).with({
+        desired_count: 10,
+        cluster: 'districtest',
+        service: 'abc'
+      })
+
+      service.save_and_update_container_count!(10)
+
+      expect(service.desired_container_count).to eq 10
+    end
+  end
+
+  describe '#logical_name' do
+    it 'gives the name of the service' do
+      allow(service).to receive(:arn) { 'arn:aws:ecs:un-north-2:1234567890:service/testdistrict/testdistrict-testserv-abcdef' }
+
+      expect(service.logical_name).to eq 'testdistrict-testserv-abcdef'
+    end
+
+    it 'throws an error is arn is nil' do
+      allow(service).to receive(:arn) { nil }
+
+      expect{service.logical_name}.to raise_error Service::ServiceNotFoundException
+    end
+  end
+
+  describe '#arn' do
+    it 'searches the array and finds the ARN' do
+      allow(service).to receive(:service_arns) { ['arn:hello', 'ggg:hello'] }
+      allow(service).to receive(:arn_prefix) { 'arn:' }
+
+      expect(service.arn).to eq 'arn:hello'
+    end
+
+    it 'returns nil if no ARN' do
+      allow(service).to receive(:service_arns) { ['kkk:hello', 'ggg:hello'] }
+      allow(service).to receive(:arn_prefix) { 'arn:' }
+
+      expect(service.arn).to be_nil
+    end
+  end
+
+  describe '#service_arns' do
+    it 'returns service arns' do
+      district = double('District', name: 'testdistrict')
+
+      result = double('PaginatedSawyer')
+      allow(result).to receive(:service_arns) { ['abc'] }
+
+      ecs = double('ECS')
+      allow(ecs).to receive(:list_services).with(cluster: 'testdistrict') { result }
+
+      allow(service).to receive(:district) { district }
+      allow(service).to receive(:ecs) { ecs }
+
+      expect(service.service_arns).to eq ['abc']
+    end
+  end
+
+  describe '#arn_prefix' do
+    it 'produces a prefix for the arn' do
+      district = double('District',
+        region: 'un-north-2',
+        name: 'testdistrict',
+        aws: double('AWS',
+          sts: double('STS', get_caller_identity: {
+            account: '1234567890'
+          })
+        )
+      )
+      allow(service).to receive(:district) { district }
+      allow(service).to receive(:service_name) { 'testserv' }
+
+      expect(service.arn_prefix).to eq 'arn:aws:ecs:un-north-2:1234567890:service/testdistrict/testdistrict-testserv'
+    end
+  end
+
   describe 'handling port mappings' do
     context 'created with default port' do
       before { service.save }

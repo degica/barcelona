@@ -74,12 +74,12 @@ class HeritagesController < ApplicationController
   end
 
   def update_service_scale
-    service.desired_container_count = desired_container_count
-    service.save!
-    @heritage.save_and_deploy!(without_before_deploy: true,
-                               description: "Change service scale #{service.name} to #{desired_container_count}")
+    service.save_and_update_container_count!(desired_container_count)
 
     render json: @heritage
+
+  rescue Service::ServiceNotFoundException => e
+    raise ExceptionHandler::NotFound, e.message
   end
 
   PERMITTED_PARAMS = [

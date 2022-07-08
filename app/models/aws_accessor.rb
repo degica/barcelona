@@ -40,6 +40,10 @@ class AwsAccessor
     @ssm ||= Aws::SSM::Client.new(client_config)
   end
 
+  def sts
+    @ssm ||= Aws::STS::Client.new(client_config)
+  end
+
   private
 
   def client_config
