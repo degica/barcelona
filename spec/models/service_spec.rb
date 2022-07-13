@@ -52,6 +52,14 @@ describe Service do
       expect(service.arn).to eq 'arn:hello'
     end
 
+    it 'searches the array and finds a legacy ARN' do
+      allow(service).to receive(:service_arns) { ['arn:old:schwarzenegger', 'ggg:hello'] }
+      allow(service).to receive(:arn_prefix) { 'arn:new' }
+      allow(service).to receive(:arn_prefix_legacy) { 'arn:old' }
+
+      expect(service.arn).to eq 'arn:old:schwarzenegger'
+    end
+
     it 'returns nil if no ARN' do
       allow(service).to receive(:service_arns) { ['kkk:hello', 'ggg:hello'] }
       allow(service).to receive(:arn_prefix) { 'arn:' }
@@ -91,7 +99,25 @@ describe Service do
       allow(service).to receive(:district) { district }
       allow(service).to receive(:service_name) { 'testserv' }
 
-      expect(service.arn_prefix).to eq 'arn:aws:ecs:un-north-2:1234567890:service/testdistrict/testdistrict-testserv'
+      expect(service.arn_prefix).to eq 'arn:aws:ecs:un-north-2:1234567890:service/testdistrict/testdistrict-testserv-ECSService'
+    end
+  end
+
+  describe '#arn_prefix_legacy' do
+    it 'produces a prefix for the arn that conforms to the legacy version' do
+      district = double('District',
+        region: 'un-north-2',
+        name: 'old',
+        aws: double('AWS',
+          sts: double('STS', get_caller_identity: {
+            account: '11111111'
+          })
+        )
+      )
+      allow(service).to receive(:district) { district }
+      allow(service).to receive(:service_name) { 'serv' }
+
+      expect(service.arn_prefix_legacy).to eq 'arn:aws:ecs:un-north-2:11111111:service/old-serv-ECSService'
     end
   end
 

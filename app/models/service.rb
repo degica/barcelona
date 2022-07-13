@@ -110,7 +110,7 @@ class Service < ActiveRecord::Base
   end
 
   def arn
-    service_arns.find { |x| x.start_with? arn_prefix }
+    service_arns.find { |x| x.start_with?(arn_prefix) || x.start_with?(arn_prefix_legacy) }
   end
 
   def service_arns
@@ -125,7 +125,16 @@ class Service < ActiveRecord::Base
       'arn:aws:ecs',
       district.region,
       district.aws.sts.get_caller_identity[:account],
-      "service/#{district.name}/#{district.name}-#{service_name}"
+      "service/#{district.name}/#{district.name}-#{service_name}-ECSService"
+    ].join(':')
+  end
+
+  def arn_prefix_legacy
+    [
+      'arn:aws:ecs',
+      district.region,
+      district.aws.sts.get_caller_identity[:account],
+      "service/#{district.name}-#{service_name}-ECSService"
     ].join(':')
   end
 
