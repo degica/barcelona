@@ -72,8 +72,26 @@ describe Service do
     it 'returns service arns' do
       district = double('District', name: 'testdistrict')
 
-      result = double('PaginatedSawyer')
-      allow(result).to receive(:service_arns) { ['abc'] }
+      # The paginated results coming back from AWS comes in the
+      # form of an object that contains a 'next token' that can
+      # be used to find the next page of results.
+
+      # As a result just grabbing 'service_arns' is not enough as
+      # the number of results returned depends on what is hardcoded
+      # as default in the library, and this only the first page
+      # of results.
+
+      # AWS (sdk~>3) recently allows us to use 'each' to iterate,
+      # saving us the pain of looping back the next token. Hence:
+
+      # We mock the object this way not because this is how it works
+      # but because it is useful to think about the returned object
+      # in this way, and this is the only aspect about its behavior
+      # that we care about.
+      result = [
+        double('PaginatedObject', service_arns: ['abc']),
+        double('PaginatedObject', service_arns: ['def'])
+      ];
 
       ecs = double('ECS')
       allow(ecs).to receive(:list_services).with(cluster: 'testdistrict') { result }
@@ -81,7 +99,7 @@ describe Service do
       allow(service).to receive(:district) { district }
       allow(service).to receive(:ecs) { ecs }
 
-      expect(service.service_arns).to eq ['abc']
+      expect(service.service_arns).to eq ['abc', 'def']
     end
   end
 

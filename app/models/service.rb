@@ -117,7 +117,9 @@ class Service < ActiveRecord::Base
     s = ecs.list_services({
       cluster: district.name
     })
-    s.service_arns
+
+    # See test to get a model fo thinking about the returned object
+    s.flat_map(&:service_arns)
   end
 
   def arn_prefix
