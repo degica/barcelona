@@ -1,11 +1,13 @@
 module Backend::Ecs::V2
   class ServiceStack < CloudFormation::Stack
     class Builder < CloudFormation::Builder
+      DEPLOYMENT_CONFIGURATION = { "MaximumPercent"=>150, "MinimumHealthyPercent"=>100 }
       def build_resources
         add_resource("AWS::ECS::Service", "ECSService") do |j|
           j.Cluster district.name
           j.TaskDefinition options[:task_definition]
           j.DesiredCount options[:desired_count]
+          j.DeploymentConfiguration DEPLOYMENT_CONFIGURATION
           if use_tcp_load_balancer?
             port_mapping = service.port_mappings.lb_registerable.first
             container_name = service.service_name
