@@ -53,18 +53,6 @@ describe Backend::Ecs::V2::ServiceStack do
         expect(generated["Resources"]["ClassicLoadBalancer"]).to_not be_present
         expect(generated["Resources"]["ECSServiceRole"]).to be_present
       end
-
-      it "generates a service with a proper DeploymentConfiguration" do
-        generated = JSON.load stack.target!
-        generated_service = generated["Resources"]["ECSService"]
-        expect(generated_service["Type"]).to eq("AWS::ECS::Service")
-        expect(generated_service["Properties"]["DesiredCount"]).to eq(1)
-        deployment_configuration = {
-          "MaximumPercent" => 150,
-          "MinimumHealthyPercent" => 100
-        }
-        expect(generated_service["Properties"]["DeploymentConfiguration"]).to eq(deployment_configuration)
-      end
     end
   end
 end
