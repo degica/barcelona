@@ -32,7 +32,7 @@ class VaultAuth < Auth
 
   def authorize_action
     unless cap_probe.authorized?(non_shallow_path(request.path), request.method)
-      raise ExceptionHandler::Forbidden.new("You are not authorized to do that action")
+      raise ExceptionHandler::Forbidden.new("You are not allowed to do that action")
     end
   end
 
@@ -40,6 +40,12 @@ class VaultAuth < Auth
     client = Vault::Client.new(address: VaultAuth.vault_url)
     reply = client.auth.token vault_token
     reply.data.fetch(:meta, nil)&.fetch(:username, "vault-user#{vault_token.hash.to_s(16)}")
+  rescue Vault::HTTPClientError => e
+    if e.code.to_s == '403'
+      raise ExceptionHandler::Forbidden.new("You are not allowed to do that action")
+    else
+      raise ExceptionHandler::Unauthorized.new("You are not authorized to do that action")
+    end
   end
 
   private

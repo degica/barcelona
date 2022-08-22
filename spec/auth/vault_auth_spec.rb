@@ -22,22 +22,33 @@ describe VaultAuth do
 
     let(:reply) { instance_double('whatever_vault_uses') }
 
-    before do
+    context 'happy path' do
+      before do
+        client = instance_double(Vault::Client)
+        intermediate = instance_double('whatever_vault_uses')
+        allow(Vault::Client).to receive(:new) { client }
+        allow(client).to receive(:auth) { intermediate }
+        allow(intermediate).to receive(:token) { reply }
+      end
+
+      it 'gives the username' do
+        allow(reply).to receive(:data) { { meta: { username: 'foobar' } } }
+        expect(auth.username).to eq 'foobar'
+      end
+
+      it 'gives the placeholder name if vault does not return a username' do
+        allow(reply).to receive(:data) { { meta: { random: 'stuff' } } }
+        expect(auth.username).to start_with 'vault-user'
+      end
+    end
+
+    it 'raises an error understood by the controller' do
       client = instance_double(Vault::Client)
       intermediate = instance_double('whatever_vault_uses')
-      allow(Vault::Client).to receive(:new) { client }
-      allow(client).to receive(:auth) { intermediate }
-      allow(intermediate).to receive(:token) { reply }
-    end
+      response = instance_double('resp', code: 403)
+      allow(Vault::Client).to receive(:new) { raise Vault::HTTPClientError.new('testurl', response) }
 
-    it 'gives the username' do
-      allow(reply).to receive(:data) { { meta: { username: 'foobar' } } }
-      expect(auth.username).to eq 'foobar'
-    end
-
-    it 'gives the placeholder name if vault does not return a username' do
-      allow(reply).to receive(:data) { { meta: { random: 'stuff' } } }
-      expect(auth.username).to start_with 'vault-user'
+      expect{auth.username}.to raise_error ExceptionHandler::Forbidden
     end
   end
 
