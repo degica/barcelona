@@ -27,6 +27,7 @@ gem 'rails', '~> 5.2.7.1'
 gem 'sqlite3'
 gem 'thor', require: false
 gem 'vault'
+gem 'tzinfo', '~> 1.2.10'
 
 group :development, :test do
   gem 'debase'
