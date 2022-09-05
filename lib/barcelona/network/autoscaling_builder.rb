@@ -4,21 +4,21 @@ module Barcelona
       # http://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html
       # amzn2-ami-ecs-hvm-2.0
       ECS_OPTIMIZED_AMI_IDS = {
-        "us-east-1"      => "ami-040d909ea4e56f8f3",
-        "us-east-2"      => "ami-09ce6553a7f2ae75d",
-        "us-west-1"      => "ami-091c5e73d3a79e85e",
-        "us-west-2"      => "ami-02c6f7952af6bd632",
-        "eu-west-1"      => "ami-044fb3b709f19cb4a",
-        "eu-west-2"      => "ami-070d0f1b66ccfd0fa",
-        "eu-west-3"      => "ami-0f51be0cf2e87b06c",
-        "eu-central-1"      => "ami-006aeb802a1a7862a",
-        "ap-northeast-1"      => "ami-08dd79a478ef2a81c",
-        "ap-northeast-2"      => "ami-0fd206971b03d9eb0",
-        "ap-southeast-1"      => "ami-08222ba0572c64812",
-        "ap-southeast-2"      => "ami-0a5d07e2b337abadb",
-        "ca-central-1"      => "ami-03e6eb48311b78d14",
-        "ap-south-1"      => "ami-04b412847162495a3",
-        "sa-east-1"      => "ami-06205847307e9f474",
+        "us-east-1"      => "ami-03f8a7b55051ae0d4",
+        "us-east-2"      => "ami-0693a7971cd761811",
+        "us-west-1"      => "ami-0f987281f7836b330",
+        "us-west-2"      => "ami-014b01f8aa1a38b78",
+        "eu-west-1"      => "ami-0e592a261c043bc6a",
+        "eu-west-2"      => "ami-085b9e3ecde6f7626",
+        "eu-west-3"      => "ami-02406e08f57b68b1c",
+        "eu-central-1"      => "ami-0b41652f00b442576",
+        "ap-northeast-1"      => "ami-06228cb76d02ff1c7",
+        "ap-northeast-2"      => "ami-0d15c49f8a42016ec",
+        "ap-southeast-1"      => "ami-026c70a35138a1088",
+        "ap-southeast-2"      => "ami-029517bdb38391983",
+        "ca-central-1"      => "ami-0d1173d3588c3f426",
+        "ap-south-1"      => "ami-09fee13e183eb2baf",
+        "sa-east-1"      => "ami-07414326f9dde3558",
       }
 
       def ebs_optimized_by_default?
