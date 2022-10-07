@@ -39,17 +39,5 @@ def show_image_id_for_ecs_optimized(regions)
   end
 end
 
-def show_image_id_for_nat_instance(regions)
-  nat_images = `aws --region us-east-1  ec2 describe-images --owners amazon --filters "Name=name,Values=amzn-ami-vpc-nat-hvm*" --query 'sort_by(Images, &CreationDate)[].Name' --output text`
-  latest_nat_image = nat_images.split.last
-  STDERR.puts "getting image id of nat instances ( latest version is #{latest_nat_image} )..."
-
-  regions.each do |region|
-    image_id=`aws --region #{region}  ec2 describe-images --owners amazon --filters "Name=name,Values=#{latest_nat_image}" --query 'sort_by(Images, &CreationDate)[].ImageId' --output text `.chomp
-    puts %Q{        "#{region}"      => "#{image_id}",}
-  end
-end
-
 show_image_id_for_amazon_linux2(regions)
 show_image_id_for_ecs_optimized(regions)
-show_image_id_for_nat_instance(regions)
