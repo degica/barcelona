@@ -3,7 +3,7 @@ name: test
 jobs:
   test:
     container:
-      image: ruby:2.6.5
+      image: public.ecr.aws/degica/rails-buildpack:2.7
       env:
         DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres
         ENCRYPTION_KEY: abcdefghijklmn
@@ -13,7 +13,9 @@ jobs:
       run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
     - uses: actions/checkout@v2
     - name: before_install
-      run: bundle install
+      run: |
+        gem install bundler:2.1.4
+        bundle install
     - name: script
       run: |-
         set -e
