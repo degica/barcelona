@@ -141,7 +141,25 @@ class Service < ActiveRecord::Base
     ].join(':')
   end
 
+  def deployment
+    if service_deployment_object.nil?
+      ServiceDeployment.create!(service: self)
+    end
+
+    service_deployment_object
+  end
+
+  def deployment_finished?
+    return true if service_deployment_object.nil?
+
+    service_deployment_object.finished?
+  end
+
   private
+
+  def service_deployment_object
+    service_deployments.unfinished.last || service_deployments.last
+  end
 
   def ecs
     @ecs ||= district.aws.ecs
