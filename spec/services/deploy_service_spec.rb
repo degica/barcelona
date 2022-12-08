@@ -126,11 +126,114 @@ describe DeployService, type: :model do
   end
 
   describe '#notify_completed' do
+    it 'sets the service deployment to completed' do
+      heritage = create :heritage, name: 'sname', district: district
+      service = create :service, heritage: heritage
+      deployment = create :service_deployment, service: service
+
+      ds = DeployService.new(district)
+      ds.notify_completed(service)
+
+      expect(deployment.reload).to be_completed
+    end
+
+    it 'sets all deployment objects for that service to completed' do
+      heritage = create :heritage, name: 'sname', district: district
+      service = create :service, heritage: heritage
+      deployment = create :service_deployment, service: service
+
+      # extra deployment objects
+      # can happen in race conditions but we should expect it and handle accordingly
+      deployment1 = create :service_deployment, service: service
+      deployment2 = create :service_deployment, service: service
+
+      ds = DeployService.new(district)
+      ds.notify_completed(service)
+
+      expect(deployment.reload).to be_completed
+      expect(deployment1.reload).to be_completed
+      expect(deployment2.reload).to be_completed
+    end
+
+    it 'notifies if the deployment has completed' do
+      heritage = create :heritage, name: 'sname', district: district
+      service = create :service, name: 'theservice', heritage: heritage
+      deployment = create :service_deployment, service: service
+
+      # this is copied from the deploy_runner_job_spec.rb
+      event_object = double("Event")
+      expect(Event).to receive(:new).with(district) { event_object }
+      expect(event_object).to receive(:notify).with(level: :good, message: "[sname] theservice service deployed")
+
+      ds = DeployService.new(district)
+      ds.notify_completed(service)
+    end
   end
 
   describe '#notify_incomplete' do
+    it 'notifies if the deployment is taking a while' do
+      heritage = create :heritage, name: 'sname', district: district
+      service = create :service, name: 'naughty', heritage: heritage
+
+      # Let's just agree that 1 hour for deployment is simply simply way too long
+      # even if practical circumstances happen to be such that deployments take
+      # more than an hour, barcelona deserves to be noisy about it.
+      create :service_deployment, service: service, created_at: 1.hour.ago
+
+      event_object = double("Event")
+      expect(Event).to receive(:new).with(district) { event_object }
+      expect(event_object).to receive(:notify).with(level: :error, message: "[sname] Deploying naughty service has not finished for a while.")
+
+      ds = DeployService.new(district)
+      ds.notify_incomplete(service)
+    end
   end
 
   describe '#notify_failed' do
+    # This is a new thing
+    # the original monitor deployment job did not check for this
+
+    it 'notifies if the deployment has failed' do
+      heritage = create :heritage, name: 'sname', district: district
+      service = create :service, name: 'bad', heritage: heritage
+      deployment = create :service_deployment, service: service
+
+      event_object = double("Event")
+      expect(Event).to receive(:new).with(district) { event_object }
+      expect(event_object).to receive(:notify).with(level: :error, message: "[sname] Deployment of bad service has failed.")
+
+      ds = DeployService.new(district)
+      ds.notify_failed(service)
+    end
+
+    it 'sets the service deployment to failed' do
+      heritage = create :heritage, name: 'sname', district: district
+      service = create :service, heritage: heritage
+      deployment = create :service_deployment, service: service
+
+      ds = DeployService.new(district)
+      ds.notify_failed(service)
+
+      expect(deployment.reload).to be_failed
+
+    end
+
+    it 'sets all deployment objects for that service to failed' do
+      heritage = create :heritage, name: 'sname', district: district
+      service = create :service, heritage: heritage
+      deployment = create :service_deployment, service: service
+
+      # extra deployment objects
+      # can happen in race conditions but we should expect it and handle accordingly
+      deployment1 = create :service_deployment, service: service
+      deployment2 = create :service_deployment, service: service
+
+      ds = DeployService.new(district)
+      ds.notify_failed(service)
+
+      expect(deployment.reload).to be_failed
+      expect(deployment1.reload).to be_failed
+      expect(deployment2.reload).to be_failed
+    end
   end
 end

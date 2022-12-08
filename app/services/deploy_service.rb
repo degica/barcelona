@@ -55,12 +55,24 @@ class DeployService
   end
 
   def notify_completed(service)
+    service.service_deployments.unfinished.each do |record|
+      record.complete!
+    end
+    event(service, message: "#{service.name} service deployed")
   end
 
   def notify_incomplete(service)
+    runtime = Time.now - service.deployment.created_at
+    if runtime > 20.minutes
+      event(service, level: :error, message: "Deploying #{service.name} service has not finished for a while.")
+    end
   end
 
   def notify_failed(service)
+    service.service_deployments.unfinished.each do |record|
+      record.fail!
+    end
+    event(service, level: :error, message: "Deployment of #{service.name} service has failed.")
   end
 
   def stack_names
@@ -84,6 +96,10 @@ class DeployService
   end
 
   private
+
+  def event(service, level: :good, message:)
+    Event.new(@district).notify(level: level, message: "[#{service.heritage.name}] #{message}")
+  end
 
   def cloudformation
     @cloudformation ||= @district.aws.cloudformation
