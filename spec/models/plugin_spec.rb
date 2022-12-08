@@ -1,7 +1,8 @@
 require 'rails_helper'
 
 describe Plugin do
-  let(:plugin) { Plugin.new(name: name) }
+  let(:district) { create(:district) }
+  let(:plugin) { Plugin.new(name: name, district: district) }
 
   describe "validations" do
     context "when plugin class doesnt exist" do
