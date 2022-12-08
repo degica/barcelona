@@ -30,6 +30,13 @@ class DeployService
     def deploy_service(service)
       ServiceDeployment.create!(service: service)
     end
+
+    def check_all
+      District.all.each do |district|
+        Rails.logger.info("Checking district #{district.name}")
+        DeployService.new(district).check
+      end
+    end
   end
 
   def initialize(district)
@@ -37,13 +44,11 @@ class DeployService
   end
 
   def check
-    statuses = stack_statuses
-
     @district.heritages.each do |heritage|
       heritage.services.each do |service|
         next if service.deployment.finished?
 
-        status = statuses[heritage.name]
+        status = stack_statuses[heritage.name]
         action = STATUS_TO_ACTION_MAP[status]
         notify(service, action)
       end
@@ -55,6 +60,7 @@ class DeployService
   end
 
   def notify_completed(service)
+    Rails.logger.info("Heritage: #{service.heritage.name} Service: #{service.name} Deployment Completed")
     service.service_deployments.unfinished.each do |record|
       record.complete!
     end
@@ -62,6 +68,7 @@ class DeployService
   end
 
   def notify_incomplete(service)
+    Rails.logger.info("Heritage: #{service.heritage.name} Service: #{service.name} Deployment Incomplete")
     runtime = Time.now - service.deployment.created_at
     if runtime > 20.minutes
       event(service, level: :error, message: "Deploying #{service.name} service has not finished for a while.")
@@ -69,6 +76,7 @@ class DeployService
   end
 
   def notify_failed(service)
+    Rails.logger.info("Heritage: #{service.heritage.name} Service: #{service.name} Deployment Failed")
     service.service_deployments.unfinished.each do |record|
       record.fail!
     end
@@ -82,17 +90,22 @@ class DeployService
   end
 
   def stack_statuses
-    results = {}
+    @stack_statuses ||= begin
+      results = {}
 
-    cloudformation.list_stacks.each do |response|
-      response.stack_summaries.each do |summary|
-        if stack_names.key?(summary.stack_name)
-          results[stack_names[summary.stack_name]] = summary.stack_status
+      cloudformation.list_stacks.each do |response|
+        response.stack_summaries.each do |summary|
+          if stack_names.key?(summary.stack_name)
+            results[stack_names[summary.stack_name]] = summary.stack_status
+          end
         end
       end
-    end
 
-    results
+      results
+    rescue StandardError => e
+      Rails.logger.error("Failed to retrieve stack statuses!")
+      raise e
+    end
   end
 
   private

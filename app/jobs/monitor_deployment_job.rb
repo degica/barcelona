@@ -2,6 +2,14 @@ class MonitorDeploymentJob < ActiveJob::Base
   queue_as :default
 
   def perform(service, count: 0, deployment_id: nil)
+    if service.heritage.version == 2
+      ServiceDeployment.create!(service)
+      return
+    end
+
+    # old version does not rely on cloudformation and thus has to be
+    # polled one by one. We will need to clean this up later.
+
     if service.deployment_finished?(deployment_id)
       notify(service, message: "#{service.name} service deployed")
     elsif count > 20

@@ -14,6 +14,28 @@ describe DeployService, type: :model do
     end
   end
 
+  describe '.check_all' do
+    it 'iterates through all districts' do
+      d1 = create :district
+      d2 = create :district
+      d3 = create :district
+
+      dsdouble1 = double('DeployService')
+      dsdouble2 = double('DeployService')
+      dsdouble3 = double('DeployService')
+
+      expect(DeployService).to receive(:new).with(d1) { dsdouble1 }
+      expect(DeployService).to receive(:new).with(d2) { dsdouble2 }
+      expect(DeployService).to receive(:new).with(d3) { dsdouble3 }
+
+      expect(dsdouble1).to receive(:check)
+      expect(dsdouble2).to receive(:check)
+      expect(dsdouble3).to receive(:check)
+
+      DeployService.check_all
+    end
+  end
+
   describe '#check' do
     it 'is backwards compatible' do
       heritage = create :heritage, name: 'sname', district: district
@@ -215,7 +237,6 @@ describe DeployService, type: :model do
       ds.notify_failed(service)
 
       expect(deployment.reload).to be_failed
-
     end
 
     it 'sets all deployment objects for that service to failed' do
