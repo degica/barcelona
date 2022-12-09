@@ -3,7 +3,7 @@ class MonitorDeploymentJob < ActiveJob::Base
 
   def perform(service, count: 0, deployment_id: nil)
     if service.heritage.version == 2
-      ServiceDeployment.create!(service)
+      ServiceDeployment.create!(service: service)
       return
     end
 
