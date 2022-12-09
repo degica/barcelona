@@ -82,8 +82,11 @@ class Service < ActiveRecord::Base
     port_mappings.find_by(protocol: 'https')
   end
 
-  def deployment_finished?(deployment_id)
-    backend.deployment_finished?(deployment_id)
+  def deployment_finished?(deployment_id=nil)
+    backend.deployment_finished?(deployment_id) if heritage.version == 1
+
+    return true if service_deployment_object.nil?
+    service_deployment_object.finished?
   end
 
   def save_and_update_container_count!(desired_container_count)
@@ -123,6 +126,10 @@ class Service < ActiveRecord::Base
     s.flat_map(&:service_arns)
   end
 
+  def stack_name
+    "#{district.name}-#{heritage.name}-#{name}"
+  end
+
   def arn_prefix
     [
       'arn:aws:ecs',
@@ -147,12 +154,6 @@ class Service < ActiveRecord::Base
     end
 
     service_deployment_object
-  end
-
-  def deployment_finished?
-    return true if service_deployment_object.nil?
-
-    service_deployment_object.finished?
   end
 
   private

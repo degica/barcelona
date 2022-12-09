@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 describe DeployService, type: :model do
-  let(:district) { create :district }
+  let(:district) { create :district, name: 'testdistrict' }
   let(:deployer) { DeployService.new(district) }
 
   describe '.deploy_service' do
@@ -38,8 +38,8 @@ describe DeployService, type: :model do
 
   describe '#check' do
     it 'is backwards compatible' do
-      heritage = create :heritage, name: 'sname', district: district
-      service = create :service, heritage: heritage
+      heritage = create :heritage, name: 'hname', district: district
+      service = create :service, name: 'sname', heritage: heritage
 
       # if no service deployment object was created
       # it would need to create one
@@ -49,7 +49,7 @@ describe DeployService, type: :model do
       expect(ds).to receive(:notify_completed).with(service)
       allow(ds).to receive(:stack_statuses) {
         {
-          'sname' => 'UPDATE_COMPLETE'
+          'testdistrict-hname-sname' => 'UPDATE_COMPLETE'
         }
       }
 
@@ -57,8 +57,8 @@ describe DeployService, type: :model do
     end
 
     it 'updates state of services' do
-      heritage = create :heritage, name: 'sname', district: district
-      service = create :service, heritage: heritage
+      heritage = create :heritage, name: 'hname', district: district
+      service = create :service, name: 'sname', heritage: heritage
       create :service_deployment, service: service
 
       ds = DeployService.new(district)
@@ -66,7 +66,7 @@ describe DeployService, type: :model do
       expect(ds).to receive(:notify_completed).with(service)
       allow(ds).to receive(:stack_statuses) {
         {
-          'sname' => 'UPDATE_COMPLETE'
+          'testdistrict-hname-sname' => 'UPDATE_COMPLETE'
         }
       }
 
@@ -74,8 +74,8 @@ describe DeployService, type: :model do
     end
 
     it 'updates state of services that are not ready yet' do
-      heritage = create :heritage, name: 'sname', district: district
-      service = create :service, heritage: heritage
+      heritage = create :heritage, name: 'hname', district: district
+      service = create :service, name: 'sname', heritage: heritage
       create :service_deployment, service: service
 
       ds = DeployService.new(district)
@@ -83,7 +83,7 @@ describe DeployService, type: :model do
       expect(ds).to receive(:notify_incomplete).with(service)
       allow(ds).to receive(:stack_statuses) {
         {
-          'sname' => 'UPDATE_IN_PROGRESS'
+          'testdistrict-hname-sname' => 'UPDATE_IN_PROGRESS'
         }
       }
 
@@ -91,8 +91,8 @@ describe DeployService, type: :model do
     end
 
     it 'update state of services that are failed' do
-      heritage = create :heritage, name: 'sname', district: district
-      service = create :service, heritage: heritage
+      heritage = create :heritage, name: 'hname', district: district
+      service = create :service, name: 'sname', heritage: heritage
       create :service_deployment, service: service
 
       ds = DeployService.new(district)
@@ -100,7 +100,7 @@ describe DeployService, type: :model do
       expect(ds).to receive(:notify_failed).with(service)
       allow(ds).to receive(:stack_statuses) {
         {
-          'sname' => 'UPDATE_ROLLBACK_COMPLETE'
+          'testdistrict-hname-sname' => 'UPDATE_ROLLBACK_COMPLETE'
         }
       }
 
@@ -112,8 +112,11 @@ describe DeployService, type: :model do
     let(:cfclient) { double('CloudformationClient') }
 
     it 'updates state of services' do
-      heritage1 = create :heritage, name: 'service-1', district: district
-      heritage2 = create :heritage, name: 'service-2', district: district
+      heritage1 = create :heritage, name: 'heritage1', district: district
+      service1 = create :service, name: 'service1', heritage: heritage1
+
+      heritage2 = create :heritage, name: 'heritage2', district: district
+      service2 = create :service, name: 'service2', heritage: heritage2
 
       ds = DeployService.new(district)
 
@@ -123,17 +126,17 @@ describe DeployService, type: :model do
         [
           double('Response', stack_summaries:[
             double('Summary', {
-              stack_name: 'heritage-service-1',
+              stack_name: 'testdistrict-heritage1-service1',
               stack_status: 'UPDATE_COMPLETE'
             }),
 
             double('Summary', {
-              stack_name: 'heritage-service-2',
+              stack_name: 'testdistrict-heritage2-service2',
               stack_status: 'UPDATE_FAILED'
             }),
 
             double('Summary', {
-              stack_name: 'heritage-service-3',
+              stack_name: 'testdistrict-heritage1-service2',
               stack_status: 'UPDATE_IN_PROGRESS'
             })
           ])
@@ -141,8 +144,8 @@ describe DeployService, type: :model do
       end
 
       expect(ds.stack_statuses).to eq({
-          'service-1' => 'UPDATE_COMPLETE',
-          'service-2' => 'UPDATE_FAILED'
+          'testdistrict-heritage1-service1' => 'UPDATE_COMPLETE',
+          'testdistrict-heritage2-service2' => 'UPDATE_FAILED'
       })
     end
   end
@@ -192,6 +195,21 @@ describe DeployService, type: :model do
     end
   end
 
+  describe '#notify' do
+    it 'logs an error action is nil' do
+      district = create :district, name: 'dtest'
+      heritage = create :heritage, name: 'htest', district: district
+      service = create :service, name: 'stest', heritage: heritage
+
+      logger_double = double('logger')
+      expect(Rails).to receive(:logger) { logger_double }
+      expect(logger_double).to receive(:error) { "[deploy_service] stack dtest-htest-stest not found!" }
+
+      ds = DeployService.new(district)
+      ds.notify(service, nil)
+    end
+  end
+
   describe '#notify_incomplete' do
     it 'notifies if the deployment is taking a while' do
       heritage = create :heritage, name: 'sname', district: district
@@ -230,7 +248,7 @@ describe DeployService, type: :model do
 
     it 'sets the service deployment to failed' do
       heritage = create :heritage, name: 'sname', district: district
-      service = create :service, heritage: heritage
+      service = create :service, name: 'hname', heritage: heritage
       deployment = create :service_deployment, service: service
 
       ds = DeployService.new(district)
@@ -241,7 +259,7 @@ describe DeployService, type: :model do
 
     it 'sets all deployment objects for that service to failed' do
       heritage = create :heritage, name: 'sname', district: district
-      service = create :service, heritage: heritage
+      service = create :service, name: 'hname', heritage: heritage
       deployment = create :service_deployment, service: service
 
       # extra deployment objects

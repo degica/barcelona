@@ -23,6 +23,7 @@ class MonitorDeploymentJob < ActiveJob::Base
   end
 
   def notify(service, level: :good, message:)
+    Rails.logger.info message
     Event.new(service.district).notify(level: level, message: "[#{service.heritage.name}] #{message}")
   end
 end

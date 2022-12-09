@@ -232,4 +232,14 @@ describe Service do
       expect(s).to_not be_deployment_finished
     end
   end
+
+  describe '#stack_name' do
+    it 'returns the corresponding stack name' do
+      s = create :service, name: 'serv'
+      allow(s.district).to receive(:name) { 'dist' }
+      allow(s.heritage).to receive(:name) { 'heri' }
+
+      expect(s.stack_name).to eq "dist-heri-serv"
+    end
+  end
 end

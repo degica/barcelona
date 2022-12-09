@@ -48,7 +48,7 @@ class DeployService
       heritage.services.each do |service|
         next if service.deployment.finished?
 
-        status = stack_statuses[heritage.name]
+        status = stack_statuses[service.stack_name]
         action = STATUS_TO_ACTION_MAP[status]
         notify(service, action)
       end
@@ -56,6 +56,11 @@ class DeployService
   end
 
   def notify(service, action)
+    if action.nil?
+      Rails.logger.error("[deploy_service] stack #{service.stack_name} not found!")
+      return
+    end
+
     send("notify_#{action}", service)
   end
 
@@ -84,9 +89,15 @@ class DeployService
   end
 
   def stack_names
-    @stack_names ||= @district.heritages.pluck(:name).map do |x|
-      ["heritage-#{x}", x]
-    end.to_h
+    @stack_names ||= begin
+      results = {}
+      @district.heritages.map do |heritage|
+        heritage.services.map do |service|
+          results[service.stack_name] = true
+        end
+      end
+      results
+    end
   end
 
   def stack_statuses
@@ -96,10 +107,12 @@ class DeployService
       cloudformation.list_stacks.each do |response|
         response.stack_summaries.each do |summary|
           if stack_names.key?(summary.stack_name)
-            results[stack_names[summary.stack_name]] = summary.stack_status
+            results[summary.stack_name] = summary.stack_status
           end
         end
       end
+
+      Rails.logger.info(results.to_yaml)
 
       results
     rescue StandardError => e
