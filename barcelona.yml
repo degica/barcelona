@@ -14,10 +14,6 @@ environments:
     name: barcelona2
     image_name: public.ecr.aws/degica/barcelona
     before_deploy: rake db:migrate
-    scheduled_tasks:
-      # 10AM JST every week day
-      - schedule: cron(0 1 ? * MON-FRI *)
-        command: bin/chaos
     services:
       - name: web
         service_type: web
