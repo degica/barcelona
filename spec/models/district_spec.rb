@@ -148,4 +148,61 @@ describe District do
       district.publish_sns("message")
     end
   end
+
+  describe '#services' do
+    it 'finds the services for the current district' do
+      d1 = create :district, name: 'd1'
+      d1h1 = create :heritage, district: d1, name: 'd1h1'
+      d1h1s1 = create :service, heritage: d1h1, name: 'd1h1s1'
+      d1h1s2 = create :service, heritage: d1h1, name: 'd1h1s2'
+      d1h1s3 = create :service, heritage: d1h1, name: 'd1h1s3'
+
+      d1h2 = create :heritage, district: d1, name: 'd1h2'
+      d1h2s1 = create :service, heritage: d1h2, name: 'd1h2s1'
+      d1h2s2 = create :service, heritage: d1h2, name: 'd1h2s2'
+
+      d2 = create :district, name: 'd2'
+      d2h1 = create :heritage, district: d2, name: 'd2h1'
+      d2h1s1 = create :service, heritage: d2h1, name: 'd2h1s1'
+      d2h1s2 = create :service, heritage: d2h1, name: 'd2h1s2'
+
+      d2h2 = create :heritage, district: d2, name: 'd2h2'
+      d2h2s1 = create :service, heritage: d2h2, name: 'd2h2s1'
+      d2h2s2 = create :service, heritage: d2h2, name: 'd2h2s2'
+
+      expect(d1.services).to eq [d1h1s1, d1h1s2, d1h1s3, d1h2s1, d1h2s2]
+      expect(d2.services).to eq [d2h1s1, d2h1s2, d2h2s1, d2h2s2]
+    end
+  end
+
+  describe '#service_deployments' do
+    it 'finds the service deployments for the current district' do
+      d1 = create :district, name: 'd1'
+      d1h1 = create :heritage, district: d1, name: 'd1h1'
+      d1h1s1 = create :service, heritage: d1h1, name: 'd1h1s1'
+
+      dep1 = create :service_deployment, service: d1h1s1
+
+      d1h1s2 = create :service, heritage: d1h1, name: 'd1h1s2'
+      d1h1s3 = create :service, heritage: d1h1, name: 'd1h1s3'
+
+      dep2 = create :service_deployment, service: d1h1s3
+
+      d1h2 = create :heritage, district: d1, name: 'd1h2'
+      d1h2s1 = create :service, heritage: d1h2, name: 'd1h2s1'
+      d1h2s2 = create :service, heritage: d1h2, name: 'd1h2s2'
+
+      d2 = create :district, name: 'd2'
+      d2h1 = create :heritage, district: d2, name: 'd2h1'
+      d2h1s1 = create :service, heritage: d2h1, name: 'd2h1s1'
+      d2h1s2 = create :service, heritage: d2h1, name: 'd2h1s2'
+
+      d2h2 = create :heritage, district: d2, name: 'd2h2'
+      d2h2s1 = create :service, heritage: d2h2, name: 'd2h2s1'
+      d2h2s2 = create :service, heritage: d2h2, name: 'd2h2s2'
+
+      expect(d1.service_deployments).to eq [dep1, dep2]
+    end
+  end
+
 end

@@ -12,6 +12,9 @@ class District < ActiveRecord::Base
   has_many :endpoints, inverse_of: :district, dependent: :destroy
   has_many :notifications, inverse_of: :district, dependent: :destroy
 
+  has_many :services, through: :heritages
+  has_many :service_deployments, through: :services
+
   validates :name, presence: true, uniqueness: true, immutable: true
   validates :region, :s3_bucket_name, :stack_name, :cidr_block, presence: true, immutable: true
   validates :nat_type, inclusion: {in: %w[instance managed_gateway managed_gateway_multi_az]}, allow_nil: true

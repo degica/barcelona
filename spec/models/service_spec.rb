@@ -196,4 +196,18 @@ describe Service do
       end
     end
   end
+
+  describe '#service_deployments' do
+    it 'finds the service deployments for the current district' do
+      s1 = create :service
+      s1d1 = create :service_deployment, service: s1
+      s1d2 = create :service_deployment, service: s1
+
+      s2 = create :service
+      s2d1 = create :service_deployment, service: s2
+
+      expect(s1.service_deployments).to eq [s1d1, s1d2]
+      expect(s2.service_deployments).to eq [s2d1]
+    end
+  end
 end

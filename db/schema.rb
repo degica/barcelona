@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_11_13_090000) do
+ActiveRecord::Schema.define(version: 2022_12_08_045503) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -182,6 +182,16 @@ ActiveRecord::Schema.define(version: 2020_11_13_090000) do
     t.index ["token"], name: "index_review_groups_on_token", unique: true
   end
 
+  create_table "service_deployments", force: :cascade do |t|
+    t.bigint "service_id", null: false
+    t.datetime "completed_at"
+    t.datetime "failed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["completed_at", "failed_at"], name: "index_service_deployments_on_completed_at_and_failed_at"
+    t.index ["service_id"], name: "index_service_deployments_on_service_id"
+  end
+
   create_table "services", force: :cascade do |t|
     t.string "name", null: false
     t.integer "cpu"
@@ -236,6 +246,7 @@ ActiveRecord::Schema.define(version: 2020_11_13_090000) do
   add_foreign_key "review_apps", "heritages"
   add_foreign_key "review_apps", "review_groups"
   add_foreign_key "review_groups", "endpoints"
+  add_foreign_key "service_deployments", "services"
   add_foreign_key "services", "heritages"
   add_foreign_key "users_districts", "districts"
   add_foreign_key "users_districts", "users"
