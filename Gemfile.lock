@@ -378,6 +378,3 @@ DEPENDENCIES
   tzinfo (~> 1.2.10)
   vault
   webmock
-
-BUNDLED WITH
-   1.17.3
