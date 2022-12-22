@@ -4,9 +4,8 @@ scheduled_tasks: &scheduled_tasks
       - schedule: cron(0 1 ? * MON-FRI *)
         command: bin/chaos
       # every 5 minutes
-      # - schedule: cron(0/5 * ? * * *)
-      #   command: rake bcn:deployment_check
-      # TODO IMPLEMENT A CHECKING FLAG SO TWO TASKS DO NOT COLLIDE
+      - schedule: cron(0/5 * ? * * *)
+        command: rake bcn:deployment_check
 
 environments:
   production:

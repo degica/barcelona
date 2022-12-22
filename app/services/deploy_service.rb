@@ -31,10 +31,29 @@ class DeployService
       ServiceDeployment.create!(service: service)
     end
 
+    DEPLOY_SERVICE_LOCK=1000001
+
+    def synchronize
+      got_lock = ActiveRecord::Base.connection.get_advisory_lock(DEPLOY_SERVICE_LOCK)
+      if !got_lock
+        Rails.logger.info("[DeployService] Lock already held. Skipping.")
+      return
+
+      yield
+    ensure
+      if got_lock && !ActiveRecord::Base.connection.release_advisory_lock(DEPLOY_SERVICE_LOCK)
+        Rails.logger.info("[DeployService] Failed to release lock")
+      end
+    end
+
     def check_all
-      District.all.each do |district|
-        Rails.logger.info("Checking district #{district.name}")
-        DeployService.new(district).check
+      Rails.logger.info("[DeployService] Starting checks.")
+
+      synchronize do
+        District.all.each do |district|
+          Rails.logger.info("Checking district #{district.name}")
+          DeployService.new(district).check
+        end
       end
     end
   end
