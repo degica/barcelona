@@ -1,4 +1,4 @@
-FROM public.ecr.aws/degica/rails-buildpack:2.7
+FROM degica/rails-buildpack:2.6
 
 ARG UID=1000
 ARG APP_HOME

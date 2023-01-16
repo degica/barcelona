@@ -1,4 +1,4 @@
-FROM public.ecr.aws/degica/rails-buildpack:2.7 AS builder
+FROM degica/rails-buildpack:2.6 AS builder
 
 ENV APP_HOME=/app
 WORKDIR $APP_HOME
