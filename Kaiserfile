@@ -2,7 +2,7 @@ require 'fileutils'
 
 plugin :database
 
-File.write('.kaiser.dockerfile', File.read('Dockerfile').sub('--without development test', '') + "\nRUN rm /app/bin/spring")
+File.write('.kaiser.dockerfile', File.read('Dockerfile').sub('RUN bundle config set without \'development test\'', '') + "\nRUN rm /app/bin/spring")
 dockerfile '.kaiser.dockerfile'
 FileUtils.rm '.kaiser.dockerfile'
 

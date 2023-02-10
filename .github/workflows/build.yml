@@ -7,7 +7,7 @@ jobs:
         BARCELONA_ENDPOINT: https://barcelona.degica.com
         DOCKER_REPOSITORY: public.ecr.aws/degica/barcelona
         DOCKER_BUILDKIT: '1'
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     steps:
     - name: workaround
       run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
@@ -16,7 +16,7 @@ jobs:
         apk add --no-cache python3 py3-pip
         pip3 install --upgrade pip
         pip3 install awscli
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: setup
       run: git submodule update --init
     - name: script
@@ -41,10 +41,10 @@ jobs:
       image: degica/rails-buildpack:2.6.5-stretch
       env:
         BARCELONA_ENDPOINT: https://barcelona.degica.com
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     needs: [build]
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: deploy_setup
       if: github.ref == 'refs/heads/master'
       run: |-
