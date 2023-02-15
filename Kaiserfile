@@ -13,6 +13,7 @@ vault_host = ENV['VAULT_HOST'] || "http://vault-app"
 vault_port = ENV['VAULT_PORT'] || '8211'
 
 app_params "
+  --platform linux/amd64
   -e RAILS_ENV=development
   -e DATABASE_URL=postgres://postgres:example@<%= db_container_name %>:5432
   -e ENCRYPTION_KEY=abcdefghijklmn
