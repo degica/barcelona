@@ -1,9 +1,9 @@
 FROM public.ecr.aws/degica/rails-buildpack:2.7.7
 
-ARG UID=1000
+ARG DOCKER_UID=1000
 ARG APP_HOME
 
-RUN useradd --uid $UID --user-group --create-home app
+RUN useradd --uid $DOCKER_UID --user-group --create-home app
 RUN mkdir -p $APP_HOME && chown -R app:app $APP_HOME
 RUN ln -s -f /app $APP_HOME
 
