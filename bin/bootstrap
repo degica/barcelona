@@ -18,12 +18,22 @@ def ask_with_description(title, description, required: false, default: nil)
   value
 end
 
+def create_sts_temporary_credentials
+  client = Aws::STS::Client.new
+  client.get_session_token({duration_seconds: 3600}).to_h[:credentials]
+end
+
 class CLI < Thor
   option :acm_cert_arn, required: false
   option :github_organization
   option :region
   option :district_name, default: "default"
+  option :create_aws_session_token, default: false, type: :boolean,
+    desc: "Create a temporary AWS STS Token from the AWS credentials passed in, and barcelona will use that token to bootstrap"
+  option :use_aws_cred_envars, default: false, type: :boolean,
+    desc: "Use the AWS credentials set in the executor's environment variables, instead of prompting the user for them."
   desc "execute", "Run Barcelona bootstrap"
+
   def execute
     ENV["RAILS_ENV"] = "bootstrap"
     require File.expand_path('../../config/application', __FILE__)
@@ -52,15 +62,29 @@ class CLI < Thor
       EOS
     end
 
-    say <<~EOS, :green
-        Provide your AWS access key ID and secret access key.
-        This access key will be used to bootstrap your Barcelona environment.
-        The best practice is to create a new access key with admin previleges and \ 
-        delete it after the bootstrap is complete.
-    EOS
+    if !options[:use_aws_cred_envars]
+      say <<~EOS, :green
+          Provide your AWS access key ID and secret access key.
+          This access key will be used to bootstrap your Barcelona environment.
+          The best practice is to create a new access key with admin previleges and \ 
+          delete it after the bootstrap is complete.
+      EOS
 
-    ENV["AWS_ACCESS_KEY_ID"] = ask("AWS Access Key ID:")
-    ENV["AWS_SECRET_ACCESS_KEY"] = ask("AWS Secret Access Key:", echo: false)
+      ENV["AWS_ACCESS_KEY_ID"] = ask("AWS Access Key ID:")
+      ENV["AWS_SECRET_ACCESS_KEY"] = ask("AWS Secret Access Key:", echo: false)
+      ENV["AWS_SESSION_TOKEN"] = ask("AWS Secret Access Key:", echo: false, required: false)
+    else
+      say "Using the AWS Credentials set in your environment variables.", :green
+    end
+
+    if options[:create_aws_session_token]
+      say "Creating temporary AWS STS token for barcelona to use.", :green
+      credentials = create_sts_temporary_credentials
+      ENV["AWS_ACCESS_KEY_ID"] = credentials[:access_key_id]
+      ENV["AWS_SECRET_ACCESS_KEY"] = credentials[:secret_access_key]
+      ENV["AWS_SESSION_TOKEN"] = credentials[:session_token]
+      say "AWS STS token created. It will expire at #{credentials[:expiration]}", :green
+    end
 
     ENV["DISTRICT_NAME"] = options[:district_name]
 
