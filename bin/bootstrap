@@ -34,6 +34,10 @@ class CLI < Thor
     desc: "Use the AWS credentials set in the executor's environment variables, instead of prompting the user for them."
   desc "execute", "Run Barcelona bootstrap"
 
+  def self.exit_on_failure?
+    true
+  end
+
   def execute
     ENV["RAILS_ENV"] = "bootstrap"
     require File.expand_path('../../config/application', __FILE__)
@@ -72,7 +76,9 @@ class CLI < Thor
 
       ENV["AWS_ACCESS_KEY_ID"] = ask("AWS Access Key ID:")
       ENV["AWS_SECRET_ACCESS_KEY"] = ask("AWS Secret Access Key:", echo: false)
-      ENV["AWS_SESSION_TOKEN"] = ask("AWS Secret Access Key:", echo: false, required: false)
+      say # `echo: false` also does not emit newline, emit it here...
+      ENV["AWS_SESSION_TOKEN"] = ask("AWS Session Token (not required):", echo: false, required: false)
+      say # see above
     else
       say "Using the AWS Credentials set in your environment variables.", :green
     end
