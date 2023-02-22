@@ -59,7 +59,7 @@ class AwsAccessor
         duration_seconds: 3600
       )
     else
-      Aws::Credentials.new(district.aws_access_key_id, district.aws_secret_access_key)
+      Aws::Credentials.new(district.aws_access_key_id, district.aws_secret_access_key, district.session_token)
     end
   end
 end

@@ -15,9 +15,10 @@ class DistrictsController < ApplicationController
     cparams = create_params
     access_key_id = cparams.delete(:aws_access_key_id)
     secret_access_key = cparams.delete(:aws_secret_access_key)
+    session_token = cparams.delete(:aws_session_token)
     @district = District.new(cparams)
 
-    ApplyDistrict.new(@district).create!(access_key_id, secret_access_key)
+    ApplyDistrict.new(@district).create!(access_key_id, secret_access_key, session_token)
 
     render json: @district, status: 201
   end
@@ -27,7 +28,8 @@ class DistrictsController < ApplicationController
     @district.attributes = uparams
     access_key_id = uparams.delete(:aws_access_key_id)
     secret_access_key = uparams.delete(:aws_secret_access_key)
-    ApplyDistrict.new(@district).update!(access_key_id, secret_access_key)
+    session_token = uparams.delete(:aws_session_token)
+    ApplyDistrict.new(@district).update!(access_key_id, secret_access_key, session_token)
 
     render json: @district
   end
@@ -68,7 +70,8 @@ class DistrictsController < ApplicationController
       :cluster_size,
       :cluster_instance_type,
       :aws_access_key_id,
-      :aws_secret_access_key
+      :aws_secret_access_key,
+      :aws_session_token
     ).tap do |whitelisted|
       whitelisted[:dockercfg] = params[:dockercfg].permit! if params[:dockercfg].present?
     end

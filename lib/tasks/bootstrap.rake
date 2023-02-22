@@ -95,6 +95,7 @@ namespace :bcn do
   task :bootstrap => ["db:setup", :environment] do
     access_key_id = ENV["AWS_ACCESS_KEY_ID"]
     secret_key    = ENV["AWS_SECRET_ACCESS_KEY"]
+    session_token = ENV["AWS_SESSION_TOKEN"]
     region        = ENV["AWS_REGION"]
     gh_org        = ENV["GITHUB_ORGANIZATION"]
     acm_cert_arn  = ENV["ACM_CERT_ARN"]
@@ -106,7 +107,7 @@ namespace :bcn do
     district = District.find_or_initialize_by(name: district_name)
     if district.id.nil?
       district.region = region
-      ApplyDistrict.new(district).create!(access_key_id, secret_key)
+      ApplyDistrict.new(district).create!(access_key_id, secret_key, session_token)
 
       print "Creating Network Stack"
       wait_cf_stack(district.stack_executor)
@@ -146,6 +147,7 @@ namespace :bcn do
     heritage.env_vars.build(key: "AWS_REGION", value: region, secret: false)
     heritage.env_vars.build(key: "AWS_ACCESS_KEY_ID", value: access_key_id, secret: false)
     heritage.env_vars.build(key: "AWS_SECRET_ACCESS_KEY", value: secret_key, secret: true)
+    heritage.env_vars.build(key: "AWS_SESSION_TOKEN", value: session_token, secret: true)
     heritage.env_vars.build(key: "RAILS_ENV", value: "production", secret: false)
     heritage.env_vars.build(key: "RAILS_LOG_TO_STDOUT", value: "true", secret: false)
     heritage.env_vars.build(key: "DISTRICT_NAME", value: district_name, secret: false)
@@ -217,6 +219,7 @@ namespace :bcn do
         cidr_block: ENV["CIDR_BLOCK"],
         aws_access_key_id: ENV["AWS_ACCESS_KEY_ID"],
         aws_secret_access_key: ENV["AWS_SECRET_ACCESS_KEY"],
+        aws_session_token: ENV["AWS_SESSION_TOKEN"],
         ssh_ca_public_key: ENV["SSH_CA_PUBLIC_KEY"]
       )
 

@@ -6,14 +6,15 @@ class ApplyDistrict
     @district = district
   end
 
-  def create!(access_key_id, secret_access_key)
+  def create!(access_key_id, secret_access_key, session_token)
     # Set access_key_id and secret_access_key temporarily to pass validation
     # These will be erased in set_district_aws_credentials if Barcelona is
     # running as a ECS service
     district.aws_access_key_id = access_key_id
     district.aws_secret_access_key = secret_access_key
+    district.aws_session_token = session_token
     if district.valid?
-      set_district_aws_credentials(access_key_id, secret_access_key)
+      set_district_aws_credentials(access_key_id, secret_access_key, session_token)
 
       create_s3_bucket
       generate_ssh_ca_key_pair
@@ -24,9 +25,9 @@ class ApplyDistrict
     district.stack_executor.create
   end
 
-  def update!(access_key_id = nil, secret_access_key = nil)
+  def update!(access_key_id = nil, secret_access_key = nil, session_token = nil)
     if district.valid?
-      set_district_aws_credentials(access_key_id, secret_access_key)
+      set_district_aws_credentials(access_key_id, secret_access_key, session_token)
     end
     district.save!
   end
@@ -50,16 +51,18 @@ class ApplyDistrict
     district.ssh_ca_public_key = key_pair.public_key.to_pem
   end
 
-  def set_district_aws_credentials(access_key_id, secret_access_key)
+  def set_district_aws_credentials(access_key_id, secret_access_key, session_token)
     return if access_key_id.nil? || secret_access_key.nil?
 
     if running_as_ecs_task?
-      district.aws_role = create_district_role(access_key_id, secret_access_key)
+      district.aws_role = create_district_role(access_key_id, secret_access_key, session_token)
       district.aws_access_key_id = nil
       district.aws_secret_access_key = nil
+      district.aws_session_token = nil
     else
       district.aws_access_key_id = access_key_id
       district.aws_secret_access_key = secret_access_key
+      district.aws_session_token = session_token
     end
   end
 
@@ -100,11 +103,11 @@ class ApplyDistrict
     aws.ecs.create_cluster(cluster_name: district.name)
   end
 
-  def create_district_role(access_key_id, secret_access_key)
+  def create_district_role(access_key_id, secret_access_key, session_token)
     task_role_arn = ecs_task_credentials&.dig("RoleArn")
     raise "Role ARN doesn't exist" if task_role_arn.nil?
 
-    iam = new_iam_client(access_key_id, secret_access_key)
+    iam = new_iam_client(access_key_id, secret_access_key, session_token)
 
     # This identity solves an issue where there are multiple barcelonas
     # and each barcelona has the same district name (e.g. default)
@@ -134,10 +137,10 @@ class ApplyDistrict
                               end
   end
 
-  def new_iam_client(access_key_id, secret_access_key)
+  def new_iam_client(access_key_id, secret_access_key. session_token)
     credentials = {
       region: district.region,
-      credentials: Aws::Credentials.new(access_key_id, secret_access_key)
+      credentials: Aws::Credentials.new(access_key_id, secret_access_key, session_token)
     }
     Aws::IAM::Client.new(credentials)
   end
