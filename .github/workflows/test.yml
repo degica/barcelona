@@ -3,15 +3,15 @@ name: test
 jobs:
   test:
     container:
-      image: ruby:2.6.5
+      image: ruby:2.7.7
       env:
         DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres
         ENCRYPTION_KEY: abcdefghijklmn
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-22.04
     steps:
     - name: workaround
       run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: before_install
       run: bundle install
     - name: script

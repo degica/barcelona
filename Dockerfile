@@ -1,4 +1,4 @@
-FROM degica/rails-buildpack:2.6 AS builder
+FROM public.ecr.aws/degica/rails-buildpack:2.7.7 as builder
 
 ENV APP_HOME=/app
 WORKDIR $APP_HOME
@@ -6,7 +6,8 @@ WORKDIR $APP_HOME
 COPY Gemfile $APP_HOME/
 COPY Gemfile.lock $APP_HOME/
 
-RUN bundle install -j=4 --without development test
+RUN bundle config set without 'development test'
+RUN bundle install -j=32
 
 FROM --platform=linux/amd64 ruby:2.6.5-slim-buster
 
