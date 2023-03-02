@@ -9,7 +9,7 @@ COPY Gemfile.lock $APP_HOME/
 RUN bundle config set without 'development test'
 RUN bundle install -j=32
 
-FROM --platform=linux/amd64 ruby:2.6.5-slim-buster
+FROM --platform=linux/amd64 ruby:2.7.7
 
 ENV APP_HOME=/app
 ENV PATH=$APP_HOME/bin:$PATH
