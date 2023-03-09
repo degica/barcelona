@@ -20,7 +20,8 @@ regions=%w(
 )
 def show_image_id_for_amazon_linux2(regions)
   path = '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
-  STDERR.puts "getting image id of #{path}..."
+  image_info=`aws ssm get-parameters --names #{path} --region us-east-1 --output json --query 'Parameters[0]' | jq -r '"Version: " + (.Version|tostring) + ", LastModifiedDate: " +  .LastModifiedDate'`.chomp
+  STDERR.puts "getting image id of #{path} ( latest info is #{image_info} )... Use these for bastion_builder.rb"
 
   regions.each do |region|
     image_id=`aws ssm get-parameters --names #{path} --region #{region} --query 'Parameters[0].Value' --output text`.chomp
@@ -30,8 +31,8 @@ end
 
 def show_image_id_for_ecs_optimized(regions)
   path = '/aws/service/ecs/optimized-ami/amazon-linux-2/recommended'
-  image_name=`aws ssm get-parameters --names #{path} --region us-east-1 --query 'Parameters[0].Value' --output text | jq -r '.image_name'`
-  STDERR.puts "getting image id of #{path} ( latest version is #{image_name} )..."
+  image_info=`aws ssm get-parameters --names #{path} --region us-east-1 --output json --query 'Parameters[0]' | jq -r '"Version: " + (.Version|tostring) + ", LastModifiedDate: " +  .LastModifiedDate + ", image_name: " + (.Value | fromjson.image_name)'`.chomp
+  STDERR.puts "getting image id of #{path} ( latest info is #{image_info} )... Use these for autoscaling_builder.rb"
 
   regions.each do |region|
     image_id=`aws ssm get-parameters --names #{path} --region #{region} --query 'Parameters[0].Value' --output text | jq -r '.image_id'`.chomp

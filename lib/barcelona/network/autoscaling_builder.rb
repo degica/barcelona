@@ -3,22 +3,23 @@ module Barcelona
     class AutoscalingBuilder < CloudFormation::Builder
       # http://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html
       # amzn2-ami-ecs-hvm-2.0
+      # latest info is Version: 107, LastModifiedDate: 2023-03-09T05:45:52.704000+09:00, image_name: amzn2-ami-ecs-hvm-2.0.20230301-x86_64-ebs
       ECS_OPTIMIZED_AMI_IDS = {
-        "us-east-1"      => "ami-0ac7415dd546fb485",
-        "us-east-2"      => "ami-0762583c8189d4204",
-        "us-west-1"      => "ami-0a46e50ca5d942c61",
-        "us-west-2"      => "ami-0ae546d2dd33d2039",
-        "eu-west-1"      => "ami-06c1d5fe67809f5dd",
-        "eu-west-2"      => "ami-07e394e4df20de8d2",
-        "eu-west-3"      => "ami-0151da05859253073",
-        "eu-central-1"      => "ami-06525d74e250ee032",
-        "ap-northeast-1"      => "ami-02378d43835d39ff4",
-        "ap-northeast-2"      => "ami-06509d7f0f8f8931f",
-        "ap-southeast-1"      => "ami-009122d67aa62493d",
-        "ap-southeast-2"      => "ami-0dd1294c5a7395c06",
-        "ca-central-1"      => "ami-079445a18d11ec016",
-        "ap-south-1"      => "ami-030493a647e0ba449",
-        "sa-east-1"      => "ami-03cae68c49eefd3ed",
+        "us-east-1"      => "ami-0345b85b1018c3e68",
+        "us-east-2"      => "ami-03dc89379f8a305fc",
+        "us-west-1"      => "ami-017f8b160fd639206",
+        "us-west-2"      => "ami-05f991e317f30f87a",
+        "eu-west-1"      => "ami-013192ba56160898d",
+        "eu-west-2"      => "ami-07250c1adbe786654",
+        "eu-west-3"      => "ami-0e600d12462af50d8",
+        "eu-central-1"      => "ami-089a2199aac0b0147",
+        "ap-northeast-1"      => "ami-01703abf1e5cede54",
+        "ap-northeast-2"      => "ami-0e96230fc6327a5ec",
+        "ap-southeast-1"      => "ami-0809e9bb32d947d14",
+        "ap-southeast-2"      => "ami-03c459b1b4740a344",
+        "ca-central-1"      => "ami-08cc570994a129e6d",
+        "ap-south-1"      => "ami-0d16d497d6d61b8a0",
+        "sa-east-1"      => "ami-091427ee6712d1fd3",
       }
 
       def ebs_optimized_by_default?
