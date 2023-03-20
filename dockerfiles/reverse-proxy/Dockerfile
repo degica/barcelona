@@ -11,3 +11,4 @@ COPY render_template.rb /render_template.rb
 COPY entrypoint /entrypoint
 
 ENTRYPOINT ["/entrypoint"]
+STOPSIGNAL SIGQUIT
