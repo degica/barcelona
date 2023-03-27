@@ -38,11 +38,12 @@ jobs:
     - name: build_and_push
       run: |-
         if [[ ${GITHUB_REF##*/} == 'master' ]]; then
-            IMAGE_TAG=$GITHUB_SHA # git SHA for staging/production deployments
+            IMAGE_TAG="latest" # update the latest image when master is merged
         else
             IMAGE_TAG=${GITHUB_REF##*/} # branch name for dev usecases
         fi
 
+        cd dockerfiles/reverse-proxy
         aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/degica
 
         docker build . -t $DOCKER_REPOSITORY:$IMAGE_TAG --build-arg git_revision=$IMAGE_TAG --pull
