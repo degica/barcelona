@@ -6,11 +6,10 @@ ENV PATH=$GOBIN:$PATH
 
 ADD . /.go/src/app
 
-RUN apk add --no-cache go curl git gcc libc-dev \
+RUN apk add --no-cache go curl git gcc libc-dev glide \
   && cd $GOPATH/src/app \
   && mkdir -p $GOBIN \
   && mkdir /barcelona \
-  && curl https://glide.sh/get | sh \
   && glide install \
   && go build -o /barcelona/barcelona-run --ldflags '-linkmode external -extldflags "-static"' \
   && rm -rf /.go \
