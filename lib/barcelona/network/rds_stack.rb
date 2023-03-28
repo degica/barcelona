@@ -16,7 +16,7 @@ module Barcelona::Network
           ref("DBSecurityGroup")
         ]
         j.DBSubnetGroupName ref("DBSubnetGroup")
-        j.StorageType "gp2"
+        j.StorageType "gp3"
       end
 
       add_resource("AWS::EC2::SecurityGroup", "DBSecurityGroup") do |j|

@@ -19,6 +19,7 @@ regions=%w(
   sa-east-1
 )
 def show_image_id_for_amazon_linux2(regions)
+  # can use gp2 for gp3 block stores
   path = '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
   STDERR.puts "getting image id of #{path}..."
 

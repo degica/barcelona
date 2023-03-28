@@ -26,6 +26,10 @@ module Barcelona
         !!(instance_type =~ /\A(a1|c4|c5.?|d2|f1|g3.?|h1|i3|m4|m5.?|p2|p3(dn)?|r4|r5.?|t3|u-.*|x1.?|z1d)\..*\z/)
       end
 
+      def instance_store_present?
+        !!(instance_type =~ /\A(m6.d)\..+\z/)
+      end
+
       def build_resources
         add_resource("AWS::AutoScaling::LaunchConfiguration",
                      "ContainerInstanceLaunchConfiguration") do |j|
@@ -38,6 +42,7 @@ module Barcelona
           j.MetadataOptions do |m|
             m.HttpTokens 'required'
           end
+
           j.BlockDeviceMappings [
             # Root volume
             # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/al2ami-storage-config.html
@@ -45,8 +50,10 @@ module Barcelona
               "DeviceName" => "/dev/xvda",
               "Ebs" => {
                 "DeleteOnTermination" => true,
-                "VolumeSize" => 100,
-                "VolumeType" => "gp2"
+                               "Iops" => 3000,
+                         "Throughput" => 125,
+                         "VolumeSize" => 100,
+                         "VolumeType" => "gp3"
               }
             }
           ]

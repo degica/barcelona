@@ -212,8 +212,10 @@ module Barcelona
               "DeviceName" => "/dev/xvda",
               "Ebs" => {
                 "DeleteOnTermination" => true,
-                "VolumeSize" => 8,
-                "VolumeType" => "gp2"
+                               "Iops" => 3000,
+                         "Throughput" => 125,
+                         "VolumeSize" => 100,
+                         "VolumeType" => "gp3"
               }
             },
           ]
