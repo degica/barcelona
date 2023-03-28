@@ -3,9 +3,17 @@ import json
 import os
 import time
 import random
+from botocore.config import Config
 
 session = boto3.session.Session()
-ecs = session.client(service_name='ecs')
+config = Config(
+    retries = {
+        'max_attempts': 4,
+        'mode': 'standard'
+    }
+)
+
+ecs = session.client(service_name='ecs', config=config)
 
 clusterName = os.environ["CLUSTER_NAME"]
 
@@ -43,10 +51,10 @@ def lambda_handler(event, context):
         tasks = ecs.list_tasks(cluster=clusterName, containerInstance=ciId)['taskArns']
         if len(tasks) > 0:
             time.sleep(5)
-            session.client('sns').publish(TopicArn=topicArn, Message=json.dumps(msg), Subject='Invoking lambda again')
+            session.client('sns', config=config).publish(TopicArn=topicArn, Message=json.dumps(msg), Subject='Invoking lambda again')
         else:
-            session.client('autoscaling').complete_lifecycle_action(LifecycleHookName=lifecycleHookName, AutoScalingGroupName=asgName, LifecycleActionResult='CONTINUE', InstanceId=ec2Id)
-    except ThrottlingException:
+            session.client('autoscaling', config=config).complete_lifecycle_action(LifecycleHookName=lifecycleHookName, AutoScalingGroupName=asgName, LifecycleActionResult='CONTINUE', InstanceId=ec2Id)
+    except ecs.exceptions.ThrottlingException:
         sec = random.uniform(3, 5)
         time.sleep(sec)
         session.client('sns').publish(TopicArn=topicArn, Message=json.dumps(msg), Subject='Invoking lambda again')
