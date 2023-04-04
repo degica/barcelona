@@ -3,23 +3,23 @@ module Barcelona
     class AutoscalingBuilder < CloudFormation::Builder
       # http://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html
       # amzn2-ami-ecs-hvm-2.0
-      # latest info is Version: 107, LastModifiedDate: 2023-03-09T05:45:52.704000+09:00, image_name: amzn2-ami-ecs-hvm-2.0.20230301-x86_64-ebs
+      # latest info is Version: 109, LastModifiedDate: 2023-03-29T00:30:12.103000+09:00, image_name: amzn2-ami-ecs-hvm-2.0.20230321-x86_64-ebs
       ECS_OPTIMIZED_AMI_IDS = {
-        "us-east-1"      => "ami-0345b85b1018c3e68",
-        "us-east-2"      => "ami-03dc89379f8a305fc",
-        "us-west-1"      => "ami-017f8b160fd639206",
-        "us-west-2"      => "ami-05f991e317f30f87a",
-        "eu-west-1"      => "ami-013192ba56160898d",
-        "eu-west-2"      => "ami-07250c1adbe786654",
-        "eu-west-3"      => "ami-0e600d12462af50d8",
-        "eu-central-1"      => "ami-089a2199aac0b0147",
-        "ap-northeast-1"      => "ami-01703abf1e5cede54",
-        "ap-northeast-2"      => "ami-0e96230fc6327a5ec",
-        "ap-southeast-1"      => "ami-0809e9bb32d947d14",
-        "ap-southeast-2"      => "ami-03c459b1b4740a344",
-        "ca-central-1"      => "ami-08cc570994a129e6d",
-        "ap-south-1"      => "ami-0d16d497d6d61b8a0",
-        "sa-east-1"      => "ami-091427ee6712d1fd3",
+        "us-east-1"      => "ami-0c76be34ffbfb0b14",
+        "us-east-2"      => "ami-076214eda80ae72ef",
+        "us-west-1"      => "ami-0d54a8e02fa6fbeec",
+        "us-west-2"      => "ami-0c6ee50d15e7364d4",
+        "eu-west-1"      => "ami-0ef8272297113026d",
+        "eu-west-2"      => "ami-08ca13e7fb2ec74db",
+        "eu-west-3"      => "ami-0361c8c21e6630839",
+        "eu-central-1"      => "ami-0161e00a80b3f7535",
+        "ap-northeast-1"      => "ami-02a0270a232f442b0",
+        "ap-northeast-2"      => "ami-06e1828e3449a66a5",
+        "ap-southeast-1"      => "ami-000e3c1953aef9f7d",
+        "ap-southeast-2"      => "ami-01d8443c7f6628efe",
+        "ca-central-1"      => "ami-0220149e79e484f34",
+        "ap-south-1"      => "ami-0352888a5fa748216",
+        "sa-east-1"      => "ami-0cd73f4ec7e0d4559",
       }
 
       def ebs_optimized_by_default?
