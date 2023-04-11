@@ -1,4 +1,4 @@
-version: '3.1'
+version: '3.5'
 services:
   web: &app_base
     depends_on:
@@ -6,10 +6,7 @@ services:
       - vault
     build:
       context: .
-      dockerfile: Dockerfile.development
-      args:
-        - DOCKER_UID=${DOCKER_UID-1000}
-        - APP_HOME=${PWD}
+      dockerfile: Dockerfile
     ports:
      - "3333:3333"
     command: rails s -b 0.0.0.0
@@ -20,17 +17,25 @@ services:
      - vault
     volumes:
       - bundle:/usr/local/bundle
-      - .:/app
+      # - .:/app
     environment: &env_base
       PORT: 3333
       DATABASE_URL: postgres://postgres:@db:5432
       ENCRYPTION_KEY: abcdefghijklmn
       GITHUB_ORGANIZATION: 'degica'
-      GITHUB_DEVELOPER_TEAM: 'developers'
-      GITHUB_ADMIN_TEAM: 'Admin developers'
+      GITHUB_DEVELOPER_TEAM: ''
+      GITHUB_ADMIN_TEAM: 'developers'
+      RAILS_ENV: development
       # Uncomment to use vault auth
       # VAULT_URL: http://vault:8200
       # VAULT_PATH_PREFIX: degica
+  test:
+    <<: *app_base
+    build:
+      context: .
+      dockerfile: Dockerfile.development
+    ports: []
+    command: sleep infinity
   worker:
     <<: *app_base
     ports: []
@@ -55,3 +60,6 @@ services:
 volumes:
   pgdata:
   bundle:
+networks:
+  default:
+    name: barcelona

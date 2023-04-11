@@ -1,13 +1,14 @@
 DOCKER_DEFAULT_PLATFORM=linux/amd64
-DOCKER_UID=$(shell id -u $(USER))
-
 init:
 	git submodule update --init
 build: init
-	DOCKER_DEFAULT_PLATFORM=linux/amd64 DOCKER_UID=$(DOCKER_UID) docker-compose build
-setup: init
-	DOCKER_DEFAULT_PLATFORM=linux/amd64 docker-compose run --rm web bin/setup
+	docker-compose build
+setup: build
+	docker-compose run --rm web bash -c 'export MAKE="make -j `nproc`" && bundle install -j `nproc`'
+	docker-compose run --rm web bundle exec bin/setup
+	docker-compose stop
+	docker-compose down
 up: init
-	DOCKER_DEFAULT_PLATFORM=linux/amd64 docker-compose up -d
+	docker-compose up -d
 restart:
 	docker-compose restart web worker
