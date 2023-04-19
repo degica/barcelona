@@ -69,6 +69,7 @@ def default_log_format
     '"$request" $status $body_bytes_sent '
     '"$http_referer" "$http_user_agent"'
     'rt=$request_time uct="$upstream_connect_time" uht="$upstream_header_time" urt="$upstream_response_time"'
+    '"trace-id$http_x_amzn_trace_id"'
   LOG_FORMAT
 end
 
