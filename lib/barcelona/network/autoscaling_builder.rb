@@ -96,6 +96,7 @@ module Barcelona
                       "ecs:DescribeContainerInstances",
                       "ecs:UpdateContainerInstancesState",
                       "ecs:ListTasks",
+                      "ecs:DescribeTasks",
                       "logs:CreateLogGroup",
                       "logs:CreateLogStream",
                       "logs:PutLogEvents",
