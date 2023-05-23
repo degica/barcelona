@@ -1,12 +1,15 @@
 # Getting Started
-## Bootstrap
+## Local Setup
 
 To start using Barcelona, you'll first need to deploy Barcelona API service.
-Install docker on your machine and run the bellow command.
+Install docker and make on your machine and run the bellow command.
 
 ```
-$ docker run --rm -it public.ecr.aws/degica/barcelona bin/bootstrap
+make setup
+make up
 ```
+
+These commands use docker-compose, you can manage the services with other docker-compose commands.
 
 ## Install Barcelona Client
 

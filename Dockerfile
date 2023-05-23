@@ -7,7 +7,7 @@ COPY Gemfile $APP_HOME/
 COPY Gemfile.lock $APP_HOME/
 
 RUN bundle config set without 'development test'
-RUN bundle install -j=32
+RUN MAKE="make -j $(nproc)" bundle install -j $(nproc)
 
 FROM --platform=linux/amd64 ruby:2.7.7
 
@@ -33,7 +33,7 @@ RUN apt-get update \
  && mkdir $APP_HOME/log \
  && chown -R app $APP_HOME
 
-COPY --from=builder /usr/local/bundle /usr/local/bundle
+COPY --from=builder --chown=app:app /usr/local/bundle /usr/local/bundle
 ADD --chown=app:app . $APP_HOME
 
 USER app

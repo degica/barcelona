@@ -10,7 +10,7 @@ class SignSSHKey
     @ca_key = ca_key
   end
 
-  def sign(identity: nil, force_command: nil, validity: "+10m", principals: %w[ec2-user hopper])
+  def sign(identity: nil, force_command: nil, no_touch_required:nil, validity: "+10m", principals: %w[ec2-user hopper])
     raise ArgumentError if user.public_key.blank? || ca_key.blank?
 
     identity ||= user.name
@@ -34,6 +34,7 @@ class SignSSHKey
       "-z", serial_number
     ]
     comm += ["-O", "force-command='#{force_command}'"] if force_command
+    comm += ["-O", "no-touch-required='#{no_touch_required}'"] if no_touch_required
     comm += [public_key_file.path]
 
     pid = spawn(comm.join(' '), err: '/dev/null', out: '/dev/null')
