@@ -38,7 +38,7 @@ describe District do
     it "assigns default users" do
       user1 = create :user
       user2 = create :user
-      district1 = District.create!(name: 'name')
+      district1 = District.create!(name: 'name', aws_role: 'rspec')
       district1.reload
       expect(district1.users).to include(user1)
       expect(district1.users).to include(user2)

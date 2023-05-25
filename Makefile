@@ -12,3 +12,8 @@ up: init
 	docker-compose up -d
 restart:
 	docker-compose restart web worker
+down:
+	docker-compose stop -t 0
+	docker-compose down
+test:
+	docker-compose run --rm test bundle exec rspec -f d

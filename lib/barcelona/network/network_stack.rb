@@ -28,7 +28,7 @@ module Barcelona::Network
 
     def build
       super do |builder|
-        builder.add_builder VPCBuilder.new(self, options)
+        builder.add_builder VpcBuilder.new(self, options)
         builder.add_builder PluginBuilder.new(self, options)
       end
     end

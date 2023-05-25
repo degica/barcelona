@@ -11,3 +11,5 @@ vendor/bundle
 .idea
 .secret
 .env
+.local
+.bash_history
