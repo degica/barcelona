@@ -16,4 +16,5 @@ down:
 	docker-compose stop -t 0
 	docker-compose down
 test:
-	docker-compose run --rm test bundle exec rspec -f d
+	docker-compose run --rm -e RAILS_ENV=test test bundle exec rake db:reset
+	docker-compose run --rm -e RAILS_ENV=test test bundle exec rspec -f d

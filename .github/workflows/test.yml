@@ -3,7 +3,7 @@ name: test
 jobs:
   test:
     container:
-      image: ruby:2.7.8
+      image: ruby:3.1.4
       env:
         DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres
         ENCRYPTION_KEY: abcdefghijklmn
@@ -19,7 +19,7 @@ jobs:
         set -e
         bundle exec rake db:create
         bundle exec rake db:setup
-        bundle exec rspec
+        bundle exec rspec -f d
     services:
       postgres:
         # Docker Hub image

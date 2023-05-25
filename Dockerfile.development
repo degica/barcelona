@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/ruby:2.7.8
+FROM public.ecr.aws/docker/library/ruby:3.1.4
 
 ENV APP_HOME=/app
 ENV PATH=$APP_HOME/bin:$PATH
@@ -22,10 +22,9 @@ RUN apt-get update \
  && mkdir $APP_HOME/log \
  && chown -R app $APP_HOME
 
-COPY Gemfile $APP_HOME/
-COPY Gemfile.lock $APP_HOME/
-
-RUN MAKE="make -j $(nproc)" bundle install -j $(nproc)
+# COPY Gemfile $APP_HOME/
+# COPY Gemfile.lock $APP_HOME/
+# RUN MAKE="make -j $(nproc)" bundle install -j $(nproc)
 
 RUN chown -R app:app /usr/local/bundle
 
