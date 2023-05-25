@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/ruby:2.7.8
+FROM public.ecr.aws/docker/library/ruby:3.2.2
 
 ENV APP_HOME=/app
 ENV PATH=$APP_HOME/bin:$PATH
@@ -24,7 +24,6 @@ RUN apt-get update \
 
 COPY Gemfile $APP_HOME/
 COPY Gemfile.lock $APP_HOME/
-
 RUN bundle config set without 'development test' && \
     MAKE="make -j $(nproc)" bundle install -j $(nproc)
 

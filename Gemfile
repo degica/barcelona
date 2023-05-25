@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-ruby '2.7.8'
+ruby '3.2.2'
 
 gem 'active_model_serializers'
 gem 'aws-sdk-autoscaling'
