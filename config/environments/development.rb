@@ -51,13 +51,4 @@ Rails.application.configure do
   # Use an evented file watcher to asynchronously detect changes in source code,
   # routes, locales, etc. This feature depends on the listen gem.
   # config.file_watcher = ActiveSupport::EventedFileUpdateChecker
-
-  # added test, local, docker and dev domains to config.hosts due to Rails 6's blocked host feature
-  config.hosts << "www.example.com"
-  config.hosts << "web"
-  config.hosts << /[a-z0-9-]+\.localhost\.labs\.degica\.com/
-  config.hosts << /\A.+\.githubpreview\.dev\z/
-  config.host_authorization = {
-    exclude: ->(request) { request.path == '/health_check' }
-  }
 end

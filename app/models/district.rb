@@ -177,7 +177,7 @@ class District < ActiveRecord::Base
   end
 
   def ca_sign_public_key(user, options = {})
-    SignSshKey.new(user, self, get_ca_key).sign(**options)
+    SignSSHKey.new(user, self, get_ca_key).sign(options)
   end
 
   def set_default_attributes

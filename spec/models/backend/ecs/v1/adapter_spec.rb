@@ -61,12 +61,12 @@ describe Backend::Ecs::V1::Adapter do
             HeritageTaskDefinition.service_definition(service)
           }
           expect(ecs_mock).to receive(:create_service).
-            with({
+            with(
               cluster: service.district.name,
               service_name: service.service_name,
               task_definition: service.service_name,
               desired_count: 1
-            }).
+            ).
             and_return(double(service: double(task_definition: 'arn/td-id',
                                               deployments: [double(id: 'aaaaaaa')])))
           expect{adapter.apply}.to_not raise_error
@@ -92,7 +92,7 @@ describe Backend::Ecs::V1::Adapter do
             HeritageTaskDefinition.service_definition(service)
           }
           expect(ecs_mock).to receive(:create_service).
-            with({
+            with(
               cluster: service.district.name,
               service_name: service.service_name,
               task_definition: service.service_name,
@@ -105,7 +105,7 @@ describe Backend::Ecs::V1::Adapter do
               ],
               role: service.district.ecs_service_role,
               desired_count: 1
-            }).
+            ).
             and_return(double(service: double(task_definition: 'arn/td-id',
                                               deployments: [double(id: 'aaaaaaa')])))
           expect(elb_mock).to receive(:create_load_balancer).
