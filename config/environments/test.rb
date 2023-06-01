@@ -45,5 +45,7 @@ Rails.application.configure do
   config.hosts << "web"
   config.hosts << /[a-z0-9-]+\.localhost\.labs\.degica\.com/
   config.hosts << /\A.+\.githubpreview\.dev\z/
-  
+  config.host_authorization = {
+    exclude: ->(request) { request.path == '/health_check' }
+  }
 end
