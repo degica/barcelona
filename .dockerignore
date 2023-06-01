@@ -1,4 +1,6 @@
 .git
+.local
+.bash_history
 log
 tmp
 vendor/bundle

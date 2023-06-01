@@ -18,7 +18,7 @@ module Barcelona
       "sa-east-1"      => "507241528517"
     }
 
-    class VPCBuilder < CloudFormation::Builder
+    class VpcBuilder < CloudFormation::Builder
       class UnsupportedNatType < StandardError; end
 
       def initialize(*args)

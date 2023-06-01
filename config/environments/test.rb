@@ -39,4 +39,13 @@ Rails.application.configure do
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
+
+  # added test, local, docker and dev domains to config.hosts due to Rails 6's blocked host feature
+  config.hosts << "www.example.com"
+  config.hosts << "web"
+  config.hosts << /[a-z0-9-]+\.localhost\.labs\.degica\.com/
+  config.hosts << /\A.+\.githubpreview\.dev\z/
+  config.host_authorization = {
+    exclude: ->(request) { request.path == '/health_check' }
+  }
 end
