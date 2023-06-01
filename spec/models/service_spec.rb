@@ -94,7 +94,7 @@ describe Service do
       ];
 
       ecs = double('ECS')
-      allow(ecs).to receive(:list_services).with({cluster: 'testdistrict'}) { result }
+      allow(ecs).to receive(:list_services).with(cluster: 'testdistrict') { result }
 
       allow(service).to receive(:district) { district }
       allow(service).to receive(:ecs) { ecs }

@@ -1,6 +1,6 @@
 require "rails_helper"
 
-describe Barcelona::Network::RdsStack do
+describe Barcelona::Network::RDSStack do
   let(:district) { create :district }
 
   it "generates RDS stack" do

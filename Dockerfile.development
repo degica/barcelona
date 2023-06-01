@@ -1,4 +1,15 @@
-FROM public.ecr.aws/docker/library/ruby:3.2.2
+FROM public.ecr.aws/degica/rails-buildpack:2.7.7 as builder
+
+ENV APP_HOME=/app
+WORKDIR $APP_HOME
+
+COPY Gemfile $APP_HOME/
+COPY Gemfile.lock $APP_HOME/
+
+RUN bundle config set without 'development test' && \
+    MAKE="make -j $(nproc)" bundle install -j $(nproc)
+
+FROM --platform=linux/amd64 ruby:2.7.7
 
 ENV APP_HOME=/app
 ENV PATH=$APP_HOME/bin:$PATH
@@ -22,11 +33,8 @@ RUN apt-get update \
  && mkdir $APP_HOME/log \
  && chown -R app $APP_HOME
 
-COPY Gemfile $APP_HOME/
-COPY Gemfile.lock $APP_HOME/
-RUN MAKE="make -j $(nproc)" bundle install -j $(nproc)
-
-RUN chown -R app:app /usr/local/bundle
+COPY --from=builder --chown=app:app /usr/local/bundle /usr/local/bundle
+ADD --chown=app:app . $APP_HOME
 
 USER app
 

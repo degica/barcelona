@@ -6,12 +6,6 @@ abort("The Rails environment is running in production mode!") if Rails.env.produ
 require 'spec_helper'
 require 'rspec/rails'
 # Add additional requires below this line. Rails is not loaded until this point!
-
-require 'factory_bot'
-require 'rspec/its'
-require 'rspec/collection_matchers'
-require 'stub_env'
-require 'shoulda-matchers'
 require 'webmock/rspec'
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
@@ -38,7 +32,6 @@ RSpec.configure do |config|
   # examples within a transaction, remove the following line or assign false
   # instead of true.
   config.use_transactional_fixtures = true
-  FactoryBot.reload
   config.include FactoryBot::Syntax::Methods
   config.include StubEnv::Helpers
   config.include ActiveSupport::Testing::TimeHelpers
