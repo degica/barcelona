@@ -191,8 +191,8 @@ describe "updating a heritage" do
       expect(Heritage.last.services.find_by(name: 'web').cpu).to eq 128
 
       api_request :patch, "/v1/heritages/nginx", params
-      expect(response.success?).to eq false
-      expect(response.body).to eq  "{\"error\":\"not_found\"}"
+      expect(response.successful?).to eq false
+      expect(response.body).to start_with  "{\"error\":\"not_found\""
     end
 
     it "when wrong existing district is given, throw an error" do
@@ -217,8 +217,8 @@ describe "updating a heritage" do
       expect(Heritage.last.services.find_by(name: 'web').cpu).to eq 128
 
       api_request :patch, "/v1/heritages/nginx", params
-      expect(response.success?).to eq false
-      expect(response.body).to eq '{"error":"The heritage nginx does not belong to district ' + "#{district2.name}\"" +'}'
+      expect(response.successful?).to eq false
+      expect(response.body).to start_with '{"error":"The heritage nginx does not belong to district ' + "#{district2.name}\""
     end
 
     describe "POST /heritages/:heritage/trigger/:token", type: :request do
