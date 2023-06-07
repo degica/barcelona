@@ -1,4 +1,4 @@
-version: '3.5'
+version: '3.8'
 services:
   web: &app_base
     depends_on:
@@ -17,8 +17,11 @@ services:
      - vault
     volumes:
       - bundle:/usr/local/bundle
-      # - .:/app
+      - .:/app
+    tmpfs:
+      - /tmp/pids/
     environment: &env_base
+      PIDFILE: /tmp/pids/server.pid
       PORT: 3333
       DATABASE_URL: postgres://postgres:@db:5432
       ENCRYPTION_KEY: abcdefghijklmn
@@ -29,6 +32,13 @@ services:
       # Uncomment to use vault auth
       # VAULT_URL: http://vault:8200
       # VAULT_PATH_PREFIX: degica
+  worker:
+    <<: *app_base
+    ports: []
+    command: rake jobs:work
+    volumes:
+      - bundle:/usr/local/bundle
+      - .:/app
   test:
     <<: *app_base
     build:
@@ -36,10 +46,9 @@ services:
       dockerfile: Dockerfile.development
     ports: []
     command: sleep infinity
-  worker:
-    <<: *app_base
-    ports: []
-    command: rake jobs:work
+    volumes:
+      - bundle:/usr/local/bundle
+      - .:/app
   db:
     image: postgres:11
     environment:

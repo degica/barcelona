@@ -6,8 +6,7 @@ WORKDIR $APP_HOME
 COPY Gemfile $APP_HOME/
 COPY Gemfile.lock $APP_HOME/
 
-RUN bundle config set without 'development test' && \
-    MAKE="make -j $(nproc)" bundle install -j $(nproc)
+RUN MAKE="make -j $(nproc)" bundle install -j $(nproc)
 
 FROM --platform=linux/amd64 ruby:2.7.7
 
