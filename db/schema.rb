@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_12_08_045503) do
+ActiveRecord::Schema.define(version: 2023_06_07_074213) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -105,6 +105,7 @@ ActiveRecord::Schema.define(version: 2022_12_08_045503) do
     t.integer "rule_priority"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "health_check_port"
     t.index ["endpoint_id", "service_id"], name: "index_listeners_on_endpoint_id_and_service_id", unique: true
     t.index ["endpoint_id"], name: "index_listeners_on_endpoint_id"
     t.index ["service_id"], name: "index_listeners_on_service_id"

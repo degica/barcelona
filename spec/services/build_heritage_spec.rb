@@ -37,7 +37,35 @@ describe BuildHeritage do
         {
           name: "worker",
           command: "rake jobs:work"
-        }
+        },
+        {
+          name: "web2",
+          cpu: 128,
+          memory: 128,
+          command: "rails s",
+          public: true,
+          port_mappings: [
+            {
+              lb_port: 80,
+              container_port: 3000
+            }
+          ],
+          listeners: [
+            {
+              endpoint: endpoint.name,
+              health_check_interval: 5,
+              health_check_path: "/health_check",
+              health_check_port: 5555,
+              rule_priority: 99,
+              rule_conditions: [
+                {
+                  type: 'path_pattern',
+                  value: '/app*'
+                }
+              ]
+            }
+          ]
+        },
       ]
     }
   end
@@ -58,9 +86,10 @@ describe BuildHeritage do
       heritage.save!
     end
 
-    it "has 2 services" do
-      expect(heritage.services.count).to eq 2
+    it "has 3 services" do
+      expect(heritage.services.count).to eq 3
 
+      puts heritage.services.inspect
       service1 = heritage.services.first
       expect(service1.id).to be_present
       expect(service1.name).to eq "web"
@@ -74,6 +103,7 @@ describe BuildHeritage do
       expect(service1.listeners.count).to eq 1
       expect(service1.listeners.first.health_check_interval).to eq 5
       expect(service1.listeners.first.health_check_path).to eq "/health_check"
+      expect(service1.listeners.first.health_check_port).to eq "traffic-port"
       expect(service1.listeners.first.rule_priority).to eq 99
       expect(service1.listeners.first.rule_conditions).to eq [{"type" => 'path_pattern',
                                                                "value" => '/app*'}]
@@ -85,6 +115,9 @@ describe BuildHeritage do
       expect(service2.memory).to eq 512
       expect(service2.command).to eq "rake jobs:work"
       expect(service2.port_mappings.count).to eq 0
+
+      service3 = heritage.services.third
+      expect(service3.listeners.first.health_check_port).to eq "5555"
     end
   end
 
@@ -104,7 +137,7 @@ describe BuildHeritage do
       end
 
       it "updates the heritage and associated records" do
-        expect(@updated_heritage.services.count).to eq 2
+        expect(@updated_heritage.services.count).to eq 3
         expect(@updated_heritage.image_tag).to eq "branch"
 
         service1 = @updated_heritage.services.first
@@ -143,7 +176,7 @@ describe BuildHeritage do
       end
 
       it "updates the heritage and associated records" do
-        expect(@updated_heritage.services.count).to eq 2
+        expect(@updated_heritage.services.count).to eq 3
         expect(@updated_heritage.image_tag).to eq "branch"
 
         service1 = @updated_heritage.services.first
@@ -175,7 +208,7 @@ describe BuildHeritage do
       end
 
       it "deletes a service that is not specified in params" do
-        expect(@updated_heritage.services.count).to eq 1
+        expect(@updated_heritage.services.count).to eq 2
 
         service1 = @updated_heritage.services.first
         expect(service1.id).to be_present
@@ -202,7 +235,7 @@ describe BuildHeritage do
       end
 
       it "adds a service" do
-        expect(@updated_heritage.services.count).to eq 3
+        expect(@updated_heritage.services.count).to eq 4
 
         webservice = @updated_heritage.services.find_by(name: 'web')
         expect(webservice.id).to be_present
@@ -220,9 +253,9 @@ describe BuildHeritage do
         expect(workerservice.command).to eq "rake jobs:work"
         expect(workerservice.port_mappings.count).to eq 0
 
-        service3 = @updated_heritage.services.third
-        expect(service3.name).to eq "another-service"
-        expect(service3.command).to eq "command"
+        service4 = @updated_heritage.services.fourth
+        expect(service4.name).to eq "another-service"
+        expect(service4.command).to eq "command"
       end
     end
 

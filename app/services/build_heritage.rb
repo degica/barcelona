@@ -30,6 +30,7 @@ class BuildHeritage
             endpoint_id: listener_map[listener[:endpoint]],
             health_check_interval: listener[:health_check_interval],
             health_check_path: listener[:health_check_path],
+            health_check_port: listener[:health_check_port],
             rule_priority: listener[:rule_priority],
             rule_conditions: listener[:rule_conditions]
           }

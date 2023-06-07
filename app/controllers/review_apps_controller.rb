@@ -69,6 +69,7 @@ class ReviewAppsController < ApplicationController
                         :endpoint,
                         :health_check_interval,
                         :health_check_path,
+                        :health_check_port,
                         :rule_priority,
                         rule_conditions: [
                           :type,
