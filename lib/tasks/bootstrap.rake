@@ -114,7 +114,7 @@ namespace :bcn do
 
     # Create RDS
     if ENV["BOOTSTRAP_DATABASE_URL"].nil?
-      stack = Barcelona::Network::RDSStack.new("barcelona-db", district,
+      stack = Barcelona::Network::RdsStack.new("barcelona-db", district,
                                                engine: :postgresql,
                                                db_user: 'barcelona',
                                                db_name: "barcelona")

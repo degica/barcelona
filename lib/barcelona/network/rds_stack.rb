@@ -39,7 +39,7 @@ module Barcelona::Network
     end
   end
 
-  class RDSStack < CloudFormation::Stack
+  class RdsStack < CloudFormation::Stack
     attr_accessor :district, :db_user, :db_name, :engine
 
     def initialize(name, district,

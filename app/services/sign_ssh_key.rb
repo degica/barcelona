@@ -1,7 +1,7 @@
 require 'tempfile'
 require 'timeout'
 
-class SignSSHKey
+class SignSshKey
   attr_accessor :user, :district, :ca_key
 
   def initialize(user, district, ca_key)

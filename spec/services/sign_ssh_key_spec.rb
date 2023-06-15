@@ -1,6 +1,6 @@
 require 'rails_helper'
 
-describe SignSSHKey, type: :model do
+describe SignSshKey, type: :model do
   let(:district) { build :district }
   subject { described_class.new(user, district, ca_key) }
 

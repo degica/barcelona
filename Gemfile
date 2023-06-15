@@ -1,5 +1,7 @@
 source 'https://rubygems.org'
 
+ruby '3.2.2'
+
 gem 'active_model_serializers'
 gem 'aws-sdk-autoscaling'
 gem 'aws-sdk-cloudformation'
@@ -23,22 +25,21 @@ gem 'octokit'
 gem 'pg'
 gem 'puma'
 gem 'pundit'
-gem 'rails', '~> 5.2.8.1'
+gem 'rails'
 gem 'sqlite3'
 gem 'thor', require: false
 gem 'vault'
-gem 'tzinfo', '~> 1.2.10'
+gem 'tzinfo'
+gem 'sass-rails'
 
 group :development, :test do
-  gem 'debase'
   gem 'pry-byebug'
   gem 'pry-rails'
-  gem 'ruby-debug-ide'
   gem 'solargraph'
 end
 
 group :development do
-  gem 'rubocop', '~> 0.86.0'
+  gem 'rubocop'
   gem 'spring'
   gem 'spring-commands-rspec'
 end
@@ -49,7 +50,7 @@ group :test do
   gem 'rspec-collection_matchers'
   gem 'rspec-its'
   gem 'rspec-rails'
-  gem 'shoulda-matchers', '~> 4.0'
+  gem 'shoulda-matchers'
   gem 'stub_env'
   gem 'webmock'
 end
