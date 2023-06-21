@@ -23,3 +23,5 @@ bundle-reset: down
 	docker volume rm -f barcelona_bundle
 	docker volume ls
 	docker-compose run --rm -e BUNDLE_IGNORE_CONFIG=true test bash -c 'export MAKE="make -j `nproc`" && bundle install -j `nproc`'
+test:
+	docker-compose run --rm -e RAILS_ENV=test test bundle exec rspec -f d

@@ -12,6 +12,19 @@ module Barcelona
 
       private
 
+      def on_heritage_task_definition(_heritage, task_definition)
+        # disable awslogs, but make sure logs do not fill up disk
+        task_definition.merge(
+          log_configuration: {
+            log_driver: "json-file",
+            options: {
+              "max-size" => "1m",
+              "tag" => "{{.FullID}}_#{task_definition[:name]}"
+            }
+          }
+        )
+      end
+
       def agent_command
         [
           "DD_AGENT_MAJOR_VERSION=7 DD_API_KEY=#{api_key} bash -c",
@@ -27,6 +40,7 @@ module Barcelona
       end
 
       def add_files!(user_data)
+        # this seems to be added to the bastion instance as well. "role:app" should probably be "role:bastion" to be accurate
         user_data.add_file("/etc/datadog-agent/datadog.yaml", "root:root", "000755", <<~DATADOG_YAML)
           api_key: #{api_key}
           logs_enabled: true
