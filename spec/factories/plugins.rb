@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory :plugin do
-    name { "logentries" }
-    plugin_attributes { { token: 'logentriestoken' } }
+    name { "datadog" }
+    plugin_attributes { { api_key: 'datadogapikey' } }
   end
 end

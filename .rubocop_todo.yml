@@ -284,7 +284,6 @@ Naming/HeredocDelimiterNaming:
     - 'bin/bootstrap'
     - 'lib/barcelona/network/bastion_builder.rb'
     - 'lib/barcelona/plugins/itamae_plugin.rb'
-    - 'lib/barcelona/plugins/logentries_plugin.rb'
     - 'lib/barcelona/plugins/newrelic_plugin.rb'
     - 'lib/barcelona/plugins/ossec_client_plugin.rb'
     - 'lib/barcelona/plugins/pcidss_plugin.rb'
@@ -319,7 +318,6 @@ Security/YAMLLoad:
   Exclude:
     - 'spec/lib/barcelona/plugins/datadog_plugin_spec.rb'
     - 'spec/lib/barcelona/plugins/itamae_plugin_spec.rb'
-    - 'spec/lib/barcelona/plugins/logentries_plugin_spec.rb'
     - 'spec/lib/barcelona/plugins/newrelic_plugin_spec.rb'
     - 'spec/lib/barcelona/plugins/ossec_client_plugin_spec.rb'
     - 'spec/lib/barcelona/plugins/pcidss_plugin_spec.rb'
@@ -416,7 +414,6 @@ Style/MutableConstant:
     - 'lib/barcelona/network/subnet_builder.rb'
     - 'lib/barcelona/network/vpc_builder.rb'
     - 'lib/barcelona/plugins/datadog_logs_plugin.rb'
-    - 'lib/barcelona/plugins/logentries_plugin.rb'
     - 'lib/barcelona/plugins/pcidss_plugin.rb'
 
 # Offense count: 1
