@@ -19,6 +19,7 @@ gem 'honeybadger', require: false
 gem 'jbuilder'
 gem 'lograge'
 gem 'net-ssh'
+gem 'newrelic_rpm'
 gem 'octokit'
 gem 'pg'
 gem 'puma'
