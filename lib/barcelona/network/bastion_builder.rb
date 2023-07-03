@@ -107,6 +107,20 @@ module Barcelona
           j.MetadataOptions do |m|
             m.HttpTokens 'required'
           end
+          j.BlockDeviceMappings [
+            # Root volume
+            # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/al2ami-storage-config.html
+            {
+              "DeviceName" => "/dev/xvda",
+              "Ebs" => {
+                "DeleteOnTermination" => true,
+                "Iops" => 3000,
+                "Throughput" => 125,
+                "VolumeSize" => 100,
+                "VolumeType" => "gp3"
+              }
+            }
+          ]
         end
 
         add_resource(BastionAutoScaling, "BastionAutoScaling",
