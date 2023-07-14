@@ -131,7 +131,7 @@ describe Barcelona::Network::NetworkStack do
         },
         "UpdatePolicy" => {
           "AutoScalingRollingUpdate" => {
-            "MaxBatchSize" => 1,
+            "MaxBatchSize" => 20,
             "MinInstancesInService" => 1
           }
         }

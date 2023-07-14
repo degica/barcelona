@@ -5,6 +5,9 @@ module Barcelona
         "AWS::AutoScaling::AutoScalingGroup"
       end
 
+      # Avoid API rate limiting for autoscaling updates
+      AUTOSCALING_MAX_BATCH_SIZE = 20
+
       def define_resource(json)
         super
         json.Properties do |j|
@@ -41,7 +44,7 @@ module Barcelona
 
         json.UpdatePolicy do |j|
           j.AutoScalingRollingUpdate do |j|
-            j.MaxBatchSize(desired_capacity > 0 ? desired_capacity : 1)
+            j.MaxBatchSize(desired_capacity > 0 ? AUTOSCALING_MAX_BATCH_SIZE : 1)
             j.MinInstancesInService desired_capacity
           end
         end
