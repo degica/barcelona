@@ -5,23 +5,23 @@ module Barcelona
       # amzn2-ami-ecs-hvm-2.0
       # You can see the latest version stored in public SSM parameter store
       # https://ap-northeast-1.console.aws.amazon.com/systems-manager/parameters/aws/service/ecs/optimized-ami/amazon-linux-2/recommended/image_id/description?region=ap-northeast-1
-      # latest info is Version: 115, LastModifiedDate: 2023-06-14T00:04:46.565000+09:00, image_name: amzn2-ami-ecs-hvm-2.0.20230606-x86_64-ebs
+      # latest info is Version: 118, LastModifiedDate: 2023-07-11T02:43:58.706000+09:00, image_name: amzn2-ami-ecs-hvm-2.0.20230705-x86_64-ebs
       ECS_OPTIMIZED_AMI_IDS = {
-        "us-east-1"      => "ami-0bf5ac026c9b5eb88",
-        "us-east-2"      => "ami-0840e4520d7b31497",
-        "us-west-1"      => "ami-0b442c02c1d3d2a18",
-        "us-west-2"      => "ami-0bde6c5470d17d540",
-        "eu-west-1"      => "ami-0637e5fd8f888abf4",
-        "eu-west-2"      => "ami-0206dc2da4b3b0a01",
-        "eu-west-3"      => "ami-0c2a9175f394c6105",
-        "eu-central-1"      => "ami-07480655a02fc53ae",
-        "ap-northeast-1"      => "ami-0f386dc4885ec169f",
-        "ap-northeast-2"      => "ami-0063312c13bc1e1ad",
-        "ap-southeast-1"      => "ami-0167d4afc8591fe51",
-        "ap-southeast-2"      => "ami-0c1b561b88a479085",
-        "ca-central-1"      => "ami-005cf0ce5ca6d42d4",
-        "ap-south-1"      => "ami-0c8892ce5874c1780",
-        "sa-east-1"      => "ami-066162c92c1822390",
+        "us-east-1"      => "ami-0507dff4275d8dd6d",
+        "us-east-2"      => "ami-0a2f86088203932e1",
+        "us-west-1"      => "ami-04a74838790dc77bf",
+        "us-west-2"      => "ami-07395cc0a598ee2eb",
+        "eu-west-1"      => "ami-023f1074e24ccf964",
+        "eu-west-2"      => "ami-079f34f67618526ea",
+        "eu-west-3"      => "ami-06ee90103b4c1602c",
+        "eu-central-1"      => "ami-0895a12593a7b3a0b",
+        "ap-northeast-1"      => "ami-0e432635473484865",
+        "ap-northeast-2"      => "ami-01bba9f96447a3f1e",
+        "ap-southeast-1"      => "ami-0d2ffabfbd38ccd28",
+        "ap-southeast-2"      => "ami-037bc2c139c7ae160",
+        "ca-central-1"      => "ami-0519bf5ddc298485d",
+        "ap-south-1"      => "ami-025fa2a3e27b6e58a",
+        "sa-east-1"      => "ami-0f544759009d3c50b",
       }
 
       def ebs_optimized_by_default?
