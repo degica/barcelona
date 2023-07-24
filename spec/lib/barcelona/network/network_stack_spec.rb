@@ -131,7 +131,7 @@ describe Barcelona::Network::NetworkStack do
         },
         "UpdatePolicy" => {
           "AutoScalingRollingUpdate" => {
-            "MaxBatchSize" => 1,
+            "MaxBatchSize" => 20,
             "MinInstancesInService" => 1
           }
         }
@@ -148,8 +148,14 @@ describe Barcelona::Network::NetworkStack do
           "EbsOptimized" => true,
           "BlockDeviceMappings" => [
             {
-              "DeviceName"=>"/dev/xvda",
-              "Ebs" => {"DeleteOnTermination"=>true, "VolumeSize"=>100, "VolumeType"=>"gp2"}
+              "DeviceName" => "/dev/xvda",
+              "Ebs" => {
+                "DeleteOnTermination" => true,
+                               "Iops" => 3000,
+                         "Throughput" => 125,
+                         "VolumeSize" => 100,
+                         "VolumeType" => "gp3"
+              }
             }
           ]
         }
@@ -375,7 +381,19 @@ describe Barcelona::Network::NetworkStack do
           "AssociatePublicIpAddress" => true,
           "SecurityGroups" => [
             {"Ref" => "SecurityGroupBastion"}
-          ]
+          ],
+          "BlockDeviceMappings" => [
+            {
+              "DeviceName" =>"/dev/xvda", 
+              "Ebs" => {
+                "DeleteOnTermination" => true,
+                "Iops" => 3000,
+                "Throughput" => 125,
+                "VolumeSize" => 100,
+                "VolumeType" => "gp3"
+              }
+            }
+          ],
         }
       },
       "BastionAutoScaling" => {
