@@ -1070,4 +1070,21 @@ describe Barcelona::Network::NetworkStack do
       expect(generated["Resources"]["RouteNATForRouteTableTrusted2"]).to be_present
     end
   end
+
+  it "m6i.large instance type is ebs optimized" do
+    district.nat_type = nil
+    district.cluster_instance_type = "m6i.large"
+    stack = described_class.new(district)
+    generated = JSON.load(stack.target!)
+    expect(generated["Resources"]["ContainerInstanceLaunchConfiguration"]["Properties"]["EbsOptimized"]).to eq true
+  end
+
+  it "m1.large instance type is not ebs optimized by default" do
+    district.nat_type = nil
+    district.cluster_instance_type = "m1.large"
+    stack = described_class.new(district)
+    generated = JSON.load(stack.target!)
+    expect(generated["Resources"]["ContainerInstanceLaunchConfiguration"]["Properties"]["EbsOptimized"]).to eq false
+  end
+
 end
