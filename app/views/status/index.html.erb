@@ -5,6 +5,18 @@
 <h2>Districts</h2>
 
 <table>
+    <thead>
+      <th>
+        Name
+      </th>
+      <th>
+        Link
+      </th>
+      <th>
+        Size
+      </th>
+    </thead>
+
   <% @districts.each do |district| %>
     <tr>
       <td>
@@ -12,51 +24,12 @@
       </td>
       <td>
         <a href="/status/<%= district.id %>">link</a>
-        
+      </td>
+      <td>
+        <%= district.cluster_size %>
       </td>
     </tr>
   <% end %>
 </table>
 
-
-<h2>Delayed Jobs</h2>
-
-<table>
-
-<%
-  Delayed::Job.all.each do |job|
-    a = job.payload_object.job_data['arguments'].first.values.first 
-    toks = a.split('/')
-    cls = toks[3].constantize
-    obj = cls.find_by_id(toks[4])
-%>
-
-  <% if obj.nil? %>
-    <tr>
-      <td>
-        <%= job.payload_object.job_data['job_class'] %>
-      </td>
-      <td>
-        <%
-        %>
-
-        <%= toks %>
-      </td>
-    </tr>
-
-  <% else %>
-    <tr>
-      <td>
-        <%= job.payload_object.job_data['job_class'] %>
-      </td>
-      <td>
-        <%
-        %>
-
-        <a href="/status/<%= toks[3].underscore %>/<%= toks[4] %>">link</a>
-      </td>
-    </tr>
-  <% end %>
-<% end %>
-
-</table>
+<h2><a href='/status/jobs'>Delayed Jobs</a></h2>

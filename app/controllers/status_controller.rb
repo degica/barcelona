@@ -8,7 +8,10 @@ class StatusController < ActionController::Base
     @objtype = 'district'
     objid = params[:id]
 
-    if params[:objid]
+    if objid == 'jobs'
+      return show_jobs
+
+    elsif params[:objid]
       @objtype = params[:status_id]
       objid = params[:objid]
     end
@@ -24,5 +27,9 @@ class StatusController < ActionController::Base
     if @obj.nil?
       raise ActiveRecord::RecordNotFound
     end
+  end
+
+  def show_jobs
+    render 'show_jobs'
   end
 end

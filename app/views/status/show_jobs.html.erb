@@ -1,0 +1,82 @@
+<h1>Delayed Jobs</h1>
+
+<% dead = {} %>
+
+<h2>Current Jobs</h2>
+
+<table>
+
+<%
+
+  Delayed::Job.all.each do |job|
+    a = job.payload_object.job_data['arguments'].first.values.first 
+    toks = a.split('/')
+    cls = toks[3].constantize
+    obj = cls.find_by_id(toks[4])
+%>
+
+  <% if obj.nil? 
+       class_key = job.payload_object.job_data['job_class']
+       item_key = "#{cls}/#{toks[4]}"
+
+       dead[class_key] ||= {}
+       dead[class_key][item_key] ||= []
+       dead[class_key][item_key] << job
+       next
+     end %>
+
+    <tr>
+      <td>
+        <%= job.payload_object.job_data['job_class'] %>
+      </td>
+      <td>
+        <a href="/status/<%= toks[3].underscore %>/<%= toks[4] %>">link</a>
+      </td>
+      <td>
+        <%= job.payload_object.job_data['executions'] %>
+      </td>
+    </tr>
+<% end %>
+
+</table>
+
+<h2>Dead Jobs</h2>
+
+<% dead.sort_by{|_, sets| sets.count}.each do |jobclass, sets| %>
+
+  <h3><%= jobclass %></h3>
+
+  <table>
+      <thead>
+        <th>
+          Name
+        </th>
+        <th>
+          Count
+        </th>
+        <th>
+          Oldest
+        </th>
+        <th>
+          Newest
+        </th>
+      </thead>
+    <% sets.each do |name, jobs| %>
+      <tr>
+        <td>
+          <%= name %>
+        </td>
+        <td>
+          <%= jobs.count %>
+        </td>
+        <td>
+          <%= jobs.min{|x| x.created_at }.created_at %>
+        </td>
+        <td>
+          <%= jobs.max{|x| x.created_at }.created_at %>
+        </td>
+      </tr>
+    <% end %>
+  </table>
+
+<% end %>
