@@ -1,4 +1,10 @@
 Rails.application.routes.draw do
+  root to: "home#index"
+
+  resources :status do
+      get '/:objid', to: 'status#show'
+  end
+
   scope :v1 do
     resources :districts, except: [:new, :edit] do
       member do

@@ -1,0 +1,25 @@
+<table>
+  <thead>
+    <th>
+      Column
+    </th>
+    <th>
+      Value
+    </th>
+  </thead>
+  <% @obj.class.columns.each do |column| %>
+  <tr>
+    <td>
+      <%= column.name %>
+    </td>
+    <td>
+      <% o = column.name.sub(/_id$/, '') %>
+      <% if column.name == "#{o}_id" && !o.camelize.safe_constantize.nil? %>
+        <a href="/status/<%= o %>/<%= @obj[column.name] %>"><%= o.humanize %></a>
+      <% else %>
+        <pre><%= format_value(@obj[column.name]) %></pre>
+      <% end %>
+    </td>
+  </tr>
+  <% end %>
+</table>

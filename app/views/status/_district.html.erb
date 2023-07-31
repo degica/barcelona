@@ -1,0 +1,109 @@
+<p>
+  A district is an AWS account, and contains endpoints and heritages.
+</p>
+
+<table>
+  <tr>
+    <td>
+      Name
+    </td>
+    <td>
+      <%= @obj.name %>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Region
+    </td>
+    <td>
+      <%= @obj.region %>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Stack Name
+    </td>
+    <td>
+      <%= @obj.stack_name %>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Backend
+    </td>
+    <td>
+      <%= @obj.cluster_backend %>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      NAT Type
+    </td>
+    <td>
+      <%= @obj.nat_type %>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Instance Type
+    </td>
+    <td>
+      <%= @obj.cluster_instance_type %>
+    </td>
+  </tr>
+</table>
+
+<h2>Endpoints</h2>
+<table>
+  <% @obj.endpoints.each do |e| %>
+    <tr>
+      <td>
+        <%= e.name %>
+      </td>
+      <td>
+        <a href="/status/endpoint/<%= e.id %>">link</a>
+      </td>
+    </tr>
+  <% end %>
+</table>
+
+<h2>Heritages</h2>
+<table>
+  <% @obj.heritages.select {|h| h.review_app.nil?}.each do |h| %>
+    <tr>
+      <td>
+        <%= h.name %>
+      </td>
+      <td>
+        <a href="/status/heritage/<%= h.id %>">link</a>
+      </td>
+      <td>
+        <pre><%= h.image_name %></pre>
+      </td>
+      <td>
+        <pre><%= h.image_tag %></pre>
+      </td>
+    </tr>
+  <% end %>
+</table>
+
+
+<h2>Review Apps</h2>
+<table>
+  <% @obj.heritages.reject {|h| h.review_app.nil?}.each do |h| %>
+    <tr>
+      <td>
+        <%= h.name %> <%= h.review_app.expired? ? '(expired)' : '' %>
+      </td>
+      <td>
+        <a href="/status/review_app/<%= h.review_app.id %>">link</a>
+      </td>
+      <td>
+        <pre><%= h.image_name %></pre>
+      </td>
+      <td>
+        <pre><%= h.image_tag %></pre>
+      </td>
+    </tr>
+  <% end %>
+</table>
