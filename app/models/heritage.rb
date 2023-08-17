@@ -50,7 +50,7 @@ class Heritage < ActiveRecord::Base
         add_resource("AWS::Lambda::Function", "ScheduleHandler") do |j|
           j.Handler "index.handler"
           j.Role get_attr("ScheduleHandlerRole", "Arn")
-          j.Runtime "nodejs12.x"
+          j.Runtime "nodejs18.x"
           j.Timeout 60
           j.Code do |j|
             j.ZipFile schedule_handler_code
