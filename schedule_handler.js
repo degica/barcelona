@@ -1,11 +1,12 @@
-var AWS = require('aws-sdk');
+import { ECSClient, RunTaskCommand } from "@aws-sdk/client-ecs";
+
 var util = require('util');
 
 exports.handler = function(input, context) {
   console.log(util.inspect(input, {showHidden: false, depth: null}))
   console.log(context)
 
-  var ecs = new AWS.ECS();
+  var ecs = new ECSClient();
   var params = {
     cluster: input.cluster,
     taskDefinition: input.task_family,
@@ -20,8 +21,9 @@ exports.handler = function(input, context) {
   }
 
   console.log(util.inspect(params, {depth: null}))
-  ecs.runTask(params, function(err, data) {
-    console.log(util.inspect(err, {depth: null}))
-    console.log(util.inspect(data, {depth: null}))
-  })
+
+  const command = new RunTaskCommand(params);
+  const response = await ecs.send(command);
+
+  console.log(util.inspect(response, {depth: null}))
 }
