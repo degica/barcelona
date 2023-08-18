@@ -151,6 +151,7 @@ describe Barcelona::Network::NetworkStack do
               "DeviceName" => "/dev/xvda",
               "Ebs" => {
                 "DeleteOnTermination" => true,
+                          "Encrypted" => true,
                                "Iops" => 3000,
                          "Throughput" => 125,
                          "VolumeSize" => 100,
@@ -387,6 +388,7 @@ describe Barcelona::Network::NetworkStack do
               "DeviceName" =>"/dev/xvda", 
               "Ebs" => {
                 "DeleteOnTermination" => true,
+                "Encrypted" => true,
                 "Iops" => 3000,
                 "Throughput" => 125,
                 "VolumeSize" => 100,
