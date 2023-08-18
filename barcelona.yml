@@ -45,3 +45,4 @@ environments:
         command: rake jobs:work
         cpu: 128
         memory: 256
+ 
