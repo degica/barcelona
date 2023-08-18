@@ -1,10 +1,10 @@
-import { ECSClient, RunTaskCommand } from "@aws-sdk/client-ecs";
+const { ECSClient, RunTaskCommand } = require("@aws-sdk/client-ecs");
 
 var util = require('util');
 
-exports.handler = function(input, context) {
-  console.log(util.inspect(input, {showHidden: false, depth: null}))
-  console.log(context)
+exports.handler = async function(input, context) {
+  console.log(util.inspect(input, {showHidden: false, depth: null}));
+  console.log(context);
 
   var ecs = new ECSClient();
   var params = {
@@ -18,12 +18,12 @@ exports.handler = function(input, context) {
         }
       ]
     }
-  }
+  };
 
-  console.log(util.inspect(params, {depth: null}))
+  console.log(util.inspect(params, {depth: null}));
 
   const command = new RunTaskCommand(params);
   const response = await ecs.send(command);
 
-  console.log(util.inspect(response, {depth: null}))
-}
+  console.log(util.inspect(response, {depth: null}));
+};
