@@ -35,6 +35,17 @@ module Backend::Ecs::V2
       !cf_executor.in_progress?
     end
 
+    def rid
+      10.times do |try_num|
+        result = cf_executor.resource_ids["ECSService"]
+        return result unless result.nil?
+        puts "Failed to retrieve resource id for service #{service.service_name}. Retrying. Try number: #{try_num}"
+        sleep 10
+      rescue => e
+        puts "Encountered error while retrieving resource id: #{e.message}"
+      end
+    end
+
     private
 
     def aws
@@ -55,7 +66,7 @@ module Backend::Ecs::V2
                          if executor.stack_status.nil?
                            nil
                          else
-                           rid = executor.resource_ids["ECSService"]
+                           puts "Extracting service info for #{service.service_name}. Status: #{executor.stack_status}"
                            aws.ecs.describe_services(
                              cluster: service.district.name,
                              services: [rid]

@@ -128,7 +128,7 @@ module CloudFormation
 
     # Returns CF ID => Real ID hash
     def resource_ids
-      @resource_ids ||= stack_resources.map do |r|
+      stack_resources.map do |r|
         [r.logical_resource_id, r.physical_resource_id]
       end.to_h
     end
