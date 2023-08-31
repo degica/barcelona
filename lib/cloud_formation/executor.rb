@@ -107,12 +107,24 @@ module CloudFormation
       when "CREATE_COMPLETE", "UPDATE_COMPLETE", "UPDATE_ROLLBACK_COMPLETE"
         update
       when "ROLLBACK_COMPLETE"
-        # ROLLBACK_COMPLETE only happens when creating stack failed
-        # The only way to solve is to delete and re-create the stack
-        raise CannotUpdateRolledbackStackException
+        try_recreate
       else
         raise UpdateInProgressException
       end
+    end
+
+    def try_recreate
+      puts 'Attempting to re-create stack from ROLLBACK_COMPLETE'
+      delete
+
+      loop do
+        break if stack_status.nil? || stack_status == 'DELETE_COMPLETE'
+        puts "Waiting for stack '#{stack.name}' to delete..."
+        sleep 10
+      end
+
+      puts 'Stack deleted. Re-creating'
+      create
     end
 
     def in_progress?
