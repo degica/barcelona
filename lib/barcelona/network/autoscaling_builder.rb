@@ -5,23 +5,23 @@ module Barcelona
       # amzn2-ami-ecs-hvm-2.0
       # You can see the latest version stored in public SSM parameter store
       # https://ap-northeast-1.console.aws.amazon.com/systems-manager/parameters/aws/service/ecs/optimized-ami/amazon-linux-2/recommended/image_id/description?region=ap-northeast-1
-      # latest info is Version: 118, LastModifiedDate: 2023-07-11T02:43:58.706000+09:00, image_name: amzn2-ami-ecs-hvm-2.0.20230705-x86_64-ebs
+      # latest info is Version: 121, LastModifiedDate: 2023-08-17T00:07:16.575000+09:00, image_name: amzn2-ami-ecs-hvm-2.0.20230809-x86_64-ebs
       ECS_OPTIMIZED_AMI_IDS = {
-        "us-east-1"      => "ami-0507dff4275d8dd6d",
-        "us-east-2"      => "ami-0a2f86088203932e1",
-        "us-west-1"      => "ami-04a74838790dc77bf",
-        "us-west-2"      => "ami-07395cc0a598ee2eb",
-        "eu-west-1"      => "ami-023f1074e24ccf964",
-        "eu-west-2"      => "ami-079f34f67618526ea",
-        "eu-west-3"      => "ami-06ee90103b4c1602c",
-        "eu-central-1"      => "ami-0895a12593a7b3a0b",
-        "ap-northeast-1"      => "ami-0e432635473484865",
-        "ap-northeast-2"      => "ami-01bba9f96447a3f1e",
-        "ap-southeast-1"      => "ami-0d2ffabfbd38ccd28",
-        "ap-southeast-2"      => "ami-037bc2c139c7ae160",
-        "ca-central-1"      => "ami-0519bf5ddc298485d",
-        "ap-south-1"      => "ami-025fa2a3e27b6e58a",
-        "sa-east-1"      => "ami-0f544759009d3c50b",
+        "us-east-1"      => "ami-0e692fe1bae5ca24c",
+        "us-east-2"      => "ami-098accd64a8a385dc",
+        "us-west-1"      => "ami-08c160e4491d2a9a1",
+        "us-west-2"      => "ami-02a4b44230bc8650a",
+        "eu-west-1"      => "ami-0c5cd894db560d66c",
+        "eu-west-2"      => "ami-02860af96bd3e1696",
+        "eu-west-3"      => "ami-01d44421a18be3f4d",
+        "eu-central-1"      => "ami-0b5009e7f102539b1",
+        "ap-northeast-1"      => "ami-0ae451dcc36be7bb3",
+        "ap-northeast-2"      => "ami-016e409dfaa836cb4",
+        "ap-southeast-1"      => "ami-0c68f952153c18847",
+        "ap-southeast-2"      => "ami-00bcae5b31b05c62c",
+        "ca-central-1"      => "ami-00f7fbbe4ca0bb446",
+        "ap-south-1"      => "ami-0205f72f24e39213b",
+        "sa-east-1"      => "ami-0d306330cbbf3cda9",
       }
 
       def ebs_optimized_by_default?
@@ -48,6 +48,7 @@ module Barcelona
               "DeviceName" => "/dev/xvda",
               "Ebs" => {
                 "DeleteOnTermination" => true,
+                "Encrypted" => true,
                 "Iops" => 3000,
                 "Throughput" => 125,
                 "VolumeSize" => 100,
