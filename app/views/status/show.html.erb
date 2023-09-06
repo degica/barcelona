@@ -1,0 +1,7 @@
+<h1><%= @objtype.humanize %></h1>
+
+<% if lookup_context.find_all("status/_#{@objtype}").any? %>
+  <%= render "#{@objtype}" %>
+<% else %>
+  <%= render 'generic' %>
+<% end %>

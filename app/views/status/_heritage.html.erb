@@ -1,0 +1,99 @@
+<p>
+  A heritage is a single application, that can consist of multiple scheduled tasks, and multiple ongoing tasks known as services.
+</p>
+
+<table>
+  <tr>
+    <td>
+      Name
+    </td>
+    <td>
+      <%= @obj.name %>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Image
+    </td>
+    <td>
+      <%= @obj.image_name %>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Tag
+    </td>
+    <td>
+      <%= @obj.image_tag %>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Version
+    </td>
+    <td>
+      <%= @obj.version %>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      Last update
+    </td>
+    <td>
+      <%= @obj.updated_at %>
+    </td>
+  </tr>
+</table>
+
+
+<h2>Schedule</h2>
+<table>
+  <% @obj.scheduled_tasks.each do |task| %>
+    <tr>
+      <td>
+        <pre>
+          <%= task['schedule'] %>
+        </pre>
+      </td>
+      <td>
+        <pre>
+          <%= task['command'] %>
+        </pre>
+      </td>
+    </tr>
+  <% end %>
+</table>
+
+<h2>Services</h2>
+<table>
+  <% @obj.services.each do |s| %>
+    <tr>
+      <td>
+        <%= s.name %>
+      </td>
+      <td>
+        <a href="/status/service/<%= s.id %>">link</a>
+      </td>
+      <td>
+        <pre><%= s.command %></pre>
+      </td>
+      <td>
+        <pre><%= s.desired_container_count %></pre>
+      </td>
+    </tr>
+  <% end %>
+</table>
+
+<h2>Jobs</h2>
+<table>
+  <% Delayed::Job.where("handler LIKE '%gid://barcelona/Heritage/#{@obj.id}%'") do |job| %>
+    <tr>
+      <td>
+        <%= job.payload_object.job_data['job_class'] %>
+      </td>
+      <td>
+        <%= job.payload_object.job_data['executions'] %>
+      </td>
+    </tr>
+  <% end %>
+</table>
