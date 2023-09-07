@@ -38,10 +38,21 @@ describe CloudFormation::Executor do
   end
 
   describe '#create_or_update' do
-    it 'raises an error if the stack was rolled back' do
-      allow(executor).to receive(:stack_status) { 'ROLLBACK_COMPLETE' }
-      expect { executor.create_or_update }.to raise_error CloudFormation::CannotUpdateRolledbackStackException
+    it 'deletes the stack if it was rolled back' do
+      status = 'ROLLBACK_COMPLETE'
+      allow(executor).to receive(:stack_status) { status }
+
+      expect(client).to receive(:delete_stack).with({stack_name: "test"}) {
+        status = 'DELETE_COMPLETE'
+      }.once
+
+      expect(executor).to receive(:create)
+
+
+      executor.create_or_update
     end
+
+
 
     it 'raises an error if the stack is still being updated' do
       allow(executor).to receive(:stack_status) { 'UPDATE_IN_PROGRESS' }
