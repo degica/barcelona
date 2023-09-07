@@ -2,8 +2,16 @@ module Backend::Ecs::V2
   class ServiceStack < CloudFormation::Stack
     class Builder < CloudFormation::Builder
       def build_resources
-        add_resource("AWS::ECS::Service", "ECSService") do |j|
-          j.Cluster district.name
+        deps = []
+        if use_alb?
+          deps = ['LBListenerRuleHTTP']
+
+          if listener&.endpoint&.https_listener_id&.present?
+            deps << 'LBListenerRuleHTTPS'
+          end
+        end
+
+        add_resource("AWS::ECS::Service", "ECSService", { depends_on: deps }) do |j|          j.Cluster district.name
           j.TaskDefinition options[:task_definition]
           j.DesiredCount options[:desired_count]
           if use_tcp_load_balancer?
