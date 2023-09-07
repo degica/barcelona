@@ -4,7 +4,11 @@ module Backend::Ecs::V2
       def build_resources
         deps = []
         if use_alb?
-          deps = ['LBListenerRuleHTTP', 'LBListenerRuleHTTPS']
+          deps = ['LBListenerRuleHTTP']
+
+          if listener&.endpoint&.https_listener_id&.present?
+            deps << 'LBListenerRuleHTTPS'
+          end
         end
 
         add_resource("AWS::ECS::Service", "ECSService", { depends_on: deps }) do |j|          j.Cluster district.name
