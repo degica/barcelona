@@ -26,7 +26,7 @@ module CloudFormation
       @logger ||= ActiveSupport::TaggedLogging.new(Logger.new(STDOUT))
     end
 
-    def putlog(logstring, severity: :info)
+    def putlog(severity, logstring)
       logger.tagged("stack:#{stack&.name}") do
         logger.public_send(severity) { logstring }
       end
