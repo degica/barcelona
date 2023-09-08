@@ -22,6 +22,16 @@ module CloudFormation
       @bucket = district.s3_bucket_name
     end
 
+    def logger
+      @logger ||= ActiveSupport::TaggedLogging.new(Logger.new(STDOUT))
+    end
+
+    def putlog(logstring, severity: :info)
+      logger.tagged("stack:#{stack&.name}") do
+        logger.public_send(severity) { logstring }
+      end
+    end
+
     def describe
       client.describe_stacks(stack_name: stack.name).stacks[0]
     rescue Aws::CloudFormation::Errors::ValidationError
@@ -48,7 +58,7 @@ module CloudFormation
       end
     rescue Aws::CloudFormation::Errors::ValidationError => e
       if e.message == "No updates are to be performed."
-        Rails.logger.warn "No updates are to be performed."
+        putlog(:warn, e.message)
       else
         raise e
       end
@@ -114,16 +124,16 @@ module CloudFormation
     end
 
     def try_recreate
-      puts 'Attempting to re-create stack from ROLLBACK_COMPLETE'
+      putlog :warn, 'Attempting to re-create stack from ROLLBACK_COMPLETE'
       delete
 
       loop do
         break if stack_status.nil? || stack_status == 'DELETE_COMPLETE'
-        puts "Waiting for stack '#{stack.name}' to delete..."
+        putlog :warn, "Waiting for stack '#{stack.name}' to delete..."
         sleep 10
       end
 
-      puts 'Stack deleted. Re-creating'
+      putlog :warn, 'Stack deleted. Re-creating'
       create
     end
 
