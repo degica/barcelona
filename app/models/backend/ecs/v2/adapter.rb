@@ -49,16 +49,19 @@ module Backend::Ecs::V2
       @cf_executor ||= CloudFormation::Executor.new(service_stack, service.district)
     end
 
+    def service_resource_id
+      cf_executor.resource_ids["ECSService"]
+    end
+
     def ecs_service
       @ecs_service ||= begin
                          executor = cf_executor
-                         if executor.stack_status.nil?
+                         if executor.stack_status.nil? || service_resource_id.nil?
                            nil
                          else
-                           rid = executor.resource_ids["ECSService"]
                            aws.ecs.describe_services(
                              cluster: service.district.name,
-                             services: [rid]
+                             services: [service_resource_id]
                            ).services.first
                          end
                        end
