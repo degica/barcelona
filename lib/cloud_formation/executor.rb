@@ -22,6 +22,16 @@ module CloudFormation
       @bucket = district.s3_bucket_name
     end
 
+    def logger
+      @logger ||= ActiveSupport::TaggedLogging.new(Logger.new(STDOUT))
+    end
+
+    def putlog(severity, logstring)
+      logger.tagged("stack:#{stack&.name}") do
+        logger.public_send(severity) { logstring }
+      end
+    end
+
     def describe
       client.describe_stacks(stack_name: stack.name).stacks[0]
     rescue Aws::CloudFormation::Errors::ValidationError
@@ -48,7 +58,7 @@ module CloudFormation
       end
     rescue Aws::CloudFormation::Errors::ValidationError => e
       if e.message == "No updates are to be performed."
-        Rails.logger.warn "No updates are to be performed."
+        putlog(:warn, e.message)
       else
         raise e
       end
@@ -107,12 +117,24 @@ module CloudFormation
       when "CREATE_COMPLETE", "UPDATE_COMPLETE", "UPDATE_ROLLBACK_COMPLETE"
         update
       when "ROLLBACK_COMPLETE"
-        # ROLLBACK_COMPLETE only happens when creating stack failed
-        # The only way to solve is to delete and re-create the stack
-        raise CannotUpdateRolledbackStackException
+        try_recreate
       else
         raise UpdateInProgressException
       end
+    end
+
+    def try_recreate
+      putlog :warn, 'Attempting to re-create stack from ROLLBACK_COMPLETE'
+      delete
+
+      loop do
+        break if stack_status.nil? || stack_status == 'DELETE_COMPLETE'
+        putlog :warn, "Waiting for stack '#{stack.name}' to delete..."
+        sleep 10
+      end
+
+      putlog :warn, 'Stack deleted. Re-creating'
+      create
     end
 
     def in_progress?
