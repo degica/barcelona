@@ -31,7 +31,7 @@ gem 'vault'
 gem 'tzinfo', '~> 1.2.10'
 
 group :development, :test do
-  gem 'debase'
+  gem 'debase', '~> 0.2.5.beta2'
   gem 'pry-byebug'
   gem 'pry-rails'
   gem 'ruby-debug-ide'
