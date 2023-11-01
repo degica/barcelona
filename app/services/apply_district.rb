@@ -85,7 +85,8 @@ class ApplyDistrict
       "ECS_RESERVED_MEMORY" => 256,
       "ECS_CONTAINER_STOP_TIMEOUT" => "5m",
       "ECS_ENABLE_TASK_IAM_ROLE" => "true",
-      "ECS_ENABLE_TASK_IAM_ROLE_NETWORK_HOST" => "true"
+      "ECS_ENABLE_TASK_IAM_ROLE_NETWORK_HOST" => "true",
+      "ECS_ENABLE_CONTAINER_METADATA" => "true"
     }
 
     if district.dockercfg.present?
