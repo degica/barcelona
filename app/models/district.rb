@@ -232,7 +232,29 @@ class District < ActiveRecord::Base
   def demand_structure(resource)
     heritages.flat_map(&:services).flat_map do |service|
       # map all the containers' memory or cpu
-      definition = service.send(:backend).send(:ecs_service).task_definition
+      backend = service.send(:backend)
+
+      if backend.nil?
+        puts "service #{service.name} of H #{service.heritage.name} has no backend"
+
+        next {
+          count: 0,
+          amount: 0
+        }
+      end
+
+      ecs_service = backend.send(:ecs_service)
+
+      if ecs_service.nil?
+        puts "service #{service.name} of H #{service.heritage.name} has no ecs"
+
+        next {
+          count: 0,
+          amount: 0
+        }
+      end
+
+      definition = ecs_service.task_definition
 
       # read the total amount requested by definition
       total_resource = aws.ecs.describe_task_definition(task_definition: definition)

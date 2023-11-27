@@ -60,6 +60,10 @@ module Backend::Ecs::V1
       !(ecs_service.nil? || ecs_service.status != "ACTIVE")
     end
 
+    def task_definition
+      fetch_ecs_service.task_definition
+    end
+
     def register_task
       task_definition = HeritageTaskDefinition.service_definition(service).to_task_definition
       aws.ecs.register_task_definition(task_definition)
