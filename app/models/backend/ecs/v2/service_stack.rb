@@ -4,7 +4,10 @@ module Backend::Ecs::V2
       def build_resources
         deps = []
         if use_alb?
-          deps = ['LBListenerRuleHTTP']
+          deps = []
+          if !service.heritage.review?
+            deps << 'LBListenerRuleHTTP'
+          end
 
           if listener&.endpoint&.https_listener_id&.present?
             deps << 'LBListenerRuleHTTPS'
