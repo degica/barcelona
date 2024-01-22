@@ -5,7 +5,7 @@ module Backend::Ecs::V2
         deps = []
         if use_alb?
           deps = []
-          if !service.heritage.review?
+          if !service&.heritage&.review?
             deps << 'LBListenerRuleHTTP'
           end
 
