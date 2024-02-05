@@ -7,14 +7,15 @@ jobs:
         BARCELONA_ENDPOINT: https://barcelona.degica.com
         DOCKER_REPOSITORY: public.ecr.aws/degica/barcelona
         DOCKER_BUILDKIT: '1'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
     - name: workaround
       run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
     - name: prepare
       run: |-
+        apk update
         apk add --no-cache python3 py3-pip
-        pip3 install --upgrade pip
+        find /usr/lib/ -type f -name 'EXTERNALLY-MANAGED' -delete
         pip3 install awscli
     - uses: actions/checkout@v3
     - name: setup

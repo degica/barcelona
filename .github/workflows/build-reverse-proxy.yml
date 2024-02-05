@@ -30,6 +30,7 @@ jobs:
     - name: prepare
       run: |-
         apk add --no-cache python3 py3-pip
+        find /usr/lib/ -type f -name 'EXTERNALLY-MANAGED' -delete
         pip3 install --upgrade pip
         pip3 install awscli
     - uses: actions/checkout@v2
