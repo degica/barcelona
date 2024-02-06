@@ -183,11 +183,13 @@ module Backend::Ecs::V2
       end
 
       def build_alb_listener
-        add_resource("AWS::ElasticLoadBalancingV2::ListenerRule", "LBListenerRuleHTTP") do |j|
-          j.Actions [{"TargetGroupArn" => ref("LBTargetGroup1"), "Type" => "forward"}]
-          j.Conditions(listener.rule_conditions.map { |c| {"Field" => c["type"], "Values" => [c["value"]]} })
-          j.ListenerArn listener.endpoint.http_listener_id
-          j.Priority listener.rule_priority
+        if !service&.heritage&.review?
+          add_resource("AWS::ElasticLoadBalancingV2::ListenerRule", "LBListenerRuleHTTP") do |j|
+            j.Actions [{"TargetGroupArn" => ref("LBTargetGroup1"), "Type" => "forward"}]
+            j.Conditions(listener.rule_conditions.map { |c| {"Field" => c["type"], "Values" => [c["value"]]} })
+            j.ListenerArn listener.endpoint.http_listener_id
+            j.Priority listener.rule_priority
+          end
         end
 
         if listener.endpoint.https_listener_id.present?
