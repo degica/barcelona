@@ -27,7 +27,7 @@ module Barcelona
 
       def agent_command
         [
-          "DD_AGENT_MAJOR_VERSION=7 DD_API_KEY=#{api_key} bash -c",
+          "DD_RUNTIME_SECURITY_CONFIG_ENABLED=true DD_AGENT_MAJOR_VERSION=7 DD_API_KEY=#{api_key} bash -c",
           '"$(curl -L https://raw.githubusercontent.com/DataDog/datadog-agent/master/cmd/agent/install_script.sh)" &&',
           'usermod -a -G docker dd-agent &&',
           'usermod -a -G systemd-journal dd-agent &&',
@@ -53,6 +53,18 @@ module Barcelona
             container_collect_all: true
           process_config:
             enabled: 'true'
+          runtime_security_config:
+            enabled: true
+          compliance_config:
+            enabled: true
+          sbom:
+            enabled: true
+            container_image:
+              enabled: true
+            host:
+              enabled: true
+          container_image:
+            enabled: true
           tags:
             - barcelona:#{district.name}
             - barcelona-dd-agent
