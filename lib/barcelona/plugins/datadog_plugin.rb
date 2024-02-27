@@ -93,8 +93,6 @@ module Barcelona
         user_data.add_file("/etc/datadog-agent/security-agent.yaml", "root:root", "000755", <<~YAML)
           runtime_security_config:
             enabled: true
-          runtime_security_config:
-            enabled: true
           compliance_config:
             enabled: true
             host_benchmarks:
