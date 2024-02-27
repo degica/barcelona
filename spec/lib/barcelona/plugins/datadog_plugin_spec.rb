@@ -33,6 +33,24 @@ module Barcelona
           expect(agent_config_hash['logs_enabled']).to eq(true)
           expect(agent_config_hash['runtime_security_config']['enabled']).to eq(true)
         end
+
+        it "installs system-probe config file" do
+          system_probe_config = user_data['write_files'].find do |f|
+            f['path'] == '/etc/datadog-agent/system-probe.yaml'
+          end
+          system_probe_config_hash = YAML.load(system_probe_config['content'])
+          expect(system_probe_config_hash['runtime_security_config']['enabled']).to eq(true)
+        end
+
+        it "installs security-agent config file" do
+          security_agent_config = user_data['write_files'].find do |f|
+            f['path'] == '/etc/datadog-agent/security-agent.yaml'
+          end
+          security_agent_config_hash = YAML.load(security_agent_config['content'])
+          expect(security_agent_config_hash['runtime_security_config']['enabled']).to eq(true)
+          expect(security_agent_config_hash['compliance_config']['enabled']).to eq(true)
+          expect(security_agent_config_hash['compliance_config']['host_benchmarks']['enabled']).to eq(true)
+        end
       end
     end
   end

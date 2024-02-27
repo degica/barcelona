@@ -72,6 +72,22 @@ module Barcelona
             - role:app
         DATADOG_YAML
 
+        user_data.add_file("/etc/datadog-agent/system-probe.yaml", "root:root", "000755", <<~YAML)
+          runtime_security_config:
+            enabled: true
+        YAML
+
+        user_data.add_file("/etc/datadog-agent/security-agent.yaml", "root:root", "000755", <<~YAML)
+          runtime_security_config:
+            enabled: true
+          runtime_security_config:
+            enabled: true
+          compliance_config:
+            enabled: true
+            host_benchmarks:
+              enabled: true
+        YAML
+
         user_data.add_file("/etc/datadog-agent/conf.d/docker.d/docker_daemon.yaml", "root:root", "000755", <<~YAML)
           init_config:
           instances:
