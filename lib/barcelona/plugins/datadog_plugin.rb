@@ -10,6 +10,19 @@ module Barcelona
         user_data
       end
 
+      def on_network_stack_template(_stack, template)
+        bastion_lc = template["BastionLaunchConfiguration"]
+        return template if bastion_lc.nil?
+
+        user_data = InstanceUserData.load_or_initialize(bastion_lc["Properties"]["UserData"])
+        add_files!(user_data)
+        user_data.run_commands += [
+          agent_command
+        ]
+        bastion_lc["Properties"]["UserData"] = user_data.build
+        template
+      end
+
       private
 
       def on_heritage_task_definition(_heritage, task_definition)
