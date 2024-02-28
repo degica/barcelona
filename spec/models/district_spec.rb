@@ -72,7 +72,7 @@ describe District do
       user_data = InstanceUserData.new
       district.save!
       district.plugins.create(name: 'secure_instance')
-      district.plugins.create(name: 'datadog', plugin_attributes: { "api_key": 'abcdefg'}, 'hook_priority': 20)
+      district.plugins.create(name: 'datadog', plugin_attributes: { "api_key": 'abcdefg', "hook_priority": 10})
       district.plugins.create(name: 'itamae', plugin_attributes: { "recipe_url": "s3://barcelona-district1-12345/itamae_recipes/recipe.tar.gz"})
       user_data = district.hook_plugins(:container_instance_user_data, self, user_data)
       user_data_hash = YAML.load(Base64.decode64(user_data.build))

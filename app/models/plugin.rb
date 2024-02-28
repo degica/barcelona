@@ -30,6 +30,11 @@ class Plugin < ActiveRecord::Base
     klass.new(self)
   end
 
+  def hook_priority
+    attributes = self.plugin_attributes || {}
+    attributes['hook_priority'].to_i
+  end
+
   private
 
   def default_attributes
