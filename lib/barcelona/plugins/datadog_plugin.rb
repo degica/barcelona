@@ -10,6 +10,19 @@ module Barcelona
         user_data
       end
 
+      def on_network_stack_template(_stack, template)
+        bastion_lc = template["BastionLaunchConfiguration"]
+        return template if bastion_lc.nil?
+
+        user_data = InstanceUserData.load_or_initialize(bastion_lc["Properties"]["UserData"])
+        add_files!(user_data)
+        user_data.run_commands += [
+          agent_command
+        ]
+        bastion_lc["Properties"]["UserData"] = user_data.build
+        template
+      end
+
       private
 
       def on_heritage_task_definition(_heritage, task_definition)
@@ -27,7 +40,7 @@ module Barcelona
 
       def agent_command
         [
-          "DD_AGENT_MAJOR_VERSION=7 DD_API_KEY=#{api_key} bash -c",
+          "DD_RUNTIME_SECURITY_CONFIG_ENABLED=true DD_AGENT_MAJOR_VERSION=7 DD_API_KEY=#{api_key} bash -c",
           '"$(curl -L https://raw.githubusercontent.com/DataDog/datadog-agent/master/cmd/agent/install_script.sh)" &&',
           'usermod -a -G docker dd-agent &&',
           'usermod -a -G systemd-journal dd-agent &&',
@@ -53,12 +66,38 @@ module Barcelona
             container_collect_all: true
           process_config:
             enabled: 'true'
+          runtime_security_config:
+            enabled: true
+          compliance_config:
+            enabled: true
+          sbom:
+            enabled: true
+            container_image:
+              enabled: true
+            host:
+              enabled: true
+          container_image:
+            enabled: true
           tags:
             - barcelona:#{district.name}
             - barcelona-dd-agent
             - district:#{district.name}
             - role:app
         DATADOG_YAML
+
+        user_data.add_file("/etc/datadog-agent/system-probe.yaml", "root:root", "000755", <<~YAML)
+          runtime_security_config:
+            enabled: true
+        YAML
+
+        user_data.add_file("/etc/datadog-agent/security-agent.yaml", "root:root", "000755", <<~YAML)
+          runtime_security_config:
+            enabled: true
+          compliance_config:
+            enabled: true
+            host_benchmarks:
+              enabled: true
+        YAML
 
         user_data.add_file("/etc/datadog-agent/conf.d/docker.d/docker_daemon.yaml", "root:root", "000755", <<~YAML)
           init_config:
