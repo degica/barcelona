@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_12_08_045503) do
+ActiveRecord::Schema.define(version: 2024_02_28_032657) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -134,6 +134,7 @@ ActiveRecord::Schema.define(version: 2022_12_08_045503) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "plugin_attributes"
+    t.integer "hook_priority", default: 10
     t.index ["district_id"], name: "index_plugins_on_district_id"
   end
 
