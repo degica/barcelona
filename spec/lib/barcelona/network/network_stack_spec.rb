@@ -374,7 +374,7 @@ describe Barcelona::Network::NetworkStack do
       "BastionLaunchConfiguration" => {
         "Type" => "AWS::AutoScaling::LaunchConfiguration",
         "Properties" => {
-          "InstanceType" => "t3.micro",
+          "InstanceType" => "t3.small",
           "MetadataOptions"=>{"HttpTokens"=>"required"},
           "IamInstanceProfile" => {"Ref" => "BastionProfile"},
           "ImageId" => kind_of(String),
