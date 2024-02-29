@@ -21,7 +21,7 @@ module Barcelona
         user_data = InstanceUserData.load_or_initialize(bastion_lc["Properties"]["UserData"])
         add_files!(user_data)
         user_data.run_commands += [
-          agent_command
+          agent_command(has_docker: false)
         ]
         bastion_lc["Properties"]["UserData"] = user_data.build
         template
@@ -42,11 +42,11 @@ module Barcelona
         )
       end
 
-      def agent_command
+      def agent_command(has_docker: true)
         [
           "DD_RUNTIME_SECURITY_CONFIG_ENABLED=true DD_AGENT_MAJOR_VERSION=7 DD_API_KEY=#{api_key} bash -c",
           '"$(curl -L https://raw.githubusercontent.com/DataDog/datadog-agent/master/cmd/agent/install_script.sh)" &&',
-          'usermod -a -G docker dd-agent &&',
+          has_docker ? 'usermod -a -G docker dd-agent &&' : '',
           'usermod -a -G systemd-journal dd-agent &&',
           'systemctl restart datadog-agent'
         ].flatten.compact.join(" ")

@@ -64,7 +64,7 @@ module Barcelona
           end
 
           it "adds datadog agent instalation to bastion servers" do
-            expect(user_data["runcmd"].last).to eq "DD_RUNTIME_SECURITY_CONFIG_ENABLED=true DD_AGENT_MAJOR_VERSION=7 DD_API_KEY=abcdef bash -c \"$(curl -L https://raw.githubusercontent.com/DataDog/datadog-agent/master/cmd/agent/install_script.sh)\" && usermod -a -G docker dd-agent && usermod -a -G systemd-journal dd-agent && systemctl restart datadog-agent"
+            expect(user_data["runcmd"].last).to eq "DD_RUNTIME_SECURITY_CONFIG_ENABLED=true DD_AGENT_MAJOR_VERSION=7 DD_API_KEY=abcdef bash -c \"$(curl -L https://raw.githubusercontent.com/DataDog/datadog-agent/master/cmd/agent/install_script.sh)\" &&  usermod -a -G systemd-journal dd-agent && systemctl restart datadog-agent"
           end
 
           it "installs agent config file to bastion servers" do
