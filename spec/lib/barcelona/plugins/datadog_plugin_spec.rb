@@ -74,7 +74,9 @@ module Barcelona
             agent_config_hash = YAML.load(agent_config['content'])
             expect(agent_config_hash['api_key']).to eq(api_key)
             expect(agent_config_hash['logs_enabled']).to eq(true)
+            expect(agent_config_hash['logs_config']['container_collect_all']).not_to eq(true)
             expect(agent_config_hash['runtime_security_config']['enabled']).to eq(true)
+            expect(agent_config_hash['container_image']['enabled']).not_to eq(true)
           end
 
           it "installs system-probe config file to bastion servers" do
