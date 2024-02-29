@@ -32,4 +32,20 @@ describe Plugin do
       end
     end
   end
+
+  describe "#hook_priority" do
+    context "when not specified" do
+      let(:plugin) { Plugin.new(name: 'test') }
+      it "should be zero" do
+        expect(plugin.hook_priority).to eq(0)
+      end
+    end
+
+    context "when specified" do
+      let(:plugin) { Plugin.new(name: 'test', plugin_attributes:{ "api_key": 'abcdefg', hook_priority: '10'}) }
+      it "should be the specified value" do
+        expect(plugin.hook_priority).to eq(10)
+      end
+    end
+  end
 end

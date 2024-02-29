@@ -53,6 +53,36 @@ describe District do
     end
   end
 
+  describe "#hook_plugins" do
+    it "calls hook by the revserse of the registered order" do
+      user_data = InstanceUserData.new
+      district.save!
+      district.plugins.create(name: 'secure_instance')
+      district.plugins.create(name: 'datadog', plugin_attributes: { "api_key": 'abcdefg'})
+      district.plugins.create(name: 'itamae', plugin_attributes: { "recipe_url": "s3://barcelona-district1-12345/itamae_recipes/recipe.tar.gz"})
+      user_data = district.hook_plugins(:container_instance_user_data, self, user_data)
+      user_data_hash = YAML.load(Base64.decode64(user_data.build))
+
+      expect(user_data_hash['runcmd'].first).to include('ruby') # itamae
+      expect(user_data_hash['runcmd'][5]).to include('datadog') # datadog
+      expect(user_data_hash['runcmd'].last).to include('tmout.sh') # secure_instance
+    end
+
+    it "calls hook by the specified order" do
+      user_data = InstanceUserData.new
+      district.save!
+      district.plugins.create(name: 'secure_instance')
+      district.plugins.create(name: 'datadog', plugin_attributes: { "api_key": 'abcdefg', "hook_priority": 10})
+      district.plugins.create(name: 'itamae', plugin_attributes: { "recipe_url": "s3://barcelona-district1-12345/itamae_recipes/recipe.tar.gz"})
+      user_data = district.hook_plugins(:container_instance_user_data, self, user_data)
+      user_data_hash = YAML.load(Base64.decode64(user_data.build))
+
+      expect(user_data_hash['runcmd'].first).to include('ruby') # itamae
+      expect(user_data_hash['runcmd'][6]).to include('clamav') # secure_instance
+      expect(user_data_hash['runcmd'].last).to include('datadog') # datadog
+    end
+  end
+
   describe "#subnets" do
     before do
       allow(district.aws).to receive(:ec2) { ec2_mock }

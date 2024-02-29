@@ -1,6 +1,10 @@
 module Barcelona
   module Plugins
     class DatadogPlugin < Base
+      # This plugin must be the last of the instalation order
+      # Usage sample: 
+      # bcn district put-plugin -a api_key=8e53.... -a hook_priority=10 ec-staging datadog
+
       def on_container_instance_user_data(_instance, user_data)
         add_files!(user_data)
         user_data.run_commands += [

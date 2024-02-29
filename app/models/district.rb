@@ -149,7 +149,10 @@ class District < ActiveRecord::Base
   end
 
   def hook_plugins(trigger, origin, arg = nil)
-    plugins.reverse.reduce(arg) do |a, plugin|
+    # call plugin by priority
+    # for same priority, by the reverse order of the registered
+    i = 0
+    plugins.sort_by {|p| [p.hook_priority, i -= 1] }.reduce(arg) do |a, plugin|
       plugin.hook(trigger, origin, a)
     end
   end
