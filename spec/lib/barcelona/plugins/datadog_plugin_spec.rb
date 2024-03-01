@@ -64,7 +64,7 @@ module Barcelona
           end
 
           it "adds datadog agent instalation to bastion servers" do
-            expect(user_data["runcmd"].last).to eq "DD_RUNTIME_SECURITY_CONFIG_ENABLED=true DD_AGENT_MAJOR_VERSION=7 DD_API_KEY=abcdef bash -c \"$(curl -L https://raw.githubusercontent.com/DataDog/datadog-agent/master/cmd/agent/install_script.sh)\" && usermod -a -G docker dd-agent && usermod -a -G systemd-journal dd-agent && systemctl restart datadog-agent"
+            expect(user_data["runcmd"].last).to eq "DD_RUNTIME_SECURITY_CONFIG_ENABLED=true DD_AGENT_MAJOR_VERSION=7 DD_API_KEY=abcdef bash -c \"$(curl -L https://raw.githubusercontent.com/DataDog/datadog-agent/master/cmd/agent/install_script.sh)\" &&  usermod -a -G systemd-journal dd-agent && systemctl restart datadog-agent"
           end
 
           it "installs agent config file to bastion servers" do
@@ -74,7 +74,9 @@ module Barcelona
             agent_config_hash = YAML.load(agent_config['content'])
             expect(agent_config_hash['api_key']).to eq(api_key)
             expect(agent_config_hash['logs_enabled']).to eq(true)
+            expect(agent_config_hash['logs_config']['container_collect_all']).not_to eq(true)
             expect(agent_config_hash['runtime_security_config']['enabled']).to eq(true)
+            expect(agent_config_hash['container_image']['enabled']).not_to eq(true)
           end
 
           it "installs system-probe config file to bastion servers" do
