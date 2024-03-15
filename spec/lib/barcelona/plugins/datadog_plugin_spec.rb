@@ -5,12 +5,14 @@ module Barcelona
     describe DatadogPlugin do
       context "without proxy plugin" do
         let(:api_key) { 'abcdef'}
+        let(:security_enabled) { 'enabled' }
         let!(:district) do
           create :district, plugins_attributes: [
             {
               name: 'datadog',
               plugin_attributes: {
-                "api_key" => api_key
+                "api_key" => api_key,
+                "cws" => security_enabled
               }
             }
           ]
@@ -32,6 +34,7 @@ module Barcelona
           expect(agent_config_hash['api_key']).to eq(api_key)
           expect(agent_config_hash['logs_enabled']).to eq(true)
           expect(agent_config_hash['runtime_security_config']['enabled']).to eq(true)
+          expect(agent_config_hash['tags'].last).to eq('role:app')
         end
 
         it "installs system-probe config file" do
@@ -50,6 +53,38 @@ module Barcelona
           expect(security_agent_config_hash['runtime_security_config']['enabled']).to eq(true)
           expect(security_agent_config_hash['compliance_config']['enabled']).to eq(true)
           expect(security_agent_config_hash['compliance_config']['host_benchmarks']['enabled']).to eq(true)
+        end
+
+        context "when security switch is off" do
+          let(:security_enabled) { nil }
+
+          it "gets hooked with container_instance_user_data trigger" do
+            expect(user_data["runcmd"].last).to eq "DD_RUNTIME_SECURITY_CONFIG_ENABLED=true DD_AGENT_MAJOR_VERSION=7 DD_API_KEY=abcdef bash -c \"$(curl -L https://raw.githubusercontent.com/DataDog/datadog-agent/master/cmd/agent/install_script.sh)\" && usermod -a -G docker dd-agent && usermod -a -G systemd-journal dd-agent && systemctl restart datadog-agent"
+          end
+
+          it "installs agent config file without security" do
+            agent_config = user_data['write_files'].find do |f|
+              f['path'] == '/etc/datadog-agent/datadog.yaml'
+            end
+            agent_config_hash = YAML.load(agent_config['content'])
+            expect(agent_config_hash['api_key']).to eq(api_key)
+            expect(agent_config_hash['logs_enabled']).to eq(true)
+            expect(agent_config_hash.dig('runtime_security_config', 'enabled')).to be_nil
+          end
+
+          it "dosn't installs system-probe config file" do
+            agent_config = user_data['write_files'].find do |f|
+              f['path'] == '/etc/datadog-agent/system-probe.yaml'
+            end
+            expect(agent_config).to be_nil
+          end
+
+          it "dosn't installs security config file" do
+            agent_config = user_data['write_files'].find do |f|
+              f['path'] == '/etc/datadog-agent/security-agent.yaml'
+            end
+            expect(agent_config).to be_nil
+          end
         end
 
         context "when hooked with network_stack_template trigger" do
@@ -95,6 +130,39 @@ module Barcelona
             expect(security_agent_config_hash['runtime_security_config']['enabled']).to eq(true)
             expect(security_agent_config_hash['compliance_config']['enabled']).to eq(true)
             expect(security_agent_config_hash['compliance_config']['host_benchmarks']['enabled']).to eq(true)
+          end
+
+          context "when security switch is off" do
+            let(:security_enabled) { nil }
+
+            it "gets hooked with container_instance_user_data trigger" do
+              expect(user_data["runcmd"].last).to eq "DD_RUNTIME_SECURITY_CONFIG_ENABLED=true DD_AGENT_MAJOR_VERSION=7 DD_API_KEY=abcdef bash -c \"$(curl -L https://raw.githubusercontent.com/DataDog/datadog-agent/master/cmd/agent/install_script.sh)\" &&  usermod -a -G systemd-journal dd-agent && systemctl restart datadog-agent"
+            end
+
+            it "installs agent config file without security" do
+              agent_config = user_data['write_files'].find do |f|
+                f['path'] == '/etc/datadog-agent/datadog.yaml'
+              end
+              agent_config_hash = YAML.load(agent_config['content'])
+              expect(agent_config_hash['api_key']).to eq(api_key)
+              expect(agent_config_hash['logs_enabled']).to eq(true)
+              expect(agent_config_hash['tags'].last).to eq('role:bastion')
+              expect(agent_config_hash.dig('runtime_security_config', 'enabled')).to be_nil
+            end
+
+            it "dosn't installs system-probe config file" do
+              agent_config = user_data['write_files'].find do |f|
+                f['path'] == '/etc/datadog-agent/system-probe.yaml'
+              end
+              expect(agent_config).to be_nil
+            end
+
+            it "dosn't installs security config file" do
+              agent_config = user_data['write_files'].find do |f|
+                f['path'] == '/etc/datadog-agent/security-agent.yaml'
+              end
+              expect(agent_config).to be_nil
+            end
           end
         end
       end
