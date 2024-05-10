@@ -1,12 +1,17 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"time"
 
 	ps "github.com/mitchellh/go-ps"
 )
+
+const StartupTimeoutSeconds = 3 * 60
+const RunTimeoutHours = 24
+const TickIntervalSeconds = 5
 
 func otherSessionRunning(processes []ps.Process) (ps.Process, error) {
 	for _, p := range processes {
@@ -27,9 +32,9 @@ func otherSessionRunning(processes []ps.Process) (ps.Process, error) {
 func watchInteractiveSession() {
 	log.Println("Interactive run watcher started")
 
-	startTimeout := time.After(30 * time.Second)
-	runTimeout := time.After(24 * time.Hour)
-	tick := time.Tick(5 * time.Second)
+	startTimeout := time.After(StartupTimeoutSeconds * time.Second)
+	runTimeout := time.After(RunTimeoutHours * time.Hour)
+	tick := time.Tick(TickIntervalSeconds * time.Second)
 	sessionStarted := false
 	for {
 		select {
@@ -54,11 +59,11 @@ func watchInteractiveSession() {
 			}
 		case <-startTimeout:
 			if !sessionStarted {
-				log.Println("Interactive session has not started for 30 seconds")
+				log.Println(fmt.Sprintf("Interactive session has not started for %d seconds", StartupTimeoutSeconds))
 				os.Exit(2)
 			}
 		case <-runTimeout:
-			log.Println("Interactive session has run for over 24 hours")
+			log.Println(fmt.Sprintf("Interactive session has run for over %d hours", RunTimeoutHours))
 			os.Exit(2)
 		}
 	}
