@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -58,11 +59,11 @@ func watchInteractiveSession() {
 			}
 		case <-startTimeout:
 			if !sessionStarted {
-				log.Printf("Interactive session has not started for %d seconds", StartupTimeoutSeconds)
+				log.Println(fmt.Sprintf("Interactive session has not started for %d seconds", StartupTimeoutSeconds))
 				os.Exit(2)
 			}
 		case <-runTimeout:
-			log.Printf("Interactive session has run for over %d hours", RunTimeoutHours)
+			log.Println(fmt.Sprintf("Interactive session has run for over %d hours", RunTimeoutHours))
 			os.Exit(2)
 		}
 	}
