@@ -5,23 +5,23 @@ module Barcelona
       # Amazon Linux 2 AMI
       # You can see the latest version stored in public SSM parameter store
       # https://ap-northeast-1.console.aws.amazon.com/systems-manager/parameters/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2/description?region=ap-northeast-1
-      # latest info is Version: 114, LastModifiedDate: 2024-05-03T05:52:56.139000+09:00
+      # latest info is Version: 102, LastModifiedDate: 2023-11-18T14:09:53.487000+09:00
       AMI_IDS = {
-        "us-east-1"      => "ami-045602374a1982480",
-        "us-east-2"      => "ami-0665e0e1f1362f164",
-        "us-west-1"      => "ami-077dc9391f73918da",
-        "us-west-2"      => "ami-06883a492f195064e",
-        "eu-west-1"      => "ami-02abe262e357982fe",
-        "eu-west-2"      => "ami-0d3718d9421324fb3",
-        "eu-west-3"      => "ami-0f824bd6298c56797",
-        "eu-central-1"      => "ami-044920fe9a918ee22",
-        "ap-northeast-1"      => "ami-0ce3d93513d1506e7",
-        "ap-northeast-2"      => "ami-0217b147346e48e84",
-        "ap-southeast-1"      => "ami-0b658343569f12708",
-        "ap-southeast-2"      => "ami-04ea1aa4bf2426024",
-        "ca-central-1"      => "ami-043047d3e14a9b434",
-        "ap-south-1"      => "ami-008b777609c202186",
-        "sa-east-1"      => "ami-02ffcda6a2a46008f",
+        "us-east-1"      => "ami-0588935a949f9ff17",
+        "us-east-2"      => "ami-0e4bab9adfcf464b1",
+        "us-west-1"      => "ami-0839bf007aad25236",
+        "us-west-2"      => "ami-0319ef1a70c93d5c8",
+        "eu-west-1"      => "ami-07e85b797329c2bae",
+        "eu-west-2"      => "ami-055c1c5b310817d75",
+        "eu-west-3"      => "ami-0d60e01ba76286b82",
+        "eu-central-1"      => "ami-08be7699a81774dd5",
+        "ap-northeast-1"      => "ami-058d2a108b2600a4f",
+        "ap-northeast-2"      => "ami-066e8b8972bbd816b",
+        "ap-southeast-1"      => "ami-08b96001e0e7a2b81",
+        "ap-southeast-2"      => "ami-018858d4e27f62c2d",
+        "ca-central-1"      => "ami-0866b1e4094c11483",
+        "ap-south-1"      => "ami-06fff02c54a38e17b",
+        "sa-east-1"      => "ami-025a07aa284285222",
       }
 
       def build_resources
