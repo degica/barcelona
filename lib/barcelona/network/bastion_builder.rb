@@ -7,21 +7,21 @@ module Barcelona
       # https://ap-northeast-1.console.aws.amazon.com/systems-manager/parameters/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2/description?region=ap-northeast-1
       # latest info is Version: 102, LastModifiedDate: 2023-11-18T14:09:53.487000+09:00
       AMI_IDS = {
-        "us-east-1"      => "ami-0588935a949f9ff17",
-        "us-east-2"      => "ami-0e4bab9adfcf464b1",
-        "us-west-1"      => "ami-0839bf007aad25236",
-        "us-west-2"      => "ami-0319ef1a70c93d5c8",
-        "eu-west-1"      => "ami-07e85b797329c2bae",
-        "eu-west-2"      => "ami-055c1c5b310817d75",
-        "eu-west-3"      => "ami-0d60e01ba76286b82",
-        "eu-central-1"      => "ami-08be7699a81774dd5",
-        "ap-northeast-1"      => "ami-058d2a108b2600a4f",
-        "ap-northeast-2"      => "ami-066e8b8972bbd816b",
-        "ap-southeast-1"      => "ami-08b96001e0e7a2b81",
-        "ap-southeast-2"      => "ami-018858d4e27f62c2d",
-        "ca-central-1"      => "ami-0866b1e4094c11483",
-        "ap-south-1"      => "ami-06fff02c54a38e17b",
-        "sa-east-1"      => "ami-025a07aa284285222",
+        "us-east-1"      => "ami-070b7c2988d4e2c89",
+        "us-east-2"      => "ami-0ee3e5d4a5112ce6a",
+        "us-west-1"      => "ami-081d1797e14cd5689",
+        "us-west-2"      => "ami-0211c3296405e1021",
+        "eu-west-1"      => "ami-08575e3ae35f313a6",
+        "eu-west-2"      => "ami-07325431fa2186a03",
+        "eu-west-3"      => "ami-028abbfd9ebaa1397",
+        "eu-central-1"      => "ami-084c4dda80be60621",
+        "ap-northeast-1"      => "ami-092957e65e64cc357",
+        "ap-northeast-2"      => "ami-0c8473b13e378f410",
+        "ap-southeast-1"      => "ami-0fe5e4fe8e0b4152c",
+        "ap-southeast-2"      => "ami-061e2848f084ca460",
+        "ca-central-1"      => "ami-0360d610188302fee",
+        "ap-south-1"      => "ami-03c3ac54a88879408",
+        "sa-east-1"      => "ami-0b62c1cd4293cf9af",
       }
 
       def build_resources
