@@ -73,8 +73,8 @@ class ReviewApp < ApplicationRecord
     ]
   end
 
-  # replace underscores and downcase - not valid as subdomain
+  # replace dots & underscores and downcase - not valid as subdomain
   def sanitized_subject
-    subject.downcase.gsub('_', '-')
+    subject.downcase.gsub(/[._]/, '-')
   end
 end

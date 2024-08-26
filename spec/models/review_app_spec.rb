@@ -39,7 +39,7 @@ describe ReviewApp do
     context 'when an invalid subject is passed' do
       let(:review_app) {
         group.review_apps.new(
-          subject: "subject_With_Caps_And_Underscores",
+          subject: "subject_With_Caps_And.Underscores",
           image_name: "image",
           image_tag: "tag",
           retention: 12 * 3600,
@@ -57,7 +57,7 @@ describe ReviewApp do
         expect{review_app.save!}.to_not raise_error
       end
 
-      it "converts the underscores to hyphens" do
+      it "converts the dots and underscores to hyphens" do
         expect(review_app.to_param).to eq('subject-with-caps-and-underscores')
         expect(review_app.slug).to eq('review---subject-with-caps-and-underscores')
       end
