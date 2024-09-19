@@ -11,7 +11,24 @@ describe HeritageTaskDefinition do
       }
     }
   }
-
+  let(:expected_log_configuration_for_runpack) {
+    {
+      log_driver: "json-file",
+      options: {
+        "max-size": "10m",
+        "max-file": "10"
+      }
+    }
+  }
+  let(:expected_log_configuration_for_runpack2) {
+    {
+      "LogDriver" => "json-file",
+      "Options" => {
+        "max-size": "10m",
+        "max-file": "10"
+      }
+    }
+  }
   describe ".service_definition" do
     subject { described_class.service_definition(service).to_task_definition }
     let(:district) { create :district }
@@ -52,7 +69,7 @@ describe HeritageTaskDefinition do
                                   essential: false,
                                   image: "public.ecr.aws/degica/barcelona-run-pack",
                                   environment: [],
-                                  log_configuration: expected_log_configuration
+                                  log_configuration: expected_log_configuration_for_runpack
                                 }
                               ]
                             })
@@ -105,7 +122,7 @@ describe HeritageTaskDefinition do
                                     essential: false,
                                     image: "public.ecr.aws/degica/barcelona-run-pack",
                                     environment: [],
-                                    log_configuration: expected_log_configuration
+                                    log_configuration: expected_log_configuration_for_runpack
                                   },
                                   {
                                     name: "#{service.service_name}-revpro",
@@ -197,7 +214,7 @@ describe HeritageTaskDefinition do
                                     essential: false,
                                     image: "public.ecr.aws/degica/barcelona-run-pack",
                                     environment: [],
-                                    log_configuration: expected_log_configuration
+                                    log_configuration: expected_log_configuration_for_runpack
                                   },
                                   {
                                     name: "#{service.service_name}-revpro",
@@ -283,7 +300,7 @@ describe HeritageTaskDefinition do
                                   essential: false,
                                   image: "public.ecr.aws/degica/barcelona-run-pack",
                                   environment: [],
-                                  log_configuration: expected_log_configuration
+                                  log_configuration: expected_log_configuration_for_runpack
                                 }
                               ]
                             })
@@ -352,7 +369,7 @@ describe HeritageTaskDefinition do
                                   "Essential" => false,
                                   "Image" => "public.ecr.aws/degica/barcelona-run-pack",
                                   "Environment" => [],
-                                  "LogConfiguration" => expected_log_configuration
+                                  "LogConfiguration" => expected_log_configuration_for_runpack2
                                 }
                               ]
                             })

@@ -141,8 +141,16 @@ class HeritageTaskDefinition
       cpu: 1,
       memory: 16,
       essential: false,
-      image: "public.ecr.aws/degica/barcelona-run-pack"
+      image: "public.ecr.aws/degica/barcelona-run-pack",
+      log_configuration: {
+        log_driver: "json-file",
+        options: {
+          "max-size": "10m",
+          "max-file": "10"
+        }
+      }
     )
+
   end
 
   def reverse_proxy_definition_tcp
