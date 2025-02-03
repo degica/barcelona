@@ -68,7 +68,7 @@ def default_log_format
     '$proxy_protocol_addr - [$time_local] '
     '"$request" $status $body_bytes_sent '
     '"$http_referer" "$http_user_agent"'
-    'rt=$request_time uct="$upstream_connect_time" uht="$upstream_header_time" urt="$upstream_response_time"'
+    'rt=$request_time uct="$upstream_connect_time" uht="$upstream_header_time" urt="$upstream_response_time" uqt="$upstream_queue_time"'
   LOG_FORMAT
 end
 
@@ -77,7 +77,7 @@ def no_query_params_log_format
     '$proxy_protocol_addr - [$time_local] '
     '"$request_method $uri $server_protocol" $status $body_bytes_sent '
     '"$http_user_agent"'
-    'rt=$request_time uct="$upstream_connect_time" uht="$upstream_header_time" urt="$upstream_response_time"'
+    'rt=$request_time uct="$upstream_connect_time" uht="$upstream_header_time" urt="$upstream_response_time" uqt="$upstream_queue_time"'
   LOG_FORMAT
 end
 
