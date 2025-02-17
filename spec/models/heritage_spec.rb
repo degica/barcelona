@@ -120,9 +120,26 @@ describe Heritage::Stack do
 
     context "when a heritage has scheduled tasks" do
       let(:heritage) { build :heritage,
-                             scheduled_tasks: [{schedule: 'rate(1 minute)',
-                                                command: 'rails runner "p :hello"'}]
+                             scheduled_tasks: [
+                                {schedule: 'rate(1 minute)',
+                                  command: 'rails runner "p :hello"'},
+                                {schedule: 'cron(0 0 * * ? *)',
+                                  command: 'rake cron:deliver_extended_jtrans_file',
+                                  external_task_def: 'taskdef_bigmemory:latest'},
+                              ]
       }
+
+      it "generates a correct cloudwatch rules" do
+        generated = JSON.load stack.target!
+        expect(generated["Resources"]["ScheduledEvent0"]["Type"]).to eq("AWS::Events::Rule")
+        input = JSON.parse(generated["Resources"]["ScheduledEvent0"]["Properties"]["Targets"][0]["Input"])
+        expect(input["task_family"]).to eq("#{heritage.name}-schedule")
+
+        expect(generated["Resources"]["ScheduledEvent1"]["Type"]).to eq("AWS::Events::Rule")
+        input = JSON.parse(generated["Resources"]["ScheduledEvent1"]["Properties"]["Targets"][0]["Input"])
+        expect(input["task_family"]).to eq("taskdef_bigmemory:latest")
+      end
+
       it "generates a correct stack template" do
         generated = JSON.load stack.target!
         expect(generated["Resources"]["ScheduleTaskDefinition"]).to be_present

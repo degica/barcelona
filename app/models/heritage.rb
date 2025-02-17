@@ -32,7 +32,7 @@ class Heritage < ActiveRecord::Base
                 "Id" => "barcelona-#{heritage.name}-schedule-event-#{i}",
                 "Input" => {
                   cluster: heritage.district.name,
-                  task_family: "#{heritage.name}-schedule",
+                  task_family: (s["external_task_def"] || "#{heritage.name}-schedule"),
                   command: run_command
                 }.to_json
               }
