@@ -127,7 +127,8 @@ class HeritagesController < ApplicationController
       ],
       scheduled_tasks: [
         :schedule,
-        :command
+        :command,
+        :external_task_def
       ],
       environment: [
         :name,
