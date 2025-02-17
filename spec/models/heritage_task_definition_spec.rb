@@ -349,8 +349,8 @@ describe HeritageTaskDefinition do
                               "ContainerDefinitions" => [
                                 {
                                   "Name" =>  "#{heritage.name}-schedule",
-                                  "Cpu" => 128,
-                                  "Memory" => 512,
+                                  "Cpu" => 512,
+                                  "Memory" => 1512,
                                   "Essential" => true,
                                   "Image" => heritage.image_path,
                                   "Environment" => [],
